@@ -56,7 +56,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 9995,
-        backgroundColor: 'rgba(43, 29, 20, 0.65)',
+        backgroundColor: 'rgba(121, 125, 98, 0.65)',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
@@ -68,11 +68,11 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '560px',
-          backgroundColor: '#FAF5EA',
+          backgroundColor: '#F1DCA7',
           borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: '0 20px 35px rgba(43, 29, 20, 0.25)',
-          border: '2px solid #BAA587',
+          boxShadow: '0 20px 35px rgba(121, 125, 98, 0.25)',
+          border: '2.5px solid #797D62',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
@@ -91,18 +91,18 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Clock size={20} color="#2B1D14" />
-              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#2B1D14' }}>
+              <Clock size={20} color="#797D62" />
+              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#797D62' }}>
                 Daily Price Confirmation
               </h2>
             </div>
-            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#2B1D14' }}>
+            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#797D62' }}>
               روزانہ نرخ نامہ کی تصدیق (24 گھنٹے میں ایک بار)
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2B1D14' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#797D62' }}
           >
             <X size={22} />
           </button>
@@ -114,15 +114,15 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
             padding: '12px 20px',
             backgroundColor: '#F1DCA7',
             fontSize: '13px',
-            color: '#2B1D14',
+            color: '#797D62',
             fontWeight: 700,
-            borderBottom: '1px solid #BAA587',
+            borderBottom: '2px solid #797D62',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
           }}
         >
-          <ShieldCheck size={18} color="#2B1D14" />
+          <ShieldCheck size={18} color="#797D62" />
           <span>
             First bill of the day protocol: Rates must be confirmed before counter sales proceed.
           </span>
@@ -136,7 +136,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
               gridTemplateColumns: '2fr 1fr 1fr',
               fontSize: '12px',
               fontWeight: 800,
-              color: '#2B1D14',
+              color: '#797D62',
               paddingBottom: '4px',
               borderBottom: '1.5px solid #BAA587',
             }}
@@ -158,13 +158,13 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
               }}
             >
               <div>
-                <div style={{ fontWeight: 800, fontSize: '14px', color: '#2B1D14' }}>{item.nameEn}</div>
-                <div className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: '#2B1D14' }}>
+                <div style={{ fontWeight: 800, fontSize: '14px', color: '#797D62' }}>{item.nameEn}</div>
+                <div className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: '#797D62' }}>
                   {item.nameUr}
                 </div>
               </div>
 
-              <div style={{ textAlign: 'center', fontWeight: 700, color: '#2B1D14' }}>
+              <div style={{ textAlign: 'center', fontWeight: 700, color: '#797D62' }}>
                 Rs {item.yesterdayRate}
               </div>
 
@@ -178,9 +178,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                       width: '90px',
                       padding: '8px 10px',
                       borderRadius: '8px',
-                      border: '2px solid #BAA587',
-                      backgroundColor: '#FAF5EA',
-                      color: '#2B1D14',
+                      border: '2.5px solid #797D62',
+                      backgroundColor: '#F1DCA7',
+                      color: '#797D62',
                       fontSize: '16px',
                       fontWeight: 900,
                       fontFamily: 'var(--font-mono)',
@@ -189,7 +189,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                     }}
                   />
                 ) : (
-                  <span style={{ fontWeight: 900, fontSize: '16px', color: '#2B1D14' }}>
+                  <span style={{ fontWeight: 900, fontSize: '16px', color: '#797D62' }}>
                     Rs {item.todayRate}
                   </span>
                 )}
@@ -201,22 +201,22 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
           {!isAdmin && (
             <div
               style={{
-                backgroundColor: '#FAF5EA',
-                border: '1.5px solid #BAA587',
+                backgroundColor: '#F1DCA7',
+                border: '2px solid #797D62',
                 borderRadius: '12px',
                 padding: '14px',
                 marginTop: '10px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={18} color="#2B1D14" />
-                <span style={{ fontWeight: 800, fontSize: '13px', color: '#2B1D14' }}>
+                <AlertCircle size={18} color="#797D62" />
+                <span style={{ fontWeight: 800, fontSize: '13px', color: '#797D62' }}>
                   {billerHoldState
                     ? 'BILL ON HOLD: Price change request sent to Admin!'
                     : 'Biller Notice: You cannot edit rates directly.'}
                 </span>
               </div>
-              <p style={{ fontSize: '12px', color: '#2B1D14', marginTop: '4px', fontWeight: 600 }}>
+              <p style={{ fontSize: '12px', color: '#797D62', marginTop: '4px', fontWeight: 600 }}>
                 {billerHoldState
                   ? 'Counter bill is locked until Admin confirms or rejects new pricing.'
                   : 'Click below to request rate update from Admin or keep previous rates to proceed.'}
@@ -245,8 +245,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   flex: 1,
                   height: '48px',
                   borderRadius: '10px',
-                  backgroundColor: '#2B1D14',
-                  color: '#FAF5EA',
+                  backgroundColor: '#797D62',
+                  color: '#F1DCA7',
                   border: 'none',
                   fontSize: '15px',
                   fontWeight: 800,
@@ -257,7 +257,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   gap: '8px',
                 }}
               >
-                {confirmed ? <CheckCircle2 size={18} color="#FAF5EA" /> : <Save size={18} color="#FAF5EA" />}
+                {confirmed ? <CheckCircle2 size={18} color="#F1DCA7" /> : <Save size={18} color="#F1DCA7" />}
                 {confirmed ? 'Prices Confirmed & Logged!' : 'Confirm & Apply Today’s Rates'}
               </button>
 
@@ -269,9 +269,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   height: '48px',
                   padding: '0 16px',
                   borderRadius: '10px',
-                  backgroundColor: '#FAF5EA',
-                  color: '#2B1D14',
-                  border: '1.5px solid #BAA587',
+                  backgroundColor: '#F1DCA7',
+                  color: '#797D62',
+                  border: '2px solid #797D62',
                   fontSize: '14px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -290,8 +290,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   flex: 1,
                   height: '48px',
                   borderRadius: '10px',
-                  backgroundColor: '#2B1D14',
-                  color: '#FAF5EA',
+                  backgroundColor: '#797D62',
+                  color: '#F1DCA7',
                   border: 'none',
                   fontSize: '14px',
                   fontWeight: 800,
@@ -308,9 +308,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   height: '48px',
                   padding: '0 16px',
                   borderRadius: '10px',
-                  backgroundColor: '#FAF5EA',
-                  color: '#2B1D14',
-                  border: '1.5px solid #BAA587',
+                  backgroundColor: '#F1DCA7',
+                  color: '#797D62',
+                  border: '2px solid #797D62',
                   fontSize: '14px',
                   fontWeight: 700,
                   cursor: 'pointer',

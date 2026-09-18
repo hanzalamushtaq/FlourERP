@@ -53,7 +53,7 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        backgroundColor: 'rgba(43, 29, 20, 0.65)',
+        backgroundColor: 'rgba(121, 125, 98, 0.65)',
         backdropFilter: 'blur(12px)',
         display: 'flex',
         flexDirection: 'column',
@@ -66,11 +66,11 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
         style={{
           width: '100%',
           maxWidth: '360px',
-          backgroundColor: '#FAF5EA',
+          backgroundColor: '#F1DCA7',
           borderRadius: '16px',
           padding: '28px 24px',
-          boxShadow: '0 20px 35px rgba(43, 29, 20, 0.25)',
-          border: '2px solid #BAA587',
+          boxShadow: '0 20px 35px rgba(121, 125, 98, 0.25)',
+          border: '2.5px solid #797D62',
           textAlign: 'center',
           animation: error ? 'shake 0.4s ease' : 'none',
         }}
@@ -81,9 +81,9 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             width: '60px',
             height: '60px',
             borderRadius: '9999px',
-            backgroundColor: '#2B1D14',
-            border: '1.5px solid #2B1D14',
-            color: error ? '#FAF5EA' : '#FAF5EA',
+            backgroundColor: '#797D62',
+            border: '1.5px solid #797D62',
+            color: error ? '#F1DCA7' : '#F1DCA7',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -91,24 +91,24 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             transition: 'all 0.2s',
           }}
         >
-          {error ? <ShieldAlert size={30} color="#FAF5EA" /> : <Lock size={30} color="#FAF5EA" />}
+          {error ? <ShieldAlert size={30} color="#F1DCA7" /> : <Lock size={30} color="#F1DCA7" />}
         </div>
 
-        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#2B1D14' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#797D62' }}>
           Terminal Locked
         </h2>
         <p
           className="font-nastaleeq"
           style={{
             fontSize: '19px',
-            color: '#2B1D14',
+            color: '#797D62',
             margin: '4px 0 8px',
             fontWeight: 700,
           }}
         >
           ٹرمینل مقفل ہے — پن درج کریں
         </p>
-        <p style={{ fontSize: '13px', color: '#2B1D14', marginBottom: '20px', fontWeight: 600 }}>
+        <p style={{ fontSize: '13px', color: '#797D62', marginBottom: '20px', fontWeight: 600 }}>
           {staffName} • Enter 4-digit PIN (Demo: 1234)
         </p>
 
@@ -133,7 +133,7 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
                   backgroundColor: error
                     ? '#797D62'
                     : filled
-                    ? '#2B1D14'
+                    ? '#797D62'
                     : '#F1DCA7',
                   border: filled ? 'none' : '2px solid #BAA587',
                   transform: filled ? 'scale(1.15)' : 'scale(1)',
@@ -161,9 +161,9 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
               style={{
                 height: '56px',
                 borderRadius: '12px',
-                backgroundColor: '#FAF5EA',
-                color: '#2B1D14',
-                border: '1.5px solid #BAA587',
+                backgroundColor: '#F1DCA7',
+                color: '#797D62',
+                border: '2px solid #797D62',
                 fontSize: '22px',
                 fontWeight: 800,
                 cursor: 'pointer',
@@ -180,9 +180,9 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             style={{
               height: '56px',
               borderRadius: '12px',
-              backgroundColor: '#FAF5EA',
-              color: '#2B1D14',
-              border: '1.5px solid #BAA587',
+              backgroundColor: '#F1DCA7',
+              color: '#797D62',
+              border: '2px solid #797D62',
               fontSize: '22px',
               fontWeight: 800,
               cursor: 'pointer',
@@ -197,9 +197,9 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             style={{
               height: '56px',
               borderRadius: '12px',
-              backgroundColor: '#2B1D14',
-              color: '#FAF5EA',
-              border: '1.5px solid #2B1D14',
+              backgroundColor: '#797D62',
+              color: '#F1DCA7',
+              border: '1.5px solid #797D62',
               fontSize: '18px',
               fontWeight: 800,
               cursor: 'pointer',

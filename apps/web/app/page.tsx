@@ -27,13 +27,13 @@ export default function Home() {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#FAF5EA', color: '#2B1D14' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F1DCA7', color: '#797D62' }}>
       {/* Top Application Header */}
       <header
         style={{
-          backgroundColor: '#FAF5EA',
-          borderBottom: '2px solid #BAA587',
-          boxShadow: '0 2px 8px rgba(43, 29, 20, 0.08)',
+          backgroundColor: '#F1DCA7',
+          borderBottom: '2.5px solid #797D62',
+          boxShadow: '0 3px 10px rgba(121, 125, 98, 0.2)',
           position: 'sticky',
           top: 0,
           zIndex: 1000,
@@ -43,46 +43,46 @@ export default function Home() {
           style={{
             maxWidth: '1280px',
             margin: '0 auto',
-            padding: '8px 20px',
+            padding: '10px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '10px',
+            gap: '12px',
           }}
         >
           {/* Logo & Shop Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div
               style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                backgroundColor: '#2B1D14',
-                border: '1.5px solid #2B1D14',
-                color: '#FAF5EA',
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                backgroundColor: '#797D62',
+                border: '2px solid #797D62',
+                color: '#F1DCA7',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Wheat size={22} strokeWidth={2.4} />
+              <Wheat size={26} strokeWidth={2.6} color="#F1DCA7" />
             </div>
 
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '20px', fontWeight: 900, color: '#2B1D14', letterSpacing: '-0.5px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#797D62', letterSpacing: '-0.5px' }}>
                   FlourERP
                 </span>
                 <span
                   style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    padding: '2px 8px',
+                    fontSize: '12px',
+                    fontWeight: 900,
+                    padding: '3px 10px',
                     borderRadius: '9999px',
-                    backgroundColor: '#F1DCA7',
-                    color: '#2B1D14',
-                    border: '1px solid #BAA587',
+                    backgroundColor: '#FFCB69',
+                    color: '#797D62',
+                    border: '1.5px solid #797D62',
                   }}
                 >
                   ONLINE
@@ -91,9 +91,9 @@ export default function Home() {
               <div
                 className="font-nastaleeq"
                 style={{
-                  fontSize: '20px',
-                  fontWeight: 700,
-                  color: '#2B1D14',
+                  fontSize: '24px',
+                  fontWeight: 900,
+                  color: '#797D62',
                   lineHeight: 1.2,
                 }}
               >
@@ -110,20 +110,21 @@ export default function Home() {
               onClick={() => setIsPriceModalOpen(true)}
               className="touch-active"
               style={{
-                padding: '8px 14px',
-                borderRadius: '10px',
-                backgroundColor: '#F1DCA7',
-                color: '#2B1D14',
-                border: '1.5px solid #BAA587',
-                fontSize: '13px',
-                fontWeight: 700,
+                padding: '10px 16px',
+                borderRadius: '12px',
+                backgroundColor: '#E8AC65',
+                color: '#797D62',
+                border: '2px solid #797D62',
+                fontSize: '15px',
+                fontWeight: 900,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '8px',
+                boxShadow: '0 2px 6px rgba(121, 125, 98, 0.15)',
               }}
             >
-              <Clock size={16} color="#2B1D14" /> Daily Prices (نرخ نامہ)
+              <Clock size={18} color="#797D62" strokeWidth={2.5} /> Daily Prices (نرخ نامہ)
             </button>
 
             {/* Role Switcher Pill */}
@@ -131,22 +132,22 @@ export default function Home() {
               style={{
                 display: 'flex',
                 backgroundColor: '#F1DCA7',
-                padding: '3px',
-                borderRadius: '10px',
-                border: '1px solid #BAA587',
+                padding: '4px',
+                borderRadius: '12px',
+                border: '2px solid #797D62',
               }}
             >
               <button
                 type="button"
                 onClick={() => setUserRole('biller')}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: '7px',
-                  border: 'none',
-                  backgroundColor: userRole === 'biller' ? '#2B1D14' : 'transparent',
-                  color: userRole === 'biller' ? '#FAF5EA' : '#2B1D14',
-                  fontWeight: 700,
-                  fontSize: '12px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: userRole === 'biller' ? '1.5px solid #797D62' : 'none',
+                  backgroundColor: userRole === 'biller' ? '#797D62' : 'transparent',
+                  color: userRole === 'biller' ? '#F1DCA7' : '#797D62',
+                  fontWeight: 900,
+                  fontSize: '14px',
                   cursor: 'pointer',
                 }}
               >
@@ -156,13 +157,13 @@ export default function Home() {
                 type="button"
                 onClick={() => setUserRole('admin')}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: '7px',
-                  border: 'none',
-                  backgroundColor: userRole === 'admin' ? '#2B1D14' : 'transparent',
-                  color: userRole === 'admin' ? '#FAF5EA' : '#2B1D14',
-                  fontWeight: 700,
-                  fontSize: '12px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: userRole === 'admin' ? '1.5px solid #797D62' : 'none',
+                  backgroundColor: userRole === 'admin' ? '#797D62' : 'transparent',
+                  color: userRole === 'admin' ? '#F1DCA7' : '#797D62',
+                  fontWeight: 900,
+                  fontSize: '14px',
                   cursor: 'pointer',
                 }}
               >
@@ -176,42 +177,43 @@ export default function Home() {
               onClick={() => setIsLocked(true)}
               className="touch-active"
               style={{
-                padding: '8px 12px',
-                borderRadius: '10px',
-                backgroundColor: '#2B1D14',
-                color: '#FAF5EA',
-                border: '1.5px solid #2B1D14',
-                fontSize: '13px',
-                fontWeight: 700,
+                padding: '10px 16px',
+                borderRadius: '12px',
+                backgroundColor: '#D08C60',
+                color: '#F1DCA7',
+                border: '2px solid #797D62',
+                fontSize: '15px',
+                fontWeight: 900,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '8px',
+                boxShadow: '0 2px 6px rgba(121, 125, 98, 0.15)',
               }}
               title="Lock Terminal"
             >
-              <Lock size={15} color="#FAF5EA" /> Lock PIN
+              <Lock size={17} color="#F1DCA7" strokeWidth={2.5} /> Lock PIN
             </button>
           </div>
         </div>
 
-        {/* Big, Clear Navigation Tabs */}
+        {/* Big, Clear Navigation Tabs for Weak Eyesight */}
         <div
           style={{
             maxWidth: '1280px',
             margin: '0 auto',
-            padding: '0 24px',
+            padding: '6px 20px 10px',
             display: 'flex',
-            gap: '8px',
+            gap: '10px',
             overflowX: 'auto',
           }}
         >
           {[
-            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={19} /> },
-            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={19} /> },
-            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={19} /> },
-            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={19} /> },
-            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={19} /> },
+            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={20} strokeWidth={2.5} /> },
+            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={20} strokeWidth={2.5} /> },
+            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={20} strokeWidth={2.5} /> },
+            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={20} strokeWidth={2.5} /> },
+            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={20} strokeWidth={2.5} /> },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -219,25 +221,26 @@ export default function Home() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
+                className="touch-active"
                 style={{
-                  padding: '8px 14px',
-                  border: 'none',
-                  background: 'none',
+                  padding: '9px 18px',
+                  borderRadius: '12px',
+                  border: isActive ? '2.5px solid #797D62' : '2px solid #9B9B7A',
+                  backgroundColor: isActive ? '#FFCB69' : '#F1DCA7',
+                  color: '#797D62',
                   cursor: 'pointer',
-                  borderBottom: isActive ? '3px solid #E8AC65' : '3px solid transparent',
-                  color: isActive ? '#2B1D14' : '#797D62',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  fontWeight: isActive ? 800 : 700,
-                  fontSize: '14px',
+                  gap: '8px',
+                  fontWeight: 900,
+                  fontSize: '15px',
                   whiteSpace: 'nowrap',
-                  transition: 'all 0.12s ease',
+                  boxShadow: isActive ? '0 3px 8px rgba(121, 125, 98, 0.25)' : 'none',
                 }}
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: isActive ? '#2B1D14' : '#BAA587' }}>
+                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, color: '#797D62' }}>
                   ({tab.ur})
                 </span>
               </button>

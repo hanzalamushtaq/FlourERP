@@ -39,9 +39,9 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         justifyContent: 'space-between',
         padding: '16px 14px',
         borderRadius: '16px',
-        backgroundColor: isSelected ? '#F1DCA7' : '#FAF5EA',
-        border: isSelected ? '3px solid #E8AC65' : '1.5px solid #BAA587',
-        boxShadow: isSelected ? '0 8px 18px rgba(43, 29, 20, 0.22)' : '0 2px 8px rgba(43, 29, 20, 0.08)',
+        backgroundColor: isSelected ? '#FFCB69' : '#F1DCA7',
+        border: isSelected ? '3.5px solid #797D62' : '2px solid #797D62',
+        boxShadow: isSelected ? '0 8px 18px rgba(121, 125, 98, 0.3)' : '0 2px 8px rgba(121, 125, 98, 0.12)',
         cursor: 'pointer',
         minHeight: '135px',
         opacity: isRateSet ? 1 : 0.85,
@@ -58,19 +58,19 @@ export const TouchCard: React.FC<TouchCardProps> = ({
       >
         <div
           style={{
-            width: '40px',
-            height: '40px',
+            width: '42px',
+            height: '42px',
             borderRadius: '10px',
             backgroundColor: isSelected ? '#E8AC65' : '#F1DCA7',
-            border: isSelected ? '1px solid #E8AC65' : '1px solid #BAA587',
-            color: isSelected ? '#2B1D14' : '#2B1D14',
+            border: '2px solid #797D62',
+            color: '#797D62',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '20px',
+            fontSize: '22px',
           }}
         >
-          {product.icon || <Wheat size={22} />}
+          {product.icon || <Wheat size={24} />}
         </div>
 
         {/* Selected Checkmark */}
@@ -80,17 +80,17 @@ export const TouchCard: React.FC<TouchCardProps> = ({
               position: 'absolute',
               top: '12px',
               right: '12px',
-              width: '24px',
-              height: '24px',
+              width: '26px',
+              height: '26px',
               borderRadius: '9999px',
-              backgroundColor: '#E8AC65',
-              color: '#FAF5EA',
+              backgroundColor: '#797D62',
+              color: '#F1DCA7',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Check size={16} strokeWidth={3} />
+            <Check size={18} strokeWidth={3} />
           </div>
         )}
 
@@ -98,13 +98,13 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         {isRateSet ? (
           <div
             style={{
-              padding: '4px 10px',
+              padding: '5px 12px',
               borderRadius: '9999px',
-              backgroundColor: isSelected ? '#FFCB69' : '#FAF5EA',
-              color: '#2B1D14',
-              fontWeight: 800,
-              fontSize: '14px',
-              border: isSelected ? '1.5px solid #E8AC65' : '1px solid #BAA587',
+              backgroundColor: isSelected ? '#E8AC65' : '#F1DCA7',
+              color: '#797D62',
+              fontWeight: 900,
+              fontSize: '15px',
+              border: '2px solid #797D62',
             }}
           >
             Rs {product.ratePerKg}/KG
@@ -115,16 +115,16 @@ export const TouchCard: React.FC<TouchCardProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              padding: '4px 8px',
+              padding: '5px 10px',
               borderRadius: '9999px',
-              backgroundColor: '#FAF5EA',
-              color: '#2B1D14',
-              border: '1px solid #BAA587',
-              fontWeight: 700,
-              fontSize: '12px',
+              backgroundColor: '#F1DCA7',
+              color: '#797D62',
+              border: '2px solid #797D62',
+              fontWeight: 900,
+              fontSize: '13px',
             }}
           >
-            <AlertTriangle size={14} color="#2B1D14" /> Rate Unset
+            <AlertTriangle size={15} color="#797D62" /> Rate Unset
           </div>
         )}
       </div>
@@ -134,23 +134,17 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         <div
           className="font-nastaleeq"
           style={{
-            fontSize: '26px',
-            fontWeight: 700,
-            color: '#2B1D14',
+            fontSize: '28px',
+            fontWeight: 900,
+            color: '#797D62',
             textAlign: 'right',
-            marginBottom: '2px',
-            letterSpacing: '0.5px',
+            lineHeight: 1.2,
           }}
         >
           {product.nameUr}
         </div>
-        <div
-          style={{
-            fontSize: '14px',
-            fontWeight: 700,
-            color: '#2B1D14',
-          }}
-        >
+
+        <div style={{ fontSize: '14px', fontWeight: 900, color: '#797D62' }}>
           {product.nameEn}
         </div>
       </div>

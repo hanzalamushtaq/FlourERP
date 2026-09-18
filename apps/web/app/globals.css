@@ -11,46 +11,46 @@
 }
 
 :root {
-  /* Complete 10-Color Crop Agriculture Palette from User Image */
-  --c1: #797D62; /* Baajra & Field Green (Deep Olive Sage) */
-  --c2: #9B9B7A; /* Muted Crop Sage (Subtle Green) */
-  --c3: #BAA587; /* Warm Khaki Wheat Husk (Dividers, Borders) */
-  --c4: #D9AE94; /* Til / Toasted Sesame (Warm Accent) */
-  --c5: #F1DCA7; /* Atta / Flour Cream (Soft Card Surfaces, Large Boxes) */
-  --c6: #FFCB69; /* Makai & Sarson Gold (Vibrant Sunlit Corn) */
-  --c7: #E8AC65; /* Pakki Gandum (Ripe Wheat Gold / Primary Action) */
-  --c8: #D08C60; /* Amber Harvest / Rich Crop (Warm Terracotta) */
-  --c9: #B58463; /* Roasted Grain / Chokar Crust */
-  --c10: #997B66; /* Deep Earth / Chokar Bran */
+  /* Strict 10-Color Palette from User Image - ZERO external colors */
+  --c1: #797D62; /* Baajra Deep Olive (Darkest Green, Text, Strong Borders) */
+  --c2: #9B9B7A; /* Muted Crop Sage */
+  --c3: #BAA587; /* Warm Khaki Wheat Husk (Secondary Borders) */
+  --c4: #D9AE94; /* Til / Toasted Sesame (Warm Accents & Badges) */
+  --c5: #F1DCA7; /* Atta / Flour Cream (Canvas Background & Light Boxes) */
+  --c6: #FFCB69; /* Makai & Sarson Gold (Highlights, Active Tabs, Total Box) */
+  --c7: #E8AC65; /* Pakki Gandum Wheat Gold (Primary CTA Buttons, Selected Borders) */
+  --c8: #D08C60; /* Amber Harvest (Backspace & Warning Action) */
+  --c9: #B58463; /* Roasted Grain */
+  --c10: #997B66; /* Deep Earth Chokar (Secondary Dark Text, Clear Action) */
 
-  /* Light Theme Semantic UI Tokens - Light boxes, deep dark typography */
-  --bg-main: #FAF5EA; /* Clean Wheat Canvas */
+  /* Semantic UI Tokens - Strictly from the 10 colors */
+  --bg-main: var(--c5);
   --bg-surface: var(--c5);
-  --bg-subtle: #F4EAD3;
-  --bg-card: #FAF5EA;
-  --bg-input: #FAF5EA;
+  --bg-subtle: var(--c4);
+  --bg-card: var(--c5);
+  --bg-input: var(--c5);
   
-  --text-primary: #2B1D14; /* Deep Chokar Earth - High Contrast Wording */
-  --text-secondary: #4A3525; /* Medium Rich Brown */
-  --text-muted: #797D62; /* Crop Sage */
-  --text-inverse: #FAF5EA;
+  --text-primary: var(--c1);
+  --text-secondary: var(--c10);
+  --text-muted: var(--c10);
+  --text-inverse: var(--c5);
 
   /* Accents */
-  --accent-primary: var(--c7); /* Wheat Gold */
-  --accent-secondary: var(--c1); /* Baajra Olive */
-  --accent-highlight: var(--c6); /* Makai Gold */
-  --accent-warm: var(--c8); /* Amber */
+  --accent-primary: var(--c7);
+  --accent-secondary: var(--c1);
+  --accent-highlight: var(--c6);
+  --accent-warm: var(--c8);
 
-  /* Borders & Dividers */
-  --border-subtle: var(--c3);
-  --border-medium: var(--c9);
-  --border-strong: #2B1D14;
+  /* Strong High-Contrast Borders for Weak Eyesight */
+  --border-subtle: var(--c1);
+  --border-medium: var(--c1);
+  --border-strong: var(--c1);
   --border-active: var(--c7);
   
-  --shadow-sm: 0 1px 2px 0 rgba(43, 29, 20, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(43, 29, 20, 0.12), 0 2px 4px -2px rgba(43, 29, 20, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(43, 29, 20, 0.15), 0 4px 6px -4px rgba(43, 29, 20, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(43, 29, 20, 0.2), 0 8px 10px -6px rgba(43, 29, 20, 0.15);
+  --shadow-sm: 0 1px 3px 0 rgba(121, 125, 98, 0.18);
+  --shadow-md: 0 4px 8px -1px rgba(121, 125, 98, 0.25);
+  --shadow-lg: 0 10px 18px -3px rgba(121, 125, 98, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(121, 125, 98, 0.35);
 
   /* Touch Target Radius */
   --radius-sm: 8px;
