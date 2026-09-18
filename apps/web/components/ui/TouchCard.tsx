@@ -39,9 +39,9 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         justifyContent: 'space-between',
         padding: '16px 14px',
         borderRadius: '16px',
-        backgroundColor: isSelected ? '#C8D5B9' : '#FAF3DD',
-        border: isSelected ? '3px solid #4A7C59' : '1.5px solid #8FC0A9',
-        boxShadow: isSelected ? '0 8px 18px rgba(74, 124, 89, 0.22)' : '0 2px 8px rgba(74, 124, 89, 0.08)',
+        backgroundColor: isSelected ? '#E6CCB2' : '#EDE0D4',
+        border: isSelected ? '3px solid #7F5539' : '1.5px solid #DDB892',
+        boxShadow: isSelected ? '0 8px 18px rgba(127, 85, 57, 0.22)' : '0 2px 8px rgba(127, 85, 57, 0.08)',
         cursor: 'pointer',
         minHeight: '135px',
         opacity: isRateSet ? 1 : 0.85,
@@ -61,9 +61,9 @@ export const TouchCard: React.FC<TouchCardProps> = ({
             width: '40px',
             height: '40px',
             borderRadius: '10px',
-            backgroundColor: isSelected ? '#4A7C59' : '#C8D5B9',
-            border: isSelected ? '1px solid #4A7C59' : '1px solid #8FC0A9',
-            color: isSelected ? '#FAF3DD' : '#4A7C59',
+            backgroundColor: isSelected ? '#7F5539' : '#E6CCB2',
+            border: isSelected ? '1px solid #7F5539' : '1px solid #DDB892',
+            color: isSelected ? '#EDE0D4' : '#7F5539',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -83,8 +83,8 @@ export const TouchCard: React.FC<TouchCardProps> = ({
               width: '24px',
               height: '24px',
               borderRadius: '9999px',
-              backgroundColor: '#4A7C59',
-              color: '#FAF3DD',
+              backgroundColor: '#7F5539',
+              color: '#EDE0D4',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -100,11 +100,11 @@ export const TouchCard: React.FC<TouchCardProps> = ({
             style={{
               padding: '4px 10px',
               borderRadius: '9999px',
-              backgroundColor: isSelected ? '#FAF3DD' : '#C8D5B9',
-              color: '#4A7C59',
+              backgroundColor: isSelected ? '#EDE0D4' : '#E6CCB2',
+              color: '#7F5539',
               fontWeight: 800,
               fontSize: '14px',
-              border: isSelected ? '1.5px solid #4A7C59' : '1px solid #8FC0A9',
+              border: isSelected ? '1.5px solid #7F5539' : '1px solid #DDB892',
             }}
           >
             Rs {product.ratePerKg}/KG
@@ -117,14 +117,14 @@ export const TouchCard: React.FC<TouchCardProps> = ({
               gap: '4px',
               padding: '4px 8px',
               borderRadius: '9999px',
-              backgroundColor: '#FAF3DD',
-              color: '#4A7C59',
-              border: '1px solid #8FC0A9',
+              backgroundColor: '#EDE0D4',
+              color: '#7F5539',
+              border: '1px solid #DDB892',
               fontWeight: 700,
               fontSize: '12px',
             }}
           >
-            <AlertTriangle size={14} color="#4A7C59" /> Rate Unset
+            <AlertTriangle size={14} color="#7F5539" /> Rate Unset
           </div>
         )}
       </div>
@@ -136,7 +136,7 @@ export const TouchCard: React.FC<TouchCardProps> = ({
           style={{
             fontSize: '26px',
             fontWeight: 700,
-            color: '#4A7C59',
+            color: '#7F5539',
             textAlign: 'right',
             marginBottom: '2px',
             letterSpacing: '0.5px',
@@ -148,7 +148,7 @@ export const TouchCard: React.FC<TouchCardProps> = ({
           style={{
             fontSize: '14px',
             fontWeight: 700,
-            color: '#4A7C59',
+            color: '#7F5539',
           }}
         >
           {product.nameEn}

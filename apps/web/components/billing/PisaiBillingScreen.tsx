@@ -128,9 +128,9 @@ export const PisaiBillingScreen: React.FC = () => {
           style={{
             padding: '8px 14px',
             borderRadius: '12px',
-            backgroundColor: serviceType === 'safai_pisai' ? '#C8D5B9' : '#FAF3DD',
-            border: serviceType === 'safai_pisai' ? '2.5px solid #4A7C59' : '1.5px solid #8FC0A9',
-            boxShadow: serviceType === 'safai_pisai' ? '0 4px 10px rgba(74, 124, 89, 0.2)' : 'none',
+            backgroundColor: serviceType === 'safai_pisai' ? '#E6CCB2' : '#EDE0D4',
+            border: serviceType === 'safai_pisai' ? '2.5px solid #7F5539' : '1.5px solid #DDB892',
+            boxShadow: serviceType === 'safai_pisai' ? '0 4px 10px rgba(127, 85, 57, 0.2)' : 'none',
             cursor: 'pointer',
             display: 'flex',
             justifyContent: 'space-between',
@@ -138,12 +138,12 @@ export const PisaiBillingScreen: React.FC = () => {
           }}
         >
           <div>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#4A7C59' }}>FULL SERVICE</span>
-            <div className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#4A7C59', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#7F5539' }}>FULL SERVICE</span>
+            <div className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#7F5539', lineHeight: 1.2 }}>
               صفائی اور پیسائی
             </div>
           </div>
-          {serviceType === 'safai_pisai' && <Check size={16} color="#4A7C59" strokeWidth={3} />}
+          {serviceType === 'safai_pisai' && <Check size={16} color="#7F5539" strokeWidth={3} />}
         </div>
 
         <div
@@ -152,9 +152,9 @@ export const PisaiBillingScreen: React.FC = () => {
           style={{
             padding: '8px 14px',
             borderRadius: '12px',
-            backgroundColor: serviceType === 'pisai' ? '#C8D5B9' : '#FAF3DD',
-            border: serviceType === 'pisai' ? '2.5px solid #4A7C59' : '1.5px solid #8FC0A9',
-            boxShadow: serviceType === 'pisai' ? '0 4px 10px rgba(74, 124, 89, 0.2)' : 'none',
+            backgroundColor: serviceType === 'pisai' ? '#E6CCB2' : '#EDE0D4',
+            border: serviceType === 'pisai' ? '2.5px solid #7F5539' : '1.5px solid #DDB892',
+            boxShadow: serviceType === 'pisai' ? '0 4px 10px rgba(127, 85, 57, 0.2)' : 'none',
             cursor: 'pointer',
             display: 'flex',
             justifyContent: 'space-between',
@@ -162,22 +162,22 @@ export const PisaiBillingScreen: React.FC = () => {
           }}
         >
           <div>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#4A7C59' }}>GRINDING ONLY</span>
-            <div className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#4A7C59', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#7F5539' }}>GRINDING ONLY</span>
+            <div className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#7F5539', lineHeight: 1.2 }}>
               صرف پیسائی
             </div>
           </div>
-          {serviceType === 'pisai' && <Check size={16} color="#4A7C59" strokeWidth={3} />}
+          {serviceType === 'pisai' && <Check size={16} color="#7F5539" strokeWidth={3} />}
         </div>
       </div>
 
       {/* 2. ENTRY CARD */}
       <div
         style={{
-          backgroundColor: '#FAF3DD',
+          backgroundColor: '#EDE0D4',
           borderRadius: '16px',
-          border: '2px solid #8FC0A9',
-          boxShadow: '0 6px 16px rgba(74, 124, 89, 0.08)',
+          border: '2px solid #DDB892',
+          boxShadow: '0 6px 16px rgba(127, 85, 57, 0.08)',
           padding: '14px 18px',
           display: 'flex',
           flexDirection: 'column',
@@ -188,7 +188,7 @@ export const PisaiBillingScreen: React.FC = () => {
           {/* Left: Inputs for Weight & Manual Charge */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: '#4A7C59', display: 'block', marginBottom: '3px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 800, color: '#7F5539', display: 'block', marginBottom: '3px' }}>
                 Wheat Weight (گندم کا وزن - KG):
               </label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -209,24 +209,24 @@ export const PisaiBillingScreen: React.FC = () => {
                     width: '100%',
                     height: '44px',
                     borderRadius: '10px',
-                    border: '2px solid #8FC0A9',
-                    backgroundColor: '#FAF3DD',
+                    border: '2px solid #DDB892',
+                    backgroundColor: '#EDE0D4',
                     fontSize: '22px',
                     fontWeight: 900,
                     fontFamily: 'var(--font-mono)',
-                    color: '#4A7C59',
+                    color: '#7F5539',
                     padding: '0 45px 0 10px',
                     outline: 'none',
                   }}
                 />
-                <span style={{ position: 'absolute', right: '12px', fontSize: '14px', fontWeight: 900, color: '#4A7C59' }}>
+                <span style={{ position: 'absolute', right: '12px', fontSize: '14px', fontWeight: 900, color: '#7F5539' }}>
                   KG
                 </span>
               </div>
             </div>
 
             <div>
-              <label style={{ fontSize: '12px', fontWeight: 800, color: '#4A7C59', display: 'block', marginBottom: '3px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 800, color: '#7F5539', display: 'block', marginBottom: '3px' }}>
                 Manual Grinding Fee (پیسائی کی اجرت - Rs):
               </label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -249,17 +249,17 @@ export const PisaiBillingScreen: React.FC = () => {
                     width: '100%',
                     height: '44px',
                     borderRadius: '10px',
-                    border: '2px solid #8FC0A9',
-                    backgroundColor: '#FAF3DD',
+                    border: '2px solid #DDB892',
+                    backgroundColor: '#EDE0D4',
                     fontSize: '22px',
                     fontWeight: 900,
                     fontFamily: 'var(--font-mono)',
-                    color: '#4A7C59',
+                    color: '#7F5539',
                     padding: '0 45px 0 10px',
                     outline: 'none',
                   }}
                 />
-                <span style={{ position: 'absolute', right: '12px', fontSize: '14px', fontWeight: 900, color: '#4A7C59' }}>
+                <span style={{ position: 'absolute', right: '12px', fontSize: '14px', fontWeight: 900, color: '#7F5539' }}>
                   Rs
                 </span>
               </div>
@@ -269,15 +269,15 @@ export const PisaiBillingScreen: React.FC = () => {
           {/* Right: Token Preview Card */}
           <div
             style={{
-              backgroundColor: '#C8D5B9',
-              border: '2px dashed #4A7C59',
+              backgroundColor: '#E6CCB2',
+              border: '2px dashed #7F5539',
               borderRadius: '12px',
               padding: '12px',
               textAlign: 'center',
-              boxShadow: '0 4px 12px rgba(74, 124, 89, 0.12)',
+              boxShadow: '0 4px 12px rgba(127, 85, 57, 0.12)',
             }}
           >
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#4A7C59' }}>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#7F5539' }}>
               CUSTOMER TOKEN NUMBER (ٹوکن نمبر)
             </span>
             <div
@@ -285,7 +285,7 @@ export const PisaiBillingScreen: React.FC = () => {
                 fontSize: '42px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: '#4A7C59',
+                color: '#7F5539',
                 lineHeight: 1.1,
                 margin: '2px 0',
                 letterSpacing: '2px',
@@ -293,7 +293,7 @@ export const PisaiBillingScreen: React.FC = () => {
             >
               #{currentTokenPreview}
             </div>
-            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#4A7C59' }}>
+            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#7F5539' }}>
               گندم پیسائی ٹوکن
             </div>
           </div>
@@ -302,10 +302,10 @@ export const PisaiBillingScreen: React.FC = () => {
         {/* 3. Cash Received Row */}
         <div
           style={{
-            backgroundColor: '#FAF3DD',
+            backgroundColor: '#EDE0D4',
             borderRadius: '10px',
             padding: '10px 14px',
-            border: '1.5px solid #8FC0A9',
+            border: '1.5px solid #DDB892',
             display: 'grid',
             gridTemplateColumns: '1.2fr 1fr',
             gap: '12px',
@@ -313,7 +313,7 @@ export const PisaiBillingScreen: React.FC = () => {
           }}
         >
           <div>
-            <label style={{ fontSize: '12px', fontWeight: 900, color: '#4A7C59', display: 'block', marginBottom: '2px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 900, color: '#7F5539', display: 'block', marginBottom: '2px' }}>
               Cash Received (وصول رقم):
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -336,17 +336,17 @@ export const PisaiBillingScreen: React.FC = () => {
                   width: '100%',
                   height: '42px',
                   borderRadius: '8px',
-                  border: '2px solid #8FC0A9',
-                  backgroundColor: '#FAF3DD',
+                  border: '2px solid #DDB892',
+                  backgroundColor: '#EDE0D4',
                   fontSize: '20px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
-                  color: '#4A7C59',
+                  color: '#7F5539',
                   padding: '0 40px 0 10px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '10px', fontSize: '13px', fontWeight: 900, color: '#4A7C59' }}>
+              <span style={{ position: 'absolute', right: '10px', fontSize: '13px', fontWeight: 900, color: '#7F5539' }}>
                 Rs
               </span>
             </div>
@@ -354,22 +354,22 @@ export const PisaiBillingScreen: React.FC = () => {
 
           <div>
             {balanceRemaining > 0 ? (
-              <div style={{ backgroundColor: '#C8D5B9', border: '1.5px solid #8FC0A9', borderRadius: '8px', padding: '6px 10px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#4A7C59' }}>Remaining Balance (باقی):</div>
-                <div style={{ fontSize: '16px', fontWeight: 900, color: '#4A7C59', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#E6CCB2', border: '1.5px solid #DDB892', borderRadius: '8px', padding: '6px 10px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#7F5539' }}>Remaining Balance (باقی):</div>
+                <div style={{ fontSize: '16px', fontWeight: 900, color: '#7F5539', fontFamily: 'var(--font-mono)' }}>
                   Rs {balanceRemaining.toLocaleString()}
                 </div>
               </div>
             ) : changeToReturn > 0 ? (
-              <div style={{ backgroundColor: '#C8D5B9', border: '1.5px solid #8FC0A9', borderRadius: '8px', padding: '6px 10px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#4A7C59' }}>Change to Return (واپسی):</div>
-                <div style={{ fontSize: '16px', fontWeight: 900, color: '#4A7C59', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#E6CCB2', border: '1.5px solid #DDB892', borderRadius: '8px', padding: '6px 10px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#7F5539' }}>Change to Return (واپسی):</div>
+                <div style={{ fontSize: '16px', fontWeight: 900, color: '#7F5539', fontFamily: 'var(--font-mono)' }}>
                   Rs {changeToReturn.toLocaleString()}
                 </div>
               </div>
             ) : (
-              <div style={{ backgroundColor: '#C8D5B9', border: '1.5px solid #8FC0A9', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#4A7C59' }}>✓ Exact Fee Received</div>
+              <div style={{ backgroundColor: '#E6CCB2', border: '1.5px solid #DDB892', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#7F5539' }}>✓ Exact Fee Received</div>
               </div>
             )}
           </div>
@@ -379,8 +379,8 @@ export const PisaiBillingScreen: React.FC = () => {
         <div
           style={{
             position: 'relative',
-            backgroundColor: '#FAF3DD',
-            border: '1.5px solid #8FC0A9',
+            backgroundColor: '#EDE0D4',
+            border: '1.5px solid #DDB892',
             borderRadius: '10px',
             padding: '10px 14px',
             display: 'flex',
@@ -389,10 +389,10 @@ export const PisaiBillingScreen: React.FC = () => {
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 800, fontSize: '12px', color: '#4A7C59', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <UserCheck size={14} color="#4A7C59" /> Customer Details (گاہک کا نام — ادھار کے لیے درج کریں)
+            <span style={{ fontWeight: 800, fontSize: '12px', color: '#7F5539', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <UserCheck size={14} color="#7F5539" /> Customer Details (گاہک کا نام — ادھار کے لیے درج کریں)
             </span>
-            <span style={{ fontSize: '11px', color: '#68B0AB', fontWeight: 600 }}>Type name for registered accounts</span>
+            <span style={{ fontSize: '11px', color: '#B08968', fontWeight: 600 }}>Type name for registered accounts</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
@@ -421,12 +421,12 @@ export const PisaiBillingScreen: React.FC = () => {
                   height: '38px',
                   padding: '6px 10px',
                   borderRadius: '8px',
-                  border: '1.5px solid #8FC0A9',
+                  border: '1.5px solid #DDB892',
                   fontSize: '13px',
                   fontWeight: 700,
                   outline: 'none',
-                  backgroundColor: '#FAF3DD',
-                  color: '#4A7C59',
+                  backgroundColor: '#EDE0D4',
+                  color: '#7F5539',
                 }}
               />
 
@@ -438,10 +438,10 @@ export const PisaiBillingScreen: React.FC = () => {
                     top: '42px',
                     left: 0,
                     right: 0,
-                    backgroundColor: '#FAF3DD',
-                    border: '1.5px solid #8FC0A9',
+                    backgroundColor: '#EDE0D4',
+                    border: '1.5px solid #DDB892',
                     borderRadius: '8px',
-                    boxShadow: '0 8px 16px rgba(74, 124, 89, 0.2)',
+                    boxShadow: '0 8px 16px rgba(127, 85, 57, 0.2)',
                     zIndex: 200,
                     maxHeight: '150px',
                     overflowY: 'auto',
@@ -454,15 +454,15 @@ export const PisaiBillingScreen: React.FC = () => {
                       className="touch-active"
                       style={{
                         padding: '8px 12px',
-                        borderBottom: '1px solid #8FC0A9',
+                        borderBottom: '1px solid #DDB892',
                         cursor: 'pointer',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}
                     >
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#4A7C59' }}>{cust.name}</span>
-                      <span style={{ fontSize: '11px', color: '#68B0AB', fontWeight: 600 }}>{cust.phone}</span>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#7F5539' }}>{cust.name}</span>
+                      <span style={{ fontSize: '11px', color: '#B08968', fontWeight: 600 }}>{cust.phone}</span>
                     </div>
                   ))}
                 </div>
@@ -487,11 +487,11 @@ export const PisaiBillingScreen: React.FC = () => {
                   height: '38px',
                   padding: '6px 10px',
                   borderRadius: '8px',
-                  border: '1.5px solid #8FC0A9',
+                  border: '1.5px solid #DDB892',
                   fontSize: '13px',
                   outline: 'none',
-                  backgroundColor: '#FAF3DD',
-                  color: '#4A7C59',
+                  backgroundColor: '#EDE0D4',
+                  color: '#7F5539',
                 }}
               />
             </div>
@@ -508,20 +508,20 @@ export const PisaiBillingScreen: React.FC = () => {
             style={{
               height: '48px',
               borderRadius: '10px',
-              backgroundColor: numWeight > 0 && numCharge > 0 ? '#4A7C59' : '#C8D5B9',
-              color: numWeight > 0 && numCharge > 0 ? '#FAF3DD' : '#8FC0A9',
+              backgroundColor: numWeight > 0 && numCharge > 0 ? '#7F5539' : '#E6CCB2',
+              color: numWeight > 0 && numCharge > 0 ? '#EDE0D4' : '#DDB892',
               border: 'none',
               fontSize: '15px',
               fontWeight: 900,
               cursor: numWeight > 0 && numCharge > 0 ? 'pointer' : 'not-allowed',
-              boxShadow: numWeight > 0 && numCharge > 0 ? '0 3px 8px rgba(74, 124, 89, 0.2)' : 'none',
+              boxShadow: numWeight > 0 && numCharge > 0 ? '0 3px 8px rgba(127, 85, 57, 0.2)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
             }}
           >
-            <Printer size={20} color={numWeight > 0 && numCharge > 0 ? '#FAF3DD' : '#8FC0A9'} />
+            <Printer size={20} color={numWeight > 0 && numCharge > 0 ? '#EDE0D4' : '#DDB892'} />
             <span>Print Cash Ticket (نقد ٹوکن)</span>
           </button>
 
@@ -539,20 +539,20 @@ export const PisaiBillingScreen: React.FC = () => {
             style={{
               height: '48px',
               borderRadius: '10px',
-              backgroundColor: numWeight > 0 && numCharge > 0 ? '#68B0AB' : '#C8D5B9',
-              color: numWeight > 0 && numCharge > 0 ? '#FAF3DD' : '#8FC0A9',
+              backgroundColor: numWeight > 0 && numCharge > 0 ? '#B08968' : '#E6CCB2',
+              color: numWeight > 0 && numCharge > 0 ? '#EDE0D4' : '#DDB892',
               border: 'none',
               fontSize: '15px',
               fontWeight: 900,
               cursor: numWeight > 0 && numCharge > 0 ? 'pointer' : 'not-allowed',
-              boxShadow: numWeight > 0 && numCharge > 0 ? '0 3px 8px rgba(74, 124, 89, 0.2)' : 'none',
+              boxShadow: numWeight > 0 && numCharge > 0 ? '0 3px 8px rgba(127, 85, 57, 0.2)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
             }}
           >
-            <BookOpen size={18} color={numWeight > 0 && numCharge > 0 ? '#FAF3DD' : '#8FC0A9'} />
+            <BookOpen size={18} color={numWeight > 0 && numCharge > 0 ? '#EDE0D4' : '#DDB892'} />
             <span>Save as Credit (ادھار ٹوکن)</span>
           </button>
         </div>
