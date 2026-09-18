@@ -1,16 +1,14 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
-import { NumericKeypad } from '../ui/NumericKeypad';
+import React, { useState, useEffect, useRef } from 'react';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
-import { Sparkles, Ticket, Printer, User, ShieldCheck } from 'lucide-react';
+import { Sparkles, Ticket, ShieldCheck, Check } from 'lucide-react';
 
 export const PisaiBillingScreen: React.FC = () => {
   const [weightKg, setWeightKg] = useState<string>('25');
   const [chargeAmount, setChargeAmount] = useState<string>('150');
-  const [activeInput, setActiveInput] = useState<'weight' | 'charge'>('weight');
-  const [serviceType, setServiceType] = useState<'pisai' | 'safai_pisai'>('safai_pisai');
+  const [serviceType, setServiceType] = useState<'safai_pisai' | 'pisai'>('safai_pisai');
   const [customerName, setCustomerName] = useState<string>('');
   const [isCredit, setIsCredit] = useState<boolean>(false);
   const [tokenCounter, setTokenCounter] = useState<number>(482);
@@ -19,46 +17,32 @@ export const PisaiBillingScreen: React.FC = () => {
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
 
+  const weightInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    weightInputRef.current?.focus();
+    weightInputRef.current?.select();
+  }, [serviceType]);
+
+  // Global Enter shortcut to print token ticket
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isReceiptOpen) return;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleGenerateTicket();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [weightKg, chargeAmount, serviceType, customerName, isCredit, isReceiptOpen]);
+
   const numWeight = parseFloat(weightKg) || 0;
   const numCharge = parseFloat(chargeAmount) || 0;
 
-  // Keypad Handlers
-  const handleKeyPress = (key: string) => {
-    if (activeInput === 'weight') {
-      if (key === '.' && weightKg.includes('.')) return;
-      setWeightKg((prev) => (prev === '0' && key !== '.' ? key : prev + key));
-    } else {
-      if (key === '.' && chargeAmount.includes('.')) return;
-      setChargeAmount((prev) => (prev === '0' && key !== '.' ? key : prev + key));
-    }
-  };
-
-  const handleClear = () => {
-    if (activeInput === 'weight') setWeightKg('0');
-    else setChargeAmount('0');
-  };
-
-  const handleBackspace = () => {
-    if (activeInput === 'weight') {
-      setWeightKg((prev) => (prev.length > 1 ? prev.slice(0, -1) : '0'));
-    } else {
-      setChargeAmount((prev) => (prev.length > 1 ? prev.slice(0, -1) : '0'));
-    }
-  };
-
-  const handleQuickAdd = (amount: number) => {
-    if (activeInput === 'weight') {
-      const curr = parseFloat(weightKg) || 0;
-      setWeightKg(String(curr + amount));
-    } else {
-      const curr = parseFloat(chargeAmount) || 0;
-      setChargeAmount(String(curr + amount));
-    }
-  };
-
   const handleGenerateTicket = () => {
     if (numWeight <= 0 || numCharge <= 0) {
-      alert('Please enter valid wheat weight and grinding fee.');
+      alert('Please enter wheat weight and charge amount.');
       return;
     }
 
@@ -87,314 +71,312 @@ export const PisaiBillingScreen: React.FC = () => {
   const currentTokenPreview = String(tokenCounter).padStart(4, '0');
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(320px, 1.1fr) minmax(340px, 1fr)',
-        gap: '20px',
-        width: '100%',
-      }}
-    >
-      {/* Left Column: Grinding Service Options & Token Card */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {/* Pisai Header Banner */}
-        <div
-          style={{
-            backgroundColor: 'var(--wheat-50)',
-            border: '2px solid var(--wheat-400)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '18px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Sparkles size={20} color="var(--wheat-700)" />
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--wheat-700)' }}>
-                Gundam Pisai Service
-              </h2>
-            </div>
-            <p
-              className="font-nastaleeq"
-              style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px' }}
-            >
-              گندم پیسائی و صفائی کاؤنٹر
-            </p>
-          </div>
-
-          {/* Large Token Badge Preview */}
-          <div
-            style={{
-              backgroundColor: 'var(--bg-surface)',
-              border: '2px solid #000000',
-              borderRadius: 'var(--radius-md)',
-              padding: '8px 16px',
-              textAlign: 'center',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-              NEXT TOKEN
-            </div>
-            <div
-              style={{
-                fontSize: '32px',
-                fontWeight: 900,
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--text-primary)',
-                letterSpacing: '2px',
-              }}
-            >
-              #{currentTokenPreview}
-            </div>
-          </div>
+    <div style={{ maxWidth: '1080px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+      {/* 1. TOP: Service Type Selection */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            1. Select Grinding Service (پیسائی کی قسم منتخب کریں)
+          </h2>
+          <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+            Click or tap service
+          </span>
         </div>
 
-        {/* Service Type Toggle Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          {/* Option 1: Safai + Pisai */}
           <div
             onClick={() => setServiceType('safai_pisai')}
             className="touch-active"
             style={{
-              padding: '16px',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: serviceType === 'safai_pisai' ? 'var(--wheat-100)' : 'var(--bg-surface)',
-              border: serviceType === 'safai_pisai' ? '2.5px solid var(--wheat-600)' : '1.5px solid var(--border-subtle)',
+              padding: '16px 20px',
+              borderRadius: '14px',
+              backgroundColor: serviceType === 'safai_pisai' ? '#fffbeb' : '#ffffff',
+              border: serviceType === 'safai_pisai' ? '3px solid #d97706' : '1.5px solid #e2e8f0',
+              boxShadow: serviceType === 'safai_pisai' ? '0 4px 12px rgba(217, 119, 6, 0.15)' : '0 1px 3px rgba(0,0,0,0.05)',
               cursor: 'pointer',
               display: 'flex',
-              flexDirection: 'column',
               justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '14px', fontWeight: 800 }}>Safai + Pisai</span>
-              {serviceType === 'safai_pisai' && <ShieldCheck size={20} color="var(--wheat-700)" />}
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#b45309' }}>
+                Full Service (صفائی + پیسائی)
+              </div>
+              <div
+                className="font-nastaleeq"
+                style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', margin: '2px 0' }}
+              >
+                صفائی اور پیسائی
+              </div>
+              <div style={{ fontSize: '13px', color: '#64748b' }}>
+                Grain cleaning and complete grinding
+              </div>
             </div>
-            <div
-              className="font-nastaleeq"
-              style={{ fontSize: '22px', fontWeight: 700, color: 'var(--wheat-700)', marginTop: '8px' }}
-            >
-              صفائی اور پیسائی
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              Complete grain cleaning + fine grinding
-            </div>
+
+            {serviceType === 'safai_pisai' && (
+              <div
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '9999px',
+                  backgroundColor: '#d97706',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Check size={18} strokeWidth={3} />
+              </div>
+            )}
           </div>
 
+          {/* Option 2: Pisai Only */}
           <div
             onClick={() => setServiceType('pisai')}
             className="touch-active"
             style={{
-              padding: '16px',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: serviceType === 'pisai' ? 'var(--wheat-100)' : 'var(--bg-surface)',
-              border: serviceType === 'pisai' ? '2.5px solid var(--wheat-600)' : '1.5px solid var(--border-subtle)',
+              padding: '16px 20px',
+              borderRadius: '14px',
+              backgroundColor: serviceType === 'pisai' ? '#fffbeb' : '#ffffff',
+              border: serviceType === 'pisai' ? '3px solid #d97706' : '1.5px solid #e2e8f0',
+              boxShadow: serviceType === 'pisai' ? '0 4px 12px rgba(217, 119, 6, 0.15)' : '0 1px 3px rgba(0,0,0,0.05)',
               cursor: 'pointer',
               display: 'flex',
-              flexDirection: 'column',
               justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '14px', fontWeight: 800 }}>Pisai Only</span>
-              {serviceType === 'pisai' && <ShieldCheck size={20} color="var(--wheat-700)" />}
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: '#b45309' }}>
+                Grinding Only (صرف پیسائی)
+              </div>
+              <div
+                className="font-nastaleeq"
+                style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', margin: '2px 0' }}
+              >
+                صرف پیسائی
+              </div>
+              <div style={{ fontSize: '13px', color: '#64748b' }}>
+                Direct grinding without cleaning
+              </div>
             </div>
+
+            {serviceType === 'pisai' && (
+              <div
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '9999px',
+                  backgroundColor: '#d97706',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Check size={18} strokeWidth={3} />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 2. BOTTOM: Keyboard Entry Card */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '18px',
+          border: '2px solid #e2e8f0',
+          boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.08)',
+          padding: '24px 28px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+        }}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', alignItems: 'center' }}>
+          {/* Left: Direct Weight & Fee Inputs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Weight Box */}
+            <div>
+              <label style={{ fontSize: '15px', fontWeight: 800, color: '#334155', display: 'block', marginBottom: '6px' }}>
+                WHEAT WEIGHT (گندم کا وزن - KG):
+              </label>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  ref={weightInputRef}
+                  type="number"
+                  step="any"
+                  value={weightKg}
+                  onChange={(e) => setWeightKg(e.target.value)}
+                  style={{
+                    width: '100%',
+                    height: '70px',
+                    borderRadius: '14px',
+                    border: '3px solid #d97706',
+                    backgroundColor: '#fffdfa',
+                    fontSize: '38px',
+                    fontWeight: 900,
+                    fontFamily: 'var(--font-mono)',
+                    color: '#0f172a',
+                    padding: '0 70px 0 18px',
+                    outline: 'none',
+                  }}
+                />
+                <span style={{ position: 'absolute', right: '18px', fontSize: '20px', fontWeight: 900, color: '#94a3b8' }}>
+                  KG
+                </span>
+              </div>
+            </div>
+
+            {/* Fee Box */}
+            <div>
+              <label style={{ fontSize: '15px', fontWeight: 800, color: '#334155', display: 'block', marginBottom: '6px' }}>
+                MANUAL GRINDING FEE (پیسائی کی اجرت - Rs):
+              </label>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="number"
+                  value={chargeAmount}
+                  onChange={(e) => setChargeAmount(e.target.value)}
+                  style={{
+                    width: '100%',
+                    height: '70px',
+                    borderRadius: '14px',
+                    border: '3px solid #059669',
+                    backgroundColor: '#fffdfa',
+                    fontSize: '38px',
+                    fontWeight: 900,
+                    fontFamily: 'var(--font-mono)',
+                    color: '#047857',
+                    padding: '0 70px 0 18px',
+                    outline: 'none',
+                  }}
+                />
+                <span style={{ position: 'absolute', right: '18px', fontSize: '20px', fontWeight: 900, color: '#94a3b8' }}>
+                  Rs
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Next Token Card */}
+          <div
+            style={{
+              backgroundColor: '#f8fafc',
+              border: '2px solid #000000',
+              borderRadius: '16px',
+              padding: '24px',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748b', letterSpacing: '1px' }}>
+              CUSTOMER TOKEN NUMBER (ٹوکن نمبر)
+            </span>
             <div
-              className="font-nastaleeq"
-              style={{ fontSize: '22px', fontWeight: 700, color: 'var(--wheat-700)', marginTop: '8px' }}
+              style={{
+                fontSize: '68px',
+                fontWeight: 900,
+                fontFamily: 'var(--font-mono)',
+                color: '#0f172a',
+                lineHeight: 1.1,
+                margin: '8px 0',
+                letterSpacing: '4px',
+              }}
             >
-              صرف پیسائی
+              #{currentTokenPreview}
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              Standard grinding without pre-clean
+            <div className="font-nastaleeq" style={{ fontSize: '22px', fontWeight: 700, color: '#b45309' }}>
+              گندم پیسائی ٹوکن
             </div>
           </div>
         </div>
 
-        {/* Customer Name & Udhaar Option */}
+        {/* Optional Customer Name & Udhaar */}
         <div
           style={{
-            backgroundColor: 'var(--bg-surface)',
-            border: '1.5px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-md)',
-            padding: '16px',
             display: 'flex',
-            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
             gap: '12px',
+            backgroundColor: '#f8fafc',
+            padding: '12px 18px',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <User size={18} color="var(--text-secondary)" />
-            <span style={{ fontWeight: 700, fontSize: '14px' }}>Customer Details (اختیاری)</span>
-          </div>
-          <input
-            type="text"
-            placeholder="Enter customer name or phone (optional)..."
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              borderRadius: 'var(--radius-sm)',
-              border: '1.5px solid var(--border-medium)',
-              fontSize: '14px',
-              outline: 'none',
-            }}
-          />
-
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={isCredit}
               onChange={(e) => setIsCredit(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--wheat-600)' }}
+              style={{ width: '20px', height: '20px', accentColor: '#d97706' }}
             />
-            <span style={{ fontWeight: 700, fontSize: '13px', color: isCredit ? 'var(--wheat-700)' : 'var(--text-secondary)' }}>
-              Assign to Udhaar / Credit Ledger (ادھار پر رکھیں)
+            <span style={{ fontWeight: 800, fontSize: '14px', color: isCredit ? '#92400e' : '#334155' }}>
+              Udhaar Customer (ادھار کھاتہ)
             </span>
           </label>
-        </div>
-      </div>
 
-      {/* Right Column: Weight & Charge Active Inputs + Numpad */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-          backgroundColor: 'var(--bg-surface)',
-          padding: '18px',
-          borderRadius: 'var(--radius-lg)',
-          border: '1.5px solid var(--border-subtle)',
-          boxShadow: 'var(--shadow-md)',
-        }}
-      >
-        {/* Active Input Switchers */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-          {/* Weight Box */}
-          <div
-            onClick={() => setActiveInput('weight')}
-            className="touch-active"
+          <input
+            type="text"
+            placeholder="Customer name (optional)..."
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
             style={{
-              padding: '12px 14px',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: activeInput === 'weight' ? 'var(--wheat-50)' : 'var(--bg-subtle)',
-              border: activeInput === 'weight' ? '2.5px solid var(--wheat-600)' : '1.5px solid var(--border-subtle)',
-              cursor: 'pointer',
+              flex: 1,
+              maxWidth: '300px',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              border: '1.5px solid #cbd5e1',
+              fontSize: '14px',
+              fontWeight: 600,
+              outline: 'none',
             }}
-          >
-            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-              WHEAT WEIGHT (وزن)
-            </div>
-            <div
-              style={{
-                fontSize: '28px',
-                fontWeight: 900,
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--text-primary)',
-                marginTop: '4px',
-              }}
-            >
-              {weightKg || '0'} <span style={{ fontSize: '16px' }}>KG</span>
-            </div>
-          </div>
-
-          {/* Charge Box */}
-          <div
-            onClick={() => setActiveInput('charge')}
-            className="touch-active"
-            style={{
-              padding: '12px 14px',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: activeInput === 'charge' ? 'var(--wheat-50)' : 'var(--bg-subtle)',
-              border: activeInput === 'charge' ? '2.5px solid var(--wheat-600)' : '1.5px solid var(--border-subtle)',
-              cursor: 'pointer',
-            }}
-          >
-            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-              MANUAL CHARGE (رقم)
-            </div>
-            <div
-              style={{
-                fontSize: '28px',
-                fontWeight: 900,
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--emerald-600)',
-                marginTop: '4px',
-              }}
-            >
-              Rs {chargeAmount || '0'}
-            </div>
-          </div>
+          />
         </div>
 
-        {/* Informational Guidance */}
-        <div
-          style={{
-            fontSize: '12px',
-            color: 'var(--text-secondary)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '2px 4px',
-          }}
-        >
-          <span>Currently Editing: <strong>{activeInput === 'weight' ? 'Weight (KG)' : 'Amount (Rs)'}</strong></span>
-          <span>Effective Rate: ~Rs {(numCharge / (numWeight || 1)).toFixed(1)}/KG</span>
-        </div>
-
-        {/* Numpad */}
-        <NumericKeypad
-          mode={activeInput === 'weight' ? 'weight' : 'amount'}
-          onKeyPress={handleKeyPress}
-          onClear={handleClear}
-          onBackspace={handleBackspace}
-          onQuickAdd={handleQuickAdd}
-        />
-
-        {/* Print Pisai Token Ticket Button */}
+        {/* Big Print Token Button */}
         <button
           type="button"
           onClick={handleGenerateTicket}
           disabled={numWeight <= 0 || numCharge <= 0}
           className="touch-active"
           style={{
-            height: '66px',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: numWeight > 0 && numCharge > 0 ? 'var(--wheat-600)' : 'var(--border-medium)',
+            height: '70px',
+            borderRadius: '14px',
+            backgroundColor: numWeight > 0 && numCharge > 0 ? '#d97706' : '#94a3b8',
             color: '#ffffff',
             border: 'none',
-            fontSize: '19px',
-            fontWeight: 800,
+            fontSize: '22px',
+            fontWeight: 900,
             cursor: numWeight > 0 && numCharge > 0 ? 'pointer' : 'not-allowed',
-            boxShadow: 'var(--shadow-lg)',
+            boxShadow: '0 8px 16px -2px rgba(217, 119, 6, 0.35)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 20px',
-            marginTop: 'auto',
+            justifyContent: 'center',
+            gap: '14px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Ticket size={28} />
-            <div style={{ textAlign: 'left' }}>
-              <div>Issue Token #{currentTokenPreview}</div>
-              <div style={{ fontSize: '12px', opacity: 0.85, fontWeight: 500 }}>
-                {numWeight} KG Pisai • Print Ticket
-              </div>
-            </div>
-          </div>
-          <div style={{ fontSize: '24px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>
-            Rs {numCharge}
-          </div>
+          <Ticket size={30} />
+          <span>ISSUE TOKEN #{currentTokenPreview} — [ENTER] (ٹوکن پرنٹ کریں)</span>
         </button>
       </div>
 
-      {/* Receipt Preview Modal */}
+      {/* Receipt Modal */}
       <ReceiptPreviewModal
         isOpen={isReceiptOpen}
-        onClose={() => setIsReceiptOpen(false)}
+        onClose={() => {
+          setIsReceiptOpen(false);
+          weightInputRef.current?.focus();
+          weightInputRef.current?.select();
+        }}
         data={receiptData}
       />
     </div>

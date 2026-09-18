@@ -18,8 +18,6 @@ import {
   FileText,
   Lock,
   Clock,
-  Shield,
-  UserCheck,
 } from 'lucide-react';
 
 export default function Home() {
@@ -29,13 +27,13 @@ export default function Home() {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
       {/* Top Application Header */}
       <header
         style={{
           backgroundColor: '#ffffff',
-          borderBottom: '2px solid var(--wheat-200)',
-          boxShadow: 'var(--shadow-sm)',
+          borderBottom: '2px solid #e2e8f0',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
           position: 'sticky',
           top: 0,
           zIndex: 1000,
@@ -43,80 +41,80 @@ export default function Home() {
       >
         <div
           style={{
-            maxWidth: '1440px',
+            maxWidth: '1280px',
             margin: '0 auto',
-            padding: '10px 20px',
+            padding: '12px 24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '12px',
+            gap: '14px',
           }}
         >
           {/* Logo & Shop Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div
               style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--wheat-500)',
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                backgroundColor: '#d97706',
                 color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: 'var(--shadow-sm)',
+                boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)',
               }}
             >
-              <Wheat size={26} strokeWidth={2.4} />
+              <Wheat size={28} strokeWidth={2.4} />
             </div>
 
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h1 style={{ fontSize: '18px', fontWeight: 900, color: 'var(--text-primary)' }}>
+                <span style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px' }}>
                   FlourERP
-                </h1>
+                </span>
                 <span
                   style={{
                     fontSize: '11px',
                     fontWeight: 800,
                     padding: '2px 8px',
-                    borderRadius: 'var(--radius-full)',
-                    backgroundColor: 'var(--emerald-50)',
-                    color: 'var(--emerald-700)',
+                    borderRadius: '9999px',
+                    backgroundColor: '#ecfdf5',
+                    color: '#047857',
                     border: '1px solid #a7f3d0',
                   }}
                 >
-                  ONLINE • LIVE DB
+                  ONLINE
                 </span>
               </div>
               <div
                 className="font-nastaleeq"
                 style={{
-                  fontSize: '18px',
+                  fontSize: '20px',
                   fontWeight: 700,
-                  color: 'var(--wheat-700)',
+                  color: '#b45309',
                   lineHeight: 1.2,
                 }}
               >
-                المدینہ فلور ملز و چکی سسٹم
+                المدینہ چکی و فلور ملز
               </div>
             </div>
           </div>
 
-          {/* Role Switcher & Security Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {/* Quick Daily Price Modal Trigger */}
+          {/* Quick Actions & Role Switcher */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Daily Price Button */}
             <button
               type="button"
               onClick={() => setIsPriceModalOpen(true)}
               className="touch-active"
               style={{
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--wheat-100)',
-                color: 'var(--wheat-700)',
-                border: '1px solid var(--wheat-400)',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                backgroundColor: '#fef3c7',
+                color: '#92400e',
+                border: '1.5px solid #fde68a',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -132,10 +130,10 @@ export default function Home() {
             <div
               style={{
                 display: 'flex',
-                backgroundColor: 'var(--bg-subtle)',
+                backgroundColor: '#f1f5f9',
                 padding: '3px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-medium)',
+                borderRadius: '10px',
+                border: '1px solid #cbd5e1',
               }}
             >
               <button
@@ -143,44 +141,43 @@ export default function Home() {
                 onClick={() => setUserRole('biller')}
                 style={{
                   padding: '6px 12px',
-                  borderRadius: 'var(--radius-sm)',
+                  borderRadius: '7px',
                   border: 'none',
-                  backgroundColor: userRole === 'biller' ? 'var(--wheat-600)' : 'transparent',
-                  color: userRole === 'biller' ? '#ffffff' : 'var(--text-secondary)',
+                  backgroundColor: userRole === 'biller' ? '#d97706' : 'transparent',
+                  color: userRole === 'biller' ? '#ffffff' : '#475569',
                   fontWeight: 700,
                   fontSize: '12px',
                   cursor: 'pointer',
                 }}
               >
-                Biller Mode
+                Biller
               </button>
               <button
                 type="button"
                 onClick={() => setUserRole('admin')}
                 style={{
                   padding: '6px 12px',
-                  borderRadius: 'var(--radius-sm)',
+                  borderRadius: '7px',
                   border: 'none',
                   backgroundColor: userRole === 'admin' ? '#0f172a' : 'transparent',
-                  color: userRole === 'admin' ? '#ffffff' : 'var(--text-secondary)',
+                  color: userRole === 'admin' ? '#ffffff' : '#475569',
                   fontWeight: 700,
                   fontSize: '12px',
                   cursor: 'pointer',
                 }}
               >
-                Admin Mode
+                Admin
               </button>
             </div>
 
-            {/* PIN Lock Screen Button */}
+            {/* Lock Screen Button */}
             <button
               type="button"
               onClick={() => setIsLocked(true)}
               className="touch-active"
               style={{
-                height: '38px',
-                padding: '0 12px',
-                borderRadius: 'var(--radius-md)',
+                padding: '8px 12px',
+                borderRadius: '10px',
                 backgroundColor: '#fee2e2',
                 color: '#b91c1c',
                 border: '1.5px solid #fca5a5',
@@ -191,30 +188,30 @@ export default function Home() {
                 alignItems: 'center',
                 gap: '6px',
               }}
-              title="Lock Counter Terminal"
+              title="Lock Terminal"
             >
               <Lock size={15} /> Lock PIN
             </button>
           </div>
         </div>
 
-        {/* Horizontal Navigation Tabs */}
+        {/* Big, Clear Navigation Tabs for 40+ year old readability */}
         <div
           style={{
-            maxWidth: '1440px',
+            maxWidth: '1280px',
             margin: '0 auto',
-            padding: '0 20px',
+            padding: '0 24px',
             display: 'flex',
-            gap: '6px',
+            gap: '8px',
             overflowX: 'auto',
           }}
         >
           {[
-            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={18} /> },
-            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={18} /> },
-            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={18} /> },
-            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={18} /> },
-            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={18} /> },
+            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={19} /> },
+            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={19} /> },
+            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={19} /> },
+            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={19} /> },
+            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={19} /> },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -227,20 +224,20 @@ export default function Home() {
                   border: 'none',
                   background: 'none',
                   cursor: 'pointer',
-                  borderBottom: isActive ? '3.5px solid var(--wheat-600)' : '3.5px solid transparent',
-                  color: isActive ? 'var(--wheat-700)' : 'var(--text-secondary)',
+                  borderBottom: isActive ? '4px solid #d97706' : '4px solid transparent',
+                  color: isActive ? '#b45309' : '#64748b',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   fontWeight: isActive ? 800 : 600,
-                  fontSize: '14px',
+                  fontSize: '15px',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.15s ease',
                 }}
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '15px', opacity: 0.9 }}>
+                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700 }}>
                   ({tab.ur})
                 </span>
               </button>
@@ -253,10 +250,10 @@ export default function Home() {
       <div
         style={{
           flex: 1,
-          maxWidth: '1440px',
+          maxWidth: '1280px',
           width: '100%',
           margin: '0 auto',
-          padding: '20px',
+          padding: '24px 20px',
         }}
       >
         {activeTab === 'billing' && <ProductBillingScreen />}

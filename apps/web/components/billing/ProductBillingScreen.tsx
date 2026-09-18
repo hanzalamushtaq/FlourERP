@@ -1,11 +1,10 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
-import { TouchCard, Product } from '../ui/TouchCard';
-import { NumericKeypad } from '../ui/NumericKeypad';
+import React, { useState, useEffect, useRef } from 'react';
+import { Product } from '../ui/TouchCard';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
-import { Scale, Banknote, Tag, UserCheck, AlertTriangle, ArrowRight, Printer } from 'lucide-react';
+import { Printer, Scale, Banknote, Tag, UserCheck, AlertTriangle, Check } from 'lucide-react';
 
 const INITIAL_PRODUCTS: Product[] = [
   { id: '1', nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (گندم)', ratePerKg: 140, unit: 'KG', isActive: true, icon: '🌾' },
@@ -13,25 +12,49 @@ const INITIAL_PRODUCTS: Product[] = [
   { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', ratePerKg: 155, unit: 'KG', isActive: true, icon: '⚪' },
   { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', ratePerKg: 160, unit: 'KG', isActive: true, icon: '🥣' },
   { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', ratePerKg: 95, unit: 'KG', isActive: true, icon: '📦' },
-  { id: '6', nameEn: 'Premium Desi Atta', nameUr: 'دیسی گندم آٹا', ratePerKg: 0, unit: 'KG', isActive: true, icon: '⚠️' }, // Rate unset guard demo
+  { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', ratePerKg: 0, unit: 'KG', isActive: true, icon: '⚠️' },
 ];
 
 export const ProductBillingScreen: React.FC = () => {
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<Product>(INITIAL_PRODUCTS[0]);
   const [calcMode, setCalcMode] = useState<'weight' | 'amount'>('weight');
-  const [inputValue, setInputValue] = useState<string>('10'); // default 10 KG
+  const [inputValue, setInputValue] = useState<string>('10');
   const [discountValue, setDiscountValue] = useState<string>('0');
-  const [showDiscountInput, setShowDiscountInput] = useState<boolean>(false);
+  const [showDiscount, setShowDiscount] = useState<boolean>(false);
   const [isCredit, setIsCredit] = useState<boolean>(false);
   const [customerName, setCustomerName] = useState<string>('');
-  
-  // Bill Preview State
+
+  // Receipt Modal State
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
   const [billCounter, setBillCounter] = useState<number>(482);
 
-  // Math Calculations
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Auto focus input on load or product change
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, [selectedProduct, calcMode]);
+
+  // Global Keyboard shortcuts: Enter to print, 1-5 to select product
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts if receipt modal is open
+      if (isReceiptOpen) return;
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleCheckout();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedProduct, calcMode, inputValue, discountValue, isCredit, customerName, isReceiptOpen]);
+
+  // Calculations
   const rate = selectedProduct.ratePerKg;
   const numInput = parseFloat(inputValue) || 0;
   const numDiscount = parseFloat(discountValue) || 0;
@@ -52,36 +75,21 @@ export const ProductBillingScreen: React.FC = () => {
   const subtotal = calculatedAmount;
   const netTotal = Math.max(0, subtotal - numDiscount);
 
-  // Keypad Handlers
-  const handleKeyPress = (key: string) => {
-    if (key === '.' && inputValue.includes('.')) return;
-    if (inputValue === '0' && key !== '.') {
-      setInputValue(key);
-    } else {
-      setInputValue((prev) => prev + key);
-    }
-  };
-
-  const handleClear = () => {
-    setInputValue('0');
-  };
-
-  const handleBackspace = () => {
-    setInputValue((prev) => (prev.length > 1 ? prev.slice(0, -1) : '0'));
-  };
-
   const handleQuickAdd = (amount: number) => {
-    const current = parseFloat(inputValue) || 0;
-    setInputValue(String(current + amount));
+    const curr = parseFloat(inputValue) || 0;
+    const nextVal = String(curr + amount);
+    setInputValue(nextVal);
+    inputRef.current?.focus();
   };
 
   const handleCheckout = () => {
     if (rate <= 0) {
-      alert('Cannot bill product: Rate is not set! Please contact Admin to set daily price.');
+      alert('Cannot bill: Daily rate is not set for this product!');
       return;
     }
     if (calculatedWeight <= 0) {
       alert('Please enter a valid quantity or amount.');
+      inputRef.current?.focus();
       return;
     }
 
@@ -114,402 +122,528 @@ export const ProductBillingScreen: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(320px, 1.2fr) minmax(340px, 1fr)',
-        gap: '20px',
-        width: '100%',
-      }}
-    >
-      {/* Left Column: Product Selection Grid */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: 'var(--bg-surface)',
-            padding: '12px 18px',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border-subtle)',
-          }}
-        >
-          <div>
-            <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Select Product (پروڈکٹ منتخب کریں)</h2>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-              Touch product card to begin calculation
-            </p>
-          </div>
-          <span
-            style={{
-              fontSize: '12px',
-              fontWeight: 700,
-              padding: '4px 10px',
-              backgroundColor: 'var(--wheat-100)',
-              color: 'var(--wheat-700)',
-              borderRadius: 'var(--radius-full)',
-            }}
-          >
-            5 Active Items
+    <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+      {/* 1. TOP: Product Selection (Large, Eye-Catching Cards with Clean Urdu) */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            1. Select Product (پروڈکٹ منتخب کریں)
+          </h2>
+          <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+            Click or tap to choose product
           </span>
         </div>
 
-        {/* Product Cards Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
             gap: '12px',
           }}
         >
-          {products.map((p) => (
-            <TouchCard
-              key={p.id}
-              product={p}
-              isSelected={selectedProduct.id === p.id}
-              onSelect={(product) => {
-                setSelectedProduct(product);
-                if (product.ratePerKg <= 0) {
-                  setInputValue('0');
-                }
-              }}
-            />
-          ))}
-        </div>
+          {products.map((p, idx) => {
+            const isSelected = selectedProduct.id === p.id;
+            const isRateSet = p.ratePerKg > 0;
+            return (
+              <div
+                key={p.id}
+                onClick={() => {
+                  setSelectedProduct(p);
+                  inputRef.current?.focus();
+                  inputRef.current?.select();
+                }}
+                className="touch-active"
+                style={{
+                  position: 'relative',
+                  padding: '14px 16px',
+                  borderRadius: '14px',
+                  backgroundColor: isSelected ? '#fffbeb' : '#ffffff',
+                  border: isSelected ? '3px solid #d97706' : '1.5px solid #e2e8f0',
+                  boxShadow: isSelected ? '0 4px 12px rgba(217, 119, 6, 0.15)' : '0 1px 3px rgba(0,0,0,0.05)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {/* Rate Badge & Check */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {isRateSet ? (
+                    <span
+                      style={{
+                        fontSize: '15px',
+                        fontWeight: 900,
+                        color: isSelected ? '#b45309' : '#047857',
+                        fontFamily: 'var(--font-mono)',
+                      }}
+                    >
+                      Rs {p.ratePerKg}/KG
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: '12px', fontWeight: 800, color: '#dc2626' }}>
+                      ⚠️ Rate Unset
+                    </span>
+                  )}
 
-        {/* Warning If Rate Not Set */}
-        {rate <= 0 && (
-          <div
-            style={{
-              padding: '16px',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: 'var(--rose-50)',
-              border: '2px dashed var(--rose-500)',
-              color: 'var(--rose-600)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-            }}
-          >
-            <AlertTriangle size={28} />
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '15px' }}>Rate Not Set! (قیمت مقرر نہیں ہے)</div>
-              <div style={{ fontSize: '12px', color: '#9f1239' }}>
-                Cannot generate bill for {selectedProduct.nameEn} until the daily price is confirmed by Admin.
+                  {isSelected && (
+                    <div
+                      style={{
+                        width: '22px',
+                        height: '22px',
+                        borderRadius: '9999px',
+                        backgroundColor: '#d97706',
+                        color: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Check size={14} strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Big Urdu Title */}
+                <div
+                  className="font-nastaleeq"
+                  style={{
+                    fontSize: '28px',
+                    fontWeight: 700,
+                    color: isSelected ? '#000000' : '#1e293b',
+                    textAlign: 'right',
+                    lineHeight: 1.4,
+                    margin: '2px 0',
+                  }}
+                >
+                  {p.nameUr}
+                </div>
+
+                {/* English Name */}
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>
+                  {p.nameEn}
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            );
+          })}
+        </div>
+      </div>
 
-        {/* Optional Credit (Udhaar) Customer Toggle */}
+      {/* 2. BOTTOM: Clean, Keyboard-First Billing Entry Card */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '18px',
+          border: '2px solid #e2e8f0',
+          boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.08)',
+          padding: '24px 28px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+        }}
+      >
+        {/* Mode Selector & Selected Product Banner */}
         <div
           style={{
-            backgroundColor: isCredit ? '#fef3c7' : 'var(--bg-surface)',
-            border: isCredit ? '2px solid #d97706' : '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '14px',
+            borderBottom: '1.5px solid #f1f5f9',
+            paddingBottom: '16px',
+          }}
+        >
+          {/* Active Product Title Callout */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                backgroundColor: '#fef3c7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+              }}
+            >
+              {selectedProduct.icon || '🌾'}
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>
+                  {selectedProduct.nameEn}
+                </span>
+                <span
+                  className="font-nastaleeq"
+                  style={{ fontSize: '24px', fontWeight: 700, color: '#d97706' }}
+                >
+                  {selectedProduct.nameUr}
+                </span>
+              </div>
+              <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 700 }}>
+                Current Rate: Rs {selectedProduct.ratePerKg} per KG
+              </span>
+            </div>
+          </div>
+
+          {/* Mode Tabs (Weight Mode vs Amount Mode) */}
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: '#f1f5f9',
+              padding: '4px',
+              borderRadius: '12px',
+              gap: '4px',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setCalcMode('weight');
+                setInputValue('10');
+                inputRef.current?.focus();
+              }}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '9px',
+                border: 'none',
+                backgroundColor: calcMode === 'weight' ? '#d97706' : 'transparent',
+                color: calcMode === 'weight' ? '#ffffff' : '#475569',
+                fontSize: '15px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Scale size={18} /> Weight Mode (وزن)
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setCalcMode('amount');
+                setInputValue('500');
+                inputRef.current?.focus();
+              }}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '9px',
+                border: 'none',
+                backgroundColor: calcMode === 'amount' ? '#d97706' : 'transparent',
+                color: calcMode === 'amount' ? '#ffffff' : '#475569',
+                fontSize: '15px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Banknote size={18} /> Rupees Mode (رقم)
+            </button>
+          </div>
+        </div>
+
+        {/* Big Entry & Live Calculation Section */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1.2fr 1fr',
+            gap: '24px',
+            alignItems: 'center',
+          }}
+        >
+          {/* Left: Huge Direct Keyboard Input Box */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <label
+              style={{
+                fontSize: '15px',
+                fontWeight: 800,
+                color: '#334155',
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <span>{calcMode === 'weight' ? 'ENTER WEIGHT (وزن لکھیں):' : 'ENTER RUPEES (رقم لکھیں):'}</span>
+              <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 600 }}>
+                Type on keyboard directly
+              </span>
+            </label>
+
+            <div
+              style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <input
+                ref={inputRef}
+                type="number"
+                step="any"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                style={{
+                  width: '100%',
+                  height: '76px',
+                  borderRadius: '14px',
+                  border: '3px solid #d97706',
+                  backgroundColor: '#fffdfa',
+                  fontSize: '44px',
+                  fontWeight: 900,
+                  fontFamily: 'var(--font-mono)',
+                  color: '#0f172a',
+                  padding: '0 80px 0 20px',
+                  outline: 'none',
+                  boxShadow: '0 0 0 4px rgba(217, 119, 6, 0.1)',
+                }}
+              />
+              <span
+                style={{
+                  position: 'absolute',
+                  right: '22px',
+                  fontSize: '22px',
+                  fontWeight: 900,
+                  color: '#94a3b8',
+                }}
+              >
+                {calcMode === 'weight' ? 'KG' : 'Rs'}
+              </span>
+            </div>
+
+            {/* Quick Increment Buttons for Fast 1-Touch Bag Sizes */}
+            {calcMode === 'weight' ? (
+              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                {[
+                  { label: '+5 kg', val: 5 },
+                  { label: '+10 kg', val: 10 },
+                  { label: '+20 kg', val: 20 },
+                  { label: '+40 kg (Bori)', val: 40 },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleQuickAdd(item.val)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 4px',
+                      borderRadius: '8px',
+                      backgroundColor: '#fef3c7',
+                      color: '#92400e',
+                      border: '1.5px solid #fde68a',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                {[
+                  { label: '+100', val: 100 },
+                  { label: '+200', val: 200 },
+                  { label: '+500', val: 500 },
+                  { label: '+1,000', val: 1000 },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleQuickAdd(item.val)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 4px',
+                      borderRadius: '8px',
+                      backgroundColor: '#fef3c7',
+                      color: '#92400e',
+                      border: '1.5px solid #fde68a',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right: Big Crisp Total Card */}
+          <div
+            style={{
+              backgroundColor: '#f8fafc',
+              border: '2px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '20px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#64748b' }}>
+                {calcMode === 'weight' ? 'BILL CALCULATION' : 'QUANTITY CALCULATION'}
+              </span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#047857' }}>
+                {calculatedWeight} KG @ Rs {rate}/KG
+              </span>
+            </div>
+
+            <div style={{ fontSize: '14px', color: '#64748b', fontWeight: 700 }}>
+              TOTAL NET AMOUNT (کل رقم):
+            </div>
+            <div
+              style={{
+                fontSize: '52px',
+                fontWeight: 900,
+                fontFamily: 'var(--font-mono)',
+                color: '#047857',
+                lineHeight: 1.1,
+                margin: '6px 0 10px',
+              }}
+            >
+              Rs {netTotal.toLocaleString()}
+            </div>
+
+            {/* Sub-breakdown if discount applied */}
+            {numDiscount > 0 && (
+              <div style={{ fontSize: '13px', color: '#b91c1c', fontWeight: 700 }}>
+                Subtotal: Rs {subtotal} — Discount: Rs {numDiscount}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Optional Clean Drawer for Udhaar / Discount */}
+        <div
+          style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '12px',
-            transition: 'all 0.2s ease',
+            flexWrap: 'wrap',
+            gap: '14px',
+            backgroundColor: '#f8fafc',
+            padding: '12px 18px',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
           }}
         >
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+          {/* Udhaar Checkbox */}
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={isCredit}
               onChange={(e) => setIsCredit(e.target.checked)}
-              style={{ width: '18px', height: '18px', accentColor: 'var(--wheat-600)' }}
+              style={{ width: '20px', height: '20px', accentColor: '#d97706' }}
             />
-            <span style={{ fontWeight: 700, fontSize: '14px', color: isCredit ? '#92400e' : 'var(--text-primary)' }}>
-              Udhaar / Credit Customer (ادھار کھاتہ)
+            <span style={{ fontWeight: 800, fontSize: '15px', color: isCredit ? '#92400e' : '#334155' }}>
+              Udhaar Customer (ادھار کھاتہ)
             </span>
           </label>
+
           {isCredit && (
             <input
               type="text"
-              placeholder="Search or enter customer name..."
+              placeholder="Customer name / phone..."
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               style={{
-                flex: 1,
-                maxWidth: '220px',
-                padding: '6px 10px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid #d97706',
-                fontSize: '13px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                border: '2px solid #d97706',
+                fontSize: '14px',
+                fontWeight: 700,
                 outline: 'none',
+                width: '260px',
               }}
             />
           )}
-        </div>
-      </div>
 
-      {/* Right Column: Calculation Modes, Numpad & Instant Total Checkout */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-          backgroundColor: 'var(--bg-surface)',
-          padding: '18px',
-          borderRadius: 'var(--radius-lg)',
-          border: '1.5px solid var(--border-subtle)',
-          boxShadow: 'var(--shadow-md)',
-        }}
-      >
-        {/* Mode Toggle Switch: Weight -> Amount vs Amount -> Weight */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            backgroundColor: 'var(--bg-subtle)',
-            padding: '4px',
-            borderRadius: 'var(--radius-md)',
-            gap: '4px',
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              setCalcMode('weight');
-              setInputValue('10');
-            }}
-            className="touch-active"
-            style={{
-              padding: '10px',
-              borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              backgroundColor: calcMode === 'weight' ? 'var(--wheat-600)' : 'transparent',
-              color: calcMode === 'weight' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-            }}
-          >
-            <Scale size={18} /> Weight → Rs (وزن سے رقم)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setCalcMode('amount');
-              setInputValue('500');
-            }}
-            className="touch-active"
-            style={{
-              padding: '10px',
-              borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              backgroundColor: calcMode === 'amount' ? 'var(--wheat-600)' : 'transparent',
-              color: calcMode === 'amount' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-            }}
-          >
-            <Banknote size={18} /> Rs → Weight (رقم سے وزن)
-          </button>
-        </div>
-
-        {/* Live Display Monitor */}
-        <div
-          style={{
-            backgroundColor: 'var(--bg-subtle)',
-            borderRadius: 'var(--radius-md)',
-            padding: '14px 16px',
-            border: '2px solid var(--border-medium)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              {calcMode === 'weight' ? 'ENTER WEIGHT (KG):' : 'ENTER DESIRED RUPEES (Rs):'}
-            </span>
-            <span
-              style={{
-                fontSize: '12px',
-                fontWeight: 800,
-                color: 'var(--wheat-700)',
-                backgroundColor: 'var(--wheat-100)',
-                padding: '2px 8px',
-                borderRadius: '4px',
-              }}
-            >
-              Rate: Rs {rate}/KG
-            </span>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '34px',
-                fontWeight: 900,
-                color: 'var(--text-primary)',
-                fontFamily: 'var(--font-mono)',
-              }}
-            >
-              {inputValue || '0'} {calcMode === 'weight' ? 'KG' : 'Rs'}
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700 }}>
-                {calcMode === 'weight' ? 'CALCULATED AMOUNT' : 'CALCULATED WEIGHT'}
-              </div>
-              <div
-                style={{
-                  fontSize: '24px',
-                  fontWeight: 800,
-                  color: calcMode === 'weight' ? 'var(--emerald-600)' : 'var(--wheat-700)',
-                  fontFamily: 'var(--font-mono)',
-                }}
-              >
-                {calcMode === 'weight' ? `Rs ${calculatedAmount}` : `${calculatedWeight} KG`}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Keypad */}
-        <NumericKeypad
-          mode={calcMode}
-          onKeyPress={handleKeyPress}
-          onClear={handleClear}
-          onBackspace={handleBackspace}
-          onQuickAdd={handleQuickAdd}
-        />
-
-        {/* Discount Bar (Permission Gated) */}
-        <div
-          style={{
-            borderTop: '1px solid var(--border-subtle)',
-            paddingTop: '10px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Discount Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
             <button
               type="button"
-              onClick={() => setShowDiscountInput(!showDiscountInput)}
+              onClick={() => setShowDiscount(!showDiscount)}
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--wheat-700)',
-                fontWeight: 700,
-                fontSize: '13px',
+                color: '#b45309',
+                fontSize: '14px',
+                fontWeight: 800,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '6px',
               }}
             >
-              <Tag size={15} /> {showDiscountInput ? 'Hide Discount' : '+ Add Discount (رعایت)'}
+              <Tag size={16} /> {showDiscount ? 'Close Discount' : '+ Add Discount (رعایت)'}
             </button>
-            {numDiscount > 0 && (
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--rose-600)' }}>
-                - Rs {numDiscount}
-              </span>
-            )}
-          </div>
 
-          {showDiscountInput && (
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {showDiscount && (
               <input
                 type="number"
-                placeholder="Discount amount (Rs)"
+                placeholder="Discount Rs"
                 value={discountValue}
                 onChange={(e) => setDiscountValue(e.target.value)}
                 style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1.5px solid var(--border-medium)',
+                  width: '120px',
+                  padding: '6px 10px',
+                  borderRadius: '6px',
+                  border: '1.5px solid #cbd5e1',
                   fontSize: '14px',
                   fontWeight: 700,
-                  fontFamily: 'var(--font-mono)',
                   outline: 'none',
                 }}
               />
-              <button
-                type="button"
-                onClick={() => setDiscountValue('0')}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: 'var(--bg-subtle)',
-                  border: '1px solid var(--border-medium)',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                }}
-              >
-                Reset
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* Big Touch Checkout Button */}
+        {/* Big Eye-Catching Print Bill Button */}
         <button
           type="button"
           onClick={handleCheckout}
           disabled={rate <= 0 || calculatedWeight <= 0}
           className="touch-active"
           style={{
-            height: '66px',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: rate > 0 && calculatedWeight > 0 ? 'var(--emerald-600)' : 'var(--border-medium)',
+            height: '70px',
+            borderRadius: '14px',
+            backgroundColor: rate > 0 && calculatedWeight > 0 ? '#059669' : '#94a3b8',
             color: '#ffffff',
             border: 'none',
-            fontSize: '20px',
-            fontWeight: 800,
+            fontSize: '22px',
+            fontWeight: 900,
             cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
-            boxShadow: 'var(--shadow-lg)',
+            boxShadow: '0 8px 16px -2px rgba(5, 150, 105, 0.35)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 20px',
-            marginTop: 'auto',
+            justifyContent: 'center',
+            gap: '14px',
+            transition: 'all 0.15s ease',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Printer size={26} />
-            <div style={{ textAlign: 'left' }}>
-              <div>Print Bill (بل بنائیں)</div>
-              <div style={{ fontSize: '12px', opacity: 0.85, fontWeight: 500 }}>
-                {calculatedWeight} KG • {selectedProduct.nameEn}
-              </div>
-            </div>
-          </div>
-          <div style={{ fontSize: '26px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>
-            Rs {netTotal}
-          </div>
+          <Printer size={30} />
+          <span>PRINT BILL — [ENTER] (بل پرنٹ کریں)</span>
         </button>
       </div>
 
       {/* Receipt Preview Modal */}
       <ReceiptPreviewModal
         isOpen={isReceiptOpen}
-        onClose={() => setIsReceiptOpen(false)}
+        onClose={() => {
+          setIsReceiptOpen(false);
+          inputRef.current?.focus();
+          inputRef.current?.select();
+        }}
         data={receiptData}
       />
     </div>
