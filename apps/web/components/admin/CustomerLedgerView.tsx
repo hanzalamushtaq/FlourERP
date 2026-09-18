@@ -129,21 +129,22 @@ export const CustomerLedgerView: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#fffbeb',
-          border: '1.5px solid #fbbf24',
-          borderRadius: 'var(--radius-lg)',
+          backgroundColor: '#FAF3DD',
+          border: '2px solid #8FC0A9',
+          borderRadius: '16px',
           padding: '16px 20px',
+          boxShadow: '0 4px 12px rgba(74, 124, 89, 0.08)',
         }}
       >
         <div>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: '#92400e' }}>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: '#4A7C59' }}>
             TOTAL OUTSTANDING CUSTOMER UDHAAR (مجموعی ادھار کھاتہ)
           </span>
           <div
             style={{
               fontSize: '32px',
               fontWeight: 900,
-              color: '#b45309',
+              color: '#4A7C59',
               fontFamily: 'var(--font-mono)',
               marginTop: '2px',
             }}
@@ -159,19 +160,19 @@ export const CustomerLedgerView: React.FC = () => {
           style={{
             height: '46px',
             padding: '0 16px',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: 'var(--wheat-600)',
-            color: '#ffffff',
+            borderRadius: '10px',
+            backgroundColor: '#4A7C59',
+            color: '#FAF3DD',
             border: 'none',
             fontSize: '14px',
-            fontWeight: 700,
+            fontWeight: 800,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
           }}
         >
-          <UserPlus size={18} /> + Add Customer (نیا کھاتہ)
+          <UserPlus size={18} color="#FAF3DD" /> + Add Customer (نیا کھاتہ)
         </button>
       </div>
 
@@ -186,13 +187,14 @@ export const CustomerLedgerView: React.FC = () => {
         {/* Customer Directory */}
         <div
           style={{
-            backgroundColor: 'var(--bg-surface)',
-            borderRadius: 'var(--radius-lg)',
-            border: '1.5px solid var(--border-subtle)',
+            backgroundColor: '#FAF3DD',
+            borderRadius: '16px',
+            border: '2px solid #8FC0A9',
             padding: '16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
+            boxShadow: '0 4px 12px rgba(74, 124, 89, 0.08)',
           }}
         >
           {/* Search Bar */}
@@ -201,13 +203,13 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: 'var(--bg-subtle)',
-              border: '1px solid var(--border-medium)',
-              borderRadius: 'var(--radius-md)',
+              backgroundColor: '#FAF3DD',
+              border: '1.5px solid #8FC0A9',
+              borderRadius: '10px',
               padding: '8px 12px',
             }}
           >
-            <Search size={18} color="var(--text-muted)" />
+            <Search size={18} color="#4A7C59" />
             <input
               type="text"
               placeholder="Search by name or phone..."
@@ -219,6 +221,8 @@ export const CustomerLedgerView: React.FC = () => {
                 outline: 'none',
                 width: '100%',
                 fontSize: '14px',
+                fontWeight: 700,
+                color: '#4A7C59',
               }}
             />
           </div>
@@ -234,27 +238,28 @@ export const CustomerLedgerView: React.FC = () => {
                   className="touch-active"
                   style={{
                     padding: '12px 14px',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: isSelected ? 'var(--wheat-100)' : 'var(--bg-card)',
-                    border: isSelected ? '2px solid var(--wheat-600)' : '1px solid var(--border-subtle)',
+                    borderRadius: '12px',
+                    backgroundColor: isSelected ? '#C8D5B9' : '#FAF3DD',
+                    border: isSelected ? '2px solid #4A7C59' : '1px solid #8FC0A9',
                     cursor: 'pointer',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
+                    boxShadow: isSelected ? '0 4px 10px rgba(74, 124, 89, 0.15)' : 'none',
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '15px' }}>{cust.name}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                    <div style={{ fontWeight: 800, fontSize: '15px', color: '#4A7C59' }}>{cust.name}</div>
+                    <div style={{ fontSize: '12px', color: '#68B0AB', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px', fontWeight: 600 }}>
                       <Phone size={12} /> {cust.phone}
                     </div>
                   </div>
 
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#b45309', fontFamily: 'var(--font-mono)' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 900, color: '#4A7C59', fontFamily: 'var(--font-mono)' }}>
                       Rs {cust.balance.toLocaleString()}
                     </div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    <div style={{ fontSize: '10px', color: '#68B0AB', marginTop: '2px', fontWeight: 600 }}>
                       {cust.lastActivity}
                     </div>
                   </div>
@@ -267,13 +272,14 @@ export const CustomerLedgerView: React.FC = () => {
         {/* Selected Customer Profile & Chronological Ledger */}
         <div
           style={{
-            backgroundColor: 'var(--bg-surface)',
-            borderRadius: 'var(--radius-lg)',
-            border: '1.5px solid var(--border-subtle)',
+            backgroundColor: '#FAF3DD',
+            borderRadius: '16px',
+            border: '2px solid #8FC0A9',
             padding: '20px',
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
+            boxShadow: '0 4px 12px rgba(74, 124, 89, 0.08)',
           }}
         >
           {/* Profile Header */}
@@ -282,20 +288,20 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'flex-start',
-              borderBottom: '1px solid var(--border-subtle)',
+              borderBottom: '1px solid #8FC0A9',
               paddingBottom: '14px',
             }}
           >
             <div>
-              <h3 style={{ fontSize: '20px', fontWeight: 800 }}>{selectedCustomer.name}</h3>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#4A7C59' }}>{selectedCustomer.name}</h3>
+              <div style={{ fontSize: '13px', color: '#68B0AB', marginTop: '2px', fontWeight: 600 }}>
                 Contact: {selectedCustomer.phone}
               </div>
             </div>
 
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>CURRENT BALANCE (بقایا ادھار)</div>
-              <div style={{ fontSize: '28px', fontWeight: 900, color: '#b45309', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#4A7C59' }}>CURRENT BALANCE (بقایا ادھار)</div>
+              <div style={{ fontSize: '28px', fontWeight: 900, color: '#4A7C59', fontFamily: 'var(--font-mono)' }}>
                 Rs {selectedCustomer.balance.toLocaleString()}
               </div>
             </div>
@@ -310,12 +316,12 @@ export const CustomerLedgerView: React.FC = () => {
               style={{
                 flex: 1,
                 height: '46px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--emerald-600)',
-                color: '#ffffff',
+                borderRadius: '10px',
+                backgroundColor: '#4A7C59',
+                color: '#FAF3DD',
                 border: 'none',
                 fontSize: '14px',
-                fontWeight: 700,
+                fontWeight: 800,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -323,22 +329,22 @@ export const CustomerLedgerView: React.FC = () => {
                 gap: '8px',
               }}
             >
-              <DollarSign size={18} /> Log Cash Repayment (ادھار وصولی)
+              <DollarSign size={18} color="#FAF3DD" /> Log Cash Repayment (ادھار وصولی)
             </button>
           </div>
 
           {/* Chronological Append-Only Transactions Ledger */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-              <History size={16} color="var(--text-secondary)" />
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+              <History size={16} color="#4A7C59" />
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#4A7C59' }}>
                 Transaction History (کھاتہ کی تفصیل)
               </span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '350px', overflowY: 'auto' }}>
               {selectedCustomer.transactions.length === 0 ? (
-                <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                <div style={{ padding: '20px', textAlign: 'center', color: '#4A7C59', fontSize: '13px', fontWeight: 600 }}>
                   No prior transactions logged for this account.
                 </div>
               ) : (
@@ -350,9 +356,9 @@ export const CustomerLedgerView: React.FC = () => {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      backgroundColor: 'var(--bg-subtle)',
-                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '10px',
+                      backgroundColor: '#C8D5B9',
+                      border: '1px solid #8FC0A9',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -360,9 +366,10 @@ export const CustomerLedgerView: React.FC = () => {
                         style={{
                           width: '32px',
                           height: '32px',
-                          borderRadius: 'var(--radius-full)',
-                          backgroundColor: tx.type === 'purchase' ? '#fef3c7' : '#d1fae5',
-                          color: tx.type === 'purchase' ? '#b45309' : '#047857',
+                          borderRadius: '9999px',
+                          backgroundColor: '#4A7C59',
+                          color: '#FAF3DD',
+                          border: '1px solid #4A7C59',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -371,23 +378,23 @@ export const CustomerLedgerView: React.FC = () => {
                         {tx.type === 'purchase' ? <ArrowUpRight size={16} /> : <ArrowDownLeft size={16} />}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: '13px' }}>{tx.description}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{tx.date}</div>
+                        <div style={{ fontWeight: 800, fontSize: '13px', color: '#4A7C59' }}>{tx.description}</div>
+                        <div style={{ fontSize: '11px', color: '#4A7C59' }}>{tx.date}</div>
                       </div>
                     </div>
 
                     <div style={{ textAlign: 'right' }}>
                       <div
                         style={{
-                          fontWeight: 800,
+                          fontWeight: 900,
                           fontSize: '14px',
-                          color: tx.type === 'purchase' ? '#b45309' : '#047857',
+                          color: '#4A7C59',
                           fontFamily: 'var(--font-mono)',
                         }}
                       >
                         {tx.type === 'purchase' ? `+ Rs ${tx.amount}` : `- Rs ${tx.amount}`}
                       </div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '11px', color: '#4A7C59', fontWeight: 600 }}>
                         Bal: Rs {tx.runningBalance.toLocaleString()}
                       </div>
                     </div>
@@ -406,8 +413,8 @@ export const CustomerLedgerView: React.FC = () => {
             position: 'fixed',
             inset: 0,
             zIndex: 9996,
-            backgroundColor: 'rgba(15, 23, 42, 0.75)',
-            backdropFilter: 'blur(6px)',
+            backgroundColor: 'rgba(74, 124, 89, 0.65)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -418,25 +425,25 @@ export const CustomerLedgerView: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: '380px',
-              backgroundColor: 'var(--bg-card)',
-              borderRadius: 'var(--radius-lg)',
+              backgroundColor: '#FAF3DD',
+              borderRadius: '16px',
               padding: '20px',
-              border: '1.5px solid var(--border-medium)',
-              boxShadow: 'var(--shadow-xl)',
+              border: '2px solid #8FC0A9',
+              boxShadow: '0 20px 35px rgba(74, 124, 89, 0.25)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 800 }}>Log Cash Repayment</h3>
-              <button onClick={() => setIsRepaymentOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#4A7C59', margin: 0 }}>Log Cash Repayment</h3>
+              <button onClick={() => setIsRepaymentOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4A7C59' }}>
                 <X size={20} />
               </button>
             </div>
 
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '14px' }}>
-              Customer: <strong>{selectedCustomer.name}</strong> • Current Udhaar: <strong>Rs {selectedCustomer.balance}</strong>
+            <p style={{ fontSize: '13px', color: '#4A7C59', marginBottom: '14px' }}>
+              Customer: <strong style={{ color: '#4A7C59' }}>{selectedCustomer.name}</strong> • Current Udhaar: <strong style={{ color: '#4A7C59' }}>Rs {selectedCustomer.balance}</strong>
             </p>
 
-            <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+            <label style={{ fontSize: '12px', fontWeight: 800, color: '#4A7C59' }}>
               REPAYMENT AMOUNT (وصولی رقم)
             </label>
             <input
@@ -446,8 +453,10 @@ export const CustomerLedgerView: React.FC = () => {
               style={{
                 width: '100%',
                 padding: '12px 14px',
-                borderRadius: 'var(--radius-md)',
-                border: '2px solid var(--emerald-600)',
+                borderRadius: '10px',
+                border: '2px solid #8FC0A9',
+                backgroundColor: '#FAF3DD',
+                color: '#4A7C59',
                 fontSize: '22px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
@@ -464,12 +473,12 @@ export const CustomerLedgerView: React.FC = () => {
               style={{
                 width: '100%',
                 height: '48px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--emerald-600)',
-                color: '#ffffff',
+                borderRadius: '10px',
+                backgroundColor: '#4A7C59',
+                color: '#FAF3DD',
                 border: 'none',
                 fontSize: '15px',
-                fontWeight: 700,
+                fontWeight: 800,
                 cursor: 'pointer',
               }}
             >
@@ -486,8 +495,8 @@ export const CustomerLedgerView: React.FC = () => {
             position: 'fixed',
             inset: 0,
             zIndex: 9996,
-            backgroundColor: 'rgba(15, 23, 42, 0.75)',
-            backdropFilter: 'blur(6px)',
+            backgroundColor: 'rgba(74, 124, 89, 0.65)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -498,40 +507,40 @@ export const CustomerLedgerView: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: '380px',
-              backgroundColor: 'var(--bg-card)',
-              borderRadius: 'var(--radius-lg)',
+              backgroundColor: '#FAF3DD',
+              borderRadius: '16px',
               padding: '20px',
-              border: '1.5px solid var(--border-medium)',
-              boxShadow: 'var(--shadow-xl)',
+              border: '2px solid #8FC0A9',
+              boxShadow: '0 20px 35px rgba(74, 124, 89, 0.25)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 800 }}>Add Credit Customer</h3>
-              <button onClick={() => setIsNewCustomerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#4A7C59', margin: 0 }}>Add Credit Customer</h3>
+              <button onClick={() => setIsNewCustomerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4A7C59' }}>
                 <X size={20} />
               </button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '18px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700 }}>Customer Name (نام)</label>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#4A7C59' }}>Customer Name (نام)</label>
                 <input
                   type="text"
                   placeholder="e.g. Haji Asif / حاجی آصف"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-medium)', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1.5px solid #8FC0A9', backgroundColor: '#FAF3DD', color: '#4A7C59', marginTop: '4px', outline: 'none', fontWeight: 700 }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700 }}>Phone Number (موبائل نمبر)</label>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#4A7C59' }}>Phone Number (موبائل نمبر)</label>
                 <input
                   type="text"
                   placeholder="0300-1234567"
                   value={newPhone}
                   onChange={(e) => setNewPhone(e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-medium)', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1.5px solid #8FC0A9', backgroundColor: '#FAF3DD', color: '#4A7C59', marginTop: '4px', outline: 'none', fontWeight: 700 }}
                 />
               </div>
             </div>
@@ -543,12 +552,12 @@ export const CustomerLedgerView: React.FC = () => {
               style={{
                 width: '100%',
                 height: '46px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--wheat-600)',
-                color: '#ffffff',
+                borderRadius: '10px',
+                backgroundColor: '#4A7C59',
+                color: '#FAF3DD',
                 border: 'none',
                 fontSize: '15px',
-                fontWeight: 700,
+                fontWeight: 800,
                 cursor: 'pointer',
               }}
             >

@@ -11,49 +11,40 @@
 }
 
 :root {
-  /* Color Palette: Warm Flour & Wheat Theme with High Contrast */
-  --bg-main: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f1f5f9;
-  --bg-card: #ffffff;
+  /* Strict 5-Color Palette from User Image */
+  --c1: #FAF3DD; /* Warm Cream / Light Off-White (Canvas, light cards, large boxes) */
+  --c2: #C8D5B9; /* Soft Celadon Sage (Subtle panels, active cards, badges) */
+  --c3: #8FC0A9; /* Seafoam Mint (Borders, dividers, keypad frames) */
+  --c4: #68B0AB; /* Muted Teal Jade (Secondary accents, status icons) */
+  --c5: #4A7C59; /* Deep Forest Moss Green (Deep wording, headings, primary CTA buttons) */
+
+  /* Light Theme Semantic UI Tokens - Light boxes, deep dark typography */
+  --bg-main: var(--c1);
+  --bg-surface: var(--c1);
+  --bg-subtle: var(--c2);
+  --bg-card: var(--c1);
+  --bg-input: var(--c1);
   
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-inverse: #ffffff;
+  --text-primary: var(--c5);
+  --text-secondary: var(--c5);
+  --text-muted: var(--c4);
+  --text-inverse: var(--c1);
 
-  /* Wheat & Gold Brand Accent */
-  --wheat-50: #fffbeb;
-  --wheat-100: #fef3c7;
-  --wheat-400: #fbbf24;
-  --wheat-500: #f59e0b;
-  --wheat-600: #d97706;
-  --wheat-700: #b45309;
+  /* Accents */
+  --accent-primary: var(--c5);
+  --accent-secondary: var(--c4);
+  --accent-muted: var(--c3);
 
-  /* Emerald (Sales & Totals) */
-  --emerald-50: #ecfdf5;
-  --emerald-500: #10b981;
-  --emerald-600: #059669;
-  --emerald-700: #047857;
-
-  /* Alert / Error / Warning */
-  --rose-50: #fff1f2;
-  --rose-500: #f43f5e;
-  --rose-600: #e11d48;
+  /* Borders & Dividers */
+  --border-subtle: var(--c3);
+  --border-medium: var(--c3);
+  --border-strong: var(--c5);
+  --border-active: var(--c5);
   
-  --amber-50: #fffbeb;
-  --amber-500: #f59e0b;
-  --amber-600: #d97706;
-
-  /* Borders & Shadows */
-  --border-subtle: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-strong: #94a3b8;
-  
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 2px 0 rgba(74, 124, 89, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(74, 124, 89, 0.12), 0 2px 4px -2px rgba(74, 124, 89, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(74, 124, 89, 0.15), 0 4px 6px -4px rgba(74, 124, 89, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(74, 124, 89, 0.2), 0 8px 10px -6px rgba(74, 124, 89, 0.15);
 
   /* Touch Target Radius */
   --radius-sm: 8px;
@@ -80,7 +71,7 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  user-select: none; /* Prevents text selection on counter tablets */
+  user-select: none;
 }
 
 /* Urdu Typography Class */
@@ -108,9 +99,9 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-subtle);
+  background: var(--c1);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
+  background: var(--c3);
   border-radius: var(--radius-full);
 }

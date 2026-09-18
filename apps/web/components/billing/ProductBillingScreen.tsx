@@ -182,10 +182,10 @@ export const ProductBillingScreen: React.FC = () => {
               className="touch-active"
               style={{
                 padding: '8px 10px',
-                borderRadius: '10px',
-                backgroundColor: isSelected ? '#fffbeb' : '#ffffff',
-                border: isSelected ? '2.5px solid #d97706' : '1px solid #cbd5e1',
-                boxShadow: isSelected ? '0 2px 6px rgba(217, 119, 6, 0.2)' : '0 1px 2px rgba(0,0,0,0.03)',
+                borderRadius: '12px',
+                backgroundColor: isSelected ? '#C8D5B9' : '#FAF3DD',
+                border: isSelected ? '2.5px solid #4A7C59' : '1.5px solid #8FC0A9',
+                boxShadow: isSelected ? '0 4px 10px rgba(74, 124, 89, 0.2)' : '0 1px 3px rgba(74, 124, 89, 0.08)',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
@@ -195,10 +195,10 @@ export const ProductBillingScreen: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px' }}>
-                <span style={{ fontWeight: 800, color: isSelected ? '#b45309' : '#047857', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontWeight: 800, color: '#4A7C59', fontFamily: 'var(--font-mono)' }}>
                   {isRateSet ? `Rs ${p.ratePerKg}` : '⚠️ Unset'}
                 </span>
-                {isSelected && <Check size={12} color="#d97706" strokeWidth={3} />}
+                {isSelected && <Check size={12} color="#4A7C59" strokeWidth={3} />}
               </div>
 
               <div
@@ -206,14 +206,14 @@ export const ProductBillingScreen: React.FC = () => {
                 style={{
                   fontSize: '20px',
                   fontWeight: 700,
-                  color: isSelected ? '#000000' : '#1e293b',
+                  color: '#4A7C59',
                   lineHeight: 1.2,
                 }}
               >
                 {p.nameUr}
               </div>
 
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#4A7C59', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {p.nameEn}
               </div>
             </div>
@@ -224,14 +224,14 @@ export const ProductBillingScreen: React.FC = () => {
       {/* 2. MAIN BILLING CARD */}
       <div
         style={{
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          border: '1.5px solid #cbd5e1',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-          padding: '12px 18px',
+          backgroundColor: '#FAF3DD',
+          borderRadius: '16px',
+          border: '2px solid #8FC0A9',
+          boxShadow: '0 6px 16px rgba(74, 124, 89, 0.08)',
+          padding: '14px 18px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
+          gap: '10px',
         }}
       >
         {/* Top Mini Strip: Selected Product + Mode Toggle */}
@@ -240,23 +240,23 @@ export const ProductBillingScreen: React.FC = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderBottom: '1px solid #f1f5f9',
-            paddingBottom: '6px',
+            borderBottom: '1px solid #8FC0A9',
+            paddingBottom: '8px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
+            <span style={{ fontSize: '16px', fontWeight: 900, color: '#4A7C59' }}>
               {selectedProduct.nameEn}
             </span>
-            <span className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#d97706' }}>
+            <span className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#4A7C59' }}>
               {selectedProduct.nameUr}
             </span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748b' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#68B0AB' }}>
               • Rate: Rs {selectedProduct.ratePerKg}/KG
             </span>
           </div>
 
-          <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '2px', borderRadius: '8px', gap: '2px' }}>
+          <div style={{ display: 'flex', backgroundColor: '#C8D5B9', padding: '3px', borderRadius: '10px', border: '1px solid #8FC0A9', gap: '3px' }}>
             <button
               type="button"
               onClick={() => {
@@ -266,11 +266,11 @@ export const ProductBillingScreen: React.FC = () => {
                 weightInputRef.current?.focus();
               }}
               style={{
-                padding: '5px 10px',
-                borderRadius: '6px',
+                padding: '6px 12px',
+                borderRadius: '7px',
                 border: 'none',
-                backgroundColor: calcMode === 'weight' ? '#d97706' : 'transparent',
-                color: calcMode === 'weight' ? '#ffffff' : '#475569',
+                backgroundColor: calcMode === 'weight' ? '#4A7C59' : 'transparent',
+                color: calcMode === 'weight' ? '#FAF3DD' : '#4A7C59',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -279,7 +279,7 @@ export const ProductBillingScreen: React.FC = () => {
                 gap: '4px',
               }}
             >
-              <Scale size={13} /> Weight Mode (وزن)
+              <Scale size={13} color={calcMode === 'weight' ? '#FAF3DD' : '#4A7C59'} /> Weight Mode (وزن)
             </button>
 
             <button
@@ -291,11 +291,11 @@ export const ProductBillingScreen: React.FC = () => {
                 weightInputRef.current?.focus();
               }}
               style={{
-                padding: '5px 10px',
-                borderRadius: '6px',
+                padding: '6px 12px',
+                borderRadius: '7px',
                 border: 'none',
-                backgroundColor: calcMode === 'amount' ? '#d97706' : 'transparent',
-                color: calcMode === 'amount' ? '#ffffff' : '#475569',
+                backgroundColor: calcMode === 'amount' ? '#4A7C59' : 'transparent',
+                color: calcMode === 'amount' ? '#FAF3DD' : '#4A7C59',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -304,7 +304,7 @@ export const ProductBillingScreen: React.FC = () => {
                 gap: '4px',
               }}
             >
-              <Banknote size={13} /> Rupees Mode (رقم)
+              <Banknote size={13} color={calcMode === 'amount' ? '#FAF3DD' : '#4A7C59'} /> Rupees Mode (رقم)
             </button>
           </div>
         </div>
@@ -313,7 +313,7 @@ export const ProductBillingScreen: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '14px', alignItems: 'center' }}>
           {/* 1. Weight Input */}
           <div>
-            <label style={{ fontSize: '13px', fontWeight: 800, color: '#334155', display: 'block', marginBottom: '2px' }}>
+            <label style={{ fontSize: '13px', fontWeight: 800, color: '#4A7C59', display: 'block', marginBottom: '4px' }}>
               {calcMode === 'weight' ? 'Weight (وزن - KG):' : 'Desired Rupees (مطلوبہ رقم):'}
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -335,19 +335,19 @@ export const ProductBillingScreen: React.FC = () => {
                 }}
                 style={{
                   width: '100%',
-                  height: '46px',
-                  borderRadius: '8px',
-                  border: '2px solid #d97706',
-                  backgroundColor: '#fffdfa',
+                  height: '48px',
+                  borderRadius: '10px',
+                  border: '2px solid #8FC0A9',
+                  backgroundColor: '#FAF3DD',
                   fontSize: '26px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
-                  color: '#0f172a',
+                  color: '#4A7C59',
                   padding: '0 45px 0 12px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '12px', fontSize: '15px', fontWeight: 900, color: '#94a3b8' }}>
+              <span style={{ position: 'absolute', right: '12px', fontSize: '15px', fontWeight: 900, color: '#4A7C59' }}>
                 {calcMode === 'weight' ? 'KG' : 'Rs'}
               </span>
             </div>
@@ -356,18 +356,19 @@ export const ProductBillingScreen: React.FC = () => {
           {/* Right: Net Total Box */}
           <div
             style={{
-              backgroundColor: '#f8fafc',
-              border: '1.5px solid #e2e8f0',
-              borderRadius: '8px',
-              padding: '8px 12px',
+              backgroundColor: '#C8D5B9',
+              border: '2px solid #4A7C59',
+              borderRadius: '10px',
+              padding: '10px 14px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
+              boxShadow: '0 4px 10px rgba(74, 124, 89, 0.12)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
-              <span style={{ fontWeight: 800, color: '#64748b' }}>TOTAL AMOUNT (کل رقم)</span>
-              <span style={{ fontWeight: 700, color: '#047857' }}>
+              <span style={{ fontWeight: 800, color: '#4A7C59' }}>TOTAL AMOUNT (کل رقم)</span>
+              <span style={{ fontWeight: 700, color: '#4A7C59' }}>
                 {calculatedWeight} KG @ Rs {rate}/KG
               </span>
             </div>
@@ -377,7 +378,7 @@ export const ProductBillingScreen: React.FC = () => {
                 fontSize: '32px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: '#047857',
+                color: '#4A7C59',
                 lineHeight: 1.1,
                 margin: '2px 0',
               }}
@@ -389,9 +390,9 @@ export const ProductBillingScreen: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowDiscount(!showDiscount)}
-                style={{ background: 'none', border: 'none', color: '#b45309', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
+                style={{ background: 'none', border: 'none', color: '#4A7C59', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
               >
-                <Tag size={12} /> {showDiscount ? 'Close Discount' : '+ Add Discount (رعایت)'}
+                <Tag size={12} color="#4A7C59" /> {showDiscount ? 'Close Discount' : '+ Add Discount (رعایت)'}
               </button>
               {showDiscount && (
                 <input
@@ -402,7 +403,7 @@ export const ProductBillingScreen: React.FC = () => {
                     setDiscountValue(e.target.value);
                     setIsReceivedAutoUpdated(true);
                   }}
-                  style={{ width: '70px', padding: '2px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '11px', fontWeight: 700, outline: 'none' }}
+                  style={{ width: '75px', padding: '3px 6px', borderRadius: '6px', border: '1.5px solid #4A7C59', backgroundColor: '#FAF3DD', color: '#4A7C59', fontSize: '12px', fontWeight: 700, outline: 'none' }}
                 />
               )}
             </div>
@@ -412,10 +413,10 @@ export const ProductBillingScreen: React.FC = () => {
         {/* 2. Cash Received Row */}
         <div
           style={{
-            backgroundColor: '#f1f5f9',
-            borderRadius: '8px',
-            padding: '8px 12px',
-            border: '1px solid #cbd5e1',
+            backgroundColor: '#FAF3DD',
+            borderRadius: '10px',
+            padding: '10px 14px',
+            border: '1.5px solid #8FC0A9',
             display: 'grid',
             gridTemplateColumns: '1.2fr 1fr',
             gap: '12px',
@@ -423,7 +424,7 @@ export const ProductBillingScreen: React.FC = () => {
           }}
         >
           <div>
-            <label style={{ fontSize: '12px', fontWeight: 900, color: '#0f172a', display: 'block', marginBottom: '2px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 900, color: '#4A7C59', display: 'block', marginBottom: '2px' }}>
               Cash Received (وصول رقم):
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -445,18 +446,18 @@ export const ProductBillingScreen: React.FC = () => {
                 style={{
                   width: '100%',
                   height: '42px',
-                  borderRadius: '6px',
-                  border: '2px solid #059669',
-                  backgroundColor: '#ffffff',
+                  borderRadius: '8px',
+                  border: '2px solid #8FC0A9',
+                  backgroundColor: '#FAF3DD',
                   fontSize: '22px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
-                  color: '#065f46',
+                  color: '#4A7C59',
                   padding: '0 40px 0 10px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '10px', fontSize: '13px', fontWeight: 900, color: '#047857' }}>
+              <span style={{ position: 'absolute', right: '10px', fontSize: '13px', fontWeight: 900, color: '#4A7C59' }}>
                 Rs
               </span>
             </div>
@@ -464,22 +465,22 @@ export const ProductBillingScreen: React.FC = () => {
 
           <div>
             {balanceRemaining > 0 ? (
-              <div style={{ backgroundColor: '#fffbeb', border: '1px solid #f59e0b', borderRadius: '6px', padding: '4px 8px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 700, color: '#92400e' }}>Remaining Balance (باقی رقم):</div>
-                <div style={{ fontSize: '18px', fontWeight: 900, color: '#b45309', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#C8D5B9', border: '1.5px solid #8FC0A9', borderRadius: '8px', padding: '6px 10px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#4A7C59' }}>Remaining Balance (باقی رقم):</div>
+                <div style={{ fontSize: '18px', fontWeight: 900, color: '#4A7C59', fontFamily: 'var(--font-mono)' }}>
                   Rs {balanceRemaining.toLocaleString()}
                 </div>
               </div>
             ) : changeToReturn > 0 ? (
-              <div style={{ backgroundColor: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px', padding: '4px 8px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 700, color: '#047857' }}>Change to Return (واپسی رقم):</div>
-                <div style={{ fontSize: '18px', fontWeight: 900, color: '#047857', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#C8D5B9', border: '1.5px solid #8FC0A9', borderRadius: '8px', padding: '6px 10px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#4A7C59' }}>Change to Return (واپسی رقم):</div>
+                <div style={{ fontSize: '18px', fontWeight: 900, color: '#4A7C59', fontFamily: 'var(--font-mono)' }}>
                   Rs {changeToReturn.toLocaleString()}
                 </div>
               </div>
             ) : (
-              <div style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#047857' }}>✓ Exact Cash Paid</div>
+              <div style={{ backgroundColor: '#C8D5B9', border: '1.5px solid #8FC0A9', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#4A7C59' }}>✓ Exact Cash Paid</div>
               </div>
             )}
           </div>
@@ -489,20 +490,20 @@ export const ProductBillingScreen: React.FC = () => {
         <div
           style={{
             position: 'relative',
-            backgroundColor: '#fffbeb',
-            border: '1px solid #fde68a',
-            borderRadius: '8px',
-            padding: '8px 12px',
+            backgroundColor: '#FAF3DD',
+            border: '1.5px solid #8FC0A9',
+            borderRadius: '10px',
+            padding: '10px 14px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
+            gap: '6px',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 800, fontSize: '11px', color: '#92400e', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <UserCheck size={13} /> Customer Details (گاہک کا نام و فون نمبر — ادھار کے لیے درج کریں)
+            <span style={{ fontWeight: 800, fontSize: '12px', color: '#4A7C59', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <UserCheck size={14} color="#4A7C59" /> Customer Details (گاہک کا نام و فون نمبر — ادھار کے لیے درج کریں)
             </span>
-            <span style={{ fontSize: '10px', color: '#b45309' }}>Type name to see registered accounts</span>
+            <span style={{ fontSize: '11px', color: '#68B0AB', fontWeight: 600 }}>Type name to see registered accounts</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
@@ -522,21 +523,21 @@ export const ProductBillingScreen: React.FC = () => {
                     if (customerName.trim()) {
                       customerPhoneInputRef.current?.focus();
                     } else {
-                      // If customer name is left empty and user presses Enter, print cash bill
                       handleFinalSubmit(false);
                     }
                   }
                 }}
                 style={{
                   width: '100%',
-                  height: '36px',
+                  height: '38px',
                   padding: '6px 10px',
-                  borderRadius: '6px',
-                  border: '1.5px solid #d97706',
+                  borderRadius: '8px',
+                  border: '1.5px solid #8FC0A9',
                   fontSize: '13px',
                   fontWeight: 700,
                   outline: 'none',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: '#FAF3DD',
+                  color: '#4A7C59',
                 }}
               />
 
@@ -545,13 +546,13 @@ export const ProductBillingScreen: React.FC = () => {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '40px',
+                    top: '42px',
                     left: 0,
                     right: 0,
-                    backgroundColor: '#ffffff',
-                    border: '1.5px solid #d97706',
+                    backgroundColor: '#FAF3DD',
+                    border: '1.5px solid #8FC0A9',
                     borderRadius: '8px',
-                    boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                    boxShadow: '0 8px 16px rgba(74, 124, 89, 0.2)',
                     zIndex: 200,
                     maxHeight: '160px',
                     overflowY: 'auto',
@@ -564,15 +565,15 @@ export const ProductBillingScreen: React.FC = () => {
                       className="touch-active"
                       style={{
                         padding: '8px 12px',
-                        borderBottom: '1px solid #f1f5f9',
+                        borderBottom: '1px solid #8FC0A9',
                         cursor: 'pointer',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}
                     >
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{cust.name}</span>
-                      <span style={{ fontSize: '11px', color: '#64748b' }}>{cust.phone}</span>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#4A7C59' }}>{cust.name}</span>
+                      <span style={{ fontSize: '11px', color: '#68B0AB', fontWeight: 600 }}>{cust.phone}</span>
                     </div>
                   ))}
                 </div>
@@ -589,19 +590,19 @@ export const ProductBillingScreen: React.FC = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    // Pressing enter on phone completes credit sale!
                     handleFinalSubmit(true);
                   }
                 }}
                 style={{
                   width: '100%',
-                  height: '36px',
+                  height: '38px',
                   padding: '6px 10px',
-                  borderRadius: '6px',
-                  border: '1px solid #d97706',
+                  borderRadius: '8px',
+                  border: '1.5px solid #8FC0A9',
                   fontSize: '13px',
                   outline: 'none',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: '#FAF3DD',
+                  color: '#4A7C59',
                 }}
               />
             </div>
@@ -609,7 +610,7 @@ export const ProductBillingScreen: React.FC = () => {
         </div>
 
         {/* 4. THE 2 ACTION BUTTONS */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px', marginTop: '2px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px', marginTop: '4px' }}>
           <button
             type="button"
             onClick={() => handleFinalSubmit(false)}
@@ -617,21 +618,21 @@ export const ProductBillingScreen: React.FC = () => {
             className="touch-active"
             style={{
               height: '48px',
-              borderRadius: '8px',
-              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#059669' : '#94a3b8',
-              color: '#ffffff',
+              borderRadius: '10px',
+              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#4A7C59' : '#C8D5B9',
+              color: rate > 0 && calculatedWeight > 0 ? '#FAF3DD' : '#8FC0A9',
               border: 'none',
               fontSize: '15px',
               fontWeight: 900,
               cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
-              boxShadow: '0 3px 8px rgba(5, 150, 105, 0.25)',
+              boxShadow: rate > 0 && calculatedWeight > 0 ? '0 3px 8px rgba(74, 124, 89, 0.2)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
             }}
           >
-            <Printer size={20} />
+            <Printer size={20} color={rate > 0 && calculatedWeight > 0 ? '#FAF3DD' : '#8FC0A9'} />
             <span>Print Cash Bill (نقد بل)</span>
           </button>
 
@@ -648,21 +649,21 @@ export const ProductBillingScreen: React.FC = () => {
             className="touch-active"
             style={{
               height: '48px',
-              borderRadius: '8px',
-              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#d97706' : '#94a3b8',
-              color: '#ffffff',
+              borderRadius: '10px',
+              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#68B0AB' : '#C8D5B9',
+              color: rate > 0 && calculatedWeight > 0 ? '#FAF3DD' : '#8FC0A9',
               border: 'none',
               fontSize: '15px',
               fontWeight: 900,
               cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
-              boxShadow: '0 3px 8px rgba(217, 119, 6, 0.25)',
+              boxShadow: rate > 0 && calculatedWeight > 0 ? '0 3px 8px rgba(74, 124, 89, 0.2)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
             }}
           >
-            <BookOpen size={18} />
+            <BookOpen size={18} color={rate > 0 && calculatedWeight > 0 ? '#FAF3DD' : '#8FC0A9'} />
             <span>Save as Credit (ادھار بل)</span>
           </button>
         </div>

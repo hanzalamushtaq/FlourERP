@@ -27,13 +27,13 @@ export default function Home() {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#FAF3DD', color: '#4A7C59' }}>
       {/* Top Application Header */}
       <header
         style={{
-          backgroundColor: '#ffffff',
-          borderBottom: '2px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+          backgroundColor: '#FAF3DD',
+          borderBottom: '2px solid #8FC0A9',
+          boxShadow: '0 2px 8px rgba(74, 124, 89, 0.08)',
           position: 'sticky',
           top: 0,
           zIndex: 1000,
@@ -43,7 +43,7 @@ export default function Home() {
           style={{
             maxWidth: '1280px',
             margin: '0 auto',
-            padding: '6px 20px',
+            padding: '8px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -52,14 +52,15 @@ export default function Home() {
           }}
         >
           {/* Logo & Shop Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '38px',
-                height: '38px',
+                width: '40px',
+                height: '40px',
                 borderRadius: '10px',
-                backgroundColor: '#d97706',
-                color: '#ffffff',
+                backgroundColor: '#4A7C59',
+                border: '1.5px solid #4A7C59',
+                color: '#FAF3DD',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -70,7 +71,7 @@ export default function Home() {
 
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px' }}>
+                <span style={{ fontSize: '20px', fontWeight: 900, color: '#4A7C59', letterSpacing: '-0.5px' }}>
                   FlourERP
                 </span>
                 <span
@@ -79,9 +80,9 @@ export default function Home() {
                     fontWeight: 800,
                     padding: '2px 8px',
                     borderRadius: '9999px',
-                    backgroundColor: '#ecfdf5',
-                    color: '#047857',
-                    border: '1px solid #a7f3d0',
+                    backgroundColor: '#C8D5B9',
+                    color: '#4A7C59',
+                    border: '1px solid #8FC0A9',
                   }}
                 >
                   ONLINE
@@ -92,7 +93,7 @@ export default function Home() {
                 style={{
                   fontSize: '20px',
                   fontWeight: 700,
-                  color: '#b45309',
+                  color: '#4A7C59',
                   lineHeight: 1.2,
                 }}
               >
@@ -111,9 +112,9 @@ export default function Home() {
               style={{
                 padding: '8px 14px',
                 borderRadius: '10px',
-                backgroundColor: '#fef3c7',
-                color: '#92400e',
-                border: '1.5px solid #fde68a',
+                backgroundColor: '#C8D5B9',
+                color: '#4A7C59',
+                border: '1.5px solid #8FC0A9',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -122,17 +123,17 @@ export default function Home() {
                 gap: '6px',
               }}
             >
-              <Clock size={16} /> Daily Prices (نرخ نامہ)
+              <Clock size={16} color="#4A7C59" /> Daily Prices (نرخ نامہ)
             </button>
 
             {/* Role Switcher Pill */}
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#f1f5f9',
+                backgroundColor: '#C8D5B9',
                 padding: '3px',
                 borderRadius: '10px',
-                border: '1px solid #cbd5e1',
+                border: '1px solid #8FC0A9',
               }}
             >
               <button
@@ -142,8 +143,8 @@ export default function Home() {
                   padding: '6px 12px',
                   borderRadius: '7px',
                   border: 'none',
-                  backgroundColor: userRole === 'biller' ? '#d97706' : 'transparent',
-                  color: userRole === 'biller' ? '#ffffff' : '#475569',
+                  backgroundColor: userRole === 'biller' ? '#4A7C59' : 'transparent',
+                  color: userRole === 'biller' ? '#FAF3DD' : '#4A7C59',
                   fontWeight: 700,
                   fontSize: '12px',
                   cursor: 'pointer',
@@ -158,8 +159,8 @@ export default function Home() {
                   padding: '6px 12px',
                   borderRadius: '7px',
                   border: 'none',
-                  backgroundColor: userRole === 'admin' ? '#0f172a' : 'transparent',
-                  color: userRole === 'admin' ? '#ffffff' : '#475569',
+                  backgroundColor: userRole === 'admin' ? '#4A7C59' : 'transparent',
+                  color: userRole === 'admin' ? '#FAF3DD' : '#4A7C59',
                   fontWeight: 700,
                   fontSize: '12px',
                   cursor: 'pointer',
@@ -177,9 +178,9 @@ export default function Home() {
               style={{
                 padding: '8px 12px',
                 borderRadius: '10px',
-                backgroundColor: '#fee2e2',
-                color: '#b91c1c',
-                border: '1.5px solid #fca5a5',
+                backgroundColor: '#4A7C59',
+                color: '#FAF3DD',
+                border: '1.5px solid #4A7C59',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -189,12 +190,12 @@ export default function Home() {
               }}
               title="Lock Terminal"
             >
-              <Lock size={15} /> Lock PIN
+              <Lock size={15} color="#FAF3DD" /> Lock PIN
             </button>
           </div>
         </div>
 
-        {/* Big, Clear Navigation Tabs for 40+ year old readability */}
+        {/* Big, Clear Navigation Tabs */}
         <div
           style={{
             maxWidth: '1280px',
@@ -219,16 +220,16 @@ export default function Home() {
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
                 style={{
-                  padding: '6px 14px',
+                  padding: '8px 14px',
                   border: 'none',
                   background: 'none',
                   cursor: 'pointer',
-                  borderBottom: isActive ? '3px solid #d97706' : '3px solid transparent',
-                  color: isActive ? '#b45309' : '#64748b',
+                  borderBottom: isActive ? '3px solid #4A7C59' : '3px solid transparent',
+                  color: isActive ? '#4A7C59' : '#68B0AB',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  fontWeight: isActive ? 800 : 600,
+                  fontWeight: isActive ? 800 : 700,
                   fontSize: '14px',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.12s ease',
@@ -236,7 +237,7 @@ export default function Home() {
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700 }}>
+                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: isActive ? '#4A7C59' : '#8FC0A9' }}>
                   ({tab.ur})
                 </span>
               </button>
