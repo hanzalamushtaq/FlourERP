@@ -24,11 +24,11 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   isAdmin = true,
 }) => {
   const [prices, setPrices] = useState<PriceItem[]>([
-    { id: '1', nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (گندم)', yesterdayRate: 138, todayRate: 140 },
-    { id: '2', nameEn: 'Fine Atta', nameUr: 'فائن آٹا', yesterdayRate: 145, todayRate: 148 },
-    { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', yesterdayRate: 155, todayRate: 155 },
-    { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', yesterdayRate: 160, todayRate: 160 },
-    { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', yesterdayRate: 90, todayRate: 95 },
+    { id: '1', nameEn: 'Chakki Atta', nameUr: 'Ãšâ€ ÃšÂ©Ã›Å’ Ã˜Â¢Ã™Â¹Ã˜Â§ (ÃšÂ¯Ã™â€ Ã˜Â¯Ã™â€¦)', yesterdayRate: 138, todayRate: 140 },
+    { id: '2', nameEn: 'Fine Atta', nameUr: 'Ã™ÂÃ˜Â§Ã˜Â¦Ã™â€  Ã˜Â¢Ã™Â¹Ã˜Â§', yesterdayRate: 145, todayRate: 148 },
+    { id: '3', nameEn: 'Maida Special', nameUr: 'Ã™â€¦Ã›Å’Ã˜Â¯Ã›Â Ã˜Â§Ã˜Â³Ã™Â¾Ã›Å’Ã˜Â´Ã™â€ž', yesterdayRate: 155, todayRate: 155 },
+    { id: '4', nameEn: 'Suji / Semolina', nameUr: 'Ã˜Â®Ã˜Â§Ã™â€žÃ˜Âµ Ã˜Â³Ã™Ë†Ã˜Â¬Ã›Å’', yesterdayRate: 160, todayRate: 160 },
+    { id: '5', nameEn: 'Chokar / Bran', nameUr: 'Ãšâ€ Ã™Ë†ÃšÂ©Ã˜Â± (ÃšÂ©ÃšÂ¾Ã™â€ž)', yesterdayRate: 90, todayRate: 95 },
   ]);
 
   const [billerHoldState, setBillerHoldState] = useState<boolean>(false);
@@ -56,7 +56,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 9995,
-        backgroundColor: 'rgba(121, 125, 98, 0.65)',
+        backgroundColor: 'rgba(27, 30, 19, 0.7)',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
@@ -68,11 +68,11 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '560px',
-          backgroundColor: '#F1DCA7',
+          backgroundColor: '#FFFFFF',
           borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: '0 20px 35px rgba(121, 125, 98, 0.25)',
-          border: '2.5px solid #797D62',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+          border: '2.5px solid #5E6348',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
@@ -82,8 +82,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         <div
           style={{
             padding: '16px 20px',
-            backgroundColor: '#F1DCA7',
-            borderBottom: '1.5px solid #BAA587',
+            backgroundColor: '#FFCB69',
+            borderBottom: '2px solid #5E6348',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -91,18 +91,18 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Clock size={20} color="#797D62" />
-              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#797D62' }}>
+              <Clock size={20} color="#1B1E13" />
+              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1B1E13' }}>
                 Daily Price Confirmation
               </h2>
             </div>
-            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#797D62' }}>
-              روزانہ نرخ نامہ کی تصدیق (24 گھنٹے میں ایک بار)
+            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#1B1E13' }}>
+              Ã˜Â±Ã™Ë†Ã˜Â²Ã˜Â§Ã™â€ Ã›Â Ã™â€ Ã˜Â±Ã˜Â® Ã™â€ Ã˜Â§Ã™â€¦Ã›Â ÃšÂ©Ã›Å’ Ã˜ÂªÃ˜ÂµÃ˜Â¯Ã›Å’Ã™â€š (24 ÃšÂ¯ÃšÂ¾Ã™â€ Ã™Â¹Ã›â€™ Ã™â€¦Ã›Å’ÃšÂº Ã˜Â§Ã›Å’ÃšÂ© Ã˜Â¨Ã˜Â§Ã˜Â±)
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#797D62' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1B1E13' }}
           >
             <X size={22} />
           </button>
@@ -112,17 +112,17 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         <div
           style={{
             padding: '12px 20px',
-            backgroundColor: '#F1DCA7',
+            backgroundColor: '#F4F1EA',
             fontSize: '13px',
-            color: '#797D62',
+            color: '#1B1E13',
             fontWeight: 700,
-            borderBottom: '2px solid #797D62',
+            borderBottom: '2px solid #5E6348',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
           }}
         >
-          <ShieldCheck size={18} color="#797D62" />
+          <ShieldCheck size={18} color="#1B1E13" />
           <span>
             First bill of the day protocol: Rates must be confirmed before counter sales proceed.
           </span>
@@ -136,12 +136,12 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
               gridTemplateColumns: '2fr 1fr 1fr',
               fontSize: '12px',
               fontWeight: 800,
-              color: '#797D62',
+              color: '#1B1E13',
               paddingBottom: '4px',
               borderBottom: '1.5px solid #BAA587',
             }}
           >
-            <span>PRODUCT (پروڈکٹ)</span>
+            <span>PRODUCT (Ã™Â¾Ã˜Â±Ã™Ë†ÃšË†ÃšÂ©Ã™Â¹)</span>
             <span style={{ textAlign: 'center' }}>YESTERDAY RATE</span>
             <span style={{ textAlign: 'right' }}>TODAY RATE (Rs/KG)</span>
           </div>
@@ -158,13 +158,13 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
               }}
             >
               <div>
-                <div style={{ fontWeight: 800, fontSize: '14px', color: '#797D62' }}>{item.nameEn}</div>
-                <div className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: '#797D62' }}>
+                <div style={{ fontWeight: 800, fontSize: '14px', color: '#1B1E13' }}>{item.nameEn}</div>
+                <div className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: '#1B1E13' }}>
                   {item.nameUr}
                 </div>
               </div>
 
-              <div style={{ textAlign: 'center', fontWeight: 700, color: '#797D62' }}>
+              <div style={{ textAlign: 'center', fontWeight: 700, color: '#1B1E13' }}>
                 Rs {item.yesterdayRate}
               </div>
 
@@ -178,9 +178,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                       width: '90px',
                       padding: '8px 10px',
                       borderRadius: '8px',
-                      border: '2.5px solid #797D62',
-                      backgroundColor: '#F1DCA7',
-                      color: '#797D62',
+                      border: '2px solid #5E6348',
+                      backgroundColor: '#FFFFFF',
+                      color: '#1B1E13',
                       fontSize: '16px',
                       fontWeight: 900,
                       fontFamily: 'var(--font-mono)',
@@ -189,7 +189,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                     }}
                   />
                 ) : (
-                  <span style={{ fontWeight: 900, fontSize: '16px', color: '#797D62' }}>
+                  <span style={{ fontWeight: 900, fontSize: '16px', color: '#1B1E13' }}>
                     Rs {item.todayRate}
                   </span>
                 )}
@@ -201,22 +201,22 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
           {!isAdmin && (
             <div
               style={{
-                backgroundColor: '#F1DCA7',
-                border: '2px solid #797D62',
+                backgroundColor: '#F8FAF8',
+                border: '2px solid #C2BAAA',
                 borderRadius: '12px',
                 padding: '14px',
                 marginTop: '10px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={18} color="#797D62" />
-                <span style={{ fontWeight: 800, fontSize: '13px', color: '#797D62' }}>
+                <AlertCircle size={18} color="#1B1E13" />
+                <span style={{ fontWeight: 800, fontSize: '13px', color: '#1B1E13' }}>
                   {billerHoldState
                     ? 'BILL ON HOLD: Price change request sent to Admin!'
                     : 'Biller Notice: You cannot edit rates directly.'}
                 </span>
               </div>
-              <p style={{ fontSize: '12px', color: '#797D62', marginTop: '4px', fontWeight: 600 }}>
+              <p style={{ fontSize: '12px', color: '#1B1E13', marginTop: '4px', fontWeight: 600 }}>
                 {billerHoldState
                   ? 'Counter bill is locked until Admin confirms or rejects new pricing.'
                   : 'Click below to request rate update from Admin or keep previous rates to proceed.'}
@@ -229,8 +229,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         <div
           style={{
             padding: '16px 20px',
-            backgroundColor: '#F1DCA7',
-            borderTop: '1.5px solid #BAA587',
+            backgroundColor: '#F4F1EA',
+            borderTop: '2px solid #C2BAAA',
             display: 'flex',
             gap: '12px',
           }}
@@ -245,8 +245,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   flex: 1,
                   height: '48px',
                   borderRadius: '10px',
-                  backgroundColor: '#797D62',
-                  color: '#F1DCA7',
+                  backgroundColor: '#5E6348',
+                  color: '#FFFFFF',
                   border: 'none',
                   fontSize: '15px',
                   fontWeight: 800,
@@ -257,8 +257,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   gap: '8px',
                 }}
               >
-                {confirmed ? <CheckCircle2 size={18} color="#F1DCA7" /> : <Save size={18} color="#F1DCA7" />}
-                {confirmed ? 'Prices Confirmed & Logged!' : 'Confirm & Apply Today’s Rates'}
+                {confirmed ? <CheckCircle2 size={18} color="#1B1E13" /> : <Save size={18} color="#1B1E13" />}
+                {confirmed ? 'Prices Confirmed & Logged!' : 'Confirm & Apply TodayÃ¢â‚¬â„¢s Rates'}
               </button>
 
               <button
@@ -269,9 +269,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   height: '48px',
                   padding: '0 16px',
                   borderRadius: '10px',
-                  backgroundColor: '#F1DCA7',
-                  color: '#797D62',
-                  border: '2px solid #797D62',
+                  backgroundColor: '#FFFFFF',
+                  color: '#1B1E13',
+                  border: '2px solid #C2BAAA',
                   fontSize: '14px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -290,8 +290,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   flex: 1,
                   height: '48px',
                   borderRadius: '10px',
-                  backgroundColor: '#797D62',
-                  color: '#F1DCA7',
+                  backgroundColor: '#5E6348',
+                  color: '#FFFFFF',
                   border: 'none',
                   fontSize: '14px',
                   fontWeight: 800,
@@ -308,9 +308,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   height: '48px',
                   padding: '0 16px',
                   borderRadius: '10px',
-                  backgroundColor: '#F1DCA7',
-                  color: '#797D62',
-                  border: '2px solid #797D62',
+                  backgroundColor: '#FFFFFF',
+                  color: '#1B1E13',
+                  border: '2px solid #C2BAAA',
                   fontSize: '14px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -325,3 +325,4 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
     </div>
   );
 };
+

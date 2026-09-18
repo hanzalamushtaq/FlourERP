@@ -49,20 +49,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#F1DCA7',
-          border: '2.5px solid #797D62',
+          backgroundColor: '#FFFFFF',
+          border: '2px solid #C2BAAA',
           borderRadius: '16px',
           padding: '18px 24px',
           flexWrap: 'wrap',
           gap: '12px',
-          boxShadow: '0 4px 12px rgba(121, 125, 98, 0.08)',
+          boxShadow: '0 4px 12px rgba(27, 30, 19, 0.06)',
         }}
       >
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#797D62' }}>
-            Shop Owner Command Center (چکی مینیجر ڈیش بورڈ)
+          <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#1B1E13' }}>
+            Shop Owner Command Center (Ãšâ€ ÃšÂ©Ã›Å’ Ã™â€¦Ã›Å’Ã™â€ Ã›Å’Ã˜Â¬Ã˜Â± ÃšË†Ã›Å’Ã˜Â´ Ã˜Â¨Ã™Ë†Ã˜Â±ÃšË†)
           </h1>
-          <p style={{ fontSize: '13px', color: '#797D62', marginTop: '2px', fontWeight: 600 }}>
+          <p style={{ fontSize: '13px', color: '#1B1E13', marginTop: '2px', fontWeight: 600 }}>
             Real-time financial status, prices, grinding queue, and credit exposure.
           </p>
         </div>
@@ -76,18 +76,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               height: '44px',
               padding: '0 16px',
               borderRadius: '10px',
-              backgroundColor: '#797D62',
-              color: '#F1DCA7',
-              border: 'none',
-              fontSize: '14px',
-              fontWeight: 800,
+              backgroundColor: '#E8AC65',
+              color: '#1B1E13',
+              border: '2px solid #5E6348',
+              fontSize: '15px',
+              fontWeight: 900,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
             }}
           >
-            <Clock size={18} color="#F1DCA7" /> Update Today's Prices
+            <Clock size={18} color="#1B1E13" /> Update Today's Prices
           </button>
 
           <button
@@ -99,18 +99,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               height: '44px',
               padding: '0 16px',
               borderRadius: '10px',
-              backgroundColor: '#F1DCA7',
-              color: '#797D62',
-              border: '2px solid #797D62',
-              fontSize: '14px',
-              fontWeight: 700,
+              backgroundColor: '#5E6348',
+              color: '#FFFFFF',
+              border: '2px solid #5E6348',
+              fontSize: '15px',
+              fontWeight: 900,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
             }}
           >
-            <Database size={18} color="#797D62" />
+            <Database size={18} color="#FFFFFF" />
             {closingTriggered ? 'Backing Up DB...' : 'Daily Closing & Backup'}
           </button>
         </div>
@@ -129,27 +129,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           onClick={() => onNavigateTab('billing')}
           className="touch-active"
           style={{
-            backgroundColor: '#F1DCA7',
-            border: '2px solid #797D62',
+            backgroundColor: '#FFFFFF',
+            border: '2px solid #C2BAAA',
             borderRadius: '16px',
             padding: '18px',
             cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(121, 125, 98, 0.08)',
+            boxShadow: '0 4px 10px rgba(27, 30, 19, 0.06)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#797D62' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>
               TODAY'S PRODUCT SALES
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F1DCA7', border: '2px solid #797D62', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <TrendingUp size={18} color="#797D62" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F4F1EA', border: '1.5px solid #C2BAAA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <TrendingUp size={18} color="#1B1E13" />
             </div>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#797D62', margin: '8px 0 2px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#1B1E13', margin: '8px 0 2px' }}>
             Rs 42,850
           </div>
-          <div style={{ fontSize: '11px', color: '#797D62', fontWeight: 600 }}>
-            38 bills issued • Atta, Maida, Suji
+          <div style={{ fontSize: '11px', color: '#1B1E13', fontWeight: 600 }}>
+            38 bills issued Ã¢â‚¬Â¢ Atta, Maida, Suji
           </div>
         </div>
 
@@ -158,27 +158,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           onClick={() => onNavigateTab('pisai')}
           className="touch-active"
           style={{
-            backgroundColor: '#F1DCA7',
-            border: '2px solid #797D62',
+            backgroundColor: '#FFFFFF',
+            border: '2px solid #C2BAAA',
             borderRadius: '16px',
             padding: '18px',
             cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(121, 125, 98, 0.08)',
+            boxShadow: '0 4px 10px rgba(27, 30, 19, 0.06)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#797D62' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>
               PISAI (GRINDING) FEES
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F1DCA7', border: '2px solid #797D62', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Sparkles size={18} color="#797D62" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F4F1EA', border: '1.5px solid #C2BAAA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Sparkles size={18} color="#1B1E13" />
             </div>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#797D62', margin: '8px 0 2px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#1B1E13', margin: '8px 0 2px' }}>
             Rs 8,640
           </div>
-          <div style={{ fontSize: '11px', color: '#797D62', fontWeight: 600 }}>
-            54 tokens processed • 1,440 KG grain
+          <div style={{ fontSize: '11px', color: '#1B1E13', fontWeight: 600 }}>
+            54 tokens processed Ã¢â‚¬Â¢ 1,440 KG grain
           </div>
         </div>
 
@@ -187,26 +187,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           onClick={() => onNavigateTab('reports')}
           className="touch-active"
           style={{
-            backgroundColor: '#F1DCA7',
-            border: '2px solid #797D62',
+            backgroundColor: '#FFFFFF',
+            border: '2px solid #C2BAAA',
             borderRadius: '16px',
             padding: '18px',
             cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(121, 125, 98, 0.08)',
+            boxShadow: '0 4px 10px rgba(27, 30, 19, 0.06)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#797D62' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>
               SHOP EXPENSES & VOIDS
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F1DCA7', border: '2px solid #797D62', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Receipt size={18} color="#797D62" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F4F1EA', border: '1.5px solid #C2BAAA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Receipt size={18} color="#1B1E13" />
             </div>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#797D62', margin: '8px 0 2px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#1B1E13', margin: '8px 0 2px' }}>
             Rs 3,625
           </div>
-          <div style={{ fontSize: '11px', color: '#797D62', fontWeight: 600 }}>
+          <div style={{ fontSize: '11px', color: '#1B1E13', fontWeight: 600 }}>
             Electricity, worker tea, 1 return
           </div>
         </div>
@@ -216,26 +216,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           onClick={() => onNavigateTab('udhaar')}
           className="touch-active"
           style={{
-            backgroundColor: '#F1DCA7',
-            border: '2px solid #797D62',
+            backgroundColor: '#FFFFFF',
+            border: '2px solid #C2BAAA',
             borderRadius: '16px',
             padding: '18px',
             cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(121, 125, 98, 0.08)',
+            boxShadow: '0 4px 10px rgba(27, 30, 19, 0.06)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#797D62' }}>
-              CUSTOMER UDHAAR (ادھار)
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>
+              CUSTOMER UDHAAR (Ã˜Â§Ã˜Â¯ÃšÂ¾Ã˜Â§Ã˜Â±)
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F1DCA7', border: '2px solid #797D62', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Users size={18} color="#797D62" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#F4F1EA', border: '1.5px solid #C2BAAA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Users size={18} color="#1B1E13" />
             </div>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#797D62', margin: '8px 0 2px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#1B1E13', margin: '8px 0 2px' }}>
             Rs 61,100
           </div>
-          <div style={{ fontSize: '11px', color: '#797D62', fontWeight: 600 }}>
+          <div style={{ fontSize: '11px', color: '#1B1E13', fontWeight: 600 }}>
             14 active credit customers
           </div>
         </div>
@@ -245,27 +245,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           onClick={() => onNavigateTab('reports')}
           className="touch-active"
           style={{
-            backgroundColor: '#F1DCA7',
-            color: '#797D62',
-            border: '2px solid #797D62',
+            backgroundColor: '#FFFFFF',
+            color: '#1B1E13',
+            border: '2px solid #C2BAAA',
             borderRadius: '16px',
             padding: '18px',
             cursor: 'pointer',
-            boxShadow: '0 8px 16px rgba(121, 125, 98, 0.15)',
+            boxShadow: '0 4px 10px rgba(27, 30, 19, 0.06)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#797D62' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>
               NET CASH IN DRAWER
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#797D62', border: '1px solid #797D62', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Wallet size={18} color="#F1DCA7" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#5E6348', border: '1px solid #5E6348', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Wallet size={18} color="#1B1E13" />
             </div>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#797D62', margin: '8px 0 2px' }}>
+          <div style={{ fontSize: '28px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#1B1E13', margin: '8px 0 2px' }}>
             Rs 47,865
           </div>
-          <div style={{ fontSize: '11px', color: '#797D62', fontWeight: 600 }}>
+          <div style={{ fontSize: '11px', color: '#1B1E13', fontWeight: 600 }}>
             Sales + Pisai + Udhaar In - Out
           </div>
         </div>
@@ -274,21 +274,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Synchronous Activity Audit Log Preview */}
       <div
         style={{
-          backgroundColor: '#F1DCA7',
+          backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          border: '2.5px solid #797D62',
+          border: '2px solid #C2BAAA',
           padding: '20px',
           boxShadow: '0 4px 12px rgba(121, 125, 98, 0.08)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ShieldCheck size={20} color="#797D62" />
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#797D62' }}>
+            <ShieldCheck size={20} color="#1B1E13" />
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#1B1E13' }}>
               Synchronous Audit Trail (`activity_log`)
             </h3>
           </div>
-          <span style={{ fontSize: '12px', color: '#797D62', fontWeight: 700 }}>
+          <span style={{ fontSize: '12px', color: '#1B1E13', fontWeight: 700 }}>
             Immutable Financial & Security Log
           </span>
         </div>
@@ -309,19 +309,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 fontSize: '12px',
                 padding: '10px 14px',
                 borderRadius: '10px',
-                backgroundColor: '#F1DCA7',
-                border: '2px solid #797D62',
+                backgroundColor: '#F8FAF8',
+                border: '1.5px solid #E2DDD3',
                 alignItems: 'center',
               }}
             >
-              <span style={{ color: '#797D62', fontWeight: 600 }}>{log.time}</span>
-              <span style={{ fontWeight: 800, color: '#797D62' }}>{log.actor}</span>
+              <span style={{ color: '#1B1E13', fontWeight: 600 }}>{log.time}</span>
+              <span style={{ fontWeight: 800, color: '#1B1E13' }}>{log.actor}</span>
               <div>
-                <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', backgroundColor: '#797D62', color: '#F1DCA7', border: '1px solid #797D62' }}>
+                <span style={{ fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', backgroundColor: '#5E6348', color: '#FFFFFF', border: '1px solid #5E6348' }}>
                   {log.action}
                 </span>
               </div>
-              <span style={{ color: '#797D62', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{log.detail}</span>
+              <span style={{ color: '#1B1E13', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{log.detail}</span>
             </div>
           ))}
         </div>
@@ -329,3 +329,4 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     </div>
   );
 };
+

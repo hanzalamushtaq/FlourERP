@@ -7,22 +7,22 @@ import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
 import { Printer, Scale, Banknote, Tag, UserCheck, Check, BookOpen } from 'lucide-react';
 
 const INITIAL_PRODUCTS: Product[] = [
-  { id: '1', nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (گندم)', ratePerKg: 140, unit: 'KG', isActive: true, icon: '🌾' },
-  { id: '2', nameEn: 'Fine Atta', nameUr: 'فائن آٹا', ratePerKg: 148, unit: 'KG', isActive: true, icon: '✨' },
-  { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', ratePerKg: 155, unit: 'KG', isActive: true, icon: '⚪' },
-  { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', ratePerKg: 160, unit: 'KG', isActive: true, icon: '🥣' },
-  { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', ratePerKg: 95, unit: 'KG', isActive: true, icon: '📦' },
-  { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', ratePerKg: 0, unit: 'KG', isActive: true, icon: '⚠️' },
+  { id: '1', nameEn: 'Chakki Atta', nameUr: 'Ãšâ€ ÃšÂ©Ã›Å’ Ã˜Â¢Ã™Â¹Ã˜Â§ (ÃšÂ¯Ã™â€ Ã˜Â¯Ã™â€¦)', ratePerKg: 140, unit: 'KG', isActive: true, icon: 'Ã°Å¸Å’Â¾' },
+  { id: '2', nameEn: 'Fine Atta', nameUr: 'Ã™ÂÃ˜Â§Ã˜Â¦Ã™â€  Ã˜Â¢Ã™Â¹Ã˜Â§', ratePerKg: 148, unit: 'KG', isActive: true, icon: 'Ã¢Å“Â¨' },
+  { id: '3', nameEn: 'Maida Special', nameUr: 'Ã™â€¦Ã›Å’Ã˜Â¯Ã›Â Ã˜Â§Ã˜Â³Ã™Â¾Ã›Å’Ã˜Â´Ã™â€ž', ratePerKg: 155, unit: 'KG', isActive: true, icon: 'Ã¢Å¡Âª' },
+  { id: '4', nameEn: 'Suji / Semolina', nameUr: 'Ã˜Â®Ã˜Â§Ã™â€žÃ˜Âµ Ã˜Â³Ã™Ë†Ã˜Â¬Ã›Å’', ratePerKg: 160, unit: 'KG', isActive: true, icon: 'Ã°Å¸Â¥Â£' },
+  { id: '5', nameEn: 'Chokar / Bran', nameUr: 'Ãšâ€ Ã™Ë†ÃšÂ©Ã˜Â± (ÃšÂ©ÃšÂ¾Ã™â€ž)', ratePerKg: 95, unit: 'KG', isActive: true, icon: 'Ã°Å¸â€œÂ¦' },
+  { id: '6', nameEn: 'Desi Atta', nameUr: 'Ã˜Â¯Ã›Å’Ã˜Â³Ã›Å’ ÃšÂ¯Ã™â€ Ã˜Â¯Ã™â€¦ Ã˜Â¢Ã™Â¹Ã˜Â§', ratePerKg: 0, unit: 'KG', isActive: true, icon: 'Ã¢Å¡Â Ã¯Â¸Â' },
 ];
 
 const MOCK_CUSTOMERS = [
-  { id: '1', name: 'Haji Rasheed (حاجی رشید)', phone: '0300-8765432' },
-  { id: '2', name: 'Haji Altaf (حاجی الطاف)', phone: '0301-7654321' },
-  { id: '3', name: 'Haji Mushtaq (حاجی مشتاق)', phone: '0302-3344556' },
-  { id: '4', name: 'Tariq Naan Shop (طارق نان بائی)', phone: '0321-9876543' },
-  { id: '5', name: 'Mian Aslam Zamindar (میاں اسلم)', phone: '0333-1122334' },
-  { id: '6', name: 'Babar Hotel & Cafe (بابر ہوٹل)', phone: '0345-5566778' },
-  { id: '7', name: 'Haji Asif Flour Dealer (حاجی آصف)', phone: '0300-9988776' },
+  { id: '1', name: 'Haji Rasheed (Ã˜Â­Ã˜Â§Ã˜Â¬Ã›Å’ Ã˜Â±Ã˜Â´Ã›Å’Ã˜Â¯)', phone: '0300-8765432' },
+  { id: '2', name: 'Haji Altaf (Ã˜Â­Ã˜Â§Ã˜Â¬Ã›Å’ Ã˜Â§Ã™â€žÃ˜Â·Ã˜Â§Ã™Â)', phone: '0301-7654321' },
+  { id: '3', name: 'Haji Mushtaq (Ã˜Â­Ã˜Â§Ã˜Â¬Ã›Å’ Ã™â€¦Ã˜Â´Ã˜ÂªÃ˜Â§Ã™â€š)', phone: '0302-3344556' },
+  { id: '4', name: 'Tariq Naan Shop (Ã˜Â·Ã˜Â§Ã˜Â±Ã™â€š Ã™â€ Ã˜Â§Ã™â€  Ã˜Â¨Ã˜Â§Ã˜Â¦Ã›Å’)', phone: '0321-9876543' },
+  { id: '5', name: 'Mian Aslam Zamindar (Ã™â€¦Ã›Å’Ã˜Â§ÃšÂº Ã˜Â§Ã˜Â³Ã™â€žÃ™â€¦)', phone: '0333-1122334' },
+  { id: '6', name: 'Babar Hotel & Cafe (Ã˜Â¨Ã˜Â§Ã˜Â¨Ã˜Â± Ã›ÂÃ™Ë†Ã™Â¹Ã™â€ž)', phone: '0345-5566778' },
+  { id: '7', name: 'Haji Asif Flour Dealer (Ã˜Â­Ã˜Â§Ã˜Â¬Ã›Å’ Ã˜Â¢Ã˜ÂµÃ™Â)', phone: '0300-9988776' },
 ];
 
 export const ProductBillingScreen: React.FC = () => {
@@ -183,8 +183,8 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 padding: '8px 10px',
                 borderRadius: '12px',
-                backgroundColor: isSelected ? '#F1DCA7' : '#F1DCA7',
-                border: isSelected ? '2.5px solid #797D62' : '1.5px solid #BAA587',
+                backgroundColor: isSelected ? '#FFCB69' : '#FFFFFF',
+                border: isSelected ? '2.5px solid #5E6348' : '1.5px solid #C2BAAA',
                 boxShadow: isSelected ? '0 4px 10px rgba(121, 125, 98, 0.2)' : '0 1px 3px rgba(121, 125, 98, 0.08)',
                 cursor: 'pointer',
                 display: 'flex',
@@ -195,10 +195,10 @@ export const ProductBillingScreen: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px' }}>
-                <span style={{ fontWeight: 800, color: '#797D62', fontFamily: 'var(--font-mono)' }}>
-                  {isRateSet ? `Rs ${p.ratePerKg}` : '⚠️ Unset'}
+                <span style={{ fontWeight: 800, color: '#1B1E13', fontFamily: 'var(--font-mono)' }}>
+                  {isRateSet ? `Rs ${p.ratePerKg}` : 'Ã¢Å¡Â Ã¯Â¸Â Unset'}
                 </span>
-                {isSelected && <Check size={12} color="#797D62" strokeWidth={3} />}
+                {isSelected && <Check size={12} color="#1B1E13" strokeWidth={3} />}
               </div>
 
               <div
@@ -206,14 +206,14 @@ export const ProductBillingScreen: React.FC = () => {
                 style={{
                   fontSize: '20px',
                   fontWeight: 700,
-                  color: '#797D62',
+                  color: '#1B1E13',
                   lineHeight: 1.2,
                 }}
               >
                 {p.nameUr}
               </div>
 
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#797D62', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#1B1E13', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {p.nameEn}
               </div>
             </div>
@@ -224,10 +224,10 @@ export const ProductBillingScreen: React.FC = () => {
       {/* 2. MAIN BILLING CARD */}
       <div
         style={{
-          backgroundColor: '#F1DCA7',
+          backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          border: '2.5px solid #797D62',
-          boxShadow: '0 6px 16px rgba(121, 125, 98, 0.08)',
+          border: '2px solid #C2BAAA',
+          boxShadow: '0 4px 14px rgba(27, 30, 19, 0.07)',
           padding: '14px 18px',
           display: 'flex',
           flexDirection: 'column',
@@ -240,23 +240,23 @@ export const ProductBillingScreen: React.FC = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderBottom: '2px solid #797D62',
+            borderBottom: '2px solid #E2DDD3',
             paddingBottom: '8px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 900, color: '#797D62' }}>
+            <span style={{ fontSize: '16px', fontWeight: 900, color: '#1B1E13' }}>
               {selectedProduct.nameEn}
             </span>
-            <span className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#797D62' }}>
+            <span className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#1B1E13' }}>
               {selectedProduct.nameUr}
             </span>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#797D62' }}>
-              • Rate: Rs {selectedProduct.ratePerKg}/KG
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#1B1E13' }}>
+              Ã¢â‚¬Â¢ Rate: Rs {selectedProduct.ratePerKg}/KG
             </span>
           </div>
 
-          <div style={{ display: 'flex', backgroundColor: '#F1DCA7', padding: '4px', borderRadius: '12px', border: '2px solid #797D62', gap: '4px' }}>
+          <div style={{ display: 'flex', backgroundColor: '#F4F1EA', padding: '4px', borderRadius: '12px', border: '2px solid #C2BAAA', gap: '4px' }}>
             <button
               type="button"
               onClick={() => {
@@ -268,9 +268,9 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 padding: '8px 16px',
                 borderRadius: '8px',
-                border: calcMode === 'weight' ? '1.5px solid #797D62' : 'none',
-                backgroundColor: calcMode === 'weight' ? '#797D62' : 'transparent',
-                color: calcMode === 'weight' ? '#F1DCA7' : '#797D62',
+                border: calcMode === 'weight' ? '1.5px solid #5E6348' : 'none',
+                backgroundColor: calcMode === 'weight' ? '#5E6348' : 'transparent',
+                color: calcMode === 'weight' ? '#FFFFFF' : '#1B1E13',
                 fontSize: '14px',
                 fontWeight: 900,
                 cursor: 'pointer',
@@ -279,7 +279,7 @@ export const ProductBillingScreen: React.FC = () => {
                 gap: '6px',
               }}
             >
-              <Scale size={16} color={calcMode === 'weight' ? '#F1DCA7' : '#797D62'} strokeWidth={2.5} /> Weight Mode (وزن)
+              <Scale size={16} color={calcMode === 'weight' ? '#FFFFFF' : '#1B1E13'} strokeWidth={2.5} /> Weight Mode (Ã™Ë†Ã˜Â²Ã™â€ )
             </button>
 
             <button
@@ -293,9 +293,9 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 padding: '8px 16px',
                 borderRadius: '8px',
-                border: calcMode === 'amount' ? '1.5px solid #797D62' : 'none',
-                backgroundColor: calcMode === 'amount' ? '#797D62' : 'transparent',
-                color: calcMode === 'amount' ? '#F1DCA7' : '#797D62',
+                border: calcMode === 'amount' ? '1.5px solid #5E6348' : 'none',
+                backgroundColor: calcMode === 'amount' ? '#5E6348' : 'transparent',
+                color: calcMode === 'amount' ? '#FFFFFF' : '#1B1E13',
                 fontSize: '14px',
                 fontWeight: 900,
                 cursor: 'pointer',
@@ -304,7 +304,7 @@ export const ProductBillingScreen: React.FC = () => {
                 gap: '6px',
               }}
             >
-              <Banknote size={16} color={calcMode === 'amount' ? '#F1DCA7' : '#797D62'} strokeWidth={2.5} /> Rupees Mode (رقم)
+              <Banknote size={16} color={calcMode === 'amount' ? '#FFFFFF' : '#1B1E13'} strokeWidth={2.5} /> Rupees Mode (Ã˜Â±Ã™â€šÃ™â€¦)
             </button>
           </div>
         </div>
@@ -313,8 +313,8 @@ export const ProductBillingScreen: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '14px', alignItems: 'center' }}>
           {/* 1. Weight Input */}
           <div>
-            <label style={{ fontSize: '15px', fontWeight: 900, color: '#797D62', display: 'block', marginBottom: '4px' }}>
-              {calcMode === 'weight' ? 'Weight (وزن - KG):' : 'Desired Rupees (مطلوبہ رقم):'}
+            <label style={{ fontSize: '15px', fontWeight: 900, color: '#1B1E13', display: 'block', marginBottom: '4px' }}>
+              {calcMode === 'weight' ? 'Weight (Ã™Ë†Ã˜Â²Ã™â€  - KG):' : 'Desired Rupees (Ã™â€¦Ã˜Â·Ã™â€žÃ™Ë†Ã˜Â¨Ã›Â Ã˜Â±Ã™â€šÃ™â€¦):'}
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
@@ -337,17 +337,17 @@ export const ProductBillingScreen: React.FC = () => {
                   width: '100%',
                   height: '52px',
                   borderRadius: '12px',
-                  border: '2.5px solid #797D62',
-                  backgroundColor: '#F1DCA7',
+                  border: '2.5px solid #5E6348',
+                  backgroundColor: '#FFFFFF',
                   fontSize: '30px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
-                  color: '#797D62',
+                  color: '#1B1E13',
                   padding: '0 50px 0 14px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '14px', fontSize: '18px', fontWeight: 900, color: '#797D62' }}>
+              <span style={{ position: 'absolute', right: '14px', fontSize: '18px', fontWeight: 900, color: '#1B1E13' }}>
                 {calcMode === 'weight' ? 'KG' : 'Rs'}
               </span>
             </div>
@@ -357,18 +357,18 @@ export const ProductBillingScreen: React.FC = () => {
           <div
             style={{
               backgroundColor: '#FFCB69',
-              border: '3px solid #797D62',
+              border: '3px solid #5E6348',
               borderRadius: '14px',
               padding: '12px 16px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(121, 125, 98, 0.25)',
+              boxShadow: '0 4px 12px rgba(27, 30, 19, 0.12)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-              <span style={{ fontWeight: 900, color: '#797D62' }}>TOTAL AMOUNT (کل رقم)</span>
-              <span style={{ fontWeight: 800, color: '#797D62' }}>
+              <span style={{ fontWeight: 900, color: '#1B1E13' }}>TOTAL AMOUNT (ÃšÂ©Ã™â€ž Ã˜Â±Ã™â€šÃ™â€¦)</span>
+              <span style={{ fontWeight: 800, color: '#1B1E13' }}>
                 {calculatedWeight} KG @ Rs {rate}/KG
               </span>
             </div>
@@ -378,7 +378,7 @@ export const ProductBillingScreen: React.FC = () => {
                 fontSize: '38px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: '#797D62',
+                color: '#1B1E13',
                 lineHeight: 1.1,
                 margin: '4px 0',
               }}
@@ -390,9 +390,9 @@ export const ProductBillingScreen: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowDiscount(!showDiscount)}
-                style={{ background: 'none', border: 'none', color: '#797D62', fontSize: '13px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                style={{ background: 'none', border: 'none', color: '#1B1E13', fontSize: '13px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                <Tag size={14} color="#797D62" /> {showDiscount ? 'Close Discount' : '+ Add Discount (رعایت)'}
+                <Tag size={14} color="#1B1E13" /> {showDiscount ? 'Close Discount' : '+ Add Discount (Ã˜Â±Ã˜Â¹Ã˜Â§Ã›Å’Ã˜Âª)'}
               </button>
               {showDiscount && (
                 <input
@@ -403,7 +403,7 @@ export const ProductBillingScreen: React.FC = () => {
                     setDiscountValue(e.target.value);
                     setIsReceivedAutoUpdated(true);
                   }}
-                  style={{ width: '85px', padding: '4px 8px', borderRadius: '8px', border: '2px solid #797D62', backgroundColor: '#F1DCA7', color: '#797D62', fontSize: '14px', fontWeight: 900, outline: 'none' }}
+                  style={{ width: '85px', padding: '4px 8px', borderRadius: '8px', border: '2px solid #C2BAAA', backgroundColor: '#FFFFFF', color: '#1B1E13', fontSize: '14px', fontWeight: 900, outline: 'none' }}
                 />
               )}
             </div>
@@ -413,10 +413,10 @@ export const ProductBillingScreen: React.FC = () => {
         {/* 2. Cash Received Row */}
         <div
           style={{
-            backgroundColor: '#F1DCA7',
+            backgroundColor: '#F4F1EA',
             borderRadius: '10px',
             padding: '10px 14px',
-            border: '2px solid #797D62',
+            border: '2px solid #C2BAAA',
             display: 'grid',
             gridTemplateColumns: '1.2fr 1fr',
             gap: '12px',
@@ -424,8 +424,8 @@ export const ProductBillingScreen: React.FC = () => {
           }}
         >
           <div>
-            <label style={{ fontSize: '12px', fontWeight: 900, color: '#797D62', display: 'block', marginBottom: '2px' }}>
-              Cash Received (وصول رقم):
+            <label style={{ fontSize: '12px', fontWeight: 900, color: '#1B1E13', display: 'block', marginBottom: '2px' }}>
+              Cash Received (Ã™Ë†Ã˜ÂµÃ™Ë†Ã™â€ž Ã˜Â±Ã™â€šÃ™â€¦):
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
@@ -447,17 +447,17 @@ export const ProductBillingScreen: React.FC = () => {
                   width: '100%',
                   height: '42px',
                   borderRadius: '8px',
-                  border: '2.5px solid #797D62',
-                  backgroundColor: '#F1DCA7',
+                  border: '2px solid #5E6348',
+                  backgroundColor: '#FFFFFF',
                   fontSize: '22px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
-                  color: '#797D62',
+                  color: '#1B1E13',
                   padding: '0 40px 0 10px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '10px', fontSize: '13px', fontWeight: 900, color: '#797D62' }}>
+              <span style={{ position: 'absolute', right: '10px', fontSize: '13px', fontWeight: 900, color: '#1B1E13' }}>
                 Rs
               </span>
             </div>
@@ -465,22 +465,22 @@ export const ProductBillingScreen: React.FC = () => {
 
           <div>
             {balanceRemaining > 0 ? (
-              <div style={{ backgroundColor: '#F1DCA7', border: '2px solid #797D62', borderRadius: '8px', padding: '6px 10px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#797D62' }}>Remaining Balance (باقی رقم):</div>
-                <div style={{ fontSize: '18px', fontWeight: 900, color: '#797D62', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#FFFFFF', border: '2px solid #5E6348', borderRadius: '8px', padding: '6px 10px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#1B1E13' }}>Remaining Balance (Ã˜Â¨Ã˜Â§Ã™â€šÃ›Å’ Ã˜Â±Ã™â€šÃ™â€¦):</div>
+                <div style={{ fontSize: '18px', fontWeight: 900, color: '#1B1E13', fontFamily: 'var(--font-mono)' }}>
                   Rs {balanceRemaining.toLocaleString()}
                 </div>
               </div>
             ) : changeToReturn > 0 ? (
-              <div style={{ backgroundColor: '#F1DCA7', border: '2px solid #797D62', borderRadius: '8px', padding: '6px 10px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#797D62' }}>Change to Return (واپسی رقم):</div>
-                <div style={{ fontSize: '18px', fontWeight: 900, color: '#797D62', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#FFFFFF', border: '2px solid #5E6348', borderRadius: '8px', padding: '6px 10px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: '#1B1E13' }}>Change to Return (Ã™Ë†Ã˜Â§Ã™Â¾Ã˜Â³Ã›Å’ Ã˜Â±Ã™â€šÃ™â€¦):</div>
+                <div style={{ fontSize: '18px', fontWeight: 900, color: '#1B1E13', fontFamily: 'var(--font-mono)' }}>
                   Rs {changeToReturn.toLocaleString()}
                 </div>
               </div>
             ) : (
-              <div style={{ backgroundColor: '#F1DCA7', border: '2px solid #797D62', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#797D62' }}>✓ Exact Cash Paid</div>
+              <div style={{ backgroundColor: '#FFFFFF', border: '2px solid #5E6348', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>Ã¢Å“â€œ Exact Cash Paid</div>
               </div>
             )}
           </div>
@@ -490,8 +490,8 @@ export const ProductBillingScreen: React.FC = () => {
         <div
           style={{
             position: 'relative',
-            backgroundColor: '#F1DCA7',
-            border: '2px solid #797D62',
+            backgroundColor: '#F8FAF8',
+            border: '2px solid #C2BAAA',
             borderRadius: '10px',
             padding: '10px 14px',
             display: 'flex',
@@ -500,10 +500,10 @@ export const ProductBillingScreen: React.FC = () => {
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 800, fontSize: '12px', color: '#797D62', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <UserCheck size={14} color="#797D62" /> Customer Details (گاہک کا نام و فون نمبر — ادھار کے لیے درج کریں)
+            <span style={{ fontWeight: 800, fontSize: '12px', color: '#1B1E13', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <UserCheck size={14} color="#1B1E13" /> Customer Details (ÃšÂ¯Ã˜Â§Ã›ÂÃšÂ© ÃšÂ©Ã˜Â§ Ã™â€ Ã˜Â§Ã™â€¦ Ã™Ë† Ã™ÂÃ™Ë†Ã™â€  Ã™â€ Ã™â€¦Ã˜Â¨Ã˜Â± Ã¢â‚¬â€ Ã˜Â§Ã˜Â¯ÃšÂ¾Ã˜Â§Ã˜Â± ÃšÂ©Ã›â€™ Ã™â€žÃ›Å’Ã›â€™ Ã˜Â¯Ã˜Â±Ã˜Â¬ ÃšÂ©Ã˜Â±Ã›Å’ÃšÂº)
             </span>
-            <span style={{ fontSize: '11px', color: '#797D62', fontWeight: 600 }}>Type name to see registered accounts</span>
+            <span style={{ fontSize: '11px', color: '#1B1E13', fontWeight: 600 }}>Type name to see registered accounts</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
@@ -511,7 +511,7 @@ export const ProductBillingScreen: React.FC = () => {
               <input
                 ref={customerNameInputRef}
                 type="text"
-                placeholder="Customer Name (گاہک کا نام)..."
+                placeholder="Customer Name (ÃšÂ¯Ã˜Â§Ã›ÂÃšÂ© ÃšÂ©Ã˜Â§ Ã™â€ Ã˜Â§Ã™â€¦)..."
                 value={customerName}
                 onChange={(e) => handleCustomerNameChange(e.target.value)}
                 onFocus={() => {
@@ -532,12 +532,12 @@ export const ProductBillingScreen: React.FC = () => {
                   height: '38px',
                   padding: '6px 10px',
                   borderRadius: '8px',
-                  border: '2px solid #797D62',
+                  border: '2px solid #C2BAAA',
                   fontSize: '13px',
                   fontWeight: 700,
                   outline: 'none',
-                  backgroundColor: '#F1DCA7',
-                  color: '#797D62',
+                  backgroundColor: '#FFFFFF',
+                  color: '#1B1E13',
                 }}
               />
 
@@ -549,8 +549,8 @@ export const ProductBillingScreen: React.FC = () => {
                     top: '42px',
                     left: 0,
                     right: 0,
-                    backgroundColor: '#F1DCA7',
-                    border: '2px solid #797D62',
+                    backgroundColor: '#FFFFFF',
+                    border: '2px solid #5E6348',
                     borderRadius: '8px',
                     boxShadow: '0 8px 16px rgba(121, 125, 98, 0.2)',
                     zIndex: 200,
@@ -565,15 +565,15 @@ export const ProductBillingScreen: React.FC = () => {
                       className="touch-active"
                       style={{
                         padding: '8px 12px',
-                        borderBottom: '2px solid #797D62',
+                        borderBottom: '2px solid #E2DDD3',
                         cursor: 'pointer',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                       }}
                     >
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#797D62' }}>{cust.name}</span>
-                      <span style={{ fontSize: '11px', color: '#797D62', fontWeight: 600 }}>{cust.phone}</span>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#1B1E13' }}>{cust.name}</span>
+                      <span style={{ fontSize: '11px', color: '#1B1E13', fontWeight: 600 }}>{cust.phone}</span>
                     </div>
                   ))}
                 </div>
@@ -584,7 +584,7 @@ export const ProductBillingScreen: React.FC = () => {
               <input
                 ref={customerPhoneInputRef}
                 type="text"
-                placeholder="Phone (موبائل نمبر اختیاری)..."
+                placeholder="Phone (Ã™â€¦Ã™Ë†Ã˜Â¨Ã˜Â§Ã˜Â¦Ã™â€ž Ã™â€ Ã™â€¦Ã˜Â¨Ã˜Â± Ã˜Â§Ã˜Â®Ã˜ÂªÃ›Å’Ã˜Â§Ã˜Â±Ã›Å’)..."
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 onKeyDown={(e) => {
@@ -598,11 +598,11 @@ export const ProductBillingScreen: React.FC = () => {
                   height: '38px',
                   padding: '6px 10px',
                   borderRadius: '8px',
-                  border: '2px solid #797D62',
+                  border: '2px solid #C2BAAA',
                   fontSize: '13px',
                   outline: 'none',
-                  backgroundColor: '#F1DCA7',
-                  color: '#797D62',
+                  backgroundColor: '#FFFFFF',
+                  color: '#1B1E13',
                 }}
               />
             </div>
@@ -619,9 +619,9 @@ export const ProductBillingScreen: React.FC = () => {
             style={{
               height: '52px',
               borderRadius: '12px',
-              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#E8AC65' : '#F1DCA7',
-              color: rate > 0 && calculatedWeight > 0 ? '#797D62' : '#BAA587',
-              border: '2.5px solid #797D62',
+              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#E8AC65' : '#E2DDD3',
+              color: rate > 0 && calculatedWeight > 0 ? '#1B1E13' : '#8A8578',
+              border: '2.5px solid #5E6348',
               fontSize: '17px',
               fontWeight: 900,
               cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
@@ -632,8 +632,8 @@ export const ProductBillingScreen: React.FC = () => {
               gap: '8px',
             }}
           >
-            <Printer size={22} color={rate > 0 && calculatedWeight > 0 ? '#797D62' : '#BAA587'} strokeWidth={2.5} />
-            <span>Print Cash Bill (نقد بل)</span>
+            <Printer size={22} color={rate > 0 && calculatedWeight > 0 ? '#1B1E13' : '#8A8578'} strokeWidth={2.5} />
+            <span>Print Cash Bill (Ã™â€ Ã™â€šÃ˜Â¯ Ã˜Â¨Ã™â€ž)</span>
           </button>
 
           <button
@@ -650,9 +650,9 @@ export const ProductBillingScreen: React.FC = () => {
             style={{
               height: '52px',
               borderRadius: '12px',
-              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#797D62' : '#F1DCA7',
-              color: rate > 0 && calculatedWeight > 0 ? '#F1DCA7' : '#BAA587',
-              border: '2.5px solid #797D62',
+              backgroundColor: rate > 0 && calculatedWeight > 0 ? '#5E6348' : '#E2DDD3',
+              color: rate > 0 && calculatedWeight > 0 ? '#FFFFFF' : '#8A8578',
+              border: '2.5px solid #5E6348',
               fontSize: '17px',
               fontWeight: 900,
               cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
@@ -663,8 +663,8 @@ export const ProductBillingScreen: React.FC = () => {
               gap: '8px',
             }}
           >
-            <BookOpen size={20} color={rate > 0 && calculatedWeight > 0 ? '#F1DCA7' : '#BAA587'} strokeWidth={2.5} />
-            <span>Save as Credit (ادھار بل)</span>
+            <BookOpen size={20} color={rate > 0 && calculatedWeight > 0 ? '#FFFFFF' : '#8A8578'} strokeWidth={2.5} />
+            <span>Save as Credit (Ã˜Â§Ã˜Â¯ÃšÂ¾Ã˜Â§Ã˜Â± Ã˜Â¨Ã™â€ž)</span>
           </button>
         </div>
       </div>

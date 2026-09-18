@@ -57,7 +57,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 9990,
-        backgroundColor: 'rgba(121, 125, 98, 0.65)',
+        backgroundColor: 'rgba(27, 30, 19, 0.7)',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
@@ -69,9 +69,9 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '380px',
-          backgroundColor: '#F1DCA7',
+          backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          border: '2.5px solid #797D62',
+          border: '2.5px solid #5E6348',
           overflow: 'hidden',
           boxShadow: '0 20px 35px rgba(121, 125, 98, 0.25)',
           display: 'flex',
@@ -87,12 +87,12 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
             justifyContent: 'space-between',
             padding: '12px 18px',
             backgroundColor: '#FFCB69',
-            borderBottom: '2px solid #797D62',
+            borderBottom: '2px solid #5E6348',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Printer size={20} color="#797D62" strokeWidth={2.5} />
-            <span style={{ fontWeight: 900, fontSize: '16px', color: '#797D62' }}>Thermal Receipt Preview</span>
+            <Printer size={20} color="#1B1E13" strokeWidth={2.5} />
+            <span style={{ fontWeight: 900, fontSize: '16px', color: '#1B1E13' }}>Thermal Receipt Preview</span>
           </div>
           <button
             onClick={onClose}
@@ -100,7 +100,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: '#797D62',
+              color: '#1B1E13',
             }}
           >
             <X size={20} />
@@ -112,28 +112,28 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
           style={{
             padding: '24px 20px',
             overflowY: 'auto',
-            backgroundColor: '#F1DCA7',
-            color: '#797D62',
+            backgroundColor: '#FCFBF7',
+            color: '#1B1E13',
             fontFamily: 'var(--font-mono)',
             fontSize: '13px',
             lineHeight: 1.4,
           }}
         >
           <div style={{ textAlign: 'center', marginBottom: '14px' }}>
-            <div className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#797D62' }}>
-              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            <div className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#1B1E13' }}>
+              Ø¨ÙØ³Ù’Ù…Ù Ø§Ù„Ù„ÙŽÙ‘Ù‡Ù Ø§Ù„Ø±ÙŽÙ‘Ø­Ù’Ù…ÙŽÙ°Ù†Ù Ø§Ù„Ø±ÙŽÙ‘Ø­ÙÙŠÙ…Ù
             </div>
             <div
               className="font-nastaleeq"
-              style={{ fontSize: '24px', fontWeight: 700, marginTop: '2px', color: '#797D62' }}
+              style={{ fontSize: '24px', fontWeight: 700, marginTop: '2px', color: '#1B1E13' }}
             >
-              المدینہ چکی و فلور ملز
+              Ø§Ù„Ù…Ø¯ÛŒÙ†Û Ú†Ú©ÛŒ Ùˆ ÙÙ„ÙˆØ± Ù…Ù„Ø²
             </div>
-            <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '1px', color: '#797D62' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '1px', color: '#1B1E13' }}>
               AL-MADINA FLOUR MILLS
             </div>
-            <div style={{ fontSize: '11px', color: '#797D62', marginTop: '2px' }}>
-              Main Bazaar, Near Clock Tower • Ph: 0300-1234567
+            <div style={{ fontSize: '11px', color: '#1B1E13', marginTop: '2px' }}>
+              Main Bazaar, Near Clock Tower â€¢ Ph: 0300-1234567
             </div>
             <div style={{ borderBottom: '1px dashed #BAA587', margin: '12px 0' }} />
           </div>
@@ -161,9 +161,9 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
           {data.isCredit && (
             <div
               style={{
-                backgroundColor: '#F1DCA7',
-                border: '2px solid #797D62',
-                color: '#797D62',
+                backgroundColor: '#FFFFFF',
+                border: '2px solid #5E6348',
+                color: '#1B1E13',
                 fontWeight: 800,
                 textAlign: 'center',
                 padding: '4px',
@@ -180,15 +180,15 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
           {data.type === 'pisai' && data.pisaiToken && (
             <div
               style={{
-                border: '2px solid #797D62',
+                border: '2px solid #5E6348',
                 borderRadius: '8px',
                 padding: '12px',
                 textAlign: 'center',
                 margin: '12px 0',
-                backgroundColor: '#F1DCA7',
+                backgroundColor: '#FFFFFF',
               }}
             >
-              <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1px', color: '#797D62' }}>
+              <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1px', color: '#1B1E13' }}>
                 CUSTOMER TOKEN NUMBER
               </div>
               <div
@@ -198,13 +198,13 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                   letterSpacing: '4px',
                   lineHeight: 1.1,
                   margin: '4px 0',
-                  color: '#797D62',
+                  color: '#1B1E13',
                 }}
               >
                 {data.pisaiToken}
               </div>
-              <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#797D62' }}>
-                ٹوکن نمبر گندم پیسائی
+              <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#1B1E13' }}>
+                Ù¹ÙˆÚ©Ù† Ù†Ù…Ø¨Ø± Ú¯Ù†Ø¯Ù… Ù¾ÛŒØ³Ø§Ø¦ÛŒ
               </div>
             </div>
           )}
@@ -220,12 +220,12 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                   gridTemplateColumns: '2fr 1fr 1fr',
                   fontWeight: 700,
                   fontSize: '11px',
-                  borderBottom: '2px solid #797D62',
+                  borderBottom: '2px solid #5E6348',
                   paddingBottom: '4px',
                   marginBottom: '6px',
                 }}
               >
-                <span>ITEM (آئٹم)</span>
+                <span>ITEM (Ø¢Ø¦Ù¹Ù…)</span>
                 <span style={{ textAlign: 'center' }}>QTY x RATE</span>
                 <span style={{ textAlign: 'right' }}>TOTAL</span>
               </div>
@@ -282,11 +282,11 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 display: 'flex',
                 justifyContent: 'space-between',
                 marginBottom: '4px',
-                color: '#797D62',
+                color: '#1B1E13',
                 fontWeight: 700,
               }}
             >
-              <span>Discount (رعایت):</span>
+              <span>Discount (Ø±Ø¹Ø§ÛŒØª):</span>
               <span>- Rs {data.discount}</span>
             </div>
           )}
@@ -298,7 +298,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               fontWeight: 900,
               marginTop: '6px',
               paddingTop: '6px',
-              borderTop: '2px solid #797D62',
+              borderTop: '2px solid #5E6348',
             }}
           >
             <span>TOTAL BILL:</span>
@@ -307,7 +307,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
 
           {data.cashReceived !== undefined && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '13px', fontWeight: 700 }}>
-              <span>CASH RECEIVED (وصول):</span>
+              <span>CASH RECEIVED (ÙˆØµÙˆÙ„):</span>
               <span>Rs {data.cashReceived}</span>
             </div>
           )}
@@ -320,25 +320,25 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 marginTop: '4px',
                 fontSize: '14px',
                 fontWeight: 800,
-                color: '#797D62',
+                color: '#1B1E13',
                 borderTop: '1px dashed #BAA587',
                 paddingTop: '4px',
               }}
             >
-              <span>{data.isCredit ? 'CREDIT / UDHAAR (بقایا ادھار):' : 'WAIVED / SHORT (چھوٹ):'}</span>
+              <span>{data.isCredit ? 'CREDIT / UDHAAR (Ø¨Ù‚Ø§ÛŒØ§ Ø§Ø¯Ú¾Ø§Ø±):' : 'WAIVED / SHORT (Ú†Ú¾ÙˆÙ¹):'}</span>
               <span>Rs {data.remainingBalance}</span>
             </div>
           )}
 
           <div style={{ textAlign: 'center', marginTop: '18px' }}>
             <div className="font-nastaleeq" style={{ fontSize: '16px' }}>
-              مال موقع پر چیک کریں۔ بعد میں واپسی نہ ہوگی۔
+              Ù…Ø§Ù„ Ù…ÙˆÙ‚Ø¹ Ù¾Ø± Ú†ÛŒÚ© Ú©Ø±ÛŒÚºÛ” Ø¨Ø¹Ø¯ Ù…ÛŒÚº ÙˆØ§Ù¾Ø³ÛŒ Ù†Û ÛÙˆÚ¯ÛŒÛ”
             </div>
-            <div style={{ fontSize: '11px', color: '#797D62', marginTop: '4px' }}>
+            <div style={{ fontSize: '11px', color: '#1B1E13', marginTop: '4px' }}>
               Thank You for Your Business!
             </div>
-            <div style={{ fontSize: '10px', color: '#797D62', marginTop: '6px' }}>
-              * Powered by FlourERP • Continuous Sequential Audit *
+            <div style={{ fontSize: '10px', color: '#1B1E13', marginTop: '6px' }}>
+              * Powered by FlourERP â€¢ Continuous Sequential Audit *
             </div>
           </div>
         </div>
@@ -347,8 +347,8 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
         <div
           style={{
             padding: '14px 18px',
-            backgroundColor: '#F1DCA7',
-            borderTop: '2.5px solid #797D62',
+            backgroundColor: '#FFFFFF',
+            borderTop: '2px solid #C2BAAA',
             display: 'flex',
             gap: '10px',
           }}
@@ -361,8 +361,8 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               height: '52px',
               borderRadius: '12px',
               backgroundColor: '#E8AC65',
-              color: '#797D62',
-              border: '2.5px solid #797D62',
+              color: '#1B1E13',
+              border: '2px solid #5E6348',
               fontSize: '17px',
               fontWeight: 900,
               cursor: 'pointer',
@@ -373,7 +373,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               boxShadow: '0 4px 10px rgba(121, 125, 98, 0.25)',
             }}
           >
-            {printed ? <CheckCircle2 size={22} color="#797D62" /> : <Printer size={22} color="#797D62" strokeWidth={2.5} />}
+            {printed ? <CheckCircle2 size={22} color="#1B1E13" /> : <Printer size={22} color="#1B1E13" strokeWidth={2.5} />}
             {printed ? 'Print Dispatched!' : 'Print Bill (ESC/POS)'}
           </button>
           <button
@@ -383,9 +383,9 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               height: '52px',
               padding: '0 16px',
               borderRadius: '12px',
-              backgroundColor: '#F1DCA7',
-              color: '#797D62',
-              border: '2.5px solid #797D62',
+              backgroundColor: '#FFFFFF',
+              color: '#1B1E13',
+              border: '2.5px solid #5E6348',
               fontSize: '15px',
               fontWeight: 900,
               cursor: 'pointer',
@@ -396,10 +396,11 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
             }}
             title="Reprint byte-identical copy"
           >
-            <RefreshCw size={16} color="#797D62" /> Reprint
+            <RefreshCw size={16} color="#1B1E13" /> Reprint
           </button>
         </div>
       </div>
     </div>
   );
 };
+

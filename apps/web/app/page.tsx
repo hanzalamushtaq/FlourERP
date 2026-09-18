@@ -27,13 +27,13 @@ export default function Home() {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F1DCA7', color: '#797D62' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAF8', color: '#1B1E13' }}>
       {/* Top Application Header */}
       <header
         style={{
-          backgroundColor: '#F1DCA7',
-          borderBottom: '2.5px solid #797D62',
-          boxShadow: '0 3px 10px rgba(121, 125, 98, 0.2)',
+          backgroundColor: '#FFFFFF',
+          borderBottom: '2px solid #C2BAAA',
+          boxShadow: '0 2px 10px rgba(27, 30, 19, 0.05)',
           position: 'sticky',
           top: 0,
           zIndex: 1000,
@@ -58,20 +58,20 @@ export default function Home() {
                 width: '46px',
                 height: '46px',
                 borderRadius: '12px',
-                backgroundColor: '#797D62',
-                border: '2px solid #797D62',
-                color: '#F1DCA7',
+                backgroundColor: '#5E6348',
+                border: '2px solid #5E6348',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Wheat size={26} strokeWidth={2.6} color="#F1DCA7" />
+              <Wheat size={26} strokeWidth={2.6} color="#FFFFFF" />
             </div>
 
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#797D62', letterSpacing: '-0.5px' }}>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#1B1E13', letterSpacing: '-0.5px' }}>
                   FlourERP
                 </span>
                 <span
@@ -81,8 +81,8 @@ export default function Home() {
                     padding: '3px 10px',
                     borderRadius: '9999px',
                     backgroundColor: '#FFCB69',
-                    color: '#797D62',
-                    border: '1.5px solid #797D62',
+                    color: '#1B1E13',
+                    border: '1.5px solid #5E6348',
                   }}
                 >
                   ONLINE
@@ -93,11 +93,11 @@ export default function Home() {
                 style={{
                   fontSize: '24px',
                   fontWeight: 900,
-                  color: '#797D62',
+                  color: '#1B1E13',
                   lineHeight: 1.2,
                 }}
               >
-                المدینہ چکی و فلور ملز
+                Ø§Ù„Ù…Ø¯ÛŒÙ†Û Ú†Ú©ÛŒ Ùˆ ÙÙ„ÙˆØ± Ù…Ù„Ø²
               </div>
             </div>
           </div>
@@ -113,28 +113,28 @@ export default function Home() {
                 padding: '10px 16px',
                 borderRadius: '12px',
                 backgroundColor: '#E8AC65',
-                color: '#797D62',
-                border: '2px solid #797D62',
+                color: '#1B1E13',
+                border: '2px solid #5E6348',
                 fontSize: '15px',
                 fontWeight: 900,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                boxShadow: '0 2px 6px rgba(121, 125, 98, 0.15)',
+                boxShadow: '0 2px 6px rgba(27, 30, 19, 0.1)',
               }}
             >
-              <Clock size={18} color="#797D62" strokeWidth={2.5} /> Daily Prices (نرخ نامہ)
+              <Clock size={18} color="#1B1E13" strokeWidth={2.5} /> Daily Prices (Ù†Ø±Ø® Ù†Ø§Ù…Û)
             </button>
 
             {/* Role Switcher Pill */}
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#F1DCA7',
+                backgroundColor: '#F4F1EA',
                 padding: '4px',
                 borderRadius: '12px',
-                border: '2px solid #797D62',
+                border: '2px solid #C2BAAA',
               }}
             >
               <button
@@ -143,9 +143,9 @@ export default function Home() {
                 style={{
                   padding: '8px 16px',
                   borderRadius: '8px',
-                  border: userRole === 'biller' ? '1.5px solid #797D62' : 'none',
-                  backgroundColor: userRole === 'biller' ? '#797D62' : 'transparent',
-                  color: userRole === 'biller' ? '#F1DCA7' : '#797D62',
+                  border: userRole === 'biller' ? '1.5px solid #5E6348' : 'none',
+                  backgroundColor: userRole === 'biller' ? '#5E6348' : 'transparent',
+                  color: userRole === 'biller' ? '#FFFFFF' : '#1B1E13',
                   fontWeight: 900,
                   fontSize: '14px',
                   cursor: 'pointer',
@@ -159,9 +159,9 @@ export default function Home() {
                 style={{
                   padding: '8px 16px',
                   borderRadius: '8px',
-                  border: userRole === 'admin' ? '1.5px solid #797D62' : 'none',
-                  backgroundColor: userRole === 'admin' ? '#797D62' : 'transparent',
-                  color: userRole === 'admin' ? '#F1DCA7' : '#797D62',
+                  border: userRole === 'admin' ? '1.5px solid #5E6348' : 'none',
+                  backgroundColor: userRole === 'admin' ? '#5E6348' : 'transparent',
+                  color: userRole === 'admin' ? '#FFFFFF' : '#1B1E13',
                   fontWeight: 900,
                   fontSize: '14px',
                   cursor: 'pointer',
@@ -180,19 +180,19 @@ export default function Home() {
                 padding: '10px 16px',
                 borderRadius: '12px',
                 backgroundColor: '#D08C60',
-                color: '#F1DCA7',
-                border: '2px solid #797D62',
+                color: '#FFFFFF',
+                border: '2px solid #B58463',
                 fontSize: '15px',
                 fontWeight: 900,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                boxShadow: '0 2px 6px rgba(121, 125, 98, 0.15)',
+                boxShadow: '0 2px 6px rgba(27, 30, 19, 0.1)',
               }}
               title="Lock Terminal"
             >
-              <Lock size={17} color="#F1DCA7" strokeWidth={2.5} /> Lock PIN
+              <Lock size={17} color="#FFFFFF" strokeWidth={2.5} /> Lock PIN
             </button>
           </div>
         </div>
@@ -209,11 +209,11 @@ export default function Home() {
           }}
         >
           {[
-            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={20} strokeWidth={2.5} /> },
-            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={20} strokeWidth={2.5} /> },
-            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={20} strokeWidth={2.5} /> },
-            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={20} strokeWidth={2.5} /> },
-            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={20} strokeWidth={2.5} /> },
+            { id: 'billing', label: 'Product Billing', ur: 'Ø¨Ù„ Ø¨Ù†Ø§Ø¦ÛŒÚº', icon: <Scale size={20} strokeWidth={2.5} /> },
+            { id: 'pisai', label: 'Gundam Pisai', ur: 'Ú¯Ù†Ø¯Ù… Ù¾ÛŒØ³Ø§Ø¦ÛŒ', icon: <Sparkles size={20} strokeWidth={2.5} /> },
+            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ÚˆÛŒØ´ Ø¨ÙˆØ±Úˆ', icon: <LayoutDashboard size={20} strokeWidth={2.5} /> },
+            { id: 'udhaar', label: 'Customer Udhaar', ur: 'Ø§Ø¯Ú¾Ø§Ø± Ú©Ú¾Ø§ØªÛ', icon: <Users size={20} strokeWidth={2.5} /> },
+            { id: 'reports', label: 'Reports & Ledger', ur: 'Ø±ÙˆØ²Ù†Ø§Ù…Ú†Û Ùˆ Ø§Ø®Ø±Ø§Ø¬Ø§Øª', icon: <FileText size={20} strokeWidth={2.5} /> },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -225,9 +225,9 @@ export default function Home() {
                 style={{
                   padding: '9px 18px',
                   borderRadius: '12px',
-                  border: isActive ? '2.5px solid #797D62' : '2px solid #9B9B7A',
-                  backgroundColor: isActive ? '#FFCB69' : '#F1DCA7',
-                  color: '#797D62',
+                  border: isActive ? '2.5px solid #5E6348' : '2px solid #C2BAAA',
+                  backgroundColor: isActive ? '#FFCB69' : '#FFFFFF',
+                  color: '#1B1E13',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -235,12 +235,12 @@ export default function Home() {
                   fontWeight: 900,
                   fontSize: '15px',
                   whiteSpace: 'nowrap',
-                  boxShadow: isActive ? '0 3px 8px rgba(121, 125, 98, 0.25)' : 'none',
+                  boxShadow: isActive ? '0 3px 8px rgba(27, 30, 19, 0.12)' : 'none',
                 }}
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, color: '#797D62' }}>
+                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, color: '#1B1E13' }}>
                   ({tab.ur})
                 </span>
               </button>
@@ -256,7 +256,7 @@ export default function Home() {
           maxWidth: '1280px',
           width: '100%',
           margin: '0 auto',
-          padding: '8px 16px 14px',
+          padding: '14px 16px 20px',
         }}
       >
         {activeTab === 'billing' && <ProductBillingScreen />}

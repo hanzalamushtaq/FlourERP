@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
 @font-face {
   font-family: 'Jameel Noori Nastaleeq';
@@ -11,29 +11,30 @@
 }
 
 :root {
-  /* Strict 10-Color Palette from User Image - ZERO external colors */
-  --c1: #797D62; /* Baajra Deep Olive (Darkest Green, Text, Strong Borders) */
-  --c2: #9B9B7A; /* Muted Crop Sage */
-  --c3: #BAA587; /* Warm Khaki Wheat Husk (Secondary Borders) */
-  --c4: #D9AE94; /* Til / Toasted Sesame (Warm Accents & Badges) */
-  --c5: #F1DCA7; /* Atta / Flour Cream (Canvas Background & Light Boxes) */
-  --c6: #FFCB69; /* Makai & Sarson Gold (Highlights, Active Tabs, Total Box) */
+  /* 10-Color Crop Agriculture Palette */
+  --c1: #5E6348; /* Deep Baajra Olive (Dark Green for Action Buttons & High Contrast Accents) */
+  --c2: #797D62; /* Olive Leaf */
+  --c3: #9B9B7A; /* Muted Crop Sage */
+  --c4: #BAA587; /* Warm Khaki Wheat Husk (Borders & Dividers) */
+  --c5: #F1DCA7; /* Atta Cream (Subtle Badges & Warm Accents) */
+  --c6: #FFCB69; /* Makai & Sarson Gold (Highlights, Active Tabs, Total Boxes) */
   --c7: #E8AC65; /* Pakki Gandum Wheat Gold (Primary CTA Buttons, Selected Borders) */
-  --c8: #D08C60; /* Amber Harvest (Backspace & Warning Action) */
+  --c8: #D08C60; /* Amber Harvest (Lock, Backspace, Warnings) */
   --c9: #B58463; /* Roasted Grain */
-  --c10: #997B66; /* Deep Earth Chokar (Secondary Dark Text, Clear Action) */
+  --c10: #997B66; /* Deep Earth Chokar (Rich Earthy Secondary) */
 
-  /* Semantic UI Tokens - Strictly from the 10 colors */
-  --bg-main: var(--c5);
-  --bg-surface: var(--c5);
-  --bg-subtle: var(--c4);
-  --bg-card: var(--c5);
-  --bg-input: var(--c5);
+  /* Clean Light Canvas Background (Light, bright, crisp) */
+  --bg-main: #F8FAF8;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F4F1EA;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
   
-  --text-primary: var(--c1);
-  --text-secondary: var(--c10);
-  --text-muted: var(--c10);
-  --text-inverse: var(--c5);
+  /* Deep High-Contrast Typography for Seniors / Weak Eyesight */
+  --text-primary: #1B1E13;
+  --text-secondary: #4A4F35;
+  --text-muted: #6B7052;
+  --text-inverse: #FFFFFF;
 
   /* Accents */
   --accent-primary: var(--c7);
@@ -41,16 +42,16 @@
   --accent-highlight: var(--c6);
   --accent-warm: var(--c8);
 
-  /* Strong High-Contrast Borders for Weak Eyesight */
-  --border-subtle: var(--c1);
-  --border-medium: var(--c1);
-  --border-strong: var(--c1);
+  /* Clear Crisp Borders */
+  --border-subtle: #E2DDD3;
+  --border-medium: #C2BAAA;
+  --border-strong: #5E6348;
   --border-active: var(--c7);
   
-  --shadow-sm: 0 1px 3px 0 rgba(121, 125, 98, 0.18);
-  --shadow-md: 0 4px 8px -1px rgba(121, 125, 98, 0.25);
-  --shadow-lg: 0 10px 18px -3px rgba(121, 125, 98, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(121, 125, 98, 0.35);
+  --shadow-sm: 0 1px 3px 0 rgba(27, 30, 19, 0.06);
+  --shadow-md: 0 4px 8px -1px rgba(27, 30, 19, 0.1);
+  --shadow-lg: 0 10px 18px -3px rgba(27, 30, 19, 0.14);
+  --shadow-xl: 0 20px 25px -5px rgba(27, 30, 19, 0.18);
 
   /* Touch Target Radius */
   --radius-sm: 8px;
@@ -80,18 +81,16 @@ body {
   user-select: none;
 }
 
-/* Urdu Typography Class */
 .font-nastaleeq {
   font-family: var(--font-urdu);
   direction: rtl;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .font-mono {
   font-family: var(--font-mono);
 }
 
-/* Tactile Active Press Feedback */
 .touch-active {
   transition: transform 0.08s ease, background-color 0.15s ease;
 }
@@ -99,15 +98,17 @@ body {
   transform: scale(0.96);
 }
 
-/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--c1);
+  background: var(--bg-subtle);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--c3);
-  border-radius: var(--radius-full);
+  background: var(--c4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c1);
 }

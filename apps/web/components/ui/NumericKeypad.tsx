@@ -50,9 +50,9 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
               style={{
                 padding: '10px 4px',
                 borderRadius: '12px',
-                backgroundColor: '#F1DCA7',
-                color: '#797D62',
-                border: '2px solid #797D62',
+                backgroundColor: '#F4F1EA',
+                color: '#1B1E13',
+                border: '2px solid #C2BAAA',
                 fontSize: '13px',
                 fontWeight: 800,
                 cursor: 'pointer',
@@ -82,14 +82,14 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
             style={{
               height: '66px',
               borderRadius: '12px',
-              backgroundColor: '#F1DCA7',
-              color: '#797D62',
-              border: '2.5px solid #797D62',
+              backgroundColor: '#FFFFFF',
+              color: '#1B1E13',
+              border: '2px solid #C2BAAA',
               fontSize: '30px',
               fontWeight: 900,
               fontFamily: 'var(--font-sans)',
               cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(121, 125, 98, 0.15)',
+              boxShadow: '0 2px 6px rgba(27, 30, 19, 0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -108,16 +108,17 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
             height: '66px',
             borderRadius: '12px',
             backgroundColor: '#D08C60',
-            color: '#F1DCA7',
-            border: '2.5px solid #797D62',
+            color: '#FFFFFF',
+            border: '2px solid #B58463',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            boxShadow: '0 2px 6px rgba(208, 140, 96, 0.3)',
           }}
           title="Backspace"
         >
-          <Delete size={28} strokeWidth={2.6} color="#F1DCA7" />
+          <Delete size={28} strokeWidth={2.6} color="#FFFFFF" />
         </button>
       </div>
 
@@ -129,9 +130,9 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         style={{
           height: '50px',
           borderRadius: '12px',
-          backgroundColor: '#997B66',
-          color: '#F1DCA7',
-          border: '2.5px solid #797D62',
+          backgroundColor: '#BAA587',
+          color: '#1B1E13',
+          border: '2px solid #997B66',
           fontSize: '16px',
           fontWeight: 900,
           cursor: 'pointer',
@@ -141,7 +142,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           gap: '8px',
         }}
       >
-        <XCircle size={20} color="#F1DCA7" /> Clear Entry (صاف کریں)
+        <XCircle size={20} color="#1B1E13" /> Clear Entry (ØµØ§Ù Ú©Ø±ÛŒÚº)
       </button>
     </div>
   );
