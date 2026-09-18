@@ -79,13 +79,6 @@ export const ProductBillingScreen: React.FC = () => {
     weightInputRef.current?.select();
   }, [selectedProduct, calcMode]);
 
-  const handleQuickAdd = (amount: number) => {
-    const curr = parseFloat(inputValue) || 0;
-    setInputValue(String(curr + amount));
-    setIsReceivedAutoUpdated(true);
-    weightInputRef.current?.focus();
-  };
-
   // Action 1: Print Cash Bill
   const handlePrintCashBill = () => {
     if (rate <= 0) {
@@ -377,33 +370,6 @@ export const ProductBillingScreen: React.FC = () => {
               <span style={{ position: 'absolute', right: '14px', fontSize: '16px', fontWeight: 900, color: '#94a3b8' }}>
                 {calcMode === 'weight' ? 'KG' : 'Rs'}
               </span>
-            </div>
-
-            {/* Quick Pills */}
-            <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
-              {(calcMode === 'weight'
-                ? [{ label: '+5 kg', val: 5 }, { label: '+10 kg', val: 10 }, { label: '+20 kg', val: 20 }, { label: '+40 kg (Bori)', val: 40 }]
-                : [{ label: '+100', val: 100 }, { label: '+200', val: 200 }, { label: '+500', val: 500 }, { label: '+1,000', val: 1000 }]
-              ).map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => handleQuickAdd(item.val)}
-                  style={{
-                    flex: 1,
-                    padding: '4px 2px',
-                    borderRadius: '6px',
-                    backgroundColor: '#fef3c7',
-                    color: '#92400e',
-                    border: '1px solid #fde68a',
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {item.label}
-                </button>
-              ))}
             </div>
           </div>
 
