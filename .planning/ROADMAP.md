@@ -16,7 +16,7 @@
 ## Progress Table
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Frontend UI & Dashboard Design | 0/3 | Not started | - |
+| 1. Frontend UI & Dashboard Design | 3/3 | Completed | 2026-09-18 |
 | 2. Backend Foundation & Core Setup | 0/3 | Not started | - |
 | 3. Product Catalog & Price Management | 0/2 | Not started | - |
 | 4. Core Billing Engine (Standard Products) | 0/3 | Not started | - |
@@ -40,7 +40,10 @@
   3. Product titles and bill previews render authentically in Jameel Noori Nastaleeq Urdu font.
   4. Admin dashboard showcases styled metric summary cards, daily price modal, customer ledger view, expense forms, and reports layout.
   5. Idle PIN-lock overlay component activates cleanly on inactivity and unlocks with a 4-digit PIN.
-**Plans**: TBD
+**Plans**:
+  - [x] 01-01: Next.js Foundation, Design System & Typography
+  - [x] 01-02: Biller Counter Billing & Grinding Ticket Experience
+  - [x] 01-03: Admin Management Dashboard, Price Workflow & Reporting UI
 **UI hint**: yes
 
 ### Phase 2: Backend Foundation & Core Setup
