@@ -1,4 +1,3 @@
-'use strict';
 'use client';
 
 import React from 'react';
@@ -129,26 +128,26 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         )}
       </div>
 
-      {/* Main Titles: English + Prominent Urdu Nastaleeq */}
-      <div style={{ marginTop: '12px' }}>
+      {/* Main Titles: Prominent Urdu Nastaleeq + Crisp English */}
+      <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <div
           className="font-nastaleeq"
           style={{
-            fontSize: '26px',
-            fontWeight: 700,
+            fontSize: '22px',
+            fontWeight: 800,
             color: '#414833',
             textAlign: 'right',
-            marginBottom: '2px',
-            letterSpacing: '0.5px',
+            lineHeight: 1.3,
           }}
         >
           {product.nameUr}
         </div>
         <div
           style={{
-            fontSize: '14px',
+            fontSize: '12px',
             fontWeight: 700,
             color: '#414833',
+            letterSpacing: '0.2px',
           }}
         >
           {product.nameEn}

@@ -1,4 +1,3 @@
-'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -63,25 +62,25 @@ export const ReportsView: React.FC = () => {
   const netDayCash = totalInflow - totalOutflow;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
       {/* Top Filter Bar & Actions */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#F4F5EE',
-          padding: '14px 18px',
-          borderRadius: 'var(--radius-lg)',
-          border: '2px solid #B6AD90',
-          boxShadow: '0 4px 12px rgba(65, 72, 51, 0.08)',
+          backgroundColor: '#FFFFFF',
+          padding: '12px 18px',
+          borderRadius: '12px',
+          border: '1.5px solid #B6AD90',
+          boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)',
           flexWrap: 'wrap',
           gap: '12px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <Calendar size={18} color="#414833" />
-          <span style={{ fontWeight: 800, fontSize: '14px', color: '#414833' }}>Date Range:</span>
+          <span style={{ fontWeight: 800, fontSize: '13.5px', color: '#414833' }}>Date Range:</span>
           {(['today', 'yesterday', '7days', 'month'] as const).map((period) => (
             <button
               key={period}
@@ -89,12 +88,12 @@ export const ReportsView: React.FC = () => {
               onClick={() => setDateFilter(period)}
               style={{
                 padding: '6px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: dateFilter === period ? 'none' : '1px solid #B6AD90',
+                borderRadius: '7px',
+                border: dateFilter === period ? 'none' : '1.5px solid #B6AD90',
                 backgroundColor: dateFilter === period ? '#414833' : '#C2C5AA',
                 color: dateFilter === period ? '#F4F5EE' : '#414833',
                 fontWeight: 800,
-                fontSize: '13px',
+                fontSize: '12.5px',
                 cursor: 'pointer',
               }}
             >
@@ -109,18 +108,18 @@ export const ReportsView: React.FC = () => {
             onClick={() => setIsExpenseOpen(true)}
             className="touch-active"
             style={{
-              height: '40px',
-              padding: '0 14px',
-              borderRadius: 'var(--radius-md)',
+              height: '42px',
+              padding: '0 16px',
+              borderRadius: '8px',
               backgroundColor: '#414833',
               color: '#F4F5EE',
               border: 'none',
-              fontSize: '13px',
+              fontSize: '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
             }}
           >
             <PlusCircle size={16} color="#F4F5EE" /> Log Expense (اخراجات)
@@ -131,18 +130,18 @@ export const ReportsView: React.FC = () => {
             onClick={() => alert('Simulated CSV export generated: Ledger_Export_18_09_2026.csv')}
             className="touch-active"
             style={{
-              height: '40px',
-              padding: '0 14px',
-              borderRadius: 'var(--radius-md)',
+              height: '42px',
+              padding: '0 16px',
+              borderRadius: '8px',
               backgroundColor: '#C2C5AA',
               color: '#414833',
               border: '1.5px solid #B6AD90',
-              fontSize: '13px',
+              fontSize: '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
             }}
           >
             <Download size={16} color="#414833" /> Export CSV
@@ -151,24 +150,33 @@ export const ReportsView: React.FC = () => {
       </div>
 
       {/* Summary KPI Strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
-        <div style={{ backgroundColor: '#F4F5EE', padding: '16px', borderRadius: 'var(--radius-md)', border: '1.5px solid #B6AD90', boxShadow: '0 4px 10px rgba(65, 72, 51, 0.08)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#414833', textTransform: 'uppercase' }}>TOTAL REVENUE INFLOW</div>
-          <div style={{ fontSize: '26px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+      <div className="reports-kpi-grid-responsive">
+        <div style={{ backgroundColor: '#FFFFFF', padding: '16px 20px', borderRadius: '12px', border: '1.5px solid #B6AD90', boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+            <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833' }}>کل آمدن (سیل و فیس)</span>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#656D4A', textTransform: 'uppercase' }}>TOTAL REVENUE INFLOW</span>
+          </div>
+          <div style={{ fontSize: '30px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             + Rs {totalInflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#F4F5EE', padding: '16px', borderRadius: 'var(--radius-md)', border: '1.5px solid #B6AD90', boxShadow: '0 4px 10px rgba(65, 72, 51, 0.08)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#414833', textTransform: 'uppercase' }}>TOTAL EXPENSES & RETURNS</div>
-          <div style={{ fontSize: '26px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#FFFFFF', padding: '16px 20px', borderRadius: '12px', border: '1.5px solid #B6AD90', boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+            <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833' }}>کل اخراجات و واپسی</span>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#656D4A', textTransform: 'uppercase' }}>TOTAL EXPENSES & RETURNS</span>
+          </div>
+          <div style={{ fontSize: '30px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             - Rs {totalOutflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#C2C5AA', padding: '16px', borderRadius: 'var(--radius-md)', border: '2px solid #414833', boxShadow: '0 6px 14px rgba(65, 72, 51, 0.15)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#414833', textTransform: 'uppercase' }}>NET CASH POSITION</div>
-          <div style={{ fontSize: '26px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#DCE0CE', padding: '16px 20px', borderRadius: '12px', border: '2px solid #7F4F24', boxShadow: '0 4px 10px rgba(65, 72, 51, 0.08)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+            <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833' }}>خالص نقد کیش</span>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#414833', textTransform: 'uppercase' }}>NET CASH POSITION</span>
+          </div>
+          <div style={{ fontSize: '30px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             Rs {netDayCash.toLocaleString()}
           </div>
         </div>
@@ -177,11 +185,11 @@ export const ReportsView: React.FC = () => {
       {/* Unified Append-Only Ledger Table */}
       <div
         style={{
-          backgroundColor: '#F4F5EE',
-          borderRadius: 'var(--radius-lg)',
-          border: '2px solid #B6AD90',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          border: '1.5px solid #B6AD90',
           overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(65, 72, 51, 0.08)',
+          boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)',
         }}
       >
         <div
@@ -192,7 +200,7 @@ export const ReportsView: React.FC = () => {
             backgroundColor: '#C2C5AA',
             borderBottom: '1.5px solid #B6AD90',
             fontWeight: 800,
-            fontSize: '12px',
+            fontSize: '12.5px',
             color: '#414833',
           }}
         >
@@ -210,20 +218,20 @@ export const ReportsView: React.FC = () => {
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1.5fr 1fr 2fr 1.2fr 1fr',
-                padding: '14px 18px',
-                borderBottom: '1px solid #B6AD90',
-                fontSize: '13px',
+                padding: '12px 18px',
+                borderBottom: '1px solid #E8EAE0',
+                fontSize: '13.5px',
                 alignItems: 'center',
               }}
             >
-              <span style={{ color: '#414833', fontSize: '12px', fontWeight: 600 }}>{item.timestamp}</span>
+              <span style={{ color: '#414833', fontSize: '13px', fontWeight: 600 }}>{item.timestamp}</span>
 
               <div>
                 <span
                   style={{
-                    fontSize: '11px',
+                    fontSize: '11.5px',
                     fontWeight: 800,
-                    padding: '3px 8px',
+                    padding: '3px 9px',
                     borderRadius: 'var(--radius-full)',
                     backgroundColor: '#414833',
                     color: '#F4F5EE',
@@ -234,21 +242,18 @@ export const ReportsView: React.FC = () => {
                 </span>
               </div>
 
-              <span style={{ fontWeight: 700, color: '#414833' }}>{item.description}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#656D4A', fontWeight: 600 }}>
-                {item.reference}
-              </span>
-
+              <span style={{ color: '#414833', fontWeight: 700 }}>{item.description}</span>
+              <span style={{ color: '#656D4A', fontFamily: 'var(--font-mono)', fontSize: '12.5px', fontWeight: 700 }}>{item.reference}</span>
               <span
                 style={{
                   textAlign: 'right',
+                  fontFamily: 'var(--font-mono)',
                   fontWeight: 900,
                   fontSize: '15px',
-                  fontFamily: 'var(--font-mono)',
-                  color: '#414833',
+                  color: item.type === 'inflow' ? '#414833' : '#7F4F24',
                 }}
               >
-                {item.type === 'inflow' ? `+ Rs ${item.amount}` : `- Rs ${item.amount}`}
+                {item.type === 'inflow' ? `+ Rs ${item.amount}` : item.type === 'outflow' ? `- Rs ${item.amount}` : `Rs ${item.amount}`}
               </span>
             </div>
           ))}

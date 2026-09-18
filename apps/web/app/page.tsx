@@ -1,4 +1,3 @@
-'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -41,9 +40,10 @@ export default function Home() {
       >
         <div
           style={{
-            maxWidth: '1280px',
+            maxWidth: '1440px',
             margin: '0 auto',
             padding: '8px 20px',
+            width: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -91,8 +91,8 @@ export default function Home() {
               <div
                 className="font-nastaleeq"
                 style={{
-                  fontSize: '20px',
-                  fontWeight: 700,
+                  fontSize: '18px',
+                  fontWeight: 800,
                   color: '#414833',
                   lineHeight: 1.2,
                 }}
@@ -103,7 +103,7 @@ export default function Home() {
           </div>
 
           {/* Quick Actions & Role Switcher */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="header-actions-responsive" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             {/* Daily Price Button */}
             <button
               type="button"
@@ -111,12 +111,12 @@ export default function Home() {
               className="touch-active"
               style={{
                 padding: '8px 14px',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 backgroundColor: '#C2C5AA',
                 color: '#414833',
                 border: '1.5px solid #B6AD90',
                 fontSize: '13px',
-                fontWeight: 700,
+                fontWeight: 800,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -132,7 +132,7 @@ export default function Home() {
                 display: 'flex',
                 backgroundColor: '#C2C5AA',
                 padding: '3px',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 border: '1px solid #B6AD90',
               }}
             >
@@ -140,13 +140,13 @@ export default function Home() {
                 type="button"
                 onClick={() => setUserRole('biller')}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: '7px',
+                  padding: '5px 12px',
+                  borderRadius: '6px',
                   border: 'none',
                   backgroundColor: userRole === 'biller' ? '#414833' : 'transparent',
                   color: userRole === 'biller' ? '#F4F5EE' : '#414833',
-                  fontWeight: 700,
-                  fontSize: '12px',
+                  fontWeight: 800,
+                  fontSize: '12.5px',
                   cursor: 'pointer',
                 }}
               >
@@ -156,13 +156,13 @@ export default function Home() {
                 type="button"
                 onClick={() => setUserRole('admin')}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: '7px',
+                  padding: '5px 12px',
+                  borderRadius: '6px',
                   border: 'none',
                   backgroundColor: userRole === 'admin' ? '#414833' : 'transparent',
                   color: userRole === 'admin' ? '#F4F5EE' : '#414833',
-                  fontWeight: 700,
-                  fontSize: '12px',
+                  fontWeight: 800,
+                  fontSize: '12.5px',
                   cursor: 'pointer',
                 }}
               >
@@ -176,13 +176,13 @@ export default function Home() {
               onClick={() => setIsLocked(true)}
               className="touch-active"
               style={{
-                padding: '8px 12px',
-                borderRadius: '10px',
+                padding: '8px 14px',
+                borderRadius: '8px',
                 backgroundColor: '#414833',
                 color: '#F4F5EE',
                 border: '1.5px solid #414833',
                 fontSize: '13px',
-                fontWeight: 700,
+                fontWeight: 800,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -195,23 +195,22 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Big, Clear Navigation Tabs */}
+        {/* Clear, Large, Readable Navigation Tabs - Equal Width Edge-to-Edge */}
         <div
+          className="nav-tabs-grid"
           style={{
-            maxWidth: '1280px',
+            maxWidth: '1440px',
             margin: '0 auto',
-            padding: '0 24px',
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
+            padding: '0 20px',
+            width: '100%',
           }}
         >
           {[
-            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={19} /> },
-            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={19} /> },
-            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={19} /> },
-            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={19} /> },
-            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={19} /> },
+            { id: 'billing', shortEn: 'Billing', ur: 'بل بنائیں', icon: <Scale size={18} /> },
+            { id: 'pisai', shortEn: 'Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={18} /> },
+            { id: 'dashboard', shortEn: 'Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={18} /> },
+            { id: 'udhaar', shortEn: 'Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={18} /> },
+            { id: 'reports', shortEn: 'Reports', ur: 'روزنامچہ', icon: <FileText size={18} /> },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -219,26 +218,31 @@ export default function Home() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
+                className="touch-active nav-tab-btn"
                 style={{
-                  padding: '8px 14px',
-                  border: 'none',
-                  background: 'none',
+                  padding: '9px 12px',
+                  backgroundColor: isActive ? '#C2C5AA' : 'rgba(194, 197, 170, 0.32)',
+                  border: isActive ? '2px solid #7F4F24' : '1.5px solid #B6AD90',
+                  borderBottom: isActive ? '3.5px solid #7F4F24' : '1.5px solid #B6AD90',
+                  borderRadius: '9px 9px 0 0',
                   cursor: 'pointer',
-                  borderBottom: isActive ? '3px solid #7F4F24' : '3px solid transparent',
                   color: isActive ? '#414833' : '#656D4A',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  fontWeight: isActive ? 800 : 700,
-                  fontSize: '14px',
+                  justifyContent: 'center',
+                  gap: '8px',
                   whiteSpace: 'nowrap',
+                  boxShadow: isActive ? '0 -2px 8px rgba(127, 79, 36, 0.16)' : 'none',
                   transition: 'all 0.12s ease',
+                  width: '100%',
                 }}
               >
                 {tab.icon}
-                <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: isActive ? '#414833' : '#656D4A' }}>
-                  ({tab.ur})
+                <span className="font-nastaleeq" style={{ fontSize: '17px', fontWeight: 800, color: '#414833' }}>
+                  {tab.ur}
+                </span>
+                <span style={{ fontSize: '12.5px', fontWeight: 800, color: isActive ? '#414833' : '#656D4A' }}>
+                  ({tab.shortEn})
                 </span>
               </button>
             );
@@ -250,10 +254,10 @@ export default function Home() {
       <div
         style={{
           flex: 1,
-          maxWidth: '1280px',
+          maxWidth: '1440px',
           width: '100%',
           margin: '0 auto',
-          padding: '8px 16px 14px',
+          padding: '12px 20px 24px',
         }}
       >
         {activeTab === 'billing' && <ProductBillingScreen />}

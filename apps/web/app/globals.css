@@ -1,14 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
-
-@font-face {
-  font-family: 'Jameel Noori Nastaleeq';
-  src: local('Jameel Noori Nastaleeq'), local('JameelNooriNastaleeq'),
-       url('https://cdn.jsdelivr.net/gh/m-a-k-s/urdu-fonts@master/fonts/Jameel%20Noori%20Nastaleeq.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/m-a-k-s/urdu-fonts@master/fonts/Jameel%20Noori%20Nastaleeq.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 :root {
   /* Strict 8-Color Crop Agriculture Palette from User Image */
@@ -57,7 +47,7 @@
 
   /* Typography */
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-urdu: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+  --font-urdu: 'Segoe UI', 'Noto Sans Arabic', Tahoma, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -77,11 +67,17 @@ body {
   user-select: none;
 }
 
+input, textarea, select, button {
+  user-select: auto;
+}
+
 /* Urdu Typography Class */
 .font-nastaleeq {
   font-family: var(--font-urdu);
   direction: rtl;
   line-height: 1.6;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .font-mono {
@@ -108,3 +104,112 @@ body {
   background: var(--c4);
   border-radius: var(--radius-full);
 }
+
+/* =========================================================
+   RESPONSIVE LAYOUT & EQUAL WIDTH UTILITIES
+   ========================================================= */
+
+/* 1. Navigation Tabs: Equal width grid across full width */
+.nav-tabs-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.nav-tab-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* 2. Product Selection Grid */
+.product-grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+/* 3. 2-Column POS Billing Split */
+.billing-grid-responsive {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 14px;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* 4. Pisai Service Grid */
+.service-grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+/* 5. Customer Ledger Grid */
+.ledger-grid-responsive {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) minmax(360px, 1.5fr);
+  gap: 16px;
+  width: 100%;
+}
+
+/* 6. Reports KPI Grid */
+.reports-kpi-grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+/* Tablet Breakpoint (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .product-grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Medium / Tablet Portrait Breakpoint (max-width: 860px) */
+@media (max-width: 860px) {
+  .billing-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+  .ledger-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile Tabs & Cards Breakpoint (max-width: 768px) */
+@media (max-width: 768px) {
+  .nav-tabs-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-tab-btn {
+    flex: 0 0 auto !important;
+    min-width: 130px;
+    padding: 8px 12px !important;
+  }
+  .reports-kpi-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Phone Breakpoint (max-width: 640px) */
+@media (max-width: 640px) {
+  .product-grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .service-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+  .header-actions-responsive {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+

@@ -1,4 +1,3 @@
-'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -29,6 +28,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
     { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', yesterdayRate: 155, todayRate: 155 },
     { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', yesterdayRate: 160, todayRate: 160 },
     { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', yesterdayRate: 90, todayRate: 95 },
+    { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', yesterdayRate: 142, todayRate: 145 },
   ]);
 
   const [billerHoldState, setBillerHoldState] = useState<boolean>(false);
