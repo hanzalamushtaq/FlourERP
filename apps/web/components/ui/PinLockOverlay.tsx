@@ -1,8 +1,8 @@
-
+'use strict';
 'use client';
 
 import React, { useState } from 'react';
-import { Lock, Unlock, ShieldAlert, Delete } from 'lucide-react';
+import { Lock, Unlock, ShieldAlert } from 'lucide-react';
 
 interface PinLockOverlayProps {
   isLocked: boolean;
@@ -53,8 +53,8 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        backgroundColor: 'rgba(27, 30, 19, 0.7)',
-        backdropFilter: 'blur(10px)',
+        backgroundColor: 'rgba(51, 61, 41, 0.65)',
+        backdropFilter: 'blur(12px)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -66,11 +66,11 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
         style={{
           width: '100%',
           maxWidth: '360px',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#F6F7F0',
           borderRadius: '16px',
           padding: '28px 24px',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
-          border: '2.5px solid #5E6348',
+          boxShadow: '0 20px 35px rgba(51, 61, 41, 0.25)',
+          border: '2px solid #B6AD90',
           textAlign: 'center',
           animation: error ? 'shake 0.4s ease' : 'none',
         }}
@@ -81,9 +81,9 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             width: '60px',
             height: '60px',
             borderRadius: '9999px',
-            backgroundColor: '#5E6348',
-            border: '2px solid #5E6348',
-            color: '#FFFFFF',
+            backgroundColor: '#333D29',
+            border: '1.5px solid #333D29',
+            color: error ? '#F6F7F0' : '#F6F7F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -91,25 +91,25 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             transition: 'all 0.2s',
           }}
         >
-          {error ? <ShieldAlert size={30} color="#FFFFFF" /> : <Lock size={30} color="#FFFFFF" />}
+          {error ? <ShieldAlert size={30} color="#F6F7F0" /> : <Lock size={30} color="#F6F7F0" />}
         </div>
 
-        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1B1E13' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#333D29' }}>
           Terminal Locked
         </h2>
         <p
           className="font-nastaleeq"
           style={{
             fontSize: '19px',
-            color: '#1B1E13',
+            color: '#333D29',
             margin: '4px 0 8px',
             fontWeight: 700,
           }}
         >
-          Ù¹Ø±Ù…ÛŒÙ†Ù„ Ù…Ù‚ÙÙ„ ÛÛ’ â€” Ù¾Ù† Ø¯Ø±Ø¬ Ú©Ø±ÛŒÚº
+          ٹرمینل مقفل ہے — پن درج کریں
         </p>
-        <p style={{ fontSize: '13px', color: '#4A4F35', marginBottom: '20px', fontWeight: 600 }}>
-          {staffName} â€¢ Enter 4-digit PIN (Demo: 1234)
+        <p style={{ fontSize: '13px', color: '#333D29', marginBottom: '20px', fontWeight: 600 }}>
+          {staffName} • Enter 4-digit PIN (Demo: 1234)
         </p>
 
         {/* PIN Indicators (Dots) */}
@@ -131,11 +131,11 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
                   height: '16px',
                   borderRadius: '9999px',
                   backgroundColor: error
-                    ? '#D08C60'
+                    ? '#656D4A'
                     : filled
-                    ? '#5E6348'
-                    : '#FFFFFF',
-                  border: filled ? 'none' : '2px solid #C2BAAA',
+                    ? '#333D29'
+                    : '#C2C5AA',
+                  border: filled ? 'none' : '2px solid #B6AD90',
                   transform: filled ? 'scale(1.15)' : 'scale(1)',
                   transition: 'all 0.15s ease',
                 }}
@@ -160,62 +160,66 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
               className="touch-active"
               style={{
                 height: '56px',
-                borderRadius: '10px',
-                border: '2px solid #C2BAAA',
-                backgroundColor: '#FFFFFF',
+                borderRadius: '12px',
+                backgroundColor: '#F6F7F0',
+                color: '#333D29',
+                border: '1.5px solid #B6AD90',
                 fontSize: '22px',
-                fontWeight: 900,
-                color: '#1B1E13',
+                fontWeight: 800,
                 cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(27, 30, 19, 0.06)',
               }}
             >
               {digit}
             </button>
           ))}
-
           <div />
-
           <button
             type="button"
             onClick={() => handleDigit('0')}
             className="touch-active"
             style={{
               height: '56px',
-              borderRadius: '10px',
-              border: '2px solid #C2BAAA',
-              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              backgroundColor: '#F6F7F0',
+              color: '#333D29',
+              border: '1.5px solid #B6AD90',
               fontSize: '22px',
-              fontWeight: 900,
-              color: '#1B1E13',
+              fontWeight: 800,
               cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(27, 30, 19, 0.06)',
             }}
           >
             0
           </button>
-
           <button
             type="button"
             onClick={handleBackspace}
             className="touch-active"
             style={{
               height: '56px',
-              borderRadius: '10px',
-              border: '2px solid #B58463',
-              backgroundColor: '#D08C60',
-              color: '#FFFFFF',
+              borderRadius: '12px',
+              backgroundColor: '#333D29',
+              color: '#F6F7F0',
+              border: '1.5px solid #333D29',
+              fontSize: '18px',
+              fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 4px rgba(208, 140, 96, 0.2)',
             }}
           >
-            <Delete size={22} color="#FFFFFF" strokeWidth={2.5} />
+            ⌫
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20%, 60% { transform: translateX(-8px); }
+          40%, 80% { transform: translateX(8px); }
+        }
+      `}</style>
     </div>
   );
 };

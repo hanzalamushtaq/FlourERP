@@ -1,4 +1,4 @@
-
+'use strict';
 'use client';
 
 import React from 'react';
@@ -50,9 +50,9 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
               style={{
                 padding: '10px 4px',
                 borderRadius: '12px',
-                backgroundColor: '#F4F1EA',
-                color: '#1B1E13',
-                border: '2px solid #C2BAAA',
+                backgroundColor: '#C2C5AA',
+                color: '#333D29',
+                border: '1.5px solid #B6AD90',
                 fontSize: '13px',
                 fontWeight: 800,
                 cursor: 'pointer',
@@ -80,16 +80,16 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
             onClick={() => onKeyPress(digit)}
             className="touch-active"
             style={{
-              height: '66px',
+              height: '62px',
               borderRadius: '12px',
-              backgroundColor: '#FFFFFF',
-              color: '#1B1E13',
-              border: '2px solid #C2BAAA',
-              fontSize: '30px',
-              fontWeight: 900,
+              backgroundColor: '#F6F7F0',
+              color: '#333D29',
+              border: '2px solid #B6AD90',
+              fontSize: '26px',
+              fontWeight: 800,
               fontFamily: 'var(--font-sans)',
               cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(27, 30, 19, 0.08)',
+              boxShadow: '0 2px 6px rgba(51, 61, 41, 0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -105,20 +105,19 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           onClick={onBackspace}
           className="touch-active"
           style={{
-            height: '66px',
+            height: '62px',
             borderRadius: '12px',
-            backgroundColor: '#D08C60',
-            color: '#FFFFFF',
-            border: '2px solid #B58463',
+            backgroundColor: '#7F4F24',
+            color: '#F6F7F0',
+            border: '2px solid #7F4F24',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 6px rgba(208, 140, 96, 0.3)',
           }}
           title="Backspace"
         >
-          <Delete size={28} strokeWidth={2.6} color="#FFFFFF" />
+          <Delete size={26} strokeWidth={2.4} color="#F6F7F0" />
         </button>
       </div>
 
@@ -128,21 +127,21 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         onClick={onClear}
         className="touch-active"
         style={{
-          height: '50px',
+          height: '46px',
           borderRadius: '12px',
-          backgroundColor: '#BAA587',
-          color: '#1B1E13',
-          border: '2px solid #997B66',
-          fontSize: '16px',
-          fontWeight: 900,
+          backgroundColor: '#582F0E',
+          color: '#F6F7F0',
+          border: '1.5px solid #582F0E',
+          fontSize: '15px',
+          fontWeight: 700,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '8px',
+          gap: '6px',
         }}
       >
-        <XCircle size={20} color="#1B1E13" /> Clear Entry (ØµØ§Ù Ú©Ø±ÛŒÚº)
+        <XCircle size={18} color="#F6F7F0" /> Clear Entry (صاف کریں)
       </button>
     </div>
   );

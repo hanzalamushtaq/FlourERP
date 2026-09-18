@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 @font-face {
   font-family: 'Jameel Noori Nastaleeq';
@@ -11,47 +11,45 @@
 }
 
 :root {
-  /* 10-Color Crop Agriculture Palette */
-  --c1: #5E6348; /* Deep Baajra Olive (Dark Green for Action Buttons & High Contrast Accents) */
-  --c2: #797D62; /* Olive Leaf */
-  --c3: #9B9B7A; /* Muted Crop Sage */
-  --c4: #BAA587; /* Warm Khaki Wheat Husk (Borders & Dividers) */
-  --c5: #F1DCA7; /* Atta Cream (Subtle Badges & Warm Accents) */
-  --c6: #FFCB69; /* Makai & Sarson Gold (Highlights, Active Tabs, Total Boxes) */
-  --c7: #E8AC65; /* Pakki Gandum Wheat Gold (Primary CTA Buttons, Selected Borders) */
-  --c8: #D08C60; /* Amber Harvest (Lock, Backspace, Warnings) */
-  --c9: #B58463; /* Roasted Grain */
-  --c10: #997B66; /* Deep Earth Chokar (Rich Earthy Secondary) */
+  /* Complete 10-Color Earth & Crop Palette from User Image */
+  --c1: #582F0E; /* Deep Roasted Earth */
+  --c2: #7F4F24; /* Warm Timber (Primary Action Button) */
+  --c3: #936639; /* Caramel Amber */
+  --c4: #A68A64; /* Warm Khaki */
+  --c5: #B6AD90; /* Soft Almond Khaki (Borders, Frames) */
+  --c6: #C2C5AA; /* Pale Sage Cream (Surfaces, Cards) */
+  --c7: #A4AC86; /* Soft Celadon (Dividers, Borders) */
+  --c8: #656D4A; /* Olive Green (Credit Button, Accents) */
+  --c9: #414833; /* Deep Forest Olive */
+  --c10: #333D29; /* Dark Moss Timber (Gehri Wording, Headings, Numbers) */
 
-  /* Clean Light Canvas Background (Light, bright, crisp) */
-  --bg-main: #F8FAF8;
-  --bg-surface: #FFFFFF;
-  --bg-subtle: #F4F1EA;
-  --bg-card: #FFFFFF;
-  --bg-input: #FFFFFF;
+  /* Light Theme Semantic UI Tokens - Light boxes, deep dark typography */
+  --bg-main: #F6F7F0; /* Clean Light Canvas */
+  --bg-surface: var(--c6);
+  --bg-subtle: #ECEEE4;
+  --bg-card: #F6F7F0;
+  --bg-input: #F6F7F0;
   
-  /* Deep High-Contrast Typography for Seniors / Weak Eyesight */
-  --text-primary: #1B1E13;
-  --text-secondary: #4A4F35;
-  --text-muted: #6B7052;
-  --text-inverse: #FFFFFF;
+  --text-primary: var(--c10); /* Deep Wording #333D29 */
+  --text-secondary: var(--c9);
+  --text-muted: var(--c8);
+  --text-inverse: #F6F7F0;
 
   /* Accents */
-  --accent-primary: var(--c7);
-  --accent-secondary: var(--c1);
-  --accent-highlight: var(--c6);
-  --accent-warm: var(--c8);
+  --accent-primary: var(--c2); /* Warm Timber #7F4F24 */
+  --accent-secondary: var(--c8); /* Olive Green #656D4A */
+  --accent-highlight: var(--c3); /* Caramel #936639 */
 
-  /* Clear Crisp Borders */
-  --border-subtle: #E2DDD3;
-  --border-medium: #C2BAAA;
-  --border-strong: #5E6348;
-  --border-active: var(--c7);
+  /* Borders & Dividers */
+  --border-subtle: var(--c5);
+  --border-medium: var(--c7);
+  --border-strong: var(--c10);
+  --border-active: var(--c2);
   
-  --shadow-sm: 0 1px 3px 0 rgba(27, 30, 19, 0.06);
-  --shadow-md: 0 4px 8px -1px rgba(27, 30, 19, 0.1);
-  --shadow-lg: 0 10px 18px -3px rgba(27, 30, 19, 0.14);
-  --shadow-xl: 0 20px 25px -5px rgba(27, 30, 19, 0.18);
+  --shadow-sm: 0 1px 2px 0 rgba(51, 61, 41, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(51, 61, 41, 0.12), 0 2px 4px -2px rgba(51, 61, 41, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(51, 61, 41, 0.15), 0 4px 6px -4px rgba(51, 61, 41, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(51, 61, 41, 0.2), 0 8px 10px -6px rgba(51, 61, 41, 0.15);
 
   /* Touch Target Radius */
   --radius-sm: 8px;
@@ -81,16 +79,18 @@ body {
   user-select: none;
 }
 
+/* Urdu Typography Class */
 .font-nastaleeq {
   font-family: var(--font-urdu);
   direction: rtl;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .font-mono {
   font-family: var(--font-mono);
 }
 
+/* Tactile Active Press Feedback */
 .touch-active {
   transition: transform 0.08s ease, background-color 0.15s ease;
 }
@@ -98,17 +98,15 @@ body {
   transform: scale(0.96);
 }
 
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-subtle);
+  background: var(--c1);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--c4);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--c1);
+  background: var(--c3);
+  border-radius: var(--radius-full);
 }

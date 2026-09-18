@@ -1,4 +1,4 @@
-
+'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -70,18 +70,18 @@ export const ReportsView: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#F6F7F0',
           padding: '14px 18px',
           borderRadius: 'var(--radius-lg)',
-          border: '2px solid #C2BAAA',
-          boxShadow: '0 4px 12px rgba(121, 125, 98, 0.08)',
+          border: '2px solid #B6AD90',
+          boxShadow: '0 4px 12px rgba(51, 61, 41, 0.08)',
           flexWrap: 'wrap',
           gap: '12px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Calendar size={18} color="#1B1E13" />
-          <span style={{ fontWeight: 800, fontSize: '14px', color: '#1B1E13' }}>Date Range:</span>
+          <Calendar size={18} color="#333D29" />
+          <span style={{ fontWeight: 800, fontSize: '14px', color: '#333D29' }}>Date Range:</span>
           {(['today', 'yesterday', '7days', 'month'] as const).map((period) => (
             <button
               key={period}
@@ -90,9 +90,9 @@ export const ReportsView: React.FC = () => {
               style={{
                 padding: '6px 12px',
                 borderRadius: 'var(--radius-md)',
-                border: dateFilter === period ? '2px solid #5E6348' : '1.5px solid #C2BAAA',
-                backgroundColor: dateFilter === period ? '#5E6348' : '#FFFFFF',
-                color: dateFilter === period ? '#FFFFFF' : '#1B1E13',
+                border: dateFilter === period ? 'none' : '1px solid #B6AD90',
+                backgroundColor: dateFilter === period ? '#333D29' : '#C2C5AA',
+                color: dateFilter === period ? '#F6F7F0' : '#333D29',
                 fontWeight: 800,
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -112,18 +112,18 @@ export const ReportsView: React.FC = () => {
               height: '40px',
               padding: '0 14px',
               borderRadius: 'var(--radius-md)',
-              backgroundColor: '#D08C60',
-              color: '#FFFFFF',
-              border: '2px solid #B58463',
-              fontSize: '14px',
-              fontWeight: 900,
+              backgroundColor: '#333D29',
+              color: '#F6F7F0',
+              border: 'none',
+              fontSize: '13px',
+              fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
             }}
           >
-            <PlusCircle size={16} color="#FFFFFF" /> Log Expense (Ã˜Â§Ã˜Â®Ã˜Â±Ã˜Â§Ã˜Â¬Ã˜Â§Ã˜Âª)
+            <PlusCircle size={16} color="#F6F7F0" /> Log Expense (اخراجات)
           </button>
 
           <button
@@ -134,9 +134,9 @@ export const ReportsView: React.FC = () => {
               height: '40px',
               padding: '0 14px',
               borderRadius: 'var(--radius-md)',
-              backgroundColor: '#FFFFFF',
-              color: '#1B1E13',
-              border: '2px solid #C2BAAA',
+              backgroundColor: '#C2C5AA',
+              color: '#333D29',
+              border: '1.5px solid #B6AD90',
               fontSize: '13px',
               fontWeight: 800,
               cursor: 'pointer',
@@ -145,30 +145,30 @@ export const ReportsView: React.FC = () => {
               gap: '6px',
             }}
           >
-            <Download size={16} color="#1B1E13" /> Export CSV
+            <Download size={16} color="#333D29" /> Export CSV
           </button>
         </div>
       </div>
 
       {/* Summary KPI Strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: 'var(--radius-md)', border: '2px solid #C2BAAA', boxShadow: '0 4px 10px rgba(121, 125, 98, 0.08)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13', textTransform: 'uppercase' }}>TOTAL REVENUE INFLOW</div>
-          <div style={{ fontSize: '26px', fontWeight: 900, color: '#1B1E13', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#F6F7F0', padding: '16px', borderRadius: 'var(--radius-md)', border: '1.5px solid #B6AD90', boxShadow: '0 4px 10px rgba(51, 61, 41, 0.08)' }}>
+          <div style={{ fontSize: '12px', fontWeight: 800, color: '#333D29', textTransform: 'uppercase' }}>TOTAL REVENUE INFLOW</div>
+          <div style={{ fontSize: '26px', fontWeight: 900, color: '#333D29', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             + Rs {totalInflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: 'var(--radius-md)', border: '2px solid #C2BAAA', boxShadow: '0 4px 10px rgba(121, 125, 98, 0.08)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13', textTransform: 'uppercase' }}>TOTAL EXPENSES & RETURNS</div>
-          <div style={{ fontSize: '26px', fontWeight: 900, color: '#1B1E13', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#F6F7F0', padding: '16px', borderRadius: 'var(--radius-md)', border: '1.5px solid #B6AD90', boxShadow: '0 4px 10px rgba(51, 61, 41, 0.08)' }}>
+          <div style={{ fontSize: '12px', fontWeight: 800, color: '#333D29', textTransform: 'uppercase' }}>TOTAL EXPENSES & RETURNS</div>
+          <div style={{ fontSize: '26px', fontWeight: 900, color: '#333D29', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             - Rs {totalOutflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: 'var(--radius-md)', border: '2px solid #C2BAAA', boxShadow: '0 6px 14px rgba(121, 125, 98, 0.15)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13', textTransform: 'uppercase' }}>NET CASH POSITION</div>
-          <div style={{ fontSize: '26px', fontWeight: 900, color: '#1B1E13', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+        <div style={{ backgroundColor: '#C2C5AA', padding: '16px', borderRadius: 'var(--radius-md)', border: '2px solid #333D29', boxShadow: '0 6px 14px rgba(51, 61, 41, 0.15)' }}>
+          <div style={{ fontSize: '12px', fontWeight: 800, color: '#333D29', textTransform: 'uppercase' }}>NET CASH POSITION</div>
+          <div style={{ fontSize: '26px', fontWeight: 900, color: '#333D29', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             Rs {netDayCash.toLocaleString()}
           </div>
         </div>
@@ -177,11 +177,11 @@ export const ReportsView: React.FC = () => {
       {/* Unified Append-Only Ledger Table */}
       <div
         style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#F6F7F0',
           borderRadius: 'var(--radius-lg)',
-          border: '2px solid #C2BAAA',
+          border: '2px solid #B6AD90',
           overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(121, 125, 98, 0.08)',
+          boxShadow: '0 4px 12px rgba(51, 61, 41, 0.08)',
         }}
       >
         <div
@@ -189,11 +189,11 @@ export const ReportsView: React.FC = () => {
             display: 'grid',
             gridTemplateColumns: '1.5fr 1fr 2fr 1.2fr 1fr',
             padding: '12px 18px',
-            backgroundColor: '#F4F1EA',
-            borderBottom: '1px solid #C2BAAA',
+            backgroundColor: '#C2C5AA',
+            borderBottom: '1.5px solid #B6AD90',
             fontWeight: 800,
             fontSize: '12px',
-            color: '#1B1E13',
+            color: '#333D29',
           }}
         >
           <span>DATE / TIME</span>
@@ -211,12 +211,12 @@ export const ReportsView: React.FC = () => {
                 display: 'grid',
                 gridTemplateColumns: '1.5fr 1fr 2fr 1.2fr 1fr',
                 padding: '14px 18px',
-                borderBottom: '1.5px solid #C2BAAA',
+                borderBottom: '1px solid #B6AD90',
                 fontSize: '13px',
                 alignItems: 'center',
               }}
             >
-              <span style={{ color: '#1B1E13', fontSize: '12px', fontWeight: 600 }}>{item.timestamp}</span>
+              <span style={{ color: '#333D29', fontSize: '12px', fontWeight: 600 }}>{item.timestamp}</span>
 
               <div>
                 <span
@@ -225,17 +225,17 @@ export const ReportsView: React.FC = () => {
                     fontWeight: 800,
                     padding: '3px 8px',
                     borderRadius: 'var(--radius-full)',
-                    backgroundColor: '#5E6348',
-                    color: '#FFFFFF',
-                    border: '1px solid #5E6348',
+                    backgroundColor: '#333D29',
+                    color: '#F6F7F0',
+                    border: '1px solid #333D29',
                   }}
                 >
                   {item.category}
                 </span>
               </div>
 
-              <span style={{ fontWeight: 700, color: '#1B1E13' }}>{item.description}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#1B1E13', fontWeight: 600 }}>
+              <span style={{ fontWeight: 700, color: '#333D29' }}>{item.description}</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#656D4A', fontWeight: 600 }}>
                 {item.reference}
               </span>
 
@@ -245,7 +245,7 @@ export const ReportsView: React.FC = () => {
                   fontWeight: 900,
                   fontSize: '15px',
                   fontFamily: 'var(--font-mono)',
-                  color: '#1B1E13',
+                  color: '#333D29',
                 }}
               >
                 {item.type === 'inflow' ? `+ Rs ${item.amount}` : `- Rs ${item.amount}`}
@@ -262,7 +262,7 @@ export const ReportsView: React.FC = () => {
             position: 'fixed',
             inset: 0,
             zIndex: 9996,
-            backgroundColor: 'rgba(27, 30, 19, 0.7)',
+            backgroundColor: 'rgba(51, 61, 41, 0.65)',
             backdropFilter: 'blur(6px)',
             display: 'flex',
             alignItems: 'center',
@@ -274,23 +274,23 @@ export const ReportsView: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: '380px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#F6F7F0',
               borderRadius: 'var(--radius-lg)',
               padding: '20px',
-              border: '2px solid #C2BAAA',
-              boxShadow: '0 20px 25px -5px rgba(121, 125, 98, 0.25)',
+              border: '2px solid #B6AD90',
+              boxShadow: '0 20px 25px -5px rgba(51, 61, 41, 0.25)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#1B1E13', margin: 0 }}>Log Shop Expense</h3>
-              <button onClick={() => setIsExpenseOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1B1E13' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#333D29', margin: 0 }}>Log Shop Expense</h3>
+              <button onClick={() => setIsExpenseOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333D29' }}>
                 <X size={20} />
               </button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '18px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>Category (Ã™â€šÃ˜Â³Ã™â€¦)</label>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#333D29' }}>Category (قسم)</label>
                 <select
                   value={expenseCategory}
                   onChange={(e) => setExpenseCategory(e.target.value)}
@@ -298,24 +298,24 @@ export const ReportsView: React.FC = () => {
                     width: '100%',
                     padding: '10px',
                     borderRadius: '8px',
-                    border: '2px solid #C2BAAA',
+                    border: '1.5px solid #B6AD90',
                     marginTop: '4px',
-                    backgroundColor: '#FFFFFF',
-                    color: '#1B1E13',
+                    backgroundColor: '#F6F7F0',
+                    color: '#333D29',
                     outline: 'none',
                     fontWeight: 700,
                   }}
                 >
-                  <option value="Electricity">Electricity (Ã˜Â¨Ã˜Â¬Ã™â€žÃ›Å’ ÃšÂ©Ã˜Â§ Ã˜Â¨Ã™â€ž)</option>
-                  <option value="Labor">Labor / Mazdoori (Ã™â€¦Ã˜Â²Ã˜Â¯Ã™Ë†Ã˜Â±Ã›Å’)</option>
-                  <option value="Maintenance">Chakki Machine Maintenance (Ã™â€¦Ã˜Â±Ã™â€¦Ã˜Âª)</option>
-                  <option value="Tea & Refreshment">Tea & Refreshment (Ãšâ€ Ã˜Â§Ã˜Â¦Ã›â€™ Ã™Â¾Ã˜Â§Ã™â€ Ã›Å’)</option>
+                  <option value="Electricity">Electricity (بجلی کا بل)</option>
+                  <option value="Labor">Labor / Mazdoori (مزدوری)</option>
+                  <option value="Maintenance">Chakki Machine Maintenance (مرمت)</option>
+                  <option value="Tea & Refreshment">Tea & Refreshment (چائے پانی)</option>
                   <option value="Other">Other Miscellaneous</option>
                 </select>
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>Description (Ã˜ÂªÃ™ÂÃ˜ÂµÃ›Å’Ã™â€ž)</label>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#333D29' }}>Description (تفصیل)</label>
                 <input
                   type="text"
                   placeholder="e.g. Belt greasing, generator diesel..."
@@ -325,10 +325,10 @@ export const ReportsView: React.FC = () => {
                     width: '100%',
                     padding: '10px',
                     borderRadius: '8px',
-                    border: '2px solid #C2BAAA',
+                    border: '1.5px solid #B6AD90',
                     marginTop: '4px',
-                    backgroundColor: '#FFFFFF',
-                    color: '#1B1E13',
+                    backgroundColor: '#F6F7F0',
+                    color: '#333D29',
                     outline: 'none',
                     fontWeight: 700,
                   }}
@@ -336,7 +336,7 @@ export const ReportsView: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#1B1E13' }}>Amount (Ã˜Â±Ã™â€šÃ™â€¦ - Rs)</label>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#333D29' }}>Amount (رقم - Rs)</label>
                 <input
                   type="number"
                   placeholder="Rs 0"
@@ -346,12 +346,12 @@ export const ReportsView: React.FC = () => {
                     width: '100%',
                     padding: '10px',
                     borderRadius: '8px',
-                    border: '2px solid #C2BAAA',
+                    border: '1.5px solid #B6AD90',
                     marginTop: '4px',
                     fontSize: '18px',
                     fontWeight: 900,
-                    backgroundColor: '#FFFFFF',
-                    color: '#1B1E13',
+                    backgroundColor: '#F6F7F0',
+                    color: '#333D29',
                     outline: 'none',
                   }}
                 />
@@ -366,11 +366,11 @@ export const ReportsView: React.FC = () => {
                 width: '100%',
                 height: '46px',
                 borderRadius: 'var(--radius-md)',
-                backgroundColor: '#D08C60',
-                color: '#FFFFFF',
-                border: '2px solid #B58463',
+                backgroundColor: '#333D29',
+                color: '#F6F7F0',
+                border: 'none',
                 fontSize: '15px',
-                fontWeight: 900,
+                fontWeight: 800,
                 cursor: 'pointer',
               }}
             >
@@ -382,4 +382,3 @@ export const ReportsView: React.FC = () => {
     </div>
   );
 };
-

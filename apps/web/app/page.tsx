@@ -1,4 +1,4 @@
-
+'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -27,13 +27,13 @@ export default function Home() {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAF8', color: '#1B1E13' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F6F7F0', color: '#333D29' }}>
       {/* Top Application Header */}
       <header
         style={{
-          backgroundColor: '#FFFFFF',
-          borderBottom: '2px solid #C2BAAA',
-          boxShadow: '0 2px 10px rgba(27, 30, 19, 0.05)',
+          backgroundColor: '#F6F7F0',
+          borderBottom: '2px solid #B6AD90',
+          boxShadow: '0 2px 8px rgba(51, 61, 41, 0.08)',
           position: 'sticky',
           top: 0,
           zIndex: 1000,
@@ -43,46 +43,46 @@ export default function Home() {
           style={{
             maxWidth: '1280px',
             margin: '0 auto',
-            padding: '10px 20px',
+            padding: '8px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '12px',
+            gap: '10px',
           }}
         >
           {/* Logo & Shop Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '12px',
-                backgroundColor: '#5E6348',
-                border: '2px solid #5E6348',
-                color: '#FFFFFF',
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                backgroundColor: '#333D29',
+                border: '1.5px solid #333D29',
+                color: '#F6F7F0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Wheat size={26} strokeWidth={2.6} color="#FFFFFF" />
+              <Wheat size={22} strokeWidth={2.4} />
             </div>
 
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#1B1E13', letterSpacing: '-0.5px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '20px', fontWeight: 900, color: '#333D29', letterSpacing: '-0.5px' }}>
                   FlourERP
                 </span>
                 <span
                   style={{
-                    fontSize: '12px',
-                    fontWeight: 900,
-                    padding: '3px 10px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    padding: '2px 8px',
                     borderRadius: '9999px',
-                    backgroundColor: '#FFCB69',
-                    color: '#1B1E13',
-                    border: '1.5px solid #5E6348',
+                    backgroundColor: '#C2C5AA',
+                    color: '#333D29',
+                    border: '1px solid #B6AD90',
                   }}
                 >
                   ONLINE
@@ -91,13 +91,13 @@ export default function Home() {
               <div
                 className="font-nastaleeq"
                 style={{
-                  fontSize: '24px',
-                  fontWeight: 900,
-                  color: '#1B1E13',
+                  fontSize: '20px',
+                  fontWeight: 700,
+                  color: '#333D29',
                   lineHeight: 1.2,
                 }}
               >
-                Ø§Ù„Ù…Ø¯ÛŒÙ†Û Ú†Ú©ÛŒ Ùˆ ÙÙ„ÙˆØ± Ù…Ù„Ø²
+                المدینہ چکی و فلور ملز
               </div>
             </div>
           </div>
@@ -110,44 +110,43 @@ export default function Home() {
               onClick={() => setIsPriceModalOpen(true)}
               className="touch-active"
               style={{
-                padding: '10px 16px',
-                borderRadius: '12px',
-                backgroundColor: '#E8AC65',
-                color: '#1B1E13',
-                border: '2px solid #5E6348',
-                fontSize: '15px',
-                fontWeight: 900,
+                padding: '8px 14px',
+                borderRadius: '10px',
+                backgroundColor: '#C2C5AA',
+                color: '#333D29',
+                border: '1.5px solid #B6AD90',
+                fontSize: '13px',
+                fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 2px 6px rgba(27, 30, 19, 0.1)',
+                gap: '6px',
               }}
             >
-              <Clock size={18} color="#1B1E13" strokeWidth={2.5} /> Daily Prices (Ù†Ø±Ø® Ù†Ø§Ù…Û)
+              <Clock size={16} color="#333D29" /> Daily Prices (نرخ نامہ)
             </button>
 
             {/* Role Switcher Pill */}
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#F4F1EA',
-                padding: '4px',
-                borderRadius: '12px',
-                border: '2px solid #C2BAAA',
+                backgroundColor: '#C2C5AA',
+                padding: '3px',
+                borderRadius: '10px',
+                border: '1px solid #B6AD90',
               }}
             >
               <button
                 type="button"
                 onClick={() => setUserRole('biller')}
                 style={{
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: userRole === 'biller' ? '1.5px solid #5E6348' : 'none',
-                  backgroundColor: userRole === 'biller' ? '#5E6348' : 'transparent',
-                  color: userRole === 'biller' ? '#FFFFFF' : '#1B1E13',
-                  fontWeight: 900,
-                  fontSize: '14px',
+                  padding: '6px 12px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  backgroundColor: userRole === 'biller' ? '#333D29' : 'transparent',
+                  color: userRole === 'biller' ? '#F6F7F0' : '#333D29',
+                  fontWeight: 700,
+                  fontSize: '12px',
                   cursor: 'pointer',
                 }}
               >
@@ -157,13 +156,13 @@ export default function Home() {
                 type="button"
                 onClick={() => setUserRole('admin')}
                 style={{
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: userRole === 'admin' ? '1.5px solid #5E6348' : 'none',
-                  backgroundColor: userRole === 'admin' ? '#5E6348' : 'transparent',
-                  color: userRole === 'admin' ? '#FFFFFF' : '#1B1E13',
-                  fontWeight: 900,
-                  fontSize: '14px',
+                  padding: '6px 12px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  backgroundColor: userRole === 'admin' ? '#333D29' : 'transparent',
+                  color: userRole === 'admin' ? '#F6F7F0' : '#333D29',
+                  fontWeight: 700,
+                  fontSize: '12px',
                   cursor: 'pointer',
                 }}
               >
@@ -177,43 +176,42 @@ export default function Home() {
               onClick={() => setIsLocked(true)}
               className="touch-active"
               style={{
-                padding: '10px 16px',
-                borderRadius: '12px',
-                backgroundColor: '#D08C60',
-                color: '#FFFFFF',
-                border: '2px solid #B58463',
-                fontSize: '15px',
-                fontWeight: 900,
+                padding: '8px 12px',
+                borderRadius: '10px',
+                backgroundColor: '#333D29',
+                color: '#F6F7F0',
+                border: '1.5px solid #333D29',
+                fontSize: '13px',
+                fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 2px 6px rgba(27, 30, 19, 0.1)',
+                gap: '6px',
               }}
               title="Lock Terminal"
             >
-              <Lock size={17} color="#FFFFFF" strokeWidth={2.5} /> Lock PIN
+              <Lock size={15} color="#F6F7F0" /> Lock PIN
             </button>
           </div>
         </div>
 
-        {/* Big, Clear Navigation Tabs for Weak Eyesight */}
+        {/* Big, Clear Navigation Tabs */}
         <div
           style={{
             maxWidth: '1280px',
             margin: '0 auto',
-            padding: '6px 20px 10px',
+            padding: '0 24px',
             display: 'flex',
-            gap: '10px',
+            gap: '8px',
             overflowX: 'auto',
           }}
         >
           {[
-            { id: 'billing', label: 'Product Billing', ur: 'Ø¨Ù„ Ø¨Ù†Ø§Ø¦ÛŒÚº', icon: <Scale size={20} strokeWidth={2.5} /> },
-            { id: 'pisai', label: 'Gundam Pisai', ur: 'Ú¯Ù†Ø¯Ù… Ù¾ÛŒØ³Ø§Ø¦ÛŒ', icon: <Sparkles size={20} strokeWidth={2.5} /> },
-            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ÚˆÛŒØ´ Ø¨ÙˆØ±Úˆ', icon: <LayoutDashboard size={20} strokeWidth={2.5} /> },
-            { id: 'udhaar', label: 'Customer Udhaar', ur: 'Ø§Ø¯Ú¾Ø§Ø± Ú©Ú¾Ø§ØªÛ', icon: <Users size={20} strokeWidth={2.5} /> },
-            { id: 'reports', label: 'Reports & Ledger', ur: 'Ø±ÙˆØ²Ù†Ø§Ù…Ú†Û Ùˆ Ø§Ø®Ø±Ø§Ø¬Ø§Øª', icon: <FileText size={20} strokeWidth={2.5} /> },
+            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={19} /> },
+            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={19} /> },
+            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={19} /> },
+            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={19} /> },
+            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={19} /> },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -221,26 +219,25 @@ export default function Home() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className="touch-active"
                 style={{
-                  padding: '9px 18px',
-                  borderRadius: '12px',
-                  border: isActive ? '2.5px solid #5E6348' : '2px solid #C2BAAA',
-                  backgroundColor: isActive ? '#FFCB69' : '#FFFFFF',
-                  color: '#1B1E13',
+                  padding: '8px 14px',
+                  border: 'none',
+                  background: 'none',
                   cursor: 'pointer',
+                  borderBottom: isActive ? '3px solid #7F4F24' : '3px solid transparent',
+                  color: isActive ? '#333D29' : '#656D4A',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  fontWeight: 900,
-                  fontSize: '15px',
+                  gap: '6px',
+                  fontWeight: isActive ? 800 : 700,
+                  fontSize: '14px',
                   whiteSpace: 'nowrap',
-                  boxShadow: isActive ? '0 3px 8px rgba(27, 30, 19, 0.12)' : 'none',
+                  transition: 'all 0.12s ease',
                 }}
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, color: '#1B1E13' }}>
+                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: isActive ? '#333D29' : '#B6AD90' }}>
                   ({tab.ur})
                 </span>
               </button>
@@ -256,7 +253,7 @@ export default function Home() {
           maxWidth: '1280px',
           width: '100%',
           margin: '0 auto',
-          padding: '14px 16px 20px',
+          padding: '8px 16px 14px',
         }}
       >
         {activeTab === 'billing' && <ProductBillingScreen />}
