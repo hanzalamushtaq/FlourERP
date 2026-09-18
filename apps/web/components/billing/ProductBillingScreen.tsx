@@ -15,6 +15,16 @@ const INITIAL_PRODUCTS: Product[] = [
   { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', ratePerKg: 0, unit: 'KG', isActive: true, icon: '⚠️' },
 ];
 
+const MOCK_CUSTOMERS = [
+  { id: '1', name: 'Haji Rasheed (حاجی رشید)', phone: '0300-8765432' },
+  { id: '2', name: 'Haji Altaf (حاجی الطاف)', phone: '0301-7654321' },
+  { id: '3', name: 'Haji Mushtaq (حاجی مشتاق)', phone: '0302-3344556' },
+  { id: '4', name: 'Tariq Naan Shop (طارق نان بائی)', phone: '0321-9876543' },
+  { id: '5', name: 'Mian Aslam Zamindar (میاں اسلم)', phone: '0333-1122334' },
+  { id: '6', name: 'Babar Hotel & Cafe (بابر ہوٹل)', phone: '0345-5566778' },
+  { id: '7', name: 'Haji Asif Flour Dealer (حاجی آصف)', phone: '0300-9988776' },
+];
+
 export const ProductBillingScreen: React.FC = () => {
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<Product>(INITIAL_PRODUCTS[0]);
@@ -25,21 +35,22 @@ export const ProductBillingScreen: React.FC = () => {
   const [receivedAmount, setReceivedAmount] = useState<string>('1400');
   const [isReceivedAutoUpdated, setIsReceivedAutoUpdated] = useState<boolean>(true);
 
-  // Customer Credit State
-  const [showCustomerField, setShowCustomerField] = useState<boolean>(false);
+  // Customer State & Autocomplete
   const [customerName, setCustomerName] = useState<string>('');
   const [customerPhone, setCustomerPhone] = useState<string>('');
-  const [creditError, setCreditError] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<typeof MOCK_CUSTOMERS>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   // Receipt Modal State
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
   const [billCounter, setBillCounter] = useState<number>(482);
 
-  // Input Refs for sequential Enter navigation
+  // Sequential Input Refs
   const weightInputRef = useRef<HTMLInputElement>(null);
   const receivedInputRef = useRef<HTMLInputElement>(null);
-  const customerInputRef = useRef<HTMLInputElement>(null);
+  const customerNameInputRef = useRef<HTMLInputElement>(null);
+  const customerPhoneInputRef = useRef<HTMLInputElement>(null);
 
   // Calculations
   const rate = selectedProduct.ratePerKg;
@@ -62,7 +73,7 @@ export const ProductBillingScreen: React.FC = () => {
   const subtotal = calculatedAmount;
   const netTotal = Math.max(0, subtotal - numDiscount);
 
-  // Sync received money when total changes if not manually typed
+  // Auto-sync received money with net total when quantity/rate changes
   useEffect(() => {
     if (isReceivedAutoUpdated) {
       setReceivedAmount(String(netTotal));
@@ -73,14 +84,36 @@ export const ProductBillingScreen: React.FC = () => {
   const balanceRemaining = Math.max(0, netTotal - numReceived);
   const changeToReturn = Math.max(0, numReceived - netTotal);
 
-  // Focus weight input on product or mode change
+  // Auto focus weight input on product selection
   useEffect(() => {
     weightInputRef.current?.focus();
     weightInputRef.current?.select();
   }, [selectedProduct, calcMode]);
 
-  // Action 1: Print Cash Bill
-  const handlePrintCashBill = () => {
+  // Customer name autocomplete suggestions
+  const handleCustomerNameChange = (val: string) => {
+    setCustomerName(val);
+    if (val.trim().length > 0) {
+      const filtered = MOCK_CUSTOMERS.filter((c) =>
+        c.name.toLowerCase().includes(val.toLowerCase())
+      );
+      setSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectCustomer = (cust: { name: string; phone: string }) => {
+    setCustomerName(cust.name);
+    setCustomerPhone(cust.phone);
+    setShowSuggestions(false);
+    customerPhoneInputRef.current?.focus();
+  };
+
+  // Submit Logic: If customer details are entered, it automatically saves as Credit
+  const handleFinalSubmit = (forcedCredit?: boolean) => {
     if (rate <= 0) {
       alert('Cannot bill: Rate not set for this product!');
       return;
@@ -91,6 +124,9 @@ export const ProductBillingScreen: React.FC = () => {
       return;
     }
 
+    const hasCustomerDetails = customerName.trim().length > 0;
+    const isCreditSale = forcedCredit !== undefined ? forcedCredit : (hasCustomerDetails || balanceRemaining > 0);
+
     const nextBillNum = `BILL-${String(billCounter).padStart(5, '0')}`;
     setBillCounter((prev) => prev + 1);
 
@@ -99,8 +135,8 @@ export const ProductBillingScreen: React.FC = () => {
       billNumber: nextBillNum,
       timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric', year: 'numeric' }),
       billerName: 'Biller 1 (Counter)',
-      customerName: customerName.trim() || undefined,
-      isCredit: false,
+      customerName: hasCustomerDetails ? `${customerName.trim()} ${customerPhone.trim() ? `(${customerPhone.trim()})` : ''}` : undefined,
+      isCredit: isCreditSale,
       items: [
         {
           nameEn: selectedProduct.nameEn,
@@ -121,61 +157,9 @@ export const ProductBillingScreen: React.FC = () => {
     setIsReceiptOpen(true);
   };
 
-  // Action 2: Save as Credit
-  const handleSaveAsCredit = () => {
-    if (rate <= 0) {
-      alert('Cannot bill: Rate not set for this product!');
-      return;
-    }
-    if (calculatedWeight <= 0) {
-      alert('Please enter weight or amount.');
-      weightInputRef.current?.focus();
-      return;
-    }
-
-    if (!customerName.trim()) {
-      setShowCustomerField(true);
-      setCreditError('⚠️ Please enter customer name/phone for credit!');
-      setTimeout(() => {
-        customerInputRef.current?.focus();
-      }, 80);
-      return;
-    }
-
-    setCreditError('');
-    const nextBillNum = `BILL-${String(billCounter).padStart(5, '0')}`;
-    setBillCounter((prev) => prev + 1);
-
-    const receipt: ReceiptData = {
-      type: 'product',
-      billNumber: nextBillNum,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric', year: 'numeric' }),
-      billerName: 'Biller 1 (Counter)',
-      customerName: `${customerName.trim()} ${customerPhone.trim() ? `(${customerPhone.trim()})` : ''}`,
-      isCredit: true,
-      items: [
-        {
-          nameEn: selectedProduct.nameEn,
-          nameUr: selectedProduct.nameUr,
-          weightKg: calculatedWeight,
-          ratePerKg: rate,
-          total: subtotal,
-        },
-      ],
-      subtotal,
-      discount: numDiscount,
-      netTotal,
-      cashReceived: numReceived,
-      remainingBalance: balanceRemaining > 0 ? balanceRemaining : netTotal,
-    };
-
-    setReceiptData(receipt);
-    setIsReceiptOpen(true);
-  };
-
   return (
-    <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      {/* 1. TOP: Compact Horizontal Product Selection */}
+    <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {/* 1. TOP: Compact Product Selection Strip */}
       <div
         style={{
           display: 'grid',
@@ -237,17 +221,17 @@ export const ProductBillingScreen: React.FC = () => {
         })}
       </div>
 
-      {/* 2. MAIN BILLING CARD (Compact & 100% Viewport-Fitted) */}
+      {/* 2. MAIN BILLING CARD */}
       <div
         style={{
           backgroundColor: '#ffffff',
-          borderRadius: '14px',
+          borderRadius: '12px',
           border: '1.5px solid #cbd5e1',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-          padding: '14px 18px',
+          padding: '12px 18px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '10px',
+          gap: '8px',
         }}
       >
         {/* Top Mini Strip: Selected Product + Mode Toggle */}
@@ -257,7 +241,7 @@ export const ProductBillingScreen: React.FC = () => {
             justifyContent: 'space-between',
             alignItems: 'center',
             borderBottom: '1px solid #f1f5f9',
-            paddingBottom: '8px',
+            paddingBottom: '6px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -282,7 +266,7 @@ export const ProductBillingScreen: React.FC = () => {
                 weightInputRef.current?.focus();
               }}
               style={{
-                padding: '6px 12px',
+                padding: '5px 10px',
                 borderRadius: '6px',
                 border: 'none',
                 backgroundColor: calcMode === 'weight' ? '#d97706' : 'transparent',
@@ -295,7 +279,7 @@ export const ProductBillingScreen: React.FC = () => {
                 gap: '4px',
               }}
             >
-              <Scale size={14} /> Weight Mode (وزن)
+              <Scale size={13} /> Weight Mode (وزن)
             </button>
 
             <button
@@ -307,7 +291,7 @@ export const ProductBillingScreen: React.FC = () => {
                 weightInputRef.current?.focus();
               }}
               style={{
-                padding: '6px 12px',
+                padding: '5px 10px',
                 borderRadius: '6px',
                 border: 'none',
                 backgroundColor: calcMode === 'amount' ? '#d97706' : 'transparent',
@@ -320,22 +304,18 @@ export const ProductBillingScreen: React.FC = () => {
                 gap: '4px',
               }}
             >
-              <Banknote size={14} /> Rupees Mode (رقم)
+              <Banknote size={13} /> Rupees Mode (رقم)
             </button>
           </div>
         </div>
 
-        {/* Entry & Total Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '16px', alignItems: 'center' }}>
-          {/* Weight Input */}
+        {/* Entry & Total Row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '14px', alignItems: 'center' }}>
+          {/* 1. Weight Input */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 800, color: '#334155' }}>
-                {calcMode === 'weight' ? '1. WEIGHT (وزن درج کریں) [Press Enter ➔ Cash Recv]:' : '1. RUPEES (رقم درج کریں) [Press Enter ➔ Cash Recv]:'}
-              </label>
-              <span style={{ fontSize: '11px', color: '#64748b' }}>Enter ➔ Next Field</span>
-            </div>
-
+            <label style={{ fontSize: '13px', fontWeight: 800, color: '#334155', display: 'block', marginBottom: '2px' }}>
+              {calcMode === 'weight' ? 'Weight (وزن - KG):' : 'Desired Rupees (مطلوبہ رقم):'}
+            </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
                 ref={weightInputRef}
@@ -355,38 +335,38 @@ export const ProductBillingScreen: React.FC = () => {
                 }}
                 style={{
                   width: '100%',
-                  height: '52px',
-                  borderRadius: '10px',
+                  height: '46px',
+                  borderRadius: '8px',
                   border: '2px solid #d97706',
                   backgroundColor: '#fffdfa',
-                  fontSize: '28px',
+                  fontSize: '26px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
                   color: '#0f172a',
-                  padding: '0 50px 0 14px',
+                  padding: '0 45px 0 12px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '14px', fontSize: '16px', fontWeight: 900, color: '#94a3b8' }}>
+              <span style={{ position: 'absolute', right: '12px', fontSize: '15px', fontWeight: 900, color: '#94a3b8' }}>
                 {calcMode === 'weight' ? 'KG' : 'Rs'}
               </span>
             </div>
           </div>
 
-          {/* Right Total Display */}
+          {/* Right: Net Total Box */}
           <div
             style={{
               backgroundColor: '#f8fafc',
               border: '1.5px solid #e2e8f0',
-              borderRadius: '10px',
-              padding: '10px 14px',
+              borderRadius: '8px',
+              padding: '8px 12px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
-              <span style={{ fontWeight: 800, color: '#64748b' }}>TOTAL BILL AMOUNT</span>
+              <span style={{ fontWeight: 800, color: '#64748b' }}>TOTAL AMOUNT (کل رقم)</span>
               <span style={{ fontWeight: 700, color: '#047857' }}>
                 {calculatedWeight} KG @ Rs {rate}/KG
               </span>
@@ -394,12 +374,12 @@ export const ProductBillingScreen: React.FC = () => {
 
             <div
               style={{
-                fontSize: '34px',
+                fontSize: '32px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
                 color: '#047857',
                 lineHeight: 1.1,
-                margin: '2px 0 4px',
+                margin: '2px 0',
               }}
             >
               Rs {netTotal.toLocaleString()}
@@ -411,45 +391,41 @@ export const ProductBillingScreen: React.FC = () => {
                 onClick={() => setShowDiscount(!showDiscount)}
                 style={{ background: 'none', border: 'none', color: '#b45309', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
               >
-                <Tag size={12} /> {showDiscount ? 'Close Discount' : '+ Add Discount'}
+                <Tag size={12} /> {showDiscount ? 'Close Discount' : '+ Add Discount (رعایت)'}
               </button>
               {showDiscount && (
                 <input
                   type="number"
-                  placeholder="Discount Rs"
+                  placeholder="Rs"
                   value={discountValue}
                   onChange={(e) => {
                     setDiscountValue(e.target.value);
                     setIsReceivedAutoUpdated(true);
                   }}
-                  style={{ width: '80px', padding: '2px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 700, outline: 'none' }}
+                  style={{ width: '70px', padding: '2px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '11px', fontWeight: 700, outline: 'none' }}
                 />
               )}
             </div>
           </div>
         </div>
 
-        {/* Cash Received Row with Enter ➔ Print shortcut */}
+        {/* 2. Cash Received Row */}
         <div
           style={{
             backgroundColor: '#f1f5f9',
-            borderRadius: '10px',
-            padding: '10px 14px',
+            borderRadius: '8px',
+            padding: '8px 12px',
             border: '1px solid #cbd5e1',
             display: 'grid',
             gridTemplateColumns: '1.2fr 1fr',
-            gap: '14px',
+            gap: '12px',
             alignItems: 'center',
           }}
         >
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 900, color: '#0f172a' }}>
-                2. CASH RECEIVED (گاہک سے وصول رقم) [Press Enter ➔ Print]:
-              </label>
-              <span style={{ fontSize: '11px', color: '#047857', fontWeight: 700 }}>Enter ➔ Print Cash</span>
-            </div>
-
+            <label style={{ fontSize: '12px', fontWeight: 900, color: '#0f172a', display: 'block', marginBottom: '2px' }}>
+              Cash Received (وصول رقم):
+            </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
                 ref={receivedInputRef}
@@ -463,24 +439,24 @@ export const ProductBillingScreen: React.FC = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    handlePrintCashBill();
+                    customerNameInputRef.current?.focus();
                   }
                 }}
                 style={{
                   width: '100%',
-                  height: '46px',
-                  borderRadius: '8px',
+                  height: '42px',
+                  borderRadius: '6px',
                   border: '2px solid #059669',
                   backgroundColor: '#ffffff',
-                  fontSize: '24px',
+                  fontSize: '22px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
                   color: '#065f46',
-                  padding: '0 45px 0 12px',
+                  padding: '0 40px 0 10px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '12px', fontSize: '14px', fontWeight: 900, color: '#047857' }}>
+              <span style={{ position: 'absolute', right: '10px', fontSize: '13px', fontWeight: 900, color: '#047857' }}>
                 Rs
               </span>
             </div>
@@ -488,78 +464,124 @@ export const ProductBillingScreen: React.FC = () => {
 
           <div>
             {balanceRemaining > 0 ? (
-              <div style={{ backgroundColor: '#fffbeb', border: '1px solid #f59e0b', borderRadius: '8px', padding: '6px 10px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#92400e' }}>REMAINING SHORT / BALANCE (باقی رقم):</div>
-                <div style={{ fontSize: '20px', fontWeight: 900, color: '#b45309', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#fffbeb', border: '1px solid #f59e0b', borderRadius: '6px', padding: '4px 8px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: '#92400e' }}>Remaining Balance (باقی رقم):</div>
+                <div style={{ fontSize: '18px', fontWeight: 900, color: '#b45309', fontFamily: 'var(--font-mono)' }}>
                   Rs {balanceRemaining.toLocaleString()}
                 </div>
               </div>
             ) : changeToReturn > 0 ? (
-              <div style={{ backgroundColor: '#ecfdf5', border: '1px solid #10b981', borderRadius: '8px', padding: '6px 10px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#047857' }}>CHANGE TO RETURN (واپسی رقم):</div>
-                <div style={{ fontSize: '20px', fontWeight: 900, color: '#047857', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ backgroundColor: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px', padding: '4px 8px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: '#047857' }}>Change to Return (واپسی رقم):</div>
+                <div style={{ fontSize: '18px', fontWeight: 900, color: '#047857', fontFamily: 'var(--font-mono)' }}>
                   Rs {changeToReturn.toLocaleString()}
                 </div>
               </div>
             ) : (
-              <div style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '6px 10px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#047857' }}>✓ Exact Cash Paid (پوری رقم وصول)</div>
+              <div style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px', textAlign: 'center' }}>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#047857' }}>✓ Exact Cash Paid</div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Customer Details Row (Auto shows if remaining > 0 or toggled) */}
-        {(showCustomerField || balanceRemaining > 0) && (
-          <div
-            style={{
-              backgroundColor: '#fffbeb',
-              border: creditError ? '2px solid #ef4444' : '1px solid #fde68a',
-              borderRadius: '10px',
-              padding: '8px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 800, fontSize: '12px', color: '#92400e', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <UserCheck size={14} /> Customer Details for Udhaar (ادھار کھاتہ کے لیے گاہک کا نام)
-              </span>
-              {creditError && (
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#dc2626' }}>
-                  {creditError}
-                </span>
-              )}
-            </div>
+        {/* 3. Customer Details with Autocomplete Search Dropdown */}
+        <div
+          style={{
+            position: 'relative',
+            backgroundColor: '#fffbeb',
+            border: '1px solid #fde68a',
+            borderRadius: '8px',
+            padding: '8px 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontWeight: 800, fontSize: '11px', color: '#92400e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <UserCheck size={13} /> Customer Details (گاہک کا نام و فون نمبر — ادھار کے لیے درج کریں)
+            </span>
+            <span style={{ fontSize: '10px', color: '#b45309' }}>Type name to see registered accounts</span>
+          </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
+            <div style={{ position: 'relative' }}>
               <input
-                ref={customerInputRef}
+                ref={customerNameInputRef}
                 type="text"
-                placeholder="Customer Name (گاہک کا نام) — e.g. Haji Rasheed"
+                placeholder="Customer Name (گاہک کا نام)..."
                 value={customerName}
-                onChange={(e) => {
-                  setCustomerName(e.target.value);
-                  if (e.target.value.trim()) setCreditError('');
+                onChange={(e) => handleCustomerNameChange(e.target.value)}
+                onFocus={() => {
+                  if (customerName.trim().length > 0 && suggestions.length > 0) setShowSuggestions(true);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    handleSaveAsCredit();
+                    if (customerName.trim()) {
+                      customerPhoneInputRef.current?.focus();
+                    } else {
+                      // If customer name is left empty and user presses Enter, print cash bill
+                      handleFinalSubmit(false);
+                    }
                   }
                 }}
                 style={{
+                  width: '100%',
+                  height: '36px',
                   padding: '6px 10px',
                   borderRadius: '6px',
-                  border: creditError ? '2px solid #ef4444' : '1px solid #d97706',
+                  border: '1.5px solid #d97706',
                   fontSize: '13px',
                   fontWeight: 700,
                   outline: 'none',
                   backgroundColor: '#ffffff',
                 }}
               />
+
+              {/* Autocomplete Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '40px',
+                    left: 0,
+                    right: 0,
+                    backgroundColor: '#ffffff',
+                    border: '1.5px solid #d97706',
+                    borderRadius: '8px',
+                    boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                    zIndex: 200,
+                    maxHeight: '160px',
+                    overflowY: 'auto',
+                  }}
+                >
+                  {suggestions.map((cust) => (
+                    <div
+                      key={cust.id}
+                      onClick={() => handleSelectCustomer(cust)}
+                      className="touch-active"
+                      style={{
+                        padding: '8px 12px',
+                        borderBottom: '1px solid #f1f5f9',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{cust.name}</span>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>{cust.phone}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
               <input
+                ref={customerPhoneInputRef}
                 type="text"
                 placeholder="Phone (موبائل نمبر اختیاری)..."
                 value={customerPhone}
@@ -567,10 +589,13 @@ export const ProductBillingScreen: React.FC = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    handleSaveAsCredit();
+                    // Pressing enter on phone completes credit sale!
+                    handleFinalSubmit(true);
                   }
                 }}
                 style={{
+                  width: '100%',
+                  height: '36px',
                   padding: '6px 10px',
                   borderRadius: '6px',
                   border: '1px solid #d97706',
@@ -581,58 +606,64 @@ export const ProductBillingScreen: React.FC = () => {
               />
             </div>
           </div>
-        )}
+        </div>
 
-        {/* 2 ACTION BUTTONS */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '10px' }}>
+        {/* 4. THE 2 ACTION BUTTONS */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px', marginTop: '2px' }}>
           <button
             type="button"
-            onClick={handlePrintCashBill}
+            onClick={() => handleFinalSubmit(false)}
             disabled={rate <= 0 || calculatedWeight <= 0}
             className="touch-active"
             style={{
-              height: '52px',
-              borderRadius: '10px',
+              height: '48px',
+              borderRadius: '8px',
               backgroundColor: rate > 0 && calculatedWeight > 0 ? '#059669' : '#94a3b8',
               color: '#ffffff',
               border: 'none',
-              fontSize: '16px',
+              fontSize: '15px',
               fontWeight: 900,
               cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
-              boxShadow: '0 4px 10px rgba(5, 150, 105, 0.25)',
+              boxShadow: '0 3px 8px rgba(5, 150, 105, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
             }}
           >
-            <Printer size={22} />
-            <span>PRINT CASH BILL — [ENTER] (Rs {numReceived} نقد)</span>
+            <Printer size={20} />
+            <span>Print Cash Bill (نقد بل)</span>
           </button>
 
           <button
             type="button"
-            onClick={handleSaveAsCredit}
+            onClick={() => {
+              if (!customerName.trim()) {
+                customerNameInputRef.current?.focus();
+              } else {
+                handleFinalSubmit(true);
+              }
+            }}
             disabled={rate <= 0 || calculatedWeight <= 0}
             className="touch-active"
             style={{
-              height: '52px',
-              borderRadius: '10px',
+              height: '48px',
+              borderRadius: '8px',
               backgroundColor: rate > 0 && calculatedWeight > 0 ? '#d97706' : '#94a3b8',
               color: '#ffffff',
               border: 'none',
               fontSize: '15px',
               fontWeight: 900,
               cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
-              boxShadow: '0 4px 10px rgba(217, 119, 6, 0.25)',
+              boxShadow: '0 3px 8px rgba(217, 119, 6, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
             }}
           >
-            <BookOpen size={20} />
-            <span>SAVE AS CREDIT (Rs {balanceRemaining > 0 ? balanceRemaining : netTotal} ادھار)</span>
+            <BookOpen size={18} />
+            <span>Save as Credit (ادھار بل)</span>
           </button>
         </div>
       </div>
