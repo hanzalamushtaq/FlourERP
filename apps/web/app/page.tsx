@@ -253,7 +253,7 @@ export default function Home() {
           maxWidth: '1280px',
           width: '100%',
           margin: '0 auto',
-          padding: '24px 20px',
+          padding: '12px 18px 20px',
         }}
       >
         {activeTab === 'billing' && <ProductBillingScreen />}

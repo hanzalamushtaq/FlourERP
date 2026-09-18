@@ -23,6 +23,8 @@ export interface ReceiptData {
   subtotal: number;
   discount: number;
   netTotal: number;
+  cashReceived?: number;
+  remainingBalance?: number;
   isCredit?: boolean;
 }
 
@@ -296,9 +298,34 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               borderTop: '2px solid #000000',
             }}
           >
-            <span>NET PAYABLE:</span>
+            <span>TOTAL BILL:</span>
             <span>Rs {data.netTotal}</span>
           </div>
+
+          {data.cashReceived !== undefined && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '13px', fontWeight: 700 }}>
+              <span>CASH RECEIVED (وصول):</span>
+              <span>Rs {data.cashReceived}</span>
+            </div>
+          )}
+
+          {data.remainingBalance !== undefined && data.remainingBalance > 0 && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: '4px',
+                fontSize: '14px',
+                fontWeight: 800,
+                color: '#b45309',
+                borderTop: '1px dashed #d1d5db',
+                paddingTop: '4px',
+              }}
+            >
+              <span>{data.isCredit ? 'CREDIT / UDHAAR (بقایا ادھار):' : 'WAIVED / SHORT (چھوٹ):'}</span>
+              <span>Rs {data.remainingBalance}</span>
+            </div>
+          )}
 
           <div style={{ textAlign: 'center', marginTop: '18px' }}>
             <div className="font-nastaleeq" style={{ fontSize: '16px' }}>
