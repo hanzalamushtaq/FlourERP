@@ -27,13 +27,13 @@ export default function Home() {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#EDE0D4', color: '#7F5539' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#FAF5EA', color: '#2B1D14' }}>
       {/* Top Application Header */}
       <header
         style={{
-          backgroundColor: '#EDE0D4',
-          borderBottom: '2px solid #DDB892',
-          boxShadow: '0 2px 8px rgba(127, 85, 57, 0.08)',
+          backgroundColor: '#FAF5EA',
+          borderBottom: '2px solid #BAA587',
+          boxShadow: '0 2px 8px rgba(43, 29, 20, 0.08)',
           position: 'sticky',
           top: 0,
           zIndex: 1000,
@@ -58,9 +58,9 @@ export default function Home() {
                 width: '40px',
                 height: '40px',
                 borderRadius: '10px',
-                backgroundColor: '#7F5539',
-                border: '1.5px solid #7F5539',
-                color: '#EDE0D4',
+                backgroundColor: '#2B1D14',
+                border: '1.5px solid #2B1D14',
+                color: '#FAF5EA',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -71,7 +71,7 @@ export default function Home() {
 
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '20px', fontWeight: 900, color: '#7F5539', letterSpacing: '-0.5px' }}>
+                <span style={{ fontSize: '20px', fontWeight: 900, color: '#2B1D14', letterSpacing: '-0.5px' }}>
                   FlourERP
                 </span>
                 <span
@@ -80,9 +80,9 @@ export default function Home() {
                     fontWeight: 800,
                     padding: '2px 8px',
                     borderRadius: '9999px',
-                    backgroundColor: '#E6CCB2',
-                    color: '#7F5539',
-                    border: '1px solid #DDB892',
+                    backgroundColor: '#F1DCA7',
+                    color: '#2B1D14',
+                    border: '1px solid #BAA587',
                   }}
                 >
                   ONLINE
@@ -93,7 +93,7 @@ export default function Home() {
                 style={{
                   fontSize: '20px',
                   fontWeight: 700,
-                  color: '#7F5539',
+                  color: '#2B1D14',
                   lineHeight: 1.2,
                 }}
               >
@@ -112,9 +112,9 @@ export default function Home() {
               style={{
                 padding: '8px 14px',
                 borderRadius: '10px',
-                backgroundColor: '#E6CCB2',
-                color: '#7F5539',
-                border: '1.5px solid #DDB892',
+                backgroundColor: '#F1DCA7',
+                color: '#2B1D14',
+                border: '1.5px solid #BAA587',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -123,17 +123,17 @@ export default function Home() {
                 gap: '6px',
               }}
             >
-              <Clock size={16} color="#7F5539" /> Daily Prices (نرخ نامہ)
+              <Clock size={16} color="#2B1D14" /> Daily Prices (نرخ نامہ)
             </button>
 
             {/* Role Switcher Pill */}
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#E6CCB2',
+                backgroundColor: '#F1DCA7',
                 padding: '3px',
                 borderRadius: '10px',
-                border: '1px solid #DDB892',
+                border: '1px solid #BAA587',
               }}
             >
               <button
@@ -143,8 +143,8 @@ export default function Home() {
                   padding: '6px 12px',
                   borderRadius: '7px',
                   border: 'none',
-                  backgroundColor: userRole === 'biller' ? '#7F5539' : 'transparent',
-                  color: userRole === 'biller' ? '#EDE0D4' : '#7F5539',
+                  backgroundColor: userRole === 'biller' ? '#2B1D14' : 'transparent',
+                  color: userRole === 'biller' ? '#FAF5EA' : '#2B1D14',
                   fontWeight: 700,
                   fontSize: '12px',
                   cursor: 'pointer',
@@ -159,8 +159,8 @@ export default function Home() {
                   padding: '6px 12px',
                   borderRadius: '7px',
                   border: 'none',
-                  backgroundColor: userRole === 'admin' ? '#7F5539' : 'transparent',
-                  color: userRole === 'admin' ? '#EDE0D4' : '#7F5539',
+                  backgroundColor: userRole === 'admin' ? '#2B1D14' : 'transparent',
+                  color: userRole === 'admin' ? '#FAF5EA' : '#2B1D14',
                   fontWeight: 700,
                   fontSize: '12px',
                   cursor: 'pointer',
@@ -178,9 +178,9 @@ export default function Home() {
               style={{
                 padding: '8px 12px',
                 borderRadius: '10px',
-                backgroundColor: '#7F5539',
-                color: '#EDE0D4',
-                border: '1.5px solid #7F5539',
+                backgroundColor: '#2B1D14',
+                color: '#FAF5EA',
+                border: '1.5px solid #2B1D14',
                 fontSize: '13px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -190,7 +190,7 @@ export default function Home() {
               }}
               title="Lock Terminal"
             >
-              <Lock size={15} color="#EDE0D4" /> Lock PIN
+              <Lock size={15} color="#FAF5EA" /> Lock PIN
             </button>
           </div>
         </div>
@@ -224,8 +224,8 @@ export default function Home() {
                   border: 'none',
                   background: 'none',
                   cursor: 'pointer',
-                  borderBottom: isActive ? '3px solid #7F5539' : '3px solid transparent',
-                  color: isActive ? '#7F5539' : '#B08968',
+                  borderBottom: isActive ? '3px solid #E8AC65' : '3px solid transparent',
+                  color: isActive ? '#2B1D14' : '#797D62',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
@@ -237,7 +237,7 @@ export default function Home() {
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: isActive ? '#7F5539' : '#DDB892' }}>
+                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: isActive ? '#2B1D14' : '#BAA587' }}>
                   ({tab.ur})
                 </span>
               </button>

@@ -11,41 +11,46 @@
 }
 
 :root {
-  /* Strict 6-Color Wheat Palette from User Image */
-  --c1: #EDE0D4; /* Warm Wheat Cream (Canvas, light cards, large boxes, thermal receipt) */
-  --c2: #E6CCB2; /* Soft Almond Biscuit (Subtle panels, active card fill, badges) */
-  --c3: #DDB892; /* Warm Sand (Borders, dividers, keypad frames) */
-  --c4: #B08968; /* Warm Hazelnut (Secondary accents, credit CTA, status tags) */
-  --c5: #7F5539; /* Deep Roasted Coffee (Deep wording, headings, high contrast text) */
-  --c6: #9C6644; /* Warm Cinnamon Wood (Primary CTA buttons, print actions, accent) */
+  /* Complete 10-Color Crop Agriculture Palette from User Image */
+  --c1: #797D62; /* Baajra & Field Green (Deep Olive Sage) */
+  --c2: #9B9B7A; /* Muted Crop Sage (Subtle Green) */
+  --c3: #BAA587; /* Warm Khaki Wheat Husk (Dividers, Borders) */
+  --c4: #D9AE94; /* Til / Toasted Sesame (Warm Accent) */
+  --c5: #F1DCA7; /* Atta / Flour Cream (Soft Card Surfaces, Large Boxes) */
+  --c6: #FFCB69; /* Makai & Sarson Gold (Vibrant Sunlit Corn) */
+  --c7: #E8AC65; /* Pakki Gandum (Ripe Wheat Gold / Primary Action) */
+  --c8: #D08C60; /* Amber Harvest / Rich Crop (Warm Terracotta) */
+  --c9: #B58463; /* Roasted Grain / Chokar Crust */
+  --c10: #997B66; /* Deep Earth / Chokar Bran */
 
   /* Light Theme Semantic UI Tokens - Light boxes, deep dark typography */
-  --bg-main: var(--c1);
-  --bg-surface: var(--c1);
-  --bg-subtle: var(--c2);
-  --bg-card: var(--c1);
-  --bg-input: var(--c1);
+  --bg-main: #FAF5EA; /* Clean Wheat Canvas */
+  --bg-surface: var(--c5);
+  --bg-subtle: #F4EAD3;
+  --bg-card: #FAF5EA;
+  --bg-input: #FAF5EA;
   
-  --text-primary: var(--c5);
-  --text-secondary: var(--c5);
-  --text-muted: var(--c4);
-  --text-inverse: var(--c1);
+  --text-primary: #2B1D14; /* Deep Chokar Earth - High Contrast Wording */
+  --text-secondary: #4A3525; /* Medium Rich Brown */
+  --text-muted: #797D62; /* Crop Sage */
+  --text-inverse: #FAF5EA;
 
   /* Accents */
-  --accent-primary: var(--c6);
-  --accent-secondary: var(--c4);
-  --accent-muted: var(--c3);
+  --accent-primary: var(--c7); /* Wheat Gold */
+  --accent-secondary: var(--c1); /* Baajra Olive */
+  --accent-highlight: var(--c6); /* Makai Gold */
+  --accent-warm: var(--c8); /* Amber */
 
   /* Borders & Dividers */
   --border-subtle: var(--c3);
-  --border-medium: var(--c3);
-  --border-strong: var(--c5);
-  --border-active: var(--c5);
+  --border-medium: var(--c9);
+  --border-strong: #2B1D14;
+  --border-active: var(--c7);
   
-  --shadow-sm: 0 1px 2px 0 rgba(127, 85, 57, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(127, 85, 57, 0.12), 0 2px 4px -2px rgba(127, 85, 57, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(127, 85, 57, 0.15), 0 4px 6px -4px rgba(127, 85, 57, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(127, 85, 57, 0.2), 0 8px 10px -6px rgba(127, 85, 57, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(43, 29, 20, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(43, 29, 20, 0.12), 0 2px 4px -2px rgba(43, 29, 20, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(43, 29, 20, 0.15), 0 4px 6px -4px rgba(43, 29, 20, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(43, 29, 20, 0.2), 0 8px 10px -6px rgba(43, 29, 20, 0.15);
 
   /* Touch Target Radius */
   --radius-sm: 8px;
