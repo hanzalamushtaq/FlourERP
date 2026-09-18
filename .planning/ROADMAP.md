@@ -1,126 +1,140 @@
 # Project Roadmap: Flour Mill (Chakki) Billing & Management System
 
 ## Phase Summary Checklist
-- [ ] **Phase 1: Foundation & Core Setup** - Next.js + Express + PostgreSQL scaffolding, persistent session auth, idle PIN lock, dynamic RBAC engine, and mobile-first UI framework.
-- [ ] **Phase 2: Product Catalog & Price Management** - Product catalog CRUD, per-KG price management, daily price confirmation workflow (Admin & Biller paths), and Urdu font rendering.
-- [ ] **Phase 3: Core Billing Engine (Standard Products)** - Dual-mode billing screen (weight↔amount), permission-gated discounts, sequential bill numbers, rate guards, and thermal ESC/POS printing.
-- [ ] **Phase 4: Gundam Pisai (Grinding) Module** - Dedicated Pisai screen, service options, manual pricing, independent 4-digit token sequence, large-format token print, and credit/discount integration.
-- [ ] **Phase 5: Credit (Udhaar) & Ledger Module** - Admin credit issuance, customer profiles with payment history, derived balance tracking, and unified append-only financial ledger.
-- [ ] **Phase 6: Expenses, Returns, Reports** - Expense logging, standalone bill returns with ledger offsets, and reports dashboard with date/customer filtering.
-- [ ] **Phase 7: Daily Closing, Backup, Bill Void, Audit Log** - End-of-day summary snapshot, automated database backup trigger, bill/Pisai voiding with reversal entries, and synchronous activity logging.
-- [ ] **Phase 8: Testing, Polish & Deployment** - End-to-end billing tests, low-literacy staff usability refinements, mobile performance tuning, and production deployment scripts.
+- [ ] **Phase 1: Frontend UI & Dashboard Design** - Next.js UI setup, design system, Jameel Noori Nastaleeq Urdu typography, Biller touch interface (cards, weight↔amount modes, numeric keypad, Pisai ticket screen), Admin Dashboard, and idle PIN-lock overlay.
+- [ ] **Phase 2: Backend Foundation & Core Setup** - Express backend scaffolding, PostgreSQL migrations, session-based auth, PIN-lock backend, dynamic RBAC engine, and fine-grained permission middleware.
+- [ ] **Phase 3: Product Catalog & Price Management** - Product catalog CRUD, per-KG rates, `price_history` audit tracking, and 24-hour daily price confirmation workflow (Admin & Biller paths).
+- [ ] **Phase 4: Core Billing Engine (Standard Products)** - Dual-mode billing screen logic, permission-gated discounts, non-resetting sequential bill numbers with DB locks, rate guards, and thermal ESC/POS printing.
+- [ ] **Phase 5: Gundam Pisai (Grinding) Module** - Dedicated Pisai screen logic, service options, manual pricing, independent 4-digit token sequence (`0001`–`9999`), large-format token print, and credit/discount integration.
+- [ ] **Phase 6: Credit (Udhaar) & Ledger Module** - Admin credit issuance, customer profiles with payment history, derived balance tracking, and unified append-only financial ledger.
+- [ ] **Phase 7: Expenses, Returns, Reports** - Expense logging, standalone bill returns with ledger offsets, and reports dashboard with date/customer filtering.
+- [ ] **Phase 8: Daily Closing, Backup, Bill Void, Audit Log** - End-of-day summary snapshot, automated database backup trigger, bill/Pisai voiding with reversal entries, and synchronous activity logging.
+- [ ] **Phase 9: Testing, Polish & Deployment** - End-to-end billing tests, low-literacy staff usability refinements, mobile performance tuning, and production deployment scripts.
 
 ---
 
 ## Progress Table
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Core Setup | 0/3 | Not started | - |
-| 2. Product Catalog & Price Management | 0/2 | Not started | - |
-| 3. Core Billing Engine (Standard Products) | 0/3 | Not started | - |
-| 4. Gundam Pisai (Grinding) Module | 0/2 | Not started | - |
-| 5. Credit (Udhaar) & Ledger Module | 0/2 | Not started | - |
-| 6. Expenses, Returns, Reports | 0/2 | Not started | - |
-| 7. Daily Closing, Backup, Bill Void, Audit Log | 0/2 | Not started | - |
-| 8. Testing, Polish & Deployment | 0/2 | Not started | - |
+| 1. Frontend UI & Dashboard Design | 0/3 | Not started | - |
+| 2. Backend Foundation & Core Setup | 0/3 | Not started | - |
+| 3. Product Catalog & Price Management | 0/2 | Not started | - |
+| 4. Core Billing Engine (Standard Products) | 0/3 | Not started | - |
+| 5. Gundam Pisai (Grinding) Module | 0/2 | Not started | - |
+| 6. Credit (Udhaar) & Ledger Module | 0/2 | Not started | - |
+| 7. Expenses, Returns, Reports | 0/2 | Not started | - |
+| 8. Daily Closing, Backup, Bill Void, Audit Log | 0/2 | Not started | - |
+| 9. Testing, Polish & Deployment | 0/2 | Not started | - |
 
 ---
 
 ## Phase Details
 
-### Phase 1: Foundation & Core Setup
-**Goal**: Establish the production monorepo architecture, secure session authentication with PIN-lock, dynamic role/permission engine, and touch-first responsive layout.
+### Phase 1: Frontend UI & Dashboard Design
+**Goal**: Design and build the entire interactive, mobile-responsive UI shell, design tokens, Urdu font rendering, Biller touch screens, Admin dashboard, and PIN-lock screen.
 **Depends on**: Nothing (first phase)
-**Requirements**: SETUP-01, SETUP-02, AUTH-01, AUTH-02, RBAC-01, RBAC-02, UI-01
+**Requirements**: UI-01, UI-02, UI-03, FONT-01, AUTH-02
 **Success Criteria**:
-  1. Developers can run both Next.js frontend and Express backend connected to PostgreSQL with applied migrations.
-  2. Users can log in with username/password, remain authenticated across browser tabs, and resume an idle counter screen via numeric PIN without losing session state.
-  3. Admin can create custom roles, assign granular permissions, and unprivileged users receive 403 Forbidden when attempting restricted API endpoints.
-  4. Counter Billers can navigate the responsive mobile-first shell featuring touch cards and an on-screen numeric keypad.
+  1. Next.js app loads with clean mobile-first design tokens, high-contrast touch cards, and responsive viewports.
+  2. Biller interface renders interactive touch product cards, weight↔amount conversion toggle, an on-screen numeric keypad, and a Pisai grinding screen with large token preview.
+  3. Product titles and bill previews render authentically in Jameel Noori Nastaleeq Urdu font.
+  4. Admin dashboard showcases styled metric summary cards, daily price modal, customer ledger view, expense forms, and reports layout.
+  5. Idle PIN-lock overlay component activates cleanly on inactivity and unlocks with a 4-digit PIN.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 2: Product Catalog & Price Management
-**Goal**: Allow the Admin to manage products and prices with Urdu typography and enforce the 24-hour daily price confirmation protocol.
+### Phase 2: Backend Foundation & Core Setup
+**Goal**: Establish Express REST backend, PostgreSQL relational database schema with migrations, persistent session auth, dynamic RBAC engine, and permission middleware.
 **Depends on**: Phase 1
-**Requirements**: CAT-01, PRICE-01, PRICE-02, PRICE-03, FONT-01
+**Requirements**: SETUP-01, SETUP-02, AUTH-01, RBAC-01, RBAC-02
 **Success Criteria**:
-  1. Admin can add, update, and deactivate packaged flour products with prices per KG, viewing historical price changes in `price_history`.
-  2. Product titles display correctly in Jameel Noori Nastaleeq font across desktop and mobile screens.
-  3. On the first print attempt of a new calendar day, Admin is prompted to either update prices or confirm previous rates before proceeding.
-  4. If a Biller initiates the daily price confirmation with a change request, the pending bill is placed on hold until Admin approves or rejects it.
+  1. Express API server runs and connects to PostgreSQL, executing database migrations with strict numeric currency columns.
+  2. Users can log in with username/password, persist sessions securely, and log out cleanly.
+  3. Admin can create custom roles and assign fine-grained permissions via backend API.
+  4. Permission middleware enforces granular checks (e.g. `can_discount`, `can_view_reports`), returning 403 Forbidden for unpermitted calls.
+**Plans**: TBD
+
+### Phase 3: Product Catalog & Price Management
+**Goal**: Implement product catalog management, per-KG rates, price history tracking, and the daily price confirmation workflow.
+**Depends on**: Phase 2
+**Requirements**: CAT-01, PRICE-01, PRICE-02, PRICE-03
+**Success Criteria**:
+  1. Admin can create, edit, and toggle active status of packaged flour products with per-KG pricing.
+  2. Price modifications are logged automatically in `price_history` with user and timestamp.
+  3. First bill of a calendar day triggers the price confirmation prompt (Admin update/keep flow).
+  4. Biller price change requests hold the pending bill until Admin review or notify the Admin upon continuing.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 3: Core Billing Engine (Standard Products)
-**Goal**: Enable high-speed touch-based product billing with dual calculation modes, permission-checked discounts, monotonic sequential numbering, and thermal receipt printing.
-**Depends on**: Phase 2
+### Phase 4: Core Billing Engine (Standard Products)
+**Goal**: Implement standard product billing logic with dual calculation modes, permission-gated discounts, sequential bill numbering with DB locks, and thermal receipt printing.
+**Depends on**: Phase 3
 **Requirements**: BILL-01, BILL-02, BILL-03, BILL-04, PRINT-01, PRINT-02
 **Success Criteria**:
-  1. Biller can tap a product card and calculate bill lines in under 15 seconds using either Weight→Amount (`qty_kg * rate`) or Amount→Weight (`amount / rate`).
-  2. Users with `can_discount` permission can apply custom discount values which are explicitly recorded on the bill.
-  3. Bills receive guaranteed monotonic, strictly sequential bill numbers via database locking with zero risk of duplicate numbers under rapid taps.
-  4. Products with zero or unconfigured prices display a clear "Rate not set" warning and cannot be billed.
-  5. The system dispatches receipt output to the thermal printer and supports exact reprint of any previously issued bill without data alteration.
+  1. Biller can generate product bills using either Weight→Amount or Amount→Weight calculation modes in under 15 seconds.
+  2. Discounts can only be applied by users with `can_discount` permission, and explicit discount amounts are stored.
+  3. Monotonic sequential bill numbers are generated via database locking with zero duplicates under concurrent taps.
+  4. Products without set rates trigger a "Rate not set" block and warning.
+  5. ESC/POS receipt generation dispatches thermal print payloads, and bills can be reprinted identically.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 4: Gundam Pisai (Grinding) Module
-**Goal**: Deliver a dedicated, frictionless Pisai billing workflow with manual rate entry, independent 4-digit token generation, and prominent thermal ticket printing.
-**Depends on**: Phase 3
+### Phase 5: Gundam Pisai (Grinding) Module
+**Goal**: Implement the dedicated Pisai grinding service module with manual pricing, independent 4-digit token sequencing, and large ticket printing.
+**Depends on**: Phase 4
 **Requirements**: PISAI-01, PISAI-02, PISAI-03, PISAI-04, PISAI-05
 **Success Criteria**:
-  1. Biller can complete a Pisai grinding transaction by inputting wheat weight, selecting service type (*Pisai* vs *Safai+Pisai*), and entering the grinding fee.
-  2. Every Pisai ticket generates a zero-padded, continuous 4-digit token number (`0001`–`9999`) from a dedicated sequence that never resets.
-  3. Thermal printer outputs a specialized collection ticket featuring the large-format 4-digit token number.
-  4. Pisai charges support permission-gated discounts and credit customer assignment seamlessly.
+  1. Biller can enter customer name (optional), wheat weight, service type (*Pisai* vs *Safai+Pisai*), and manual fee.
+  2. Pisai tickets receive a dedicated, non-resetting 4-digit sequential token number (`0001`–`9999`).
+  3. System prints large-format collection tickets for the customer.
+  4. Pisai bills integrate with discount rules and credit assignment seamlessly.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 5: Credit (Udhaar) & Ledger Module
+### Phase 6: Credit (Udhaar) & Ledger Module
 **Goal**: Provide Admin-controlled customer credit tracking, profile management, and a unified append-only financial ledger.
-**Depends on**: Phase 4
+**Depends on**: Phase 5
 **Requirements**: CRED-01, CRED-02, CRED-03, LEDGER-01
 **Success Criteria**:
-  1. Admin-authorized users can issue credit during billing by selecting an existing customer or quickly registering a new customer.
-  2. Customer profile screen displays chronological purchase bills, repayments, and live materialized outstanding balance.
-  3. Counter staff can log cash repayments against customer debt, updating their outstanding balance in real time.
-  4. Every financial event (product sales, grinding fees, credit issuance, debt repayments) writes an append-only row to `ledger_entries`.
+  1. Authorized users can issue credit bills to new or existing customers.
+  2. Customer profile screen displays chronological bills, payments, and live derived balance.
+  3. Cash repayments can be logged against outstanding balances in real time.
+  4. Every financial event is recorded in the append-only `ledger_entries` table.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 6: Expenses, Returns, Reports
-**Goal**: Implement shop expense logging, bill returns with automatic ledger offsets, and comprehensive owner reporting dashboards.
-**Depends on**: Phase 5
+### Phase 7: Expenses, Returns, Reports
+**Goal**: Implement expense recording, product returns with ledger offsets, and comprehensive owner reporting dashboards.
+**Depends on**: Phase 6
 **Requirements**: EXP-01, RET-01, REP-01, REP-02
 **Success Criteria**:
-  1. Staff can log categorized business expenses (electricity, labor, maintenance) with server-assigned timestamps.
-  2. Returns can be processed against original bills or Pisai tokens, writing offsetting entries to the business ledger.
-  3. Admin dashboard presents pre-aggregated summary cards reflecting net sales, grinding revenue, expenses, and outstanding customer debt.
-  4. Admin can inspect drill-down reports filtered by date range and search credit ledgers by customer name with export options.
+  1. Staff can log categorized shop expenses with server-assigned timestamps.
+  2. Returns can be processed against original bills or Pisai tokens with offsetting ledger entries.
+  3. Admin dashboard renders pre-aggregated cards for sales, grinding, expenses, and credit debt.
+  4. Admin can filter reports by date range and search customer credit histories with export options.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 7: Daily Closing, Backup, Bill Void, Audit Log
+### Phase 8: Daily Closing, Backup, Bill Void, Audit Log
 **Goal**: Implement end-of-day reconciliation with snapshot freezing, automated database backups, Admin voiding with reversal entries, and comprehensive audit trails.
-**Depends on**: Phase 6
+**Depends on**: Phase 7
 **Requirements**: CLOSE-01, BACKUP-01, VOID-01, AUDIT-01
 **Success Criteria**:
-  1. Admin can complete Daily Closing, creating an immutable snapshot (`daily_closing_records`) and locking the day against retrospective changes.
-  2. Daily closing confirmation triggers an automated PostgreSQL database backup job without requiring manual server interaction.
-  3. Admin can void any standard bill or Pisai token, flagging the record as voided and writing an offsetting reversal entry to `ledger_entries` without destroying historical records.
-  4. Every sensitive modification (pricing updates, voids, credit issuance, permission changes) synchronously writes an immutable entry into `activity_log`.
+  1. Admin can execute Daily Closing, generating an immutable `daily_closing_records` snapshot and locking the day against backdated edits.
+  2. Daily closing automatically triggers a PostgreSQL database backup job.
+  3. Admin can void any standard bill or Pisai token, creating linked reversal ledger entries without deleting original records.
+  4. Every sensitive modification synchronously writes an immutable row to `activity_log`.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 8: Testing, Polish & Deployment
+### Phase 9: Testing, Polish & Deployment
 **Goal**: Execute comprehensive automated tests, validate usability with low-literacy counter staff, optimize mobile performance, and configure production deployment.
-**Depends on**: Phase 7
+**Depends on**: Phase 8
 **Requirements**: TEST-01, TEST-02, PERF-01, DEPLOY-01
 **Success Criteria**:
-  1. Automated test suite passes 100% of test cases for billing math, concurrency safety, and permission guards.
-  2. Usability testing confirms that counter staff with basic literacy can complete standard sales and grinding tickets within 15 seconds without assistance.
-  3. Mobile UI operates fluidly on counter Android tablets/smartphones with sub-second page transitions and responsive layouts.
-  4. Production environment is fully configured with automated database seeding, process supervisor configs, and operator documentation.
+  1. Automated test suite passes 100% of test cases for billing calculations, sequence concurrency, and RBAC guards.
+  2. Usability testing confirms that counter staff with basic literacy can complete sales and grinding tickets within 15 seconds without assistance.
+  3. Mobile UI operates fluidly on counter tablets and phones with sub-second page transitions.
+  4. Production environment is fully configured with automated database seeding, process supervisor configs, and operator handover documentation.
 **Plans**: TBD
 **UI hint**: yes
