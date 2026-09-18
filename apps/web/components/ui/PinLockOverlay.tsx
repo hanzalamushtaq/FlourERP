@@ -53,7 +53,7 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        backgroundColor: 'rgba(51, 61, 41, 0.65)',
+        backgroundColor: 'rgba(65, 72, 51, 0.65)',
         backdropFilter: 'blur(12px)',
         display: 'flex',
         flexDirection: 'column',
@@ -66,10 +66,10 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
         style={{
           width: '100%',
           maxWidth: '360px',
-          backgroundColor: '#F6F7F0',
+          backgroundColor: '#F4F5EE',
           borderRadius: '16px',
           padding: '28px 24px',
-          boxShadow: '0 20px 35px rgba(51, 61, 41, 0.25)',
+          boxShadow: '0 20px 35px rgba(65, 72, 51, 0.25)',
           border: '2px solid #B6AD90',
           textAlign: 'center',
           animation: error ? 'shake 0.4s ease' : 'none',
@@ -81,9 +81,9 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             width: '60px',
             height: '60px',
             borderRadius: '9999px',
-            backgroundColor: '#333D29',
-            border: '1.5px solid #333D29',
-            color: error ? '#F6F7F0' : '#F6F7F0',
+            backgroundColor: '#414833',
+            border: '1.5px solid #414833',
+            color: error ? '#F4F5EE' : '#F4F5EE',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -91,24 +91,24 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             transition: 'all 0.2s',
           }}
         >
-          {error ? <ShieldAlert size={30} color="#F6F7F0" /> : <Lock size={30} color="#F6F7F0" />}
+          {error ? <ShieldAlert size={30} color="#F4F5EE" /> : <Lock size={30} color="#F4F5EE" />}
         </div>
 
-        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#333D29' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#414833' }}>
           Terminal Locked
         </h2>
         <p
           className="font-nastaleeq"
           style={{
             fontSize: '19px',
-            color: '#333D29',
+            color: '#414833',
             margin: '4px 0 8px',
             fontWeight: 700,
           }}
         >
           ٹرمینل مقفل ہے — پن درج کریں
         </p>
-        <p style={{ fontSize: '13px', color: '#333D29', marginBottom: '20px', fontWeight: 600 }}>
+        <p style={{ fontSize: '13px', color: '#414833', marginBottom: '20px', fontWeight: 600 }}>
           {staffName} • Enter 4-digit PIN (Demo: 1234)
         </p>
 
@@ -133,7 +133,7 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
                   backgroundColor: error
                     ? '#656D4A'
                     : filled
-                    ? '#333D29'
+                    ? '#414833'
                     : '#C2C5AA',
                   border: filled ? 'none' : '2px solid #B6AD90',
                   transform: filled ? 'scale(1.15)' : 'scale(1)',
@@ -161,8 +161,8 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
               style={{
                 height: '56px',
                 borderRadius: '12px',
-                backgroundColor: '#F6F7F0',
-                color: '#333D29',
+                backgroundColor: '#F4F5EE',
+                color: '#414833',
                 border: '1.5px solid #B6AD90',
                 fontSize: '22px',
                 fontWeight: 800,
@@ -180,8 +180,8 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             style={{
               height: '56px',
               borderRadius: '12px',
-              backgroundColor: '#F6F7F0',
-              color: '#333D29',
+              backgroundColor: '#F4F5EE',
+              color: '#414833',
               border: '1.5px solid #B6AD90',
               fontSize: '22px',
               fontWeight: 800,
@@ -197,9 +197,9 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             style={{
               height: '56px',
               borderRadius: '12px',
-              backgroundColor: '#333D29',
-              color: '#F6F7F0',
-              border: '1.5px solid #333D29',
+              backgroundColor: '#414833',
+              color: '#F4F5EE',
+              border: '1.5px solid #414833',
               fontSize: '18px',
               fontWeight: 800,
               cursor: 'pointer',

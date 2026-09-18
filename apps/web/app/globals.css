@@ -11,45 +11,43 @@
 }
 
 :root {
-  /* Complete 10-Color Earth & Crop Palette from User Image */
-  --c1: #582F0E; /* Deep Roasted Earth */
-  --c2: #7F4F24; /* Warm Timber (Primary Action Button) */
-  --c3: #936639; /* Caramel Amber */
-  --c4: #A68A64; /* Warm Khaki */
-  --c5: #B6AD90; /* Soft Almond Khaki (Borders, Frames) */
-  --c6: #C2C5AA; /* Pale Sage Cream (Surfaces, Cards) */
-  --c7: #A4AC86; /* Soft Celadon (Dividers, Borders) */
-  --c8: #656D4A; /* Olive Green (Credit Button, Accents) */
-  --c9: #414833; /* Deep Forest Olive */
-  --c10: #333D29; /* Dark Moss Timber (Gehri Wording, Headings, Numbers) */
+  /* Strict 8-Color Crop Agriculture Palette from User Image */
+  --c1: #7F4F24; /* Warm Timber (Primary CTA, Cash Buttons, Active Borders) */
+  --c2: #936639; /* Caramel Amber (Rate Badges, Highlights) */
+  --c3: #A68A64; /* Warm Khaki (Accents, Focus Outlines) */
+  --c4: #B6AD90; /* Soft Almond Khaki (Borders, Dividers, Frames) */
+  --c5: #C2C5AA; /* Pale Sage Cream (Surfaces, Card Fill, Panels) */
+  --c6: #A4AC86; /* Soft Celadon (Pills, Inactive Badges) */
+  --c7: #656D4A; /* Olive Green (Secondary CTA, Credit Buttons) */
+  --c8: #414833; /* Deep Forest Olive (Wording, Headings, Numbers, Keypad Text) */
 
   /* Light Theme Semantic UI Tokens - Light boxes, deep dark typography */
-  --bg-main: #F6F7F0; /* Clean Light Canvas */
-  --bg-surface: var(--c6);
-  --bg-subtle: #ECEEE4;
-  --bg-card: #F6F7F0;
-  --bg-input: #F6F7F0;
+  --bg-main: #F4F5EE; /* Clean Light Canvas */
+  --bg-surface: var(--c5);
+  --bg-subtle: #E8EAE0;
+  --bg-card: #F4F5EE;
+  --bg-input: #F4F5EE;
   
-  --text-primary: var(--c10); /* Deep Wording #333D29 */
-  --text-secondary: var(--c9);
-  --text-muted: var(--c8);
-  --text-inverse: #F6F7F0;
+  --text-primary: var(--c8); /* Deep Wording #414833 */
+  --text-secondary: var(--c8);
+  --text-muted: var(--c7);
+  --text-inverse: #F4F5EE;
 
   /* Accents */
-  --accent-primary: var(--c2); /* Warm Timber #7F4F24 */
-  --accent-secondary: var(--c8); /* Olive Green #656D4A */
-  --accent-highlight: var(--c3); /* Caramel #936639 */
+  --accent-primary: var(--c1); /* Warm Timber #7F4F24 */
+  --accent-secondary: var(--c7); /* Olive Green #656D4A */
+  --accent-highlight: var(--c2); /* Caramel Amber #936639 */
 
   /* Borders & Dividers */
-  --border-subtle: var(--c5);
-  --border-medium: var(--c7);
-  --border-strong: var(--c10);
-  --border-active: var(--c2);
+  --border-subtle: var(--c4);
+  --border-medium: var(--c6);
+  --border-strong: var(--c8);
+  --border-active: var(--c1);
   
-  --shadow-sm: 0 1px 2px 0 rgba(51, 61, 41, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(51, 61, 41, 0.12), 0 2px 4px -2px rgba(51, 61, 41, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(51, 61, 41, 0.15), 0 4px 6px -4px rgba(51, 61, 41, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(51, 61, 41, 0.2), 0 8px 10px -6px rgba(51, 61, 41, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(65, 72, 51, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(65, 72, 51, 0.12), 0 2px 4px -2px rgba(65, 72, 51, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(65, 72, 51, 0.15), 0 4px 6px -4px rgba(65, 72, 51, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(65, 72, 51, 0.2), 0 8px 10px -6px rgba(65, 72, 51, 0.15);
 
   /* Touch Target Radius */
   --radius-sm: 8px;
@@ -104,9 +102,9 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--c1);
+  background: var(--bg-main);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--c3);
+  background: var(--c4);
   border-radius: var(--radius-full);
 }

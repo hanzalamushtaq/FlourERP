@@ -51,7 +51,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
                 padding: '10px 4px',
                 borderRadius: '12px',
                 backgroundColor: '#C2C5AA',
-                color: '#333D29',
+                color: '#414833',
                 border: '1.5px solid #B6AD90',
                 fontSize: '13px',
                 fontWeight: 800,
@@ -82,14 +82,14 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
             style={{
               height: '62px',
               borderRadius: '12px',
-              backgroundColor: '#F6F7F0',
-              color: '#333D29',
+              backgroundColor: '#F4F5EE',
+              color: '#414833',
               border: '2px solid #B6AD90',
               fontSize: '26px',
               fontWeight: 800,
               fontFamily: 'var(--font-sans)',
               cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(51, 61, 41, 0.08)',
+              boxShadow: '0 2px 6px rgba(65, 72, 51, 0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -108,7 +108,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
             height: '62px',
             borderRadius: '12px',
             backgroundColor: '#7F4F24',
-            color: '#F6F7F0',
+            color: '#F4F5EE',
             border: '2px solid #7F4F24',
             cursor: 'pointer',
             display: 'flex',
@@ -117,7 +117,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           }}
           title="Backspace"
         >
-          <Delete size={26} strokeWidth={2.4} color="#F6F7F0" />
+          <Delete size={26} strokeWidth={2.4} color="#F4F5EE" />
         </button>
       </div>
 
@@ -129,9 +129,9 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         style={{
           height: '46px',
           borderRadius: '12px',
-          backgroundColor: '#582F0E',
-          color: '#F6F7F0',
-          border: '1.5px solid #582F0E',
+          backgroundColor: '#414833',
+          color: '#F4F5EE',
+          border: '1.5px solid #414833',
           fontSize: '15px',
           fontWeight: 700,
           cursor: 'pointer',
@@ -141,7 +141,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           gap: '6px',
         }}
       >
-        <XCircle size={18} color="#F6F7F0" /> Clear Entry (صاف کریں)
+        <XCircle size={18} color="#F4F5EE" /> Clear Entry (صاف کریں)
       </button>
     </div>
   );
