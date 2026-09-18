@@ -43,30 +43,29 @@ export default function Home() {
           style={{
             maxWidth: '1280px',
             margin: '0 auto',
-            padding: '12px 24px',
+            padding: '6px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '14px',
+            gap: '10px',
           }}
         >
           {/* Logo & Shop Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div
               style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '12px',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
                 backgroundColor: '#d97706',
                 color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)',
               }}
             >
-              <Wheat size={28} strokeWidth={2.4} />
+              <Wheat size={22} strokeWidth={2.4} />
             </div>
 
             <div>
@@ -220,24 +219,24 @@ export default function Home() {
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
                 style={{
-                  padding: '12px 18px',
+                  padding: '6px 14px',
                   border: 'none',
                   background: 'none',
                   cursor: 'pointer',
-                  borderBottom: isActive ? '4px solid #d97706' : '4px solid transparent',
+                  borderBottom: isActive ? '3px solid #d97706' : '3px solid transparent',
                   color: isActive ? '#b45309' : '#64748b',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   fontWeight: isActive ? 800 : 600,
-                  fontSize: '15px',
+                  fontSize: '14px',
                   whiteSpace: 'nowrap',
-                  transition: 'all 0.15s ease',
+                  transition: 'all 0.12s ease',
                 }}
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700 }}>
+                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700 }}>
                   ({tab.ur})
                 </span>
               </button>
@@ -253,7 +252,7 @@ export default function Home() {
           maxWidth: '1280px',
           width: '100%',
           margin: '0 auto',
-          padding: '12px 18px 20px',
+          padding: '8px 16px 14px',
         }}
       >
         {activeTab === 'billing' && <ProductBillingScreen />}
