@@ -1,0 +1,10 @@
+{
+  "mode": "standard",
+  "granularity": "standard",
+  "phase_id_convention": "sequential",
+  "project_code": "FLOUR",
+  "workflow": {
+    "auto_advance": false,
+    "verify_work": true
+  }
+}
