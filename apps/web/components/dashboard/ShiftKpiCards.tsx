@@ -22,40 +22,27 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
   const cards = [
     {
       id: 'sales' as const,
-      title: 'آج کی کل نقد سیلز',
-      value: `${todaySales.toLocaleString()} Rs`,
-      icon: <Banknote size={24} color="#15803d" />,
-      bgIcon: '#dcfce7',
-      borderColor: '#e2e8f0',
-      valueColor: '#0f172a',
+      title: 'کل نقد سیلز',
+      value: `Rs ${todaySales.toLocaleString()}`,
+      icon: <Banknote size={20} color="#15803d" />,
     },
     {
       id: 'recovery' as const,
-      title: 'ادھار وصولی (ریکوری)',
-      value: `${creditRecovery.toLocaleString()} Rs`,
-      icon: <HandCoins size={24} color="#0284c7" />,
-      bgIcon: '#e0f2fe',
-      borderColor: '#e2e8f0',
-      valueColor: '#0f172a',
+      title: 'ادھار وصولی',
+      value: `Rs ${creditRecovery.toLocaleString()}`,
+      icon: <HandCoins size={20} color="#0284c7" />,
     },
     {
       id: 'pisai' as const,
-      title: 'آج کی گندم پسائی',
+      title: 'گندم پسائی',
       value: `${todayPisaiKg.toLocaleString()} KG`,
-      icon: <Wheat size={24} color="#d97706" />,
-      bgIcon: '#fef3c7',
-      borderColor: '#e2e8f0',
-      valueColor: '#0f172a',
-      isKg: true,
+      icon: <Wheat size={20} color="#d97706" />,
     },
     {
       id: 'drawer' as const,
-      title: 'کیش دراز بیلنس (موجود)',
-      value: `${cashDrawerBalance.toLocaleString()} Rs`,
-      icon: <Landmark size={24} color="#475569" />,
-      bgIcon: '#f1f5f9',
-      borderColor: '#e2e8f0',
-      valueColor: '#0f172a',
+      title: 'کیش دراز بیلنس',
+      value: `Rs ${cashDrawerBalance.toLocaleString()}`,
+      icon: <Landmark size={20} color="#475569" />,
     },
   ];
 
@@ -63,8 +50,8 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '14px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '12px',
         width: '100%',
         direction: 'rtl',
       }}
@@ -76,25 +63,23 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
           onClick={() => onCardClick?.(card.id)}
           style={{
             backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            border: `1.5px solid ${card.borderColor}`,
-            padding: '16px 18px',
+            borderRadius: '10px',
+            border: '1px solid #e2e8f0',
+            padding: '12px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
             cursor: onCardClick ? 'pointer' : 'default',
           }}
         >
-          {/* Text Info */}
           <div>
             <div
               className="font-nastaleeq"
               style={{
                 fontSize: '13px',
-                fontWeight: 700,
                 color: '#64748b',
-                lineHeight: 1.2,
+                fontWeight: 700,
+                lineHeight: 1.1,
               }}
             >
               {card.title}
@@ -102,46 +87,26 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
 
             <div
               style={{
-                fontSize: '22px',
+                fontSize: '18px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: card.valueColor,
-                marginTop: '6px',
-                letterSpacing: '-0.5px',
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: '4px',
+                color: '#0f172a',
+                marginTop: '4px',
               }}
             >
-              {card.isKg && (
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    backgroundColor: '#fef3c7',
-                    color: '#b45309',
-                    padding: '1px 5px',
-                    borderRadius: '4px',
-                  }}
-                >
-                  KG
-                </span>
-              )}
-              <span>{card.value}</span>
+              {card.value}
             </div>
           </div>
 
-          {/* Right Icon Circle */}
           <div
             style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '12px',
-              backgroundColor: card.bgIcon,
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              backgroundColor: '#f8fafc',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0,
             }}
           >
             {card.icon}

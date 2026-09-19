@@ -30,58 +30,44 @@ export const CounterDashboard: React.FC<CounterDashboardProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
+        gap: '16px',
         width: '100%',
-        maxWidth: '1380px',
+        maxWidth: '1280px',
         margin: '0 auto',
-        padding: '16px 20px',
+        padding: '16px',
       }}
     >
-      {/* 1. Hero Quick Action Cards [F8], [F2], [F3] */}
-      <section>
-        <HeroActionCards
-          onNewBill={onNewBill}
-          onNewPisaiToken={onNewPisaiToken}
-          onEditRates={onEditRates}
-          todayBillsCount={142}
-          activePisaiTokensCount={28}
-          ratesLastUpdated="09:00 AM"
-        />
-      </section>
+      {/* 1. Clean Quick Action Cards */}
+      <HeroActionCards
+        onNewBill={onNewBill}
+        onNewPisaiToken={onNewPisaiToken}
+        onEditRates={onEditRates}
+      />
 
-      {/* 2. Shift Financial Metric Summary Tiles */}
-      <section>
-        <ShiftKpiCards
-          todaySales={184500}
-          creditRecovery={42000}
-          todayPisaiKg={1250}
-          cashDrawerBalance={126500}
-          onCardClick={onMetricCardClick}
-        />
-      </section>
+      {/* 2. Key Metrics Row */}
+      <ShiftKpiCards
+        todaySales={184500}
+        creditRecovery={42000}
+        todayPisaiKg={1250}
+        cashDrawerBalance={126500}
+        onCardClick={onMetricCardClick}
+      />
 
-      {/* 3. Operational Real-Time Monitoring (Chakki Queue + Recent Bills Feed) */}
-      <section
+      {/* 3. Operational Queue & Invoices */}
+      <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(320px, 1fr) minmax(480px, 2fr)',
-          gap: '16px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '14px',
           alignItems: 'stretch',
         }}
       >
-        {/* Left Column: Chakki Machine & Token Live Queue */}
-        <div>
-          <ChakkiQueueCard />
-        </div>
-
-        {/* Right Column: Shift Recent Invoices & Live Bills */}
-        <div>
-          <RecentInvoicesTable
-            onReprint={onReprintReceipt}
-            onViewAllInvoices={onViewAllInvoices}
-          />
-        </div>
-      </section>
+        <ChakkiQueueCard />
+        <RecentInvoicesTable
+          onReprint={onReprintReceipt}
+          onViewAllInvoices={onViewAllInvoices}
+        />
+      </div>
     </div>
   );
 };
