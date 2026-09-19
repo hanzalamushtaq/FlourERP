@@ -54,8 +54,10 @@
   1. Express API server runs and connects to PostgreSQL, executing database migrations with strict numeric currency columns.
   2. Users can log in with username/password, persist sessions securely, and log out cleanly.
   3. Admin can create custom roles and assign fine-grained permissions via backend API.
-  4. Permission middleware enforces granular checks (e.g. `can_discount`, `can_view_reports`), returning 403 Forbidden for unpermitted calls.
-**Plans**: TBD
+**Plans**:
+  - [ ] 02-01: Express Monorepo Scaffolding & PostgreSQL Database Migrations
+  - [ ] 02-02: Authentication Engine, Session Management & PIN-Lock API
+  - [ ] 02-03: Dynamic RBAC Engine & Fine-Grained Permission Middleware
 
 ### Phase 3: Product Catalog & Price Management
 **Goal**: Implement product catalog management, per-KG rates, price history tracking, and the daily price confirmation workflow.
