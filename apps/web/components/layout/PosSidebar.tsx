@@ -197,10 +197,11 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 style={{
                   fontSize: '9.5px',
                   fontWeight: 800,
-                  padding: '1px 5px',
+                  padding: '2px 6px',
                   borderRadius: '4px',
-                  backgroundColor: isAdminUser ? '#7F4F24' : '#656D4A',
-                  color: '#FFFFFF',
+                  backgroundColor: isAdminUser ? '#fffbeb' : '#f0f9ff',
+                  color: isAdminUser ? '#b45309' : '#0284c7',
+                  border: `1px solid ${isAdminUser ? '#fde68a' : '#bae6fd'}`,
                 }}
               >
                 {isAdminUser ? 'ایڈمن' : 'بلر'}
@@ -251,7 +252,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   padding: '8px 12px',
                   borderRadius: '7px',
                   border: 'none',
-                  backgroundColor: isActive ? '#7F4F24' : 'transparent', // Warm Timber active
+                  backgroundColor: isActive ? '#9f4c03c5' : 'transparent', // Warm Timber active
                   color: isActive ? '#ffffff' : '#414833',
                   cursor: 'pointer',
                   fontWeight: isActive ? 800 : 600,
@@ -300,9 +301,9 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 width: '100%',
                 padding: '7px 10px',
                 borderRadius: '6px',
-                border: '1px solid #fee2e2',
-                backgroundColor: '#fff1f2',
-                color: '#991b1b',
+                border: '1px solid #cbd5e1',
+                backgroundColor: '#ffffff',
+                color: '#64748b',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -311,10 +312,11 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 fontWeight: 700,
                 cursor: 'pointer',
                 direction: 'rtl',
+                transition: 'all 0.15s ease',
               }}
             >
-              <LogOut size={14} color="#991b1b" />
-              <span className="font-nastaleeq">لاگ آؤٹ (سیشن ختم کریں)</span>
+              <LogOut size={14} color="#64748b" />
+              <span className="font-nastaleeq">لاگ آؤٹ</span>
             </button>
           </div>
         )}
@@ -350,7 +352,6 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Printer size={12} color="#64748b" />
-            <span>پرنٹر تیار</span>
           </div>
         </div>
       </div>

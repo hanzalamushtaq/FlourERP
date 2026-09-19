@@ -332,9 +332,9 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
         {/* Header */}
         <div
           style={{
-            padding: '16px 20px',
-            backgroundColor: '#414833',
-            color: '#F4F5EE',
+            padding: '14px 20px',
+            backgroundColor: '#FFFFFF',
+            borderBottom: '1.5px solid #E2E8F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -347,21 +347,21 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 width: '38px',
                 height: '38px',
                 borderRadius: '8px',
-                backgroundColor: '#7F4F24',
-                color: '#FFFFFF',
+                backgroundColor: '#fffbeb',
+                border: '1.5px solid #fde68a',
+                color: '#d97706',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               }}
             >
-              <ShieldCheck size={22} strokeWidth={2.4} />
+              <ShieldCheck size={22} strokeWidth={2.4} color="#d97706" />
             </div>
             <div>
-              <h2 className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>
+              <h2 className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, margin: 0, color: '#414833' }}>
                 اختیارات و رولز مینیجر (RBAC & Permissions CRUD)
               </h2>
-              <div style={{ fontSize: '11px', color: '#C2C5AA', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', color: '#656D4A', marginTop: '2px' }}>
                 ہر رول کے اختیارات کو اپنی مرضی سے بنائیں، تبدیل کریں اور سٹاف کو لگائیں
               </div>
             </div>
@@ -373,7 +373,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#C2C5AA',
+              color: '#64748B',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -601,37 +601,44 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
           ) : activeTab === 'roles' ? (
             /* TAB 1: ROLES OVERVIEW WITH EDIT & DELETE BUTTONS */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {roles.map((r) => (
-                <div
-                  key={r.id}
-                  style={{
-                    backgroundColor: r.isSystem ? '#FAF7EE' : '#FFFFFF',
-                    border: r.isSystem ? '1.5px solid #E6D5C3' : '1.5px solid #E2E8F0',
-                    borderRadius: '10px',
-                    padding: '14px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 900, color: '#414833' }}>
-                        {r.name}
-                      </span>
-                      {r.isSystem && (
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: 800,
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            backgroundColor: '#7F4F24',
-                            color: '#FFFFFF',
-                          }}
-                        >
-                          SYSTEM ROLE
+              {roles.map((r) => {
+                const isSuperAdmin = r.name.toLowerCase().includes('admin');
+                const isBiller = r.name.toLowerCase().includes('biller');
+                const cardBg = isSuperAdmin ? '#fffbeb' : isBiller ? '#f0f9ff' : '#f8fafc';
+                const cardBorder = isSuperAdmin ? '#fde68a' : isBiller ? '#bae6fd' : '#e2e8f0';
+
+                return (
+                  <div
+                    key={r.id}
+                    style={{
+                      backgroundColor: cardBg,
+                      border: `1.5px solid ${cardBorder}`,
+                      borderRadius: '10px',
+                      padding: '14px',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 900, color: '#414833' }}>
+                          {r.name}
                         </span>
-                      )}
-                    </div>
+                        {r.isSystem && (
+                          <span
+                            style={{
+                              fontSize: '9.5px',
+                              fontWeight: 800,
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              backgroundColor: '#ffffff',
+                              color: isSuperAdmin ? '#92400e' : '#0369a1',
+                              border: `1px solid ${cardBorder}`,
+                            }}
+                          >
+                            SYSTEM ROLE
+                          </span>
+                        )}
+                      </div>
 
                     {/* Action buttons: Edit Permissions & Delete Role */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -721,7 +728,8 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     })}
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           ) : activeTab === 'staff' ? (
             /* TAB 2: ASSIGN ROLES TO USERS */

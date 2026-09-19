@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Clock, FileSpreadsheet, LogOut, UserCheck } from 'lucide-react';
+import { Search, Clock, FileSpreadsheet, LogOut } from 'lucide-react';
 
 interface PosHeaderProps {
   onOpenZReport: () => void;
@@ -44,7 +44,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       style={{
         backgroundColor: '#ffffff',
         borderBottom: '1px solid #e2e8f0',
-        padding: '10px 20px',
+        padding: '9px 18px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -52,8 +52,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         userSelect: 'none',
       }}
     >
-      {/* Left: Search & Shift Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      {/* Left: Search, Clock & Shift Actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {/* Search */}
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', direction: 'rtl' }}>
           <input
@@ -61,21 +61,21 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             placeholder="تلاش: گاہک یا بل نمبر..."
             className="font-nastaleeq"
             style={{
-              height: '36px',
-              padding: '0 32px 0 12px',
-              borderRadius: '8px',
+              height: '34px',
+              padding: '0 30px 0 10px',
+              borderRadius: '7px',
               border: '1px solid #cbd5e1',
               backgroundColor: '#f8fafc',
-              fontSize: '13px',
-              width: '210px',
+              fontSize: '12.5px',
+              width: '190px',
               outline: 'none',
               textAlign: 'right',
             }}
           />
           <Search
-            size={15}
+            size={14}
             color="#94a3b8"
-            style={{ position: 'absolute', right: '10px', pointerEvents: 'none' }}
+            style={{ position: 'absolute', right: '9px', pointerEvents: 'none' }}
           />
         </div>
 
@@ -84,13 +84,14 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '5px',
             backgroundColor: '#f8fafc',
-            padding: '5px 10px',
-            borderRadius: '8px',
+            padding: '5px 9px',
+            borderRadius: '7px',
             border: '1px solid #e2e8f0',
-            fontSize: '12px',
+            fontSize: '11.5px',
             color: '#475569',
+            whiteSpace: 'nowrap',
           }}
         >
           <span
@@ -104,11 +105,11 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             صبح شفٹ
           </span>
           <span>•</span>
-          <Clock size={13} color="#64748b" />
+          <Clock size={12} color="#64748b" />
           <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{currentTime}</span>
         </div>
 
-        {/* End Shift (Z-Report) Button - Only if permitted */}
+        {/* End Shift (Z-Report) Button - WhiteSpace NoWrap to prevent line breaking */}
         {canCloseDay && (
           <button
             type="button"
@@ -118,24 +119,26 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               backgroundColor: '#414833',
               color: '#F4F5EE',
               border: 'none',
-              borderRadius: '8px',
-              padding: '7px 14px',
-              fontSize: '12px',
+              borderRadius: '7px',
+              padding: '6px 12px',
+              fontSize: '11.5px',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}
           >
-            <FileSpreadsheet size={15} color="#C2C5AA" />
-            <span className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800 }}>
+            <FileSpreadsheet size={14} color="#C2C5AA" />
+            <span className="font-nastaleeq" style={{ fontSize: '12.5px', fontWeight: 800 }}>
               شفٹ اختتام (Z-Report)
             </span>
           </button>
         )}
 
-        {/* Logout Quick Button */}
+        {/* Logout Button (Theme-Harmonious, Soft Neutral) */}
         {onLogout && (
           <button
             type="button"
@@ -143,31 +146,32 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             className="touch-active"
             title="لاگ آؤٹ"
             style={{
-              backgroundColor: '#fff1f2',
-              color: '#991b1b',
-              border: '1px solid #fecdd3',
-              borderRadius: '8px',
-              padding: '7px 10px',
-              fontSize: '12px',
+              backgroundColor: '#ffffff',
+              color: '#64748b',
+              border: '1px solid #cbd5e1',
+              borderRadius: '7px',
+              padding: '6px 10px',
+              fontSize: '11.5px',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
+              whiteSpace: 'nowrap',
             }}
           >
-            <LogOut size={14} color="#991b1b" />
+            <LogOut size={13} color="#64748b" />
             <span className="font-nastaleeq" style={{ fontSize: '12px' }}>لاگ آؤٹ</span>
           </button>
         )}
       </div>
 
       {/* Right: Clean Header Title & Operator Badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', direction: 'rtl' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', direction: 'rtl', flexShrink: 0 }}>
         <div>
           <h1
             className="font-nastaleeq"
-            style={{ fontSize: '18px', fontWeight: 900, color: '#414833', margin: 0 }}
+            style={{ fontSize: '17px', fontWeight: 900, color: '#414833', margin: 0, lineHeight: 1.1 }}
           >
             {title || (isAdmin ? 'ایڈمن کمانڈ سنٹر' : 'کاؤنٹر بلر ورک سپیس')}
           </h1>
@@ -176,15 +180,17 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           </div>
         </div>
 
+        {/* Operator Profile Pill */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            backgroundColor: '#F4F5EE',
-            border: '1px solid #C2C5AA',
-            padding: '5px 10px',
-            borderRadius: '10px',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            padding: '4px 10px',
+            borderRadius: '8px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
           }}
         >
           <div
@@ -192,12 +198,12 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               width: '26px',
               height: '26px',
               borderRadius: '50%',
-              backgroundColor: isAdmin ? '#7F4F24' : '#656D4A',
+              backgroundColor: isAdmin ? '#7F4F24' : '#0284c7',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '12px',
+              fontSize: '11.5px',
               fontWeight: 800,
             }}
           >
@@ -211,10 +217,10 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               style={{
                 fontSize: '9.5px',
                 fontWeight: 700,
-                color: isAdmin ? '#7F4F24' : '#656D4A',
+                color: isAdmin ? '#7F4F24' : '#0284c7',
               }}
             >
-              {isAdmin ? 'سسٹم ایڈمن' : 'کاؤنٹر بلر'}
+              {isAdmin ? 'سسٹم ایڈمن' : 'کاؤنٹر آپریٹر'}
             </div>
           </div>
         </div>

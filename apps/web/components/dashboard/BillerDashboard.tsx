@@ -6,15 +6,8 @@ import {
   ShoppingCart,
   Cog,
   BookUser,
-  Clock,
-  Printer,
-  Receipt,
-  Scale,
-  DollarSign,
-  AlertTriangle,
-  Info,
-  CheckCircle,
 } from 'lucide-react';
+import { ShiftKpiCards } from './ShiftKpiCards';
 import { ChakkiQueueCard } from './ChakkiQueueCard';
 import { RecentInvoicesTable } from './RecentInvoicesTable';
 import { ReceiptData } from '../ui/ReceiptPreviewModal';
@@ -38,6 +31,39 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   onReprintReceipt,
   onViewAllInvoices,
 }) => {
+  const actionCards = [
+    {
+      id: 'billing',
+      title: 'نیا بل بنائیں',
+      hotkey: 'F8',
+      icon: <ShoppingCart size={28} />,
+      color: '#d97706',
+      bgLight: '#fffbeb', // Relative soft amber
+      border: '#fde68a',
+      onClick: onNewBill,
+    },
+    {
+      id: 'pisai',
+      title: 'گندم پسائی ٹوکن',
+      hotkey: 'F2',
+      icon: <Cog size={28} />,
+      color: '#0284c7',
+      bgLight: '#f0f9ff', // Relative soft blue
+      border: '#bae6fd',
+      onClick: onNewPisaiToken,
+    },
+    {
+      id: 'udhaar',
+      title: 'ادھار کھاتہ و وصولی',
+      hotkey: 'Alt+K',
+      icon: <BookUser size={28} />,
+      color: '#059669',
+      bgLight: '#ecfdf5', // Relative soft green
+      border: '#a7f3d0',
+      onClick: onViewUdhaar,
+    },
+  ];
+
   return (
     <div
       style={{
@@ -62,7 +88,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           padding: '14px 20px',
           flexWrap: 'wrap',
           gap: '12px',
-          boxShadow: '0 2px 4px rgba(65, 72, 51, 0.06)',
+          boxShadow: '0 2px 4px rgba(65, 72, 51, 0.04)',
           direction: 'rtl',
         }}
       >
@@ -72,15 +98,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
               width: '42px',
               height: '42px',
               borderRadius: '10px',
-              backgroundColor: '#656D4A', // Olive Green
-              color: '#FFFFFF',
+              backgroundColor: '#f0fdf4',
+              border: '1.5px solid #bbf7d0',
+              color: '#15803d',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 4px rgba(101, 109, 74, 0.25)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
             }}
           >
-            <ShoppingCart size={22} />
+            <ShoppingCart size={22} color="#15803d" />
           </div>
 
           <div>
@@ -97,9 +124,9 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
                   fontWeight: 800,
                   padding: '2px 8px',
                   borderRadius: '12px',
-                  backgroundColor: '#E8EAE0',
-                  color: '#414833',
-                  border: '1px solid #C2C5AA',
+                  backgroundColor: '#f0f9ff',
+                  color: '#0369a1',
+                  border: '1px solid #bae6fd',
                 }}
               >
                 {counterId}
@@ -121,356 +148,134 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            backgroundColor: '#F4F5EE',
-            border: '1px solid #CBD5E1',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: '10px',
-            padding: '8px 14px',
+            padding: '6px 14px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
           }}
         >
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700 }}>آج کا آٹا ریٹ (20KG)</div>
-            <div style={{ fontSize: '15px', fontWeight: 900, color: '#7F4F24', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700 }} className="font-nastaleeq">
+              آٹا ریٹ (20KG)
+            </div>
+            <div style={{ fontSize: '15px', fontWeight: 900, color: '#d97706', fontFamily: 'var(--font-mono)' }}>
               Rs. 2,150
             </div>
           </div>
-          <div style={{ height: '24px', width: '1px', backgroundColor: '#CBD5E1' }} />
+          <div style={{ height: '22px', width: '1px', backgroundColor: '#e2e8f0' }} />
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700 }}>پسائی ریٹ فی کلو</div>
-            <div style={{ fontSize: '15px', fontWeight: 900, color: '#656D4A', fontFamily: 'var(--font-mono)' }}>
+            <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 700 }} className="font-nastaleeq">
+              پسائی فی کلو
+            </div>
+            <div style={{ fontSize: '15px', fontWeight: 900, color: '#059669', fontFamily: 'var(--font-mono)' }}>
               Rs. 8.50
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Top 3 Main Duty Action Cards (Designed for touch-friendly rapid counter work) */}
+      {/* 2. Top 3 Relative Color Filled Duty Action Cards */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
           gap: '14px',
+          width: '100%',
           direction: 'rtl',
         }}
       >
-        {/* Duty 1: Sales Billing (F8) */}
-        <button
-          type="button"
-          onClick={onNewBill}
-          className="touch-active"
-          style={{
-            backgroundColor: '#7F4F24', // Warm Timber Primary
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: '14px',
-            padding: '18px 20px',
-            cursor: 'pointer',
-            textAlign: 'right',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '130px',
-            boxShadow: '0 4px 10px rgba(127, 79, 36, 0.25)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <ShoppingCart size={22} color="#FFFFFF" />
+        {actionCards.map((card) => (
+          <div
+            key={card.id}
+            className="touch-active"
+            onClick={card.onClick}
+            style={{
+              backgroundColor: card.bgLight, // Relative filled background
+              borderRadius: '12px',
+              border: `1.5px solid ${card.border}`,
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {/* Right: Icon + Title */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '10px',
+                  backgroundColor: '#ffffff',
+                  color: card.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
+                  border: `1px solid ${card.border}`,
+                }}
+              >
+                {card.icon}
+              </div>
+
+              <div>
+                <h2
+                  className="font-nastaleeq"
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 900,
+                    color:
+                      card.color === '#d97706'
+                        ? '#92400e'
+                        : card.color === '#0284c7'
+                        ? '#075985'
+                        : '#065f46',
+                    lineHeight: 1.2,
+                    margin: 0,
+                  }}
+                >
+                  {card.title}
+                </h2>
+              </div>
             </div>
+
+            {/* Left: Hotkey Badge */}
             <span
               style={{
-                fontSize: '11px',
-                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
                 fontWeight: 800,
-                padding: '2px 8px',
+                fontFamily: 'var(--font-mono)',
+                padding: '4px 10px',
                 borderRadius: '6px',
-                backgroundColor: '#5E3615',
-                color: '#F4F5EE',
+                backgroundColor: '#ffffff',
+                color: card.color,
+                border: `1px solid ${card.border}`,
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
               }}
             >
-              F8
+              {card.hotkey}
             </span>
           </div>
-
-          <div>
-            <div
-              className="font-nastaleeq"
-              style={{ fontSize: '19px', fontWeight: 900, color: '#FFFFFF' }}
-            >
-              نیا سیلز بل بنائیں
-            </div>
-            <div
-              className="font-nastaleeq"
-              style={{ fontSize: '12.5px', color: '#E8EAE0', marginTop: '2px' }}
-            >
-              آٹا، میدہ، سوجی اور چوکر کی نقد و ادھار فروخت
-            </div>
-          </div>
-        </button>
-
-        {/* Duty 2: Pisai Token Intake (F2) */}
-        <button
-          type="button"
-          onClick={onNewPisaiToken}
-          className="touch-active"
-          style={{
-            backgroundColor: '#656D4A', // Olive Green
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: '14px',
-            padding: '18px 20px',
-            cursor: 'pointer',
-            textAlign: 'right',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '130px',
-            boxShadow: '0 4px 10px rgba(101, 109, 74, 0.25)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Cog size={22} color="#FFFFFF" />
-            </div>
-            <span
-              style={{
-                fontSize: '11px',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 800,
-                padding: '2px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#414833',
-                color: '#F4F5EE',
-              }}
-            >
-              F2
-            </span>
-          </div>
-
-          <div>
-            <div
-              className="font-nastaleeq"
-              style={{ fontSize: '19px', fontWeight: 900, color: '#FFFFFF' }}
-            >
-              گندم پسائی ٹوکن جاری کریں
-            </div>
-            <div
-              className="font-nastaleeq"
-              style={{ fontSize: '12.5px', color: '#E8EAE0', marginTop: '2px' }}
-            >
-              کسٹمر گندم وصولی، وزن اندراج اور چکی ٹوکن پرنٹ
-            </div>
-          </div>
-        </button>
-
-        {/* Duty 3: Customer Udhaar Ledger (Alt+K) */}
-        <button
-          type="button"
-          onClick={onViewUdhaar}
-          className="touch-active"
-          style={{
-            backgroundColor: '#414833', // Deep Forest Olive
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: '14px',
-            padding: '18px 20px',
-            cursor: 'pointer',
-            textAlign: 'right',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '130px',
-            boxShadow: '0 4px 10px rgba(65, 72, 51, 0.25)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <BookUser size={22} color="#FFFFFF" />
-            </div>
-            <span
-              style={{
-                fontSize: '11px',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 800,
-                padding: '2px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#282E20',
-                color: '#F4F5EE',
-              }}
-            >
-              Alt+K
-            </span>
-          </div>
-
-          <div>
-            <div
-              className="font-nastaleeq"
-              style={{ fontSize: '19px', fontWeight: 900, color: '#FFFFFF' }}
-            >
-              ادھار کھاتہ و کیش وصولی
-            </div>
-            <div
-              className="font-nastaleeq"
-              style={{ fontSize: '12.5px', color: '#E8EAE0', marginTop: '2px' }}
-            >
-              کسٹمر بقایا جات چیک کریں اور ادائیگی ریکارڈ کریں
-            </div>
-          </div>
-        </button>
+        ))}
       </div>
 
-      {/* 3. Biller Shift KPIs Row */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '12px',
-          direction: 'rtl',
+      {/* 3. Relative Color Filled Key Metrics Row */}
+      <ShiftKpiCards
+        todaySales={184500}
+        creditRecovery={42000}
+        todayPisaiKg={1250}
+        cashDrawerBalance={126500}
+        onCardClick={(metric) => {
+          if (metric === 'sales') onNewBill();
+          else if (metric === 'pisai') onNewPisaiToken();
+          else if (metric === 'recovery') onViewUdhaar();
         }}
-      >
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            border: '1.5px solid #C2C5AA',
-            borderRadius: '12px',
-            padding: '14px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-          }}
-        >
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '8px',
-              backgroundColor: '#F4F5EE',
-              color: '#7F4F24',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid #C2C5AA',
-            }}
-          >
-            <DollarSign size={20} />
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', color: '#656D4A', fontWeight: 700 }} className="font-nastaleeq">
-              کاؤنٹر کیش دراز (Cash in Drawer)
-            </div>
-            <div style={{ fontSize: '18px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)' }}>
-              Rs. 126,500
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            border: '1.5px solid #C2C5AA',
-            borderRadius: '12px',
-            padding: '14px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-          }}
-        >
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '8px',
-              backgroundColor: '#F4F5EE',
-              color: '#656D4A',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid #C2C5AA',
-            }}
-          >
-            <Receipt size={20} />
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', color: '#656D4A', fontWeight: 700 }} className="font-nastaleeq">
-              آج جاری کردہ بلز (Shift Invoices)
-            </div>
-            <div style={{ fontSize: '18px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)' }}>
-              48 بلز
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            border: '1.5px solid #C2C5AA',
-            borderRadius: '12px',
-            padding: '14px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-          }}
-        >
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '8px',
-              backgroundColor: '#F4F5EE',
-              color: '#414833',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid #C2C5AA',
-            }}
-          >
-            <Scale size={20} />
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', color: '#656D4A', fontWeight: 700 }} className="font-nastaleeq">
-              آج کی پسائی گندم (Grinding Weight)
-            </div>
-            <div style={{ fontSize: '18px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)' }}>
-              1,250 کلوگرام
-            </div>
-          </div>
-        </div>
-      </div>
+      />
 
       {/* 4. Operational Queue & Invoices */}
       <div
