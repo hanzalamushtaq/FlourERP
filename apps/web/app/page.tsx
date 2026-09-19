@@ -8,13 +8,14 @@ import { ProductBillingScreen } from '../components/billing/ProductBillingScreen
 import { PisaiBillingScreen } from '../components/billing/PisaiBillingScreen';
 import { CustomerLedgerView } from '../components/admin/CustomerLedgerView';
 import { ReportsView } from '../components/admin/ReportsView';
+import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { DailyPriceModal } from '../components/admin/DailyPriceModal';
 import { PinLockOverlay } from '../components/ui/PinLockOverlay';
 import { ZReportModal } from '../components/admin/ZReportModal';
 import { ReceiptPreviewModal, ReceiptData } from '../components/ui/ReceiptPreviewModal';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin'>('dashboard');
   const [userRole, setUserRole] = useState<'admin' | 'biller'>('biller');
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
@@ -157,6 +158,20 @@ export default function Home() {
           {activeTab === 'reports' && (
             <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               <ReportsView />
+            </div>
+          )}
+
+          {activeTab === 'admin' && (
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              <AdminDashboard
+                onOpenPriceModal={() => setIsPriceModalOpen(true)}
+                onNavigateTab={(tab) => {
+                  if (tab === 'billing') setActiveTab('billing');
+                  else if (tab === 'pisai') setActiveTab('pisai');
+                  else if (tab === 'udhaar') setActiveTab('udhaar');
+                  else if (tab === 'reports') setActiveTab('reports');
+                }}
+              />
             </div>
           )}
 

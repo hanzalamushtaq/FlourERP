@@ -13,11 +13,12 @@ import {
   Calculator,
   Lock,
   Printer,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface PosSidebarProps {
-  currentTab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock';
-  onSelectTab: (tab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock') => void;
+  currentTab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin';
+  onSelectTab: (tab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin') => void;
   onOpenPriceModal: () => void;
   onLock: () => void;
   operatorName?: string;
@@ -79,6 +80,12 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       label: 'روزنامچہ و حساب',
       icon: <Calculator size={18} />,
       onClick: () => onSelectTab('reports'),
+    },
+    {
+      id: 'admin',
+      label: 'ایڈمن و اختیارات (RBAC)',
+      icon: <ShieldCheck size={18} />,
+      onClick: () => onSelectTab('admin'),
     },
   ];
 

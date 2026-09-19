@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { DailyPriceModal } from './DailyPriceModal';
+import { RoleManagementModal } from './RoleManagementModal';
 import {
   TrendingUp,
   Sparkles,
@@ -26,6 +27,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onNavigateTab,
 }) => {
   const [closingTriggered, setClosingTriggered] = useState(false);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
   const handleDailyClosing = () => {
     const confirmClosing = window.confirm(
@@ -66,7 +68,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => setIsRoleModalOpen(true)}
+            className="touch-active"
+            style={{
+              height: '42px',
+              padding: '0 16px',
+              borderRadius: '8px',
+              backgroundColor: '#7F4F24',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '13.5px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 2px 4px rgba(127, 79, 36, 0.2)',
+            }}
+          >
+            <ShieldCheck size={16} color="#FFFFFF" /> سٹاف رولز و اختیارات (RBAC)
+          </button>
+
           <button
             type="button"
             onClick={onOpenPriceModal}
@@ -330,6 +355,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Role & Permission Management Modal */}
+      <RoleManagementModal
+        isOpen={isRoleModalOpen}
+        onClose={() => setIsRoleModalOpen(false)}
+      />
     </div>
   );
 };
