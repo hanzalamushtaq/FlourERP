@@ -111,14 +111,14 @@ export const ProductBillingScreen: React.FC = () => {
     customerPhoneInputRef.current?.focus();
   };
 
-  // Submit Logic: If customer details are entered, it automatically saves as Credit
+  // Submit Handler
   const handleFinalSubmit = (forcedCredit?: boolean) => {
     if (rate <= 0) {
-      alert('Cannot bill: Rate not set for this product!');
+      alert('اس پروڈکٹ کا ریٹ مقرر نہیں ہے۔ برائے مہربانی ریٹ لسٹ اپ ڈیٹ کریں۔');
       return;
     }
     if (calculatedWeight <= 0) {
-      alert('Please enter weight or amount.');
+      alert('برائے مہربانی صحیح وزن درج کریں۔');
       weightInputRef.current?.focus();
       return;
     }
@@ -126,15 +126,15 @@ export const ProductBillingScreen: React.FC = () => {
     const hasCustomerDetails = customerName.trim().length > 0;
     const isCreditSale = forcedCredit !== undefined ? forcedCredit : (hasCustomerDetails || balanceRemaining > 0);
 
-    const nextBillNum = `BILL-${String(billCounter).padStart(5, '0')}`;
+    const billNumberFormatted = String(billCounter).padStart(5, '0');
     setBillCounter((prev) => prev + 1);
 
     const receipt: ReceiptData = {
       type: 'product',
-      billNumber: nextBillNum,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric', year: 'numeric' }),
-      billerName: 'Biller 1 (Counter)',
-      customerName: hasCustomerDetails ? `${customerName.trim()} ${customerPhone.trim() ? `(${customerPhone.trim()})` : ''}` : undefined,
+      billNumber: billNumberFormatted,
+      timestamp: new Date().toLocaleString('en-US', { hour12: true }),
+      billerName: 'محمد عاصف (کاؤنٹر 01)',
+      customerName: customerName.trim() || undefined,
       isCredit: isCreditSale,
       items: [
         {
@@ -157,9 +157,16 @@ export const ProductBillingScreen: React.FC = () => {
   };
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      {/* 1. TOP: Fitted Product Selection Cards - Clear, Prominent & Readable */}
-      <div className="product-grid-responsive">
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* 1. TOP: Compact Product Selection Cards */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: '8px',
+          width: '100%',
+        }}
+      >
         {products.map((p) => {
           const isSelected = selectedProduct.id === p.id;
           const isRateSet = p.ratePerKg > 0;
@@ -175,61 +182,56 @@ export const ProductBillingScreen: React.FC = () => {
               className="touch-active"
               style={{
                 padding: '8px 10px',
-                borderRadius: '10px',
-                backgroundColor: isSelected ? '#DCE0CE' : '#FFFFFF',
-                border: isSelected ? '2.5px solid #7F4F24' : '1.5px solid #B6AD90',
-                boxShadow: isSelected ? '0 4px 10px rgba(127, 79, 36, 0.2)' : '0 1px 4px rgba(65, 72, 51, 0.06)',
+                borderRadius: '8px',
+                backgroundColor: isSelected ? '#fffbeb' : '#ffffff',
+                border: isSelected ? '1.5px solid #d97706' : '1px solid #e2e8f0',
+                boxShadow: isSelected ? '0 1px 4px rgba(217, 119, 6, 0.15)' : 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                minHeight: '86px',
-                transition: 'all 0.12s ease',
+                minHeight: '68px',
+                transition: 'all 0.1s ease',
               }}
             >
               {/* Top Row: Icon + Rate Badge */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '20px' }}>{p.icon || '🌾'}</span>
+                <span style={{ fontSize: '16px' }}>{p.icon || '🌾'}</span>
                 <span
                   style={{
-                    fontWeight: 800,
-                    fontSize: '12px',
+                    fontWeight: 700,
+                    fontSize: '11px',
                     fontFamily: 'var(--font-mono)',
-                    color: isSelected ? '#F4F5EE' : '#414833',
-                    backgroundColor: isSelected ? '#7F4F24' : '#C2C5AA',
-                    padding: '2px 7px',
-                    borderRadius: '6px',
-                    border: '1px solid #B6AD90',
+                    color: isSelected ? '#b45309' : '#475569',
+                    backgroundColor: isSelected ? '#fef3c7' : '#f1f5f9',
+                    padding: '1px 6px',
+                    borderRadius: '4px',
                   }}
                 >
-                  {isRateSet ? ('Rs ' + p.ratePerKg) : '⚠️ Unset'}
+                  {isRateSet ? `Rs ${p.ratePerKg}` : 'Unset'}
                 </span>
               </div>
 
-              {/* Middle: Clear Urdu Nastaleeq */}
+              {/* Middle: Urdu Name */}
               <div
                 className="font-nastaleeq"
                 style={{
-                  fontSize: '18px',
+                  fontSize: '14px',
                   fontWeight: 800,
-                  color: '#414833',
-                  lineHeight: 1.25,
+                  color: isSelected ? '#92400e' : '#0f172a',
+                  lineHeight: 1.2,
                   textAlign: 'center',
                 }}
               >
                 {p.nameUr}
               </div>
 
-              {/* Bottom: Crisp English Subtitle Badge */}
+              {/* Bottom: English Name */}
               <div
                 style={{
-                  fontSize: '11.5px',
-                  fontWeight: 800,
-                  color: '#656D4A',
+                  fontSize: '10.5px',
+                  color: '#64748b',
                   textAlign: 'center',
-                  backgroundColor: '#F4F5EE',
-                  borderRadius: '5px',
-                  padding: '2px 6px',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -242,43 +244,44 @@ export const ProductBillingScreen: React.FC = () => {
         })}
       </div>
 
-      {/* 2. BALANCED 2-COLUMN ZERO-SCROLL POS BILLING GRID */}
-      <div className="billing-grid-responsive">
+      {/* 2. 2-COLUMN BALANCED BILLING GRID */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(320px, 1.4fr) minmax(280px, 1fr)',
+          gap: '12px',
+          alignItems: 'start',
+        }}
+      >
         {/* LEFT COLUMN: Entry Fields */}
         <div
           style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '12px',
-            border: '1.5px solid #B6AD90',
-            padding: '14px 18px',
+            backgroundColor: '#ffffff',
+            borderRadius: '10px',
+            border: '1px solid #e2e8f0',
+            padding: '14px 16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
-            boxShadow: '0 2px 8px rgba(65, 72, 51, 0.06)',
           }}
         >
-          {/* Selected Product Header Strip - Horizontal Inline */}
+          {/* Selected Product Strip & Mode Switcher */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottom: '1.5px solid #E8EAE0',
+              borderBottom: '1px solid #f1f5f9',
               paddingBottom: '8px',
-              flexWrap: 'wrap',
-              gap: '8px',
+              direction: 'rtl',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '22px' }}>{selectedProduct.icon}</span>
-              <span className="font-nastaleeq" style={{ fontSize: '19px', fontWeight: 800, color: '#414833' }}>
+              <span className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>
                 {selectedProduct.nameUr}
               </span>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: '#656D4A' }}>
-                ({selectedProduct.nameEn})
-              </span>
-              <span style={{ fontSize: '13.5px', fontWeight: 800, color: '#7F4F24', fontFamily: 'var(--font-mono)' }}>
-                • Rs {selectedProduct.ratePerKg}/KG
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#d97706', fontFamily: 'var(--font-mono)' }}>
+                Rs {selectedProduct.ratePerKg}/KG
               </span>
             </div>
 
@@ -286,11 +289,10 @@ export const ProductBillingScreen: React.FC = () => {
             <div
               style={{
                 display: 'flex',
-                backgroundColor: '#C2C5AA',
-                padding: '3px',
-                borderRadius: '8px',
-                border: '1px solid #B6AD90',
-                gap: '4px',
+                backgroundColor: '#f1f5f9',
+                padding: '2px',
+                borderRadius: '6px',
+                gap: '2px',
               }}
             >
               <button
@@ -302,21 +304,21 @@ export const ProductBillingScreen: React.FC = () => {
                   weightInputRef.current?.focus();
                 }}
                 style={{
-                  padding: '5px 12px',
-                  borderRadius: '6px',
+                  padding: '4px 10px',
+                  borderRadius: '5px',
                   border: 'none',
-                  backgroundColor: calcMode === 'weight' ? '#414833' : 'transparent',
-                  color: calcMode === 'weight' ? '#F4F5EE' : '#414833',
-                  fontSize: '12.5px',
-                  fontWeight: 800,
+                  backgroundColor: calcMode === 'weight' ? '#0f172a' : 'transparent',
+                  color: calcMode === 'weight' ? '#ffffff' : '#475569',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '4px',
                 }}
               >
-                <Scale size={15} color={calcMode === 'weight' ? '#F4F5EE' : '#414833'} />
-                <span>وزن (Weight)</span>
+                <Scale size={13} />
+                <span className="font-nastaleeq">وزن</span>
               </button>
 
               <button
@@ -328,38 +330,30 @@ export const ProductBillingScreen: React.FC = () => {
                   weightInputRef.current?.focus();
                 }}
                 style={{
-                  padding: '5px 12px',
-                  borderRadius: '6px',
+                  padding: '4px 10px',
+                  borderRadius: '5px',
                   border: 'none',
-                  backgroundColor: calcMode === 'amount' ? '#414833' : 'transparent',
-                  color: calcMode === 'amount' ? '#F4F5EE' : '#414833',
-                  fontSize: '12.5px',
-                  fontWeight: 800,
+                  backgroundColor: calcMode === 'amount' ? '#0f172a' : 'transparent',
+                  color: calcMode === 'amount' ? '#ffffff' : '#475569',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '4px',
                 }}
               >
-                <Banknote size={15} color={calcMode === 'amount' ? '#F4F5EE' : '#414833'} />
-                <span>رقم (Rupees)</span>
+                <Banknote size={13} />
+                <span className="font-nastaleeq">رقم</span>
               </button>
             </div>
           </div>
 
-          {/* Weight Entry + Quick Add Row */}
+          {/* Weight / Amount Entry */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span className="font-nastaleeq" style={{ fontSize: '17px', fontWeight: 800, color: '#414833' }}>
-                  {calcMode === 'weight' ? 'وزن درج کریں' : 'مطلوبہ رقم درج کریں'}
-                </span>
-                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#656D4A' }}>
-                  {calcMode === 'weight' ? '(Weight - KG)' : '(Rupees - Rs)'}
-                </span>
-              </div>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#7F4F24', fontFamily: 'var(--font-mono)' }}>
-                {'Rate: Rs ' + rate + '/KG'}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', direction: 'rtl' }}>
+              <span className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#334155' }}>
+                {calcMode === 'weight' ? 'وزن درج کریں (KG):' : 'مطلوبہ رقم درج کریں (Rs):'}
               </span>
             </div>
 
@@ -382,34 +376,34 @@ export const ProductBillingScreen: React.FC = () => {
                 }}
                 style={{
                   width: '100%',
-                  height: '52px',
-                  borderRadius: '9px',
-                  border: '2px solid #B6AD90',
-                  backgroundColor: '#F4F5EE',
-                  fontSize: '28px',
-                  fontWeight: 900,
+                  height: '42px',
+                  borderRadius: '6px',
+                  border: '1.5px solid #cbd5e1',
+                  backgroundColor: '#f8fafc',
+                  fontSize: '18px',
+                  fontWeight: 800,
                   fontFamily: 'var(--font-mono)',
-                  color: '#414833',
-                  padding: '0 50px 0 14px',
+                  color: '#0f172a',
+                  padding: '0 40px 0 12px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '16px', fontSize: '15px', fontWeight: 900, color: '#414833' }}>
+              <span style={{ position: 'absolute', right: '12px', fontSize: '13px', fontWeight: 800, color: '#64748b' }}>
                 {calcMode === 'weight' ? 'KG' : 'Rs'}
               </span>
             </div>
 
-            {/* Quick-Tap Weight Increments */}
+            {/* Weight Quick Pills */}
             {calcMode === 'weight' && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginTop: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginTop: '6px' }}>
                 {[
-                  { label: '5 KG (کلو)', val: 5 },
-                  { label: '10 KG (کلو)', val: 10 },
-                  { label: '20 KG (کلو)', val: 20 },
-                  { label: '40 KG (بوری)', val: 40 },
+                  { label: '5 KG', val: 5 },
+                  { label: '10 KG', val: 10 },
+                  { label: '20 KG', val: 20 },
+                  { label: '40 KG', val: 40 },
                 ].map((pill) => (
                   <button
-                    key={pill.label}
+                    key={pill.val}
                     type="button"
                     onClick={() => {
                       setInputValue(String(pill.val));
@@ -418,15 +412,15 @@ export const ProductBillingScreen: React.FC = () => {
                     }}
                     className="touch-active"
                     style={{
-                      padding: '8px 6px',
-                      borderRadius: '8px',
-                      backgroundColor: numInput === pill.val ? '#7F4F24' : '#C2C5AA',
-                      color: numInput === pill.val ? '#F4F5EE' : '#414833',
-                      border: numInput === pill.val ? '2px solid #7F4F24' : '1.5px solid #B6AD90',
+                      padding: '5px 4px',
+                      borderRadius: '5px',
+                      backgroundColor: numInput === pill.val ? '#0f172a' : '#f1f5f9',
+                      color: numInput === pill.val ? '#ffffff' : '#334155',
+                      border: '1px solid #e2e8f0',
                       cursor: 'pointer',
                       textAlign: 'center',
-                      fontSize: '13.5px',
-                      fontWeight: 800,
+                      fontSize: '12px',
+                      fontWeight: 700,
                     }}
                   >
                     {pill.label}
@@ -438,15 +432,10 @@ export const ProductBillingScreen: React.FC = () => {
 
           {/* Cash Received Row */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span className="font-nastaleeq" style={{ fontSize: '17px', fontWeight: 800, color: '#414833' }}>
-                  وصول رقم
-                </span>
-                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#656D4A' }}>
-                  (Cash Received - Rs)
-                </span>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', direction: 'rtl' }}>
+              <span className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#334155' }}>
+                وصول رقم (Rs):
+              </span>
               <button
                 type="button"
                 onClick={() => {
@@ -455,17 +444,19 @@ export const ProductBillingScreen: React.FC = () => {
                 }}
                 className="touch-active"
                 style={{
-                  background: '#C2C5AA',
-                  border: '1.5px solid #B6AD90',
-                  borderRadius: '6px',
-                  padding: '5px 12px',
-                  fontSize: '12.5px',
-                  fontWeight: 800,
-                  color: '#414833',
+                  background: 'none',
+                  border: 'none',
+                  color: '#0284c7',
+                  fontSize: '12px',
+                  fontWeight: 700,
                   cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px',
                 }}
               >
-                ✓ پورے پیسے (Exact Cash)
+                <Check size={13} />
+                <span className="font-nastaleeq">مکمل ادا</span>
               </button>
             </div>
 
@@ -487,352 +478,268 @@ export const ProductBillingScreen: React.FC = () => {
                 }}
                 style={{
                   width: '100%',
-                  height: '48px',
-                  borderRadius: '9px',
-                  border: '2px solid #B6AD90',
-                  backgroundColor: '#F4F5EE',
-                  fontSize: '26px',
-                  fontWeight: 900,
+                  height: '42px',
+                  borderRadius: '6px',
+                  border: '1.5px solid #cbd5e1',
+                  backgroundColor: '#f8fafc',
+                  fontSize: '18px',
+                  fontWeight: 800,
                   fontFamily: 'var(--font-mono)',
-                  color: '#414833',
-                  padding: '0 48px 0 14px',
+                  color: '#0f172a',
+                  padding: '0 40px 0 12px',
                   outline: 'none',
                 }}
               />
-              <span style={{ position: 'absolute', right: '16px', fontSize: '15px', fontWeight: 900, color: '#414833' }}>
+              <span style={{ position: 'absolute', right: '12px', fontSize: '13px', fontWeight: 800, color: '#64748b' }}>
                 Rs
               </span>
             </div>
           </div>
 
-          {/* Customer Details for Udhaar */}
-          <div
-            style={{
-              position: 'relative',
-              backgroundColor: '#F4F5EE',
-              borderRadius: '10px',
-              border: '1.5px solid #B6AD90',
-              padding: '10px 14px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <UserCheck size={16} color="#414833" />
-                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833' }}>
-                  گاہک کا نام و فون
+          {/* Customer Name (Udhaar / Optional) */}
+          <div style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', direction: 'rtl' }}>
+              <span className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#334155' }}>
+                گاہک کا نام (اختیاری):
+              </span>
+              {balanceRemaining > 0 && (
+                <span className="font-nastaleeq" style={{ fontSize: '11px', color: '#b91c1c', fontWeight: 700 }}>
+                  * ادھار کے لیے نام ضروری ہے
                 </span>
-                <span style={{ fontSize: '12px', color: '#656D4A', fontWeight: 700 }}>
-                  (Customer - ادھار کھاتہ)
-                </span>
-              </div>
-              <span style={{ fontSize: '11px', color: '#656D4A', fontWeight: 600 }}>Type name for list</span>
+              )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
-              <div style={{ position: 'relative' }}>
-                <input
-                  ref={customerNameInputRef}
-                  type="text"
-                  placeholder="گاہک کا نام / Name..."
-                  value={customerName}
-                  onChange={(e) => handleCustomerNameChange(e.target.value)}
-                  onFocus={() => {
-                    if (customerName.trim().length > 0 && suggestions.length > 0) setShowSuggestions(true);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (customerName.trim()) {
-                        customerPhoneInputRef.current?.focus();
-                      } else {
-                        handleFinalSubmit(false);
-                      }
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    height: '38px',
-                    padding: '4px 10px',
-                    borderRadius: '7px',
-                    border: '1.5px solid #B6AD90',
-                    fontSize: '13.5px',
-                    fontWeight: 700,
-                    outline: 'none',
-                    backgroundColor: '#FFFFFF',
-                    color: '#414833',
-                  }}
-                />
+            <input
+              ref={customerNameInputRef}
+              type="text"
+              placeholder="گاہک کا نام لکھیں..."
+              value={customerName}
+              onChange={(e) => handleCustomerNameChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  customerPhoneInputRef.current?.focus();
+                }
+              }}
+              className="font-nastaleeq"
+              style={{
+                width: '100%',
+                height: '38px',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e1',
+                backgroundColor: '#ffffff',
+                padding: '0 10px',
+                fontSize: '13px',
+                outline: 'none',
+                textAlign: 'right',
+              }}
+            />
 
-                {/* Suggestions Dropdown */}
-                {showSuggestions && suggestions.length > 0 && (
+            {/* Suggestions Dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  left: 0,
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  zIndex: 50,
+                  marginTop: '2px',
+                  maxHeight: '160px',
+                  overflowY: 'auto',
+                }}
+              >
+                {suggestions.map((c) => (
                   <div
+                    key={c.id}
+                    onClick={() => handleSelectCustomer(c)}
+                    className="touch-active"
                     style={{
-                      position: 'absolute',
-                      top: '42px',
-                      left: 0,
-                      right: 0,
-                      backgroundColor: '#FFFFFF',
-                      border: '1.5px solid #B6AD90',
-                      borderRadius: '8px',
-                      boxShadow: '0 6px 16px rgba(65, 72, 51, 0.2)',
-                      zIndex: 200,
-                      maxHeight: '140px',
-                      overflowY: 'auto',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #f1f5f9',
+                      fontSize: '12px',
+                      textAlign: 'right',
                     }}
                   >
-                    {suggestions.map((cust) => (
-                      <div
-                        key={cust.id}
-                        onClick={() => handleSelectCustomer(cust)}
-                        className="touch-active"
-                        style={{
-                          padding: '8px 12px',
-                          borderBottom: '1px solid #E8EAE0',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#414833' }}>{cust.name}</span>
-                        <span style={{ fontSize: '11px', color: '#656D4A', fontWeight: 600 }}>{cust.phone}</span>
-                      </div>
-                    ))}
+                    <span className="font-nastaleeq" style={{ fontWeight: 700 }}>{c.name}</span>
+                    <span style={{ color: '#64748b', fontSize: '11px', marginRight: '6px' }}>{c.phone}</span>
                   </div>
-                )}
+                ))}
               </div>
-
-              <div>
-                <input
-                  ref={customerPhoneInputRef}
-                  type="text"
-                  placeholder="موبائل نمبر / Phone..."
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleFinalSubmit(true);
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    height: '38px',
-                    padding: '4px 10px',
-                    borderRadius: '7px',
-                    border: '1.5px solid #B6AD90',
-                    fontSize: '13.5px',
-                    outline: 'none',
-                    backgroundColor: '#FFFFFF',
-                    color: '#414833',
-                  }}
-                />
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Total Amount & 2 Prominent Action Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* RIGHT COLUMN: Total Bill Box & Action Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {/* Total Bill Box */}
           <div
             style={{
-              backgroundColor: '#C2C5AA',
-              borderRadius: '12px',
-              border: '2px solid #B6AD90',
-              padding: '16px 20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '10px',
+              border: '1.5px solid #e2e8f0',
+              padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px',
-              boxShadow: '0 4px 10px rgba(65, 72, 51, 0.08)',
+              gap: '10px',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 800, color: '#414833' }}>
-                  کل رقم
-                </span>
-                <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#656D4A' }}>
-                  (TOTAL BILL)
-                </span>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl' }}>
+              <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>
+                کل رقم
+              </span>
               <span
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 800,
-                  color: '#414833',
-                  backgroundColor: '#F4F5EE',
-                  padding: '3px 9px',
-                  borderRadius: '6px',
-                  border: '1.5px solid #B6AD90',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  color: '#475569',
+                  backgroundColor: '#f1f5f9',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
                 }}
               >
-                {calculatedWeight + ' KG @ Rs ' + rate}
+                {calculatedWeight} KG @ Rs {rate}
               </span>
             </div>
 
-            {/* Clear, Prominent Bill Figure */}
+            {/* Total Figure */}
             <div
               style={{
-                fontSize: '40px',
+                fontSize: '28px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: '#414833',
-                lineHeight: 1,
-                margin: '6px 0 4px',
+                color: '#0f172a',
+                lineHeight: 1.1,
                 letterSpacing: '-0.5px',
               }}
             >
-              {'Rs ' + netTotal.toLocaleString()}
+              Rs {netTotal.toLocaleString()}
             </div>
 
             {/* Balance or Return Status */}
             {balanceRemaining > 0 ? (
               <div
                 style={{
-                  backgroundColor: '#F4F5EE',
-                  border: '1.5px solid #656D4A',
-                  borderRadius: '7px',
-                  padding: '7px 12px',
+                  backgroundColor: '#fef3c7',
+                  border: '1px solid #fde68a',
+                  borderRadius: '6px',
+                  padding: '6px 10px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  direction: 'rtl',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 800, color: '#656D4A' }}>
-                    باقی ادھار
-                  </span>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#656D4A' }}>
-                    (Remaining):
-                  </span>
-                </div>
-                <span style={{ fontSize: '17px', fontWeight: 900, color: '#656D4A', fontFamily: 'var(--font-mono)' }}>
-                  {'Rs ' + balanceRemaining.toLocaleString()}
+                <span className="font-nastaleeq" style={{ fontSize: '12px', fontWeight: 800, color: '#b45309' }}>
+                  باقی ادھار:
+                </span>
+                <span style={{ fontSize: '14px', fontWeight: 900, color: '#b45309', fontFamily: 'var(--font-mono)' }}>
+                  Rs {balanceRemaining.toLocaleString()}
                 </span>
               </div>
             ) : changeToReturn > 0 ? (
               <div
                 style={{
-                  backgroundColor: '#F4F5EE',
-                  border: '1.5px solid #7F4F24',
-                  borderRadius: '7px',
-                  padding: '7px 12px',
+                  backgroundColor: '#ecfdf5',
+                  border: '1px solid #a7f3d0',
+                  borderRadius: '6px',
+                  padding: '6px 10px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  direction: 'rtl',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 800, color: '#7F4F24' }}>
-                    گاہک کو واپسی
-                  </span>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#7F4F24' }}>
-                    (Return):
-                  </span>
-                </div>
-                <span style={{ fontSize: '17px', fontWeight: 900, color: '#7F4F24', fontFamily: 'var(--font-mono)' }}>
-                  {'Rs ' + changeToReturn.toLocaleString()}
+                <span className="font-nastaleeq" style={{ fontSize: '12px', fontWeight: 800, color: '#047857' }}>
+                  گاہک کو واپسی:
+                </span>
+                <span style={{ fontSize: '14px', fontWeight: 900, color: '#047857', fontFamily: 'var(--font-mono)' }}>
+                  Rs {changeToReturn.toLocaleString()}
                 </span>
               </div>
-            ) : (
-              <div
-                style={{
-                  backgroundColor: '#F4F5EE',
-                  border: '1.5px solid #B6AD90',
-                  borderRadius: '7px',
-                  padding: '6px 8px',
-                  textAlign: 'center',
-                  fontSize: '13px',
-                  fontWeight: 800,
-                  color: '#414833',
-                }}
-              >
-                ✓ مکمل نقد ادائیگی (Exact Cash Paid)
-              </div>
-            )}
+            ) : null}
 
-            {/* Discount Option */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px dashed #B6AD90' }}>
+            {/* Discount Option Toggle */}
+            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '8px' }}>
               <button
                 type="button"
                 onClick={() => setShowDiscount(!showDiscount)}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#414833',
-                  fontSize: '12.5px',
-                  fontWeight: 800,
+                  color: '#64748b',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '4px',
                 }}
               >
-                <Tag size={14} color="#414833" />
-                <span>{showDiscount ? 'رعایت بند کریں' : '+ رعایت شامل کریں (+ Add Discount)'}</span>
+                <Tag size={12} />
+                <span className="font-nastaleeq">رعایت شامل کریں (+ Discount)</span>
               </button>
+
               {showDiscount && (
-                <input
-                  type="number"
-                  placeholder="Rs"
-                  value={discountValue}
-                  onChange={(e) => {
-                    setDiscountValue(e.target.value);
-                    setIsReceivedAutoUpdated(true);
-                  }}
-                  style={{
-                    width: '75px',
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    border: '1.5px solid #414833',
-                    backgroundColor: '#F4F5EE',
-                    color: '#414833',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    outline: 'none',
-                  }}
-                />
+                <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <input
+                    type="number"
+                    placeholder="رعایت رقم"
+                    value={discountValue}
+                    onChange={(e) => {
+                      setDiscountValue(e.target.value);
+                      setIsReceivedAutoUpdated(true);
+                    }}
+                    style={{
+                      width: '80px',
+                      height: '32px',
+                      padding: '0 8px',
+                      borderRadius: '5px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '12px',
+                      fontFamily: 'var(--font-mono)',
+                    }}
+                  />
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>Rs</span>
+                </div>
               )}
             </div>
           </div>
 
-          {/* 2 ACTION BUTTONS - PROMINENT, TOUCH FRIENDLY & PERFECT FIT */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* BUTTON 1: PRINT CASH BILL */}
+          {/* 2 Clean Action Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {/* Button 1: Print Cash Bill */}
             <button
               type="button"
               onClick={() => handleFinalSubmit(false)}
               disabled={rate <= 0 || calculatedWeight <= 0}
               className="touch-active"
               style={{
-                height: '54px',
-                borderRadius: '11px',
-                backgroundColor: rate > 0 && calculatedWeight > 0 ? '#7F4F24' : '#C2C5AA',
-                color: '#F4F5EE',
+                height: '44px',
+                borderRadius: '8px',
+                backgroundColor: rate > 0 && calculatedWeight > 0 ? '#15803d' : '#94a3b8',
+                color: '#ffffff',
                 border: 'none',
                 cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
-                boxShadow: rate > 0 && calculatedWeight > 0 ? '0 4px 12px rgba(127, 79, 36, 0.28)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '10px',
-                padding: '0 20px',
+                gap: '8px',
+                padding: '0 16px',
               }}
             >
-              <Printer size={22} color="#F4F5EE" strokeWidth={2.4} />
-              <span className="font-nastaleeq" style={{ fontSize: '21px', fontWeight: 800, color: '#F4F5EE' }}>
+              <Printer size={16} />
+              <span className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 800 }}>
                 نقد بل پرنٹ کریں
-              </span>
-              <span style={{ fontSize: '13.5px', fontWeight: 800, color: '#F4F5EE', opacity: 0.9 }}>
-                (Print Cash Bill)
               </span>
             </button>
 
-            {/* BUTTON 2: SAVE AS CREDIT */}
+            {/* Button 2: Save as Credit */}
             <button
               type="button"
               onClick={() => {
@@ -845,26 +752,22 @@ export const ProductBillingScreen: React.FC = () => {
               disabled={rate <= 0 || calculatedWeight <= 0}
               className="touch-active"
               style={{
-                height: '48px',
-                borderRadius: '11px',
-                backgroundColor: rate > 0 && calculatedWeight > 0 ? '#656D4A' : '#C2C5AA',
-                color: '#F4F5EE',
+                height: '40px',
+                borderRadius: '8px',
+                backgroundColor: rate > 0 && calculatedWeight > 0 ? '#0f172a' : '#94a3b8',
+                color: '#ffffff',
                 border: 'none',
                 cursor: rate > 0 && calculatedWeight > 0 ? 'pointer' : 'not-allowed',
-                boxShadow: rate > 0 && calculatedWeight > 0 ? '0 4px 10px rgba(101, 109, 74, 0.25)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '10px',
-                padding: '0 20px',
+                gap: '8px',
+                padding: '0 16px',
               }}
             >
-              <BookOpen size={19} color="#F4F5EE" strokeWidth={2.4} />
-              <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 800, color: '#F4F5EE' }}>
+              <BookOpen size={15} />
+              <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800 }}>
                 ادھار کھاتہ میں محفوظ کریں
-              </span>
-              <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#F4F5EE', opacity: 0.9 }}>
-                (Save as Credit)
               </span>
             </button>
           </div>
@@ -881,5 +784,6 @@ export const ProductBillingScreen: React.FC = () => {
         }}
         data={receiptData}
       />
-    </div>);
+    </div>
+  );
 };

@@ -1,12 +1,13 @@
+'use strict';
 'use client';
 
 import React, { useState } from 'react';
-import { X, CheckCircle2, Clock, ShieldCheck, AlertCircle, Save } from 'lucide-react';
+import { Clock, Check, AlertCircle, ShieldCheck, X } from 'lucide-react';
 
 interface DailyPriceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  isAdmin?: boolean;
+  isAdmin: boolean;
 }
 
 interface PriceItem {
@@ -17,22 +18,22 @@ interface PriceItem {
   todayRate: number;
 }
 
+const INITIAL_PRICES: PriceItem[] = [
+  { id: '1', nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (گندم)', yesterdayRate: 140, todayRate: 140 },
+  { id: '2', nameEn: 'Fine Atta', nameUr: 'فائن آٹا', yesterdayRate: 148, todayRate: 148 },
+  { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', yesterdayRate: 155, todayRate: 155 },
+  { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', yesterdayRate: 160, todayRate: 160 },
+  { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', yesterdayRate: 95, todayRate: 95 },
+  { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', yesterdayRate: 145, todayRate: 145 },
+];
+
 export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   isOpen,
   onClose,
-  isAdmin = true,
+  isAdmin,
 }) => {
-  const [prices, setPrices] = useState<PriceItem[]>([
-    { id: '1', nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (گندم)', yesterdayRate: 138, todayRate: 140 },
-    { id: '2', nameEn: 'Fine Atta', nameUr: 'فائن آٹا', yesterdayRate: 145, todayRate: 148 },
-    { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', yesterdayRate: 155, todayRate: 155 },
-    { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', yesterdayRate: 160, todayRate: 160 },
-    { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', yesterdayRate: 90, todayRate: 95 },
-    { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', yesterdayRate: 142, todayRate: 145 },
-  ]);
-
+  const [prices, setPrices] = useState<PriceItem[]>(INITIAL_PRICES);
   const [billerHoldState, setBillerHoldState] = useState<boolean>(false);
-  const [confirmed, setConfirmed] = useState<boolean>(false);
 
   if (!isOpen) return null;
 
@@ -43,11 +44,18 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   };
 
   const handleConfirmAll = () => {
-    setConfirmed(true);
-    setTimeout(() => {
-      setConfirmed(false);
-      onClose();
-    }, 1000);
+    alert('آج کے ریٹس محفوظ اور تصدیق کر لیے گئے ہیں۔');
+    onClose();
+  };
+
+  const handleBillerRequestUpdate = () => {
+    setBillerHoldState(true);
+    alert('ایڈمن کو ریٹ تبدیلی کی درخواست بھیج دی گئی ہے۔');
+  };
+
+  const handleBillerKeepPrevious = () => {
+    alert('کل والے ریٹس پر بلنگ جاری رکھی گئی ہے۔');
+    onClose();
   };
 
   return (
@@ -55,24 +63,25 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 9995,
-        backgroundColor: 'rgba(65, 72, 51, 0.65)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(15, 23, 42, 0.7)',
+        backdropFilter: 'blur(4px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '16px',
+        zIndex: 2000,
+        direction: 'rtl',
       }}
     >
       <div
         style={{
           width: '100%',
-          maxWidth: '560px',
-          backgroundColor: '#F4F5EE',
-          borderRadius: '16px',
+          maxWidth: '520px',
+          backgroundColor: '#ffffff',
+          borderRadius: '14px',
           overflow: 'hidden',
-          boxShadow: '0 20px 35px rgba(65, 72, 51, 0.25)',
-          border: '2px solid #B6AD90',
+          boxShadow: '0 20px 35px rgba(0, 0, 0, 0.2)',
+          border: '1px solid #cbd5e1',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
@@ -81,69 +90,48 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         {/* Header */}
         <div
           style={{
-            padding: '16px 20px',
-            backgroundColor: '#C2C5AA',
-            borderBottom: '1.5px solid #B6AD90',
+            padding: '14px 18px',
+            backgroundColor: '#0f172a',
+            color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Clock size={20} color="#414833" />
-              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#414833' }}>
-                Daily Price Confirmation
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Clock size={18} color="#fbbf24" />
+            <div>
+              <h2 className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 900, margin: 0 }}>
+                روزانہ نرخ نامہ کی تصدیق
               </h2>
-            </div>
-            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#414833' }}>
-              روزانہ نرخ نامہ کی تصدیق (24 گھنٹے میں ایک بار)
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>Daily Price Confirmation Protocol</div>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#414833' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
           >
-            <X size={22} />
+            <X size={18} />
           </button>
         </div>
 
-        {/* Informational Banner */}
-        <div
-          style={{
-            padding: '12px 20px',
-            backgroundColor: '#C2C5AA',
-            fontSize: '13px',
-            color: '#414833',
-            fontWeight: 700,
-            borderBottom: '1px solid #B6AD90',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <ShieldCheck size={18} color="#414833" />
-          <span>
-            First bill of the day protocol: Rates must be confirmed before counter sales proceed.
-          </span>
-        </div>
-
         {/* Product Rates Table */}
-        <div style={{ padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ padding: '16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: '2fr 1fr 1fr',
-              fontSize: '12px',
+              fontSize: '11.5px',
               fontWeight: 800,
-              color: '#414833',
-              paddingBottom: '4px',
-              borderBottom: '1.5px solid #B6AD90',
+              color: '#64748b',
+              paddingBottom: '6px',
+              borderBottom: '1px solid #e2e8f0',
             }}
           >
-            <span>PRODUCT (پروڈکٹ)</span>
-            <span style={{ textAlign: 'center' }}>YESTERDAY RATE</span>
-            <span style={{ textAlign: 'right' }}>TODAY RATE (Rs/KG)</span>
+            <span>پروڈکٹ (Product)</span>
+            <span style={{ textAlign: 'center' }}>کل کا ریٹ</span>
+            <span style={{ textAlign: 'left' }}>آج کا ریٹ (Rs/KG)</span>
           </div>
 
           {prices.map((item) => (
@@ -153,86 +141,60 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 display: 'grid',
                 gridTemplateColumns: '2fr 1fr 1fr',
                 alignItems: 'center',
-                padding: '10px 0',
-                borderBottom: '1px dashed #B6AD90',
+                padding: '8px 0',
+                borderBottom: '1px solid #f8fafc',
               }}
             >
               <div>
-                <div style={{ fontWeight: 800, fontSize: '14px', color: '#414833' }}>{item.nameEn}</div>
-                <div className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: '#414833' }}>
+                <div className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
                   {item.nameUr}
                 </div>
+                <div style={{ fontSize: '11px', color: '#64748b' }}>{item.nameEn}</div>
               </div>
 
-              <div style={{ textAlign: 'center', fontWeight: 700, color: '#414833' }}>
+              <div style={{ textAlign: 'center', fontWeight: 700, color: '#64748b', fontSize: '13px', fontFamily: 'var(--font-mono)' }}>
                 Rs {item.yesterdayRate}
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 {isAdmin ? (
                   <input
                     type="number"
                     value={item.todayRate}
                     onChange={(e) => handleRateChange(item.id, parseFloat(e.target.value) || 0)}
                     style={{
-                      width: '90px',
-                      padding: '8px 10px',
-                      borderRadius: '8px',
-                      border: '2px solid #B6AD90',
-                      backgroundColor: '#F4F5EE',
-                      color: '#414833',
-                      fontSize: '16px',
-                      fontWeight: 900,
+                      width: '80px',
+                      height: '34px',
+                      padding: '0 8px',
+                      borderRadius: '6px',
+                      border: '1.5px solid #cbd5e1',
+                      backgroundColor: '#f8fafc',
+                      color: '#0f172a',
+                      fontSize: '14px',
+                      fontWeight: 800,
                       fontFamily: 'var(--font-mono)',
-                      textAlign: 'right',
+                      textAlign: 'left',
                       outline: 'none',
                     }}
                   />
                 ) : (
-                  <span style={{ fontWeight: 900, fontSize: '16px', color: '#414833' }}>
+                  <span style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
                     Rs {item.todayRate}
                   </span>
                 )}
               </div>
             </div>
           ))}
-
-          {/* Biller Mode Test State */}
-          {!isAdmin && (
-            <div
-              style={{
-                backgroundColor: '#F4F5EE',
-                border: '1.5px solid #B6AD90',
-                borderRadius: '12px',
-                padding: '14px',
-                marginTop: '10px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={18} color="#414833" />
-                <span style={{ fontWeight: 800, fontSize: '13px', color: '#414833' }}>
-                  {billerHoldState
-                    ? 'BILL ON HOLD: Price change request sent to Admin!'
-                    : 'Biller Notice: You cannot edit rates directly.'}
-                </span>
-              </div>
-              <p style={{ fontSize: '12px', color: '#414833', marginTop: '4px', fontWeight: 600 }}>
-                {billerHoldState
-                  ? 'Counter bill is locked until Admin confirms or rejects new pricing.'
-                  : 'Click below to request rate update from Admin or keep previous rates to proceed.'}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Footer Actions */}
         <div
           style={{
-            padding: '16px 20px',
-            backgroundColor: '#C2C5AA',
-            borderTop: '1.5px solid #B6AD90',
+            padding: '12px 18px',
+            backgroundColor: '#f8fafc',
+            borderTop: '1px solid #e2e8f0',
             display: 'flex',
-            gap: '12px',
+            gap: '10px',
           }}
         >
           {isAdmin ? (
@@ -243,80 +205,79 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 className="touch-active"
                 style={{
                   flex: 1,
-                  height: '48px',
-                  borderRadius: '10px',
-                  backgroundColor: '#414833',
-                  color: '#F4F5EE',
+                  height: '40px',
+                  borderRadius: '8px',
+                  backgroundColor: '#15803d',
+                  color: '#ffffff',
                   border: 'none',
-                  fontSize: '15px',
+                  fontSize: '13px',
                   fontWeight: 800,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
+                  gap: '6px',
                 }}
               >
-                {confirmed ? <CheckCircle2 size={18} color="#F4F5EE" /> : <Save size={18} color="#F4F5EE" />}
-                {confirmed ? 'Prices Confirmed & Logged!' : 'Confirm & Apply Today’s Rates'}
+                <Check size={16} />
+                <span className="font-nastaleeq">ریٹس کی تصدیق کریں (Save)</span>
               </button>
-
               <button
                 type="button"
                 onClick={onClose}
                 className="touch-active"
                 style={{
-                  height: '48px',
                   padding: '0 16px',
-                  borderRadius: '10px',
-                  backgroundColor: '#F4F5EE',
-                  color: '#414833',
-                  border: '1.5px solid #B6AD90',
-                  fontSize: '14px',
+                  height: '40px',
+                  borderRadius: '8px',
+                  backgroundColor: '#ffffff',
+                  color: '#475569',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '12px',
                   fontWeight: 700,
                   cursor: 'pointer',
                 }}
               >
-                Keep Previous Rates
+                بند کریں
               </button>
             </>
           ) : (
             <>
               <button
                 type="button"
-                onClick={() => setBillerHoldState(true)}
+                onClick={handleBillerKeepPrevious}
                 className="touch-active"
                 style={{
                   flex: 1,
-                  height: '48px',
-                  borderRadius: '10px',
-                  backgroundColor: '#414833',
-                  color: '#F4F5EE',
+                  height: '40px',
+                  borderRadius: '8px',
+                  backgroundColor: '#0f172a',
+                  color: '#ffffff',
                   border: 'none',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 800,
                   cursor: 'pointer',
                 }}
               >
-                Request Rate Change (Hold Bill)
+                سابقہ ریٹس پر جاری رکھیں
               </button>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleBillerRequestUpdate}
                 className="touch-active"
                 style={{
-                  height: '48px',
-                  padding: '0 16px',
-                  borderRadius: '10px',
-                  backgroundColor: '#F4F5EE',
-                  color: '#414833',
-                  border: '1.5px solid #B6AD90',
-                  fontSize: '14px',
-                  fontWeight: 700,
+                  flex: 1,
+                  height: '40px',
+                  borderRadius: '8px',
+                  backgroundColor: '#f59e0b',
+                  color: '#0f172a',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: 800,
                   cursor: 'pointer',
                 }}
               >
-                Proceed With Previous Rates
+                ایڈمن سے ریٹ تبدیلی کی درخواست
               </button>
             </>
           )}

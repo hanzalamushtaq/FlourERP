@@ -109,49 +109,49 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
         {/* Scrollable Receipt Body (Simulated ESC/POS 80mm Roll) */}
         <div
           style={{
-            padding: '24px 20px',
+            padding: '20px 18px',
             overflowY: 'auto',
-            backgroundColor: '#F4F5EE',
-            color: '#414833',
+            backgroundColor: '#ffffff',
+            color: '#0f172a',
             fontFamily: 'var(--font-mono)',
-            fontSize: '13px',
+            fontSize: '12px',
             lineHeight: 1.4,
           }}
         >
-          <div style={{ textAlign: 'center', marginBottom: '14px' }}>
-            <div className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 700, color: '#414833' }}>
+          <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+            <div className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </div>
             <div
               className="font-nastaleeq"
-              style={{ fontSize: '24px', fontWeight: 700, marginTop: '2px', color: '#414833' }}
+              style={{ fontSize: '18px', fontWeight: 800, marginTop: '2px', color: '#0f172a' }}
             >
               المدینہ چکی و فلور ملز
             </div>
-            <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '1px', color: '#414833' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', color: '#64748b' }}>
               AL-MADINA FLOUR MILLS
             </div>
-            <div style={{ fontSize: '11px', color: '#414833', marginTop: '2px' }}>
+            <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>
               Main Bazaar, Near Clock Tower • Ph: 0300-1234567
             </div>
-            <div style={{ borderBottom: '1px dashed #B6AD90', margin: '12px 0' }} />
+            <div style={{ borderBottom: '1px dashed #cbd5e1', margin: '10px 0' }} />
           </div>
 
           {/* Bill / Token Identifiers */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
             <span>{data.type === 'pisai' ? 'PISAI TOKEN:' : 'BILL NO:'}</span>
-            <strong style={{ fontSize: '14px' }}>{data.billNumber}</strong>
+            <strong style={{ fontSize: '13px' }}>{data.billNumber}</strong>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '11px' }}>
             <span>DATE/TIME:</span>
             <span>{data.timestamp}</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '11px' }}>
             <span>OPERATOR:</span>
             <span>{data.billerName}</span>
           </div>
           {data.customerName && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '11px' }}>
               <span>CUSTOMER:</span>
               <strong>{data.customerName}</strong>
             </div>
@@ -160,55 +160,55 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
           {data.isCredit && (
             <div
               style={{
-                backgroundColor: '#C2C5AA',
-                border: '1px solid #B6AD90',
-                color: '#414833',
+                backgroundColor: '#fef3c7',
+                border: '1px solid #fde68a',
+                color: '#b45309',
                 fontWeight: 800,
                 textAlign: 'center',
                 padding: '4px',
                 borderRadius: '4px',
                 margin: '8px 0',
-                fontSize: '12px',
+                fontSize: '11px',
               }}
             >
               *** UDHAAR / CREDIT BILL ***
             </div>
           )}
 
-          {/* Large Pisai Token Callout */}
+          {/* Clean Pisai Token Callout */}
           {data.type === 'pisai' && data.pisaiToken && (
             <div
               style={{
-                border: '2px solid #414833',
+                border: '1.5px solid #0f172a',
                 borderRadius: '8px',
-                padding: '12px',
+                padding: '8px',
                 textAlign: 'center',
-                margin: '12px 0',
-                backgroundColor: '#C2C5AA',
+                margin: '10px 0',
+                backgroundColor: '#f8fafc',
               }}
             >
-              <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1px', color: '#414833' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', color: '#64748b' }}>
                 CUSTOMER TOKEN NUMBER
               </div>
               <div
                 style={{
-                  fontSize: '46px',
+                  fontSize: '26px',
                   fontWeight: 900,
-                  letterSpacing: '4px',
+                  letterSpacing: '2px',
                   lineHeight: 1.1,
                   margin: '4px 0',
-                  color: '#414833',
+                  color: '#0f172a',
                 }}
               >
                 {data.pisaiToken}
               </div>
-              <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#414833' }}>
+              <div className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
                 ٹوکن نمبر گندم پیسائی
               </div>
             </div>
           )}
 
-          <div style={{ borderBottom: '1px dashed #B6AD90', margin: '12px 0' }} />
+          <div style={{ borderBottom: '1px dashed #cbd5e1', margin: '10px 0' }} />
 
           {/* Line Items Table */}
           {data.items && data.items.length > 0 && (

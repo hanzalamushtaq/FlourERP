@@ -145,7 +145,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <TrendingUp size={18} color="#414833" />
             </div>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
             Rs 42,850
           </div>
           <div style={{ fontSize: '12px', color: '#656D4A', fontWeight: 600 }}>
@@ -175,7 +175,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Sparkles size={18} color="#414833" />
             </div>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
             Rs 8,640
           </div>
           <div style={{ fontSize: '12px', color: '#656D4A', fontWeight: 600 }}>
@@ -205,7 +205,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Receipt size={18} color="#414833" />
             </div>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
             Rs 3,625
           </div>
           <div style={{ fontSize: '12px', color: '#656D4A', fontWeight: 600 }}>
@@ -235,7 +235,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Users size={18} color="#414833" />
             </div>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
             Rs 61,100
           </div>
           <div style={{ fontSize: '12px', color: '#656D4A', fontWeight: 600 }}>
@@ -266,7 +266,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Wallet size={18} color="#F4F5EE" />
             </div>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#414833', margin: '6px 0 2px' }}>
             Rs 47,865
           </div>
           <div style={{ fontSize: '12px', color: '#414833', fontWeight: 600 }}>

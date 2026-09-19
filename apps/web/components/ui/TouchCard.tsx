@@ -97,13 +97,13 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         {isRateSet ? (
           <div
             style={{
-              padding: '4px 10px',
-              borderRadius: '9999px',
-              backgroundColor: isSelected ? '#7F4F24' : '#C2C5AA',
-              color: isSelected ? '#F4F5EE' : '#414833',
+              padding: '2px 8px',
+              borderRadius: '6px',
+              backgroundColor: isSelected ? '#fef3c7' : '#f1f5f9',
+              color: isSelected ? '#b45309' : '#475569',
               fontWeight: 800,
-              fontSize: '14px',
-              border: isSelected ? '1.5px solid #7F4F24' : '1px solid #B6AD90',
+              fontSize: '11.5px',
+              border: isSelected ? '1px solid #fde68a' : '1px solid #e2e8f0',
             }}
           >
             Rs {product.ratePerKg}/KG
@@ -114,40 +114,38 @@ export const TouchCard: React.FC<TouchCardProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              padding: '4px 8px',
-              borderRadius: '9999px',
-              backgroundColor: '#F4F5EE',
-              color: '#414833',
-              border: '1px solid #B6AD90',
+              padding: '2px 6px',
+              borderRadius: '6px',
+              backgroundColor: '#fee2e2',
+              color: '#b91c1c',
               fontWeight: 700,
-              fontSize: '12px',
+              fontSize: '11px',
             }}
           >
-            <AlertTriangle size={14} color="#414833" /> Rate Unset
+            <AlertTriangle size={12} /> Rate Unset
           </div>
         )}
       </div>
 
-      {/* Main Titles: Prominent Urdu Nastaleeq + Crisp English */}
-      <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      {/* Main Titles */}
+      <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
         <div
           className="font-nastaleeq"
           style={{
-            fontSize: '22px',
+            fontSize: '15px',
             fontWeight: 800,
-            color: '#414833',
+            color: '#0f172a',
             textAlign: 'right',
-            lineHeight: 1.3,
+            lineHeight: 1.2,
           }}
         >
           {product.nameUr}
         </div>
         <div
           style={{
-            fontSize: '12px',
-            fontWeight: 700,
-            color: '#414833',
-            letterSpacing: '0.2px',
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#64748b',
           }}
         >
           {product.nameEn}

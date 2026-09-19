@@ -93,21 +93,21 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
           {error ? <ShieldAlert size={30} color="#F4F5EE" /> : <Lock size={30} color="#F4F5EE" />}
         </div>
 
-        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#414833' }}>
+        <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
           Terminal Locked
         </h2>
         <p
           className="font-nastaleeq"
           style={{
-            fontSize: '19px',
-            color: '#414833',
-            margin: '4px 0 8px',
+            fontSize: '14px',
+            color: '#475569',
+            margin: '2px 0 6px',
             fontWeight: 700,
           }}
         >
           ٹرمینل مقفل ہے — پن درج کریں
         </p>
-        <p style={{ fontSize: '13px', color: '#414833', marginBottom: '20px', fontWeight: 600 }}>
+        <p style={{ fontSize: '11.5px', color: '#64748b', marginBottom: '16px', fontWeight: 600 }}>
           {staffName} • Enter 4-digit PIN (Demo: 1234)
         </p>
 
@@ -116,8 +116,8 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
           style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: '14px',
-            marginBottom: '24px',
+            gap: '12px',
+            marginBottom: '20px',
           }}
         >
           {[0, 1, 2, 3].map((index) => {
@@ -126,16 +126,16 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
               <div
                 key={index}
                 style={{
-                  width: '16px',
-                  height: '16px',
+                  width: '14px',
+                  height: '14px',
                   borderRadius: '9999px',
                   backgroundColor: error
-                    ? '#656D4A'
+                    ? '#ef4444'
                     : filled
-                    ? '#414833'
-                    : '#C2C5AA',
-                  border: filled ? 'none' : '2px solid #B6AD90',
-                  transform: filled ? 'scale(1.15)' : 'scale(1)',
+                    ? '#0f172a'
+                    : '#e2e8f0',
+                  border: filled ? 'none' : '1.5px solid #cbd5e1',
+                  transform: filled ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.15s ease',
                 }}
               />
@@ -148,7 +148,7 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '10px',
+            gap: '8px',
           }}
         >
           {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
@@ -158,13 +158,14 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
               onClick={() => handleDigit(digit)}
               className="touch-active"
               style={{
-                height: '56px',
-                borderRadius: '12px',
-                backgroundColor: '#F4F5EE',
-                color: '#414833',
-                border: '1.5px solid #B6AD90',
-                fontSize: '22px',
+                height: '46px',
+                borderRadius: '8px',
+                backgroundColor: '#ffffff',
+                color: '#0f172a',
+                border: '1px solid #cbd5e1',
+                fontSize: '18px',
                 fontWeight: 800,
+                fontFamily: 'var(--font-mono)',
                 cursor: 'pointer',
               }}
             >
@@ -177,13 +178,14 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
             onClick={() => handleDigit('0')}
             className="touch-active"
             style={{
-              height: '56px',
-              borderRadius: '12px',
-              backgroundColor: '#F4F5EE',
-              color: '#414833',
-              border: '1.5px solid #B6AD90',
-              fontSize: '22px',
+              height: '46px',
+              borderRadius: '8px',
+              backgroundColor: '#ffffff',
+              color: '#0f172a',
+              border: '1px solid #cbd5e1',
+              fontSize: '18px',
               fontWeight: 800,
+              fontFamily: 'var(--font-mono)',
               cursor: 'pointer',
             }}
           >

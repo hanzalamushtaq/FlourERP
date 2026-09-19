@@ -151,32 +151,32 @@ export const ReportsView: React.FC = () => {
 
       {/* Summary KPI Strip */}
       <div className="reports-kpi-grid-responsive">
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px 20px', borderRadius: '12px', border: '1.5px solid #B6AD90', boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)' }}>
+        <div style={{ backgroundColor: '#ffffff', padding: '14px 18px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833' }}>کل آمدن (سیل و فیس)</span>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#656D4A', textTransform: 'uppercase' }}>TOTAL REVENUE INFLOW</span>
+            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>کل آمدن (سیل و فیس)</span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748b' }}>TOTAL REVENUE</span>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, color: '#15803d', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             + Rs {totalInflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', padding: '16px 20px', borderRadius: '12px', border: '1.5px solid #B6AD90', boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)' }}>
+        <div style={{ backgroundColor: '#ffffff', padding: '14px 18px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833' }}>کل اخراجات و واپسی</span>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#656D4A', textTransform: 'uppercase' }}>TOTAL EXPENSES & RETURNS</span>
+            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>کل اخراجات و واپسی</span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748b' }}>TOTAL EXPENSES</span>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, color: '#b91c1c', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             - Rs {totalOutflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#DCE0CE', padding: '16px 20px', borderRadius: '12px', border: '2px solid #7F4F24', boxShadow: '0 4px 10px rgba(65, 72, 51, 0.08)' }}>
+        <div style={{ backgroundColor: '#ffffff', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #d97706' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833' }}>خالص نقد کیش</span>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#414833', textTransform: 'uppercase' }}>NET CASH POSITION</span>
+            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>خالص نقد کیش</span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#d97706' }}>NET CASH POSITION</span>
           </div>
-          <div style={{ fontSize: '30px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             Rs {netDayCash.toLocaleString()}
           </div>
         </div>

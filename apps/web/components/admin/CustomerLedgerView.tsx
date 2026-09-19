@@ -136,14 +136,14 @@ export const CustomerLedgerView: React.FC = () => {
         }}
       >
         <div>
-          <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#656D4A' }}>
-            TOTAL OUTSTANDING CUSTOMER UDHAAR (مجموعی ادھار کھاتہ)
+          <span style={{ fontSize: '12px', fontWeight: 800, color: '#64748b' }}>
+            مجموعی ادھار کھاتہ (Total Outstanding Udhaar)
           </span>
           <div
             style={{
-              fontSize: '32px',
+              fontSize: '22px',
               fontWeight: 900,
-              color: '#414833',
+              color: '#0f172a',
               fontFamily: 'var(--font-mono)',
               marginTop: '2px',
             }}
@@ -286,43 +286,43 @@ export const CustomerLedgerView: React.FC = () => {
             }}
           >
             <div>
-              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#414833' }}>{selectedCustomer.name}</h3>
-              <div style={{ fontSize: '13px', color: '#656D4A', marginTop: '3px', fontWeight: 600 }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>{selectedCustomer.name}</h3>
+              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px', fontWeight: 600 }}>
                 Contact: {selectedCustomer.phone}
               </div>
             </div>
 
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '11px', fontWeight: 800, color: '#656D4A' }}>CURRENT BALANCE (بقایا ادھار)</div>
-              <div style={{ fontSize: '28px', fontWeight: 900, color: '#414833', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>بقایا ادھار (Current Balance)</div>
+              <div style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
                 Rs {selectedCustomer.balance.toLocaleString()}
               </div>
             </div>
           </div>
 
           {/* Action Bar: Log Cash Repayment */}
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
             <button
               type="button"
               onClick={() => setIsRepaymentOpen(true)}
               className="touch-active"
               style={{
                 flex: 1,
-                height: '46px',
-                borderRadius: '9px',
-                backgroundColor: '#7F4F24',
-                color: '#F4F5EE',
+                height: '40px',
+                borderRadius: '8px',
+                backgroundColor: '#15803d',
+                color: '#ffffff',
                 border: 'none',
-                fontSize: '14px',
+                fontSize: '13px',
                 fontWeight: 800,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
+                gap: '6px',
               }}
             >
-              <DollarSign size={18} color="#F4F5EE" /> Log Cash Repayment (ادھار وصولی)
+              <DollarSign size={16} /> Log Cash Repayment (ادھار وصولی)
             </button>
           </div>
 

@@ -79,16 +79,15 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
             onClick={() => onKeyPress(digit)}
             className="touch-active"
             style={{
-              height: '62px',
-              borderRadius: '12px',
-              backgroundColor: '#F4F5EE',
-              color: '#414833',
-              border: '2px solid #B6AD90',
-              fontSize: '26px',
+              height: '48px',
+              borderRadius: '8px',
+              backgroundColor: '#ffffff',
+              color: '#0f172a',
+              border: '1.5px solid #cbd5e1',
+              fontSize: '18px',
               fontWeight: 800,
-              fontFamily: 'var(--font-sans)',
+              fontFamily: 'var(--font-mono)',
               cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(65, 72, 51, 0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
