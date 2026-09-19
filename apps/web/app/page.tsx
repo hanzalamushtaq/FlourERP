@@ -1,290 +1,237 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { PosSidebar } from '../components/layout/PosSidebar';
+import { PosHeader } from '../components/layout/PosHeader';
+import { CounterDashboard } from '../components/dashboard/CounterDashboard';
 import { ProductBillingScreen } from '../components/billing/ProductBillingScreen';
 import { PisaiBillingScreen } from '../components/billing/PisaiBillingScreen';
-import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { CustomerLedgerView } from '../components/admin/CustomerLedgerView';
 import { ReportsView } from '../components/admin/ReportsView';
 import { DailyPriceModal } from '../components/admin/DailyPriceModal';
 import { PinLockOverlay } from '../components/ui/PinLockOverlay';
-import {
-  Wheat,
-  Scale,
-  Sparkles,
-  LayoutDashboard,
-  Users,
-  FileText,
-  Lock,
-  Clock,
-} from 'lucide-react';
+import { ZReportModal } from '../components/admin/ZReportModal';
+import { ReceiptPreviewModal, ReceiptData } from '../components/ui/ReceiptPreviewModal';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'billing' | 'pisai' | 'dashboard' | 'udhaar' | 'reports'>('billing');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock'>('dashboard');
   const [userRole, setUserRole] = useState<'admin' | 'biller'>('biller');
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
+  const [isZReportOpen, setIsZReportOpen] = useState<boolean>(false);
+
+  // Reprint Receipt Modal State
+  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
+  const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
+
+  // Global Keyboard Shortcuts (F8, F2, F3, Esc, Alt+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if typing in an active text input or textarea (unless it's an F-key)
+      const target = e.target as HTMLElement;
+      const isInputActive = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+
+      // F8 -> New Sales Bill
+      if (e.key === 'F8') {
+        e.preventDefault();
+        setActiveTab('billing');
+      }
+      // F2 -> Gundam Pisai & Token
+      else if (e.key === 'F2') {
+        e.preventDefault();
+        setActiveTab('pisai');
+      }
+      // F3 -> Daily Rates Modal
+      else if (e.key === 'F3') {
+        e.preventDefault();
+        setIsPriceModalOpen(true);
+      }
+      // Esc -> Home / Dashboard
+      else if (e.key === 'Escape') {
+        if (isReceiptOpen) {
+          setIsReceiptOpen(false);
+        } else if (isPriceModalOpen) {
+          setIsPriceModalOpen(false);
+        } else if (isZReportOpen) {
+          setIsZReportOpen(false);
+        } else {
+          setActiveTab('dashboard');
+        }
+      }
+      // Alt+K -> Customer Udhaar Ledger
+      else if (e.altKey && (e.key === 'k' || e.key === 'K' || e.key === 'ک')) {
+        e.preventDefault();
+        setActiveTab('udhaar');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isReceiptOpen, isPriceModalOpen, isZReportOpen]);
+
+  const handleReprintReceipt = (receipt: ReceiptData) => {
+    setSelectedReceipt(receipt);
+    setIsReceiptOpen(true);
+  };
+
+  const handleConfirmShiftClose = () => {
+    // Lock the shift & trigger closing state
+    setIsLocked(true);
+  };
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
-      {/* Top Application Header */}
-      <header
-        style={{
-          backgroundColor: '#ffffff',
-          borderBottom: '2px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1000,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1280px',
-            margin: '0 auto',
-            padding: '6px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '10px',
-          }}
-        >
-          {/* Logo & Shop Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                backgroundColor: '#d97706',
-                color: '#ffffff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Wheat size={22} strokeWidth={2.4} />
-            </div>
+    <div
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: '#f8fafc',
+        width: '100%',
+        overflowX: 'hidden',
+      }}
+    >
+      {/* 1. Left Navigation Sidebar with POS Hotkeys & Operator Info */}
+      <PosSidebar
+        currentTab={activeTab}
+        onSelectTab={setActiveTab}
+        onOpenPriceModal={() => setIsPriceModalOpen(true)}
+        onLock={() => setIsLocked(true)}
+        operatorName="محمد عاصف"
+        counterId="کاؤنٹر #01 (آپریٹر)"
+      />
 
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px' }}>
-                  FlourERP
-                </span>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    padding: '2px 8px',
-                    borderRadius: '9999px',
-                    backgroundColor: '#ecfdf5',
-                    color: '#047857',
-                    border: '1px solid #a7f3d0',
-                  }}
-                >
-                  ONLINE
-                </span>
-              </div>
-              <div
-                className="font-nastaleeq"
-                style={{
-                  fontSize: '20px',
-                  fontWeight: 700,
-                  color: '#b45309',
-                  lineHeight: 1.2,
-                }}
-              >
-                المدینہ چکی و فلور ملز
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions & Role Switcher */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Daily Price Button */}
-            <button
-              type="button"
-              onClick={() => setIsPriceModalOpen(true)}
-              className="touch-active"
-              style={{
-                padding: '8px 14px',
-                borderRadius: '10px',
-                backgroundColor: '#fef3c7',
-                color: '#92400e',
-                border: '1.5px solid #fde68a',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              <Clock size={16} /> Daily Prices (نرخ نامہ)
-            </button>
-
-            {/* Role Switcher Pill */}
-            <div
-              style={{
-                display: 'flex',
-                backgroundColor: '#f1f5f9',
-                padding: '3px',
-                borderRadius: '10px',
-                border: '1px solid #cbd5e1',
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setUserRole('biller')}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '7px',
-                  border: 'none',
-                  backgroundColor: userRole === 'biller' ? '#d97706' : 'transparent',
-                  color: userRole === 'biller' ? '#ffffff' : '#475569',
-                  fontWeight: 700,
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                }}
-              >
-                Biller
-              </button>
-              <button
-                type="button"
-                onClick={() => setUserRole('admin')}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '7px',
-                  border: 'none',
-                  backgroundColor: userRole === 'admin' ? '#0f172a' : 'transparent',
-                  color: userRole === 'admin' ? '#ffffff' : '#475569',
-                  fontWeight: 700,
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                }}
-              >
-                Admin
-              </button>
-            </div>
-
-            {/* Lock Screen Button */}
-            <button
-              type="button"
-              onClick={() => setIsLocked(true)}
-              className="touch-active"
-              style={{
-                padding: '8px 12px',
-                borderRadius: '10px',
-                backgroundColor: '#fee2e2',
-                color: '#b91c1c',
-                border: '1.5px solid #fca5a5',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-              title="Lock Terminal"
-            >
-              <Lock size={15} /> Lock PIN
-            </button>
-          </div>
-        </div>
-
-        {/* Big, Clear Navigation Tabs for 40+ year old readability */}
-        <div
-          style={{
-            maxWidth: '1280px',
-            margin: '0 auto',
-            padding: '0 24px',
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-          }}
-        >
-          {[
-            { id: 'billing', label: 'Product Billing', ur: 'بل بنائیں', icon: <Scale size={19} /> },
-            { id: 'pisai', label: 'Gundam Pisai', ur: 'گندم پیسائی', icon: <Sparkles size={19} /> },
-            { id: 'dashboard', label: 'Admin Dashboard', ur: 'ڈیش بورڈ', icon: <LayoutDashboard size={19} /> },
-            { id: 'udhaar', label: 'Customer Udhaar', ur: 'ادھار کھاتہ', icon: <Users size={19} /> },
-            { id: 'reports', label: 'Reports & Ledger', ur: 'روزنامچہ و اخراجات', icon: <FileText size={19} /> },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id as any)}
-                style={{
-                  padding: '6px 14px',
-                  border: 'none',
-                  background: 'none',
-                  cursor: 'pointer',
-                  borderBottom: isActive ? '3px solid #d97706' : '3px solid transparent',
-                  color: isActive ? '#b45309' : '#64748b',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontWeight: isActive ? 800 : 600,
-                  fontSize: '14px',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.12s ease',
-                }}
-              >
-                {tab.icon}
-                <span>{tab.label}</span>
-                <span className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700 }}>
-                  ({tab.ur})
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </header>
-
-      {/* Main Screen Content */}
+      {/* 2. Main Workspace Layout */}
       <div
         style={{
           flex: 1,
-          maxWidth: '1280px',
-          width: '100%',
-          margin: '0 auto',
-          padding: '8px 16px 14px',
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          height: '100vh',
+          overflowY: 'auto',
         }}
       >
-        {activeTab === 'billing' && <ProductBillingScreen />}
-        {activeTab === 'pisai' && <PisaiBillingScreen />}
-        {activeTab === 'dashboard' && (
-          <AdminDashboard
-            onOpenPriceModal={() => setIsPriceModalOpen(true)}
-            onNavigateTab={(tab) => {
-              if (tab === 'billing') setActiveTab('billing');
-              else if (tab === 'pisai') setActiveTab('pisai');
-              else if (tab === 'udhaar') setActiveTab('udhaar');
-              else if (tab === 'reports') setActiveTab('reports');
-            }}
-          />
-        )}
-        {activeTab === 'udhaar' && <CustomerLedgerView />}
-        {activeTab === 'reports' && <ReportsView />}
+        {/* Top Action Header */}
+        <PosHeader
+          onOpenZReport={() => setIsZReportOpen(true)}
+          onRefresh={() => {
+            // Soft refresh state
+          }}
+        />
+
+        {/* View Router based on active tab */}
+        <main style={{ flex: 1, paddingBottom: '24px' }}>
+          {activeTab === 'dashboard' && (
+            <CounterDashboard
+              onNewBill={() => setActiveTab('billing')}
+              onNewPisaiToken={() => setActiveTab('pisai')}
+              onEditRates={() => setIsPriceModalOpen(true)}
+              onReprintReceipt={handleReprintReceipt}
+              onViewAllInvoices={() => setActiveTab('reports')}
+              onMetricCardClick={(metric) => {
+                if (metric === 'sales') setActiveTab('billing');
+                else if (metric === 'pisai') setActiveTab('pisai');
+                else if (metric === 'recovery') setActiveTab('udhaar');
+                else if (metric === 'drawer') setIsZReportOpen(true);
+              }}
+            />
+          )}
+
+          {activeTab === 'billing' && (
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              <ProductBillingScreen />
+            </div>
+          )}
+
+          {activeTab === 'pisai' && (
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              <PisaiBillingScreen />
+            </div>
+          )}
+
+          {activeTab === 'udhaar' && (
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              <CustomerLedgerView />
+            </div>
+          )}
+
+          {activeTab === 'reports' && (
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              <ReportsView />
+            </div>
+          )}
+
+          {activeTab === 'stock' && (
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px', textAlign: 'center' }}>
+              <div
+                style={{
+                  backgroundColor: '#ffffff',
+                  borderRadius: '16px',
+                  border: '1.5px solid #fee2e2',
+                  padding: '36px',
+                  maxWidth: '600px',
+                  margin: '40px auto',
+                }}
+              >
+                <div style={{ fontSize: '40px', marginBottom: '10px' }}>📦</div>
+                <h2 className="font-nastaleeq" style={{ fontSize: '22px', fontWeight: 900, color: '#991b1b' }}>
+                  گودام و اسٹاک الرٹ
+                </h2>
+                <p className="font-nastaleeq" style={{ fontSize: '15px', color: '#475569', marginTop: '10px' }}>
+                  میدہ بوری 50KG اور سوجی کا اسٹاک کم ہے۔ برائے مہربانی نیا اسٹاک حاصل کریں یا ریٹ لسٹ چیک کریں۔
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('dashboard')}
+                  className="touch-active"
+                  style={{
+                    marginTop: '20px',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    backgroundColor: '#0f172a',
+                    color: '#ffffff',
+                    border: 'none',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ڈیش بورڈ پر واپس جائیں (Esc)
+                </button>
+              </div>
+            </div>
+          )}
+        </main>
       </div>
 
       {/* Daily Price Confirmation Modal */}
       <DailyPriceModal
         isOpen={isPriceModalOpen}
         onClose={() => setIsPriceModalOpen(false)}
-        isAdmin={userRole === 'admin'}
+        isAdmin={true}
+      />
+
+      {/* End-of-Shift / Z-Report Reconciliation Modal */}
+      <ZReportModal
+        isOpen={isZReportOpen}
+        onClose={() => setIsZReportOpen(false)}
+        onConfirmCloseShift={handleConfirmShiftClose}
       />
 
       {/* Screen Masking PIN-Lock Overlay */}
       <PinLockOverlay
         isLocked={isLocked}
         onUnlock={() => setIsLocked(false)}
-        staffName={userRole === 'admin' ? 'Shop Owner (Hanzala)' : 'Counter Biller 1'}
+        staffName="محمد عاصف (کاؤنٹر #01)"
       />
-    </main>
+
+      {/* Receipt Reprint Modal */}
+      {selectedReceipt && (
+        <ReceiptPreviewModal
+          isOpen={isReceiptOpen}
+          onClose={() => setIsReceiptOpen(false)}
+          data={selectedReceipt}
+        />
+      )}
+    </div>
   );
 }
