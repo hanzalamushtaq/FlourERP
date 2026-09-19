@@ -138,6 +138,86 @@ roleRouter.post('/', requireAuth, requirePermission('can_manage_users'), async (
   });
 });
 
+// GET /api/roles/staff - List all staff users with their roles
+roleRouter.get('/staff', requireAuth, async (_req: Request, res: Response) => {
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      username: true,
+      fullName: true,
+      role: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  const staff = users.map((u) => ({
+    id: u.id,
+    username: u.username,
+    fullName: u.fullName,
+    roleId: u.role.id,
+    roleName: u.role.name,
+  }));
+
+  res.json({
+    success: true,
+    data: staff,
+  });
+});
+
+// PUT /api/roles/staff/:userId - Assign a role to a staff member
+roleRouter.put('/staff/:userId', requireAuth, requirePermission('can_manage_users'), async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { roleId, roleName } = req.body;
+
+  let targetRole = null;
+  if (roleId) {
+    targetRole = await prisma.role.findUnique({ where: { id: roleId } });
+  } else if (roleName) {
+    targetRole = await prisma.role.findUnique({ where: { name: roleName } });
+  }
+
+  if (!targetRole) {
+    return res.status(404).json({
+      success: false,
+      error: {
+        code: 'ROLE_NOT_FOUND',
+        message: 'Specified role not found.',
+      },
+    });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: {
+        code: 'USER_NOT_FOUND',
+        message: 'Staff user not found.',
+      },
+    });
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { roleId: targetRole.id },
+  });
+
+  res.json({
+    success: true,
+    data: {
+      userId,
+      roleId: targetRole.id,
+      roleName: targetRole.name,
+      message: `Role assigned successfully.`,
+    },
+  });
+});
+
 // PUT /api/roles/:id - Update role (requires 'can_manage_users')
 roleRouter.put('/:id', requireAuth, requirePermission('can_manage_users'), async (req: Request, res: Response) => {
   const { id } = req.params;

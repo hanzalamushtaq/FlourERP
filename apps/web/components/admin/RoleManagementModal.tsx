@@ -11,8 +11,12 @@ import {
   KeyRound,
   Lock,
   UserCheck,
+  Edit2,
+  Trash2,
+  Save,
   AlertCircle,
 } from 'lucide-react';
+import { getToken } from '../../lib/auth';
 
 export interface PermissionItem {
   code: string;
@@ -37,7 +41,7 @@ export interface StaffUser {
   roleName: string;
 }
 
-const ALL_PERMISSIONS: PermissionItem[] = [
+export const ALL_PERMISSIONS: PermissionItem[] = [
   { code: 'can_bill', labelUr: 'نیا سیلز بل بنانا', labelEn: 'Standard Product Billing', category: 'billing' },
   { code: 'can_pisai', labelUr: 'گندم پسائی ٹوکن جاری کرنا', labelEn: 'Grinding Token Issuance', category: 'billing' },
   { code: 'can_discount', labelUr: 'بل میں رعایت / ڈسکاؤنٹ دینا', labelEn: 'Apply Discretionary Discounts', category: 'billing' },
@@ -84,50 +88,85 @@ const INITIAL_STAFF: StaffUser[] = [
 interface RoleManagementModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onRolesUpdated?: (roles: RoleItem[]) => void;
 }
 
 export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
   isOpen,
   onClose,
+  onRolesUpdated,
 }) => {
   const [activeTab, setActiveTab] = useState<'roles' | 'staff' | 'create'>('roles');
   const [roles, setRoles] = useState<RoleItem[]>(INITIAL_ROLES);
   const [staff, setStaff] = useState<StaffUser[]>(INITIAL_STAFF);
 
+  // Edit Role State
+  const [editingRole, setEditingRole] = useState<RoleItem | null>(null);
+  const [editPerms, setEditPerms] = useState<string[]>([]);
+
   // New Role Form State
   const [newRoleName, setNewRoleName] = useState('');
   const [newRoleDesc, setNewRoleDesc] = useState('');
   const [selectedPerms, setSelectedPerms] = useState<string[]>(['can_bill']);
-  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
+  const [noticeMessage, setNoticeMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  // Load from backend if available
-  useEffect(() => {
-    const fetchBackendRoles = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/roles');
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && json.data) {
-            setRoles(json.data);
-          }
+  // Fetch roles & staff from backend with auth token
+  const refreshRolesFromBackend = async () => {
+    const token = getToken();
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+      const res = await fetch('http://localhost:5000/api/roles', { headers });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setRoles(json.data);
+          onRolesUpdated?.(json.data);
         }
-      } catch {
-        // Fallback to initial local state
       }
-    };
+    } catch {
+      // Local state fallback
+    }
+
+    try {
+      const staffRes = await fetch('http://localhost:5000/api/roles/staff', { headers });
+      if (staffRes.ok) {
+        const staffJson = await staffRes.json();
+        if (staffJson.success && staffJson.data) {
+          setStaff(staffJson.data);
+        }
+      }
+    } catch {
+      // Local state fallback
+    }
+  };
+
+  useEffect(() => {
     if (isOpen) {
-      fetchBackendRoles();
+      refreshRolesFromBackend();
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const togglePermission = (code: string) => {
+  const showNotice = (text: string, type: 'success' | 'error' = 'success') => {
+    setNoticeMessage({ text, type });
+    setTimeout(() => setNoticeMessage(null), 3000);
+  };
+
+  const toggleNewRolePerm = (code: string) => {
     setSelectedPerms((prev) =>
       prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
     );
   };
 
+  const toggleEditRolePerm = (code: string) => {
+    setEditPerms((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+    );
+  };
+
+  // 1. CREATE ROLE
   const handleCreateRole = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRoleName.trim() || selectedPerms.length === 0) return;
@@ -141,38 +180,125 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
       permissions: selectedPerms,
     };
 
-    // Try posting to backend
+    const token = getToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
     try {
-      await fetch('http://localhost:5000/api/roles', {
+      const res = await fetch('http://localhost:5000/api/roles', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           name: newRole.name,
           description: newRole.description,
           permissions: newRole.permissions,
         }),
       });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data?.id) {
+          newRole.id = json.data.id;
+        }
+      }
     } catch {
-      // Optimistic local state update
+      // Local state fallback
     }
 
-    setRoles((prev) => [...prev, newRole]);
-    setSaveSuccess(`نیا رول "${newRole.name}" کامیابی سے شامل کر دیا گیا ہے۔`);
+    const updatedRoles = [...roles, newRole];
+    setRoles(updatedRoles);
+    onRolesUpdated?.(updatedRoles);
+    showNotice(`نیا رول "${newRole.name}" کامیابی سے شامل کر دیا گیا ہے۔`);
     setNewRoleName('');
     setNewRoleDesc('');
     setSelectedPerms(['can_bill']);
-    setTimeout(() => {
-      setSaveSuccess(null);
-      setActiveTab('roles');
-    }, 1500);
+    setTimeout(() => setActiveTab('roles'), 1000);
   };
 
-  const handleAssignRole = (userId: string, newRoleName: string) => {
+  // 2. UPDATE ROLE PERMISSIONS
+  const handleSaveRoleEdit = async () => {
+    if (!editingRole) return;
+
+    const token = getToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
+    try {
+      await fetch(`http://localhost:5000/api/roles/${editingRole.id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          permissions: editPerms,
+        }),
+      });
+    } catch {
+      // Local state fallback
+    }
+
+    const updatedRoles = roles.map((r) =>
+      r.id === editingRole.id ? { ...r, permissions: editPerms } : r
+    );
+
+    setRoles(updatedRoles);
+    onRolesUpdated?.(updatedRoles);
+    showNotice(`رول "${editingRole.name}" کے اختیارات کامیابی سے اپڈیٹ ہو گئے۔`);
+    setEditingRole(null);
+  };
+
+  // 3. DELETE ROLE
+  const handleDeleteRole = async (role: RoleItem) => {
+    if (role.isSystem) {
+      showNotice('سسٹم رولز (SuperAdmin, Biller) کو ڈیلیٹ نہیں کیا جا سکتا۔', 'error');
+      return;
+    }
+
+    const confirmDelete = window.confirm(`کیا آپ واقعی رول "${role.name}" کو ڈیلیٹ کرنا چاہتے ہیں؟`);
+    if (!confirmDelete) return;
+
+    const token = getToken();
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+      await fetch(`http://localhost:5000/api/roles/${role.id}`, {
+        method: 'DELETE',
+        headers,
+      });
+    } catch {
+      // Local state fallback
+    }
+
+    const updatedRoles = roles.filter((r) => r.id !== role.id);
+    setRoles(updatedRoles);
+    onRolesUpdated?.(updatedRoles);
+    showNotice(`رول "${role.name}" ڈیلیٹ کر دیا گیا ہے۔`);
+  };
+
+  // 4. ASSIGN ROLE TO STAFF
+  const handleAssignRole = async (userId: string, newRoleName: string) => {
+    const token = getToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
+    try {
+      await fetch(`http://localhost:5000/api/roles/staff/${userId}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ roleName: newRoleName }),
+      });
+    } catch {
+      // Local fallback
+    }
+
     setStaff((prev) =>
       prev.map((s) => (s.id === userId ? { ...s, roleName: newRoleName } : s))
     );
-    setSaveSuccess('سٹاف ممبر کا رول تبدیل کر دیا گیا ہے۔');
-    setTimeout(() => setSaveSuccess(null), 2000);
+    showNotice('سٹاف ممبر کا رول کامیابی سے تبدیل ہو گیا۔');
   };
 
   return (
@@ -194,8 +320,8 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
           backgroundColor: '#FFFFFF',
           borderRadius: '16px',
           width: '100%',
-          maxWidth: '780px',
-          maxHeight: '90vh',
+          maxWidth: '820px',
+          maxHeight: '92vh',
           display: 'flex',
           flexDirection: 'column',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
@@ -226,16 +352,17 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               }}
             >
               <ShieldCheck size={22} strokeWidth={2.4} />
             </div>
             <div>
               <h2 className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>
-                اختیارات و رولز مینیجر (RBAC & User Access)
+                اختیارات و رولز مینیجر (RBAC & Permissions CRUD)
               </h2>
               <div style={{ fontSize: '11px', color: '#C2C5AA', marginTop: '2px' }}>
-                سٹاف کے اختیارات (Permissions) اور رولز (Roles) تفویض کریں
+                ہر رول کے اختیارات کو اپنی مرضی سے بنائیں، تبدیل کریں اور سٹاف کو لگائیں
               </div>
             </div>
           </div>
@@ -270,7 +397,10 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
         >
           <button
             type="button"
-            onClick={() => setActiveTab('roles')}
+            onClick={() => {
+              setActiveTab('roles');
+              setEditingRole(null);
+            }}
             style={{
               padding: '12px 16px',
               border: 'none',
@@ -286,12 +416,15 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             }}
           >
             <KeyRound size={15} />
-            <span className="font-nastaleeq">تمام رولز ({roles.length})</span>
+            <span className="font-nastaleeq">موجودہ رولز ({roles.length})</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab('staff')}
+            onClick={() => {
+              setActiveTab('staff');
+              setEditingRole(null);
+            }}
             style={{
               padding: '12px 16px',
               border: 'none',
@@ -307,12 +440,15 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             }}
           >
             <Users size={15} />
-            <span className="font-nastaleeq">سٹاف کو رول لگانا ({staff.length})</span>
+            <span className="font-nastaleeq">سٹاف کو رول لگائیں ({staff.length})</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab('create')}
+            onClick={() => {
+              setActiveTab('create');
+              setEditingRole(null);
+            }}
             style={{
               padding: '12px 16px',
               border: 'none',
@@ -328,32 +464,142 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             }}
           >
             <Plus size={15} />
-            <span className="font-nastaleeq">+ نیا رول بنائیں</span>
+            <span className="font-nastaleeq">+ نیا رول بنائیں (Create Role)</span>
           </button>
         </div>
 
         {/* Notifications */}
-        {saveSuccess && (
+        {noticeMessage && (
           <div
             style={{
-              backgroundColor: '#F0FDF4',
-              borderBottom: '1px solid #BBF7D0',
+              backgroundColor: noticeMessage.type === 'success' ? '#F0FDF4' : '#FEF2F2',
+              borderBottom: noticeMessage.type === 'success' ? '1px solid #BBF7D0' : '1px solid #FECACA',
               padding: '8px 16px',
-              color: '#15803D',
+              color: noticeMessage.type === 'success' ? '#15803D' : '#B91C1C',
               fontSize: '12.5px',
               fontWeight: 700,
               textAlign: 'center',
               direction: 'rtl',
             }}
           >
-            ✓ {saveSuccess}
+            {noticeMessage.type === 'success' ? '✓ ' : '⚠ '}
+            {noticeMessage.text}
           </div>
         )}
 
         {/* Modal Body */}
         <div style={{ padding: '16px', overflowY: 'auto', flex: 1, direction: 'rtl' }}>
-          {/* TAB 1: ROLES OVERVIEW */}
-          {activeTab === 'roles' && (
+          {/* INLINE EDIT ROLE PERMISSIONS VIEW */}
+          {editingRole ? (
+            <div style={{ backgroundColor: '#FAF7EE', padding: '16px', borderRadius: '12px', border: '1.5px solid #E6D5C3' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div>
+                  <h3 className="font-nastaleeq" style={{ fontSize: '17px', fontWeight: 900, color: '#414833', margin: 0 }}>
+                    رول اختیارات میں تبدیلی: {editingRole.name}
+                  </h3>
+                  <div style={{ fontSize: '11.5px', color: '#656D4A', marginTop: '2px' }}>
+                    اختیارات کو منتخب یا غیر منتخب کریں اور محفوظ کریں
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setEditingRole(null)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid #CBD5E1',
+                    backgroundColor: '#FFFFFF',
+                    fontSize: '11.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  منسوخ (Cancel)
+                </button>
+              </div>
+
+              {/* Checkboxes Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '8px',
+                  marginBottom: '16px',
+                }}
+              >
+                {ALL_PERMISSIONS.map((perm) => {
+                  const isChecked = editPerms.includes(perm.code);
+                  return (
+                    <div
+                      key={perm.code}
+                      onClick={() => toggleEditRolePerm(perm.code)}
+                      className="touch-active"
+                      style={{
+                        backgroundColor: isChecked ? '#FFFBEB' : '#FFFFFF',
+                        border: isChecked ? '1.5px solid #D97706' : '1px solid #E2E8F0',
+                        borderRadius: '8px',
+                        padding: '10px 12px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '4px',
+                          border: isChecked ? 'none' : '1.5px solid #94A3B8',
+                          backgroundColor: isChecked ? '#D97706' : '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {isChecked && <Check size={12} color="#FFFFFF" strokeWidth={3} />}
+                      </div>
+
+                      <div>
+                        <div className="font-nastaleeq" style={{ fontSize: '12.5px', fontWeight: 800, color: isChecked ? '#92400E' : '#334155' }}>
+                          {perm.labelUr}
+                        </div>
+                        <div style={{ fontSize: '10.5px', color: '#64748B' }}>{perm.labelEn}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={handleSaveRoleEdit}
+                  className="touch-active"
+                  style={{
+                    height: '38px',
+                    padding: '0 18px',
+                    borderRadius: '7px',
+                    backgroundColor: '#7F4F24',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <Save size={15} />
+                  <span className="font-nastaleeq">اختیارات محفوظ کریں (Save Permissions)</span>
+                </button>
+              </div>
+            </div>
+          ) : activeTab === 'roles' ? (
+            /* TAB 1: ROLES OVERVIEW WITH EDIT & DELETE BUTTONS */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {roles.map((r) => (
                 <div
@@ -386,16 +632,69 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                         </span>
                       )}
                     </div>
-                    <span style={{ fontSize: '11.5px', color: '#656D4A', fontWeight: 700 }}>
-                      {r.permissions.length} اختیارات شامل ہیں
-                    </span>
+
+                    {/* Action buttons: Edit Permissions & Delete Role */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingRole(r);
+                          setEditPerms(r.permissions);
+                        }}
+                        className="touch-active"
+                        title="Edit Permissions"
+                        style={{
+                          height: '28px',
+                          padding: '0 10px',
+                          borderRadius: '5px',
+                          border: '1px solid #CBD5E1',
+                          backgroundColor: '#FFFFFF',
+                          color: '#414833',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <Edit2 size={12} />
+                        <span className="font-nastaleeq">اختیارات تبدیل کریں</span>
+                      </button>
+
+                      {!r.isSystem && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRole(r)}
+                          className="touch-active"
+                          title="Delete Role"
+                          style={{
+                            height: '28px',
+                            padding: '0 8px',
+                            borderRadius: '5px',
+                            border: '1px solid #FECACA',
+                            backgroundColor: '#FEF2F2',
+                            color: '#B91C1C',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                          }}
+                        >
+                          <Trash2 size={12} />
+                          <span className="font-nastaleeq">ڈیلیٹ</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '10px', lineHeight: 1.3 }}>
                     {r.description}
                   </p>
 
-                  {/* Permissions Pills */}
+                  {/* Permissions Badges */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {r.permissions.map((permCode) => {
                       const def = ALL_PERMISSIONS.find((p) => p.code === permCode);
@@ -424,10 +723,8 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 </div>
               ))}
             </div>
-          )}
-
-          {/* TAB 2: ASSIGN ROLES TO USERS */}
-          {activeTab === 'staff' && (
+          ) : activeTab === 'staff' ? (
+            /* TAB 2: ASSIGN ROLES TO USERS */
             <div>
               <div style={{ fontSize: '13px', color: '#64748B', marginBottom: '12px', fontWeight: 600 }}>
                 مندرجہ ذیل سٹاف ممبرز کے لیے رول منتخب کریں:
@@ -504,10 +801,8 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 ))}
               </div>
             </div>
-          )}
-
-          {/* TAB 3: CREATE NEW ROLE */}
-          {activeTab === 'create' && (
+          ) : (
+            /* TAB 3: CREATE NEW ROLE */
             <form onSubmit={handleCreateRole} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label className="font-nastaleeq" style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
@@ -569,7 +864,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     return (
                       <div
                         key={perm.code}
-                        onClick={() => togglePermission(perm.code)}
+                        onClick={() => toggleNewRolePerm(perm.code)}
                         className="touch-active"
                         style={{
                           backgroundColor: isChecked ? '#FFFBEB' : '#F8FAFC',

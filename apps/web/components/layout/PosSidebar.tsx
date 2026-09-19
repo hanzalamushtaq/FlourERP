@@ -14,6 +14,7 @@ import {
   Lock,
   Printer,
   ShieldCheck,
+  LogOut,
 } from 'lucide-react';
 
 interface PosSidebarProps {
@@ -23,6 +24,9 @@ interface PosSidebarProps {
   onLock: () => void;
   operatorName?: string;
   counterId?: string;
+  roleName?: string;
+  permissions?: string[];
+  onLogout?: () => void;
 }
 
 export const PosSidebar: React.FC<PosSidebarProps> = ({
@@ -32,14 +36,23 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
   onLock,
   operatorName = 'محمد عاصف',
   counterId = 'کاؤنٹر 01',
+  roleName = 'Biller',
+  permissions = [],
+  onLogout,
 }) => {
-  const menuItems = [
+  const isAdminUser =
+    roleName.toLowerCase().includes('admin') || permissions.includes('can_manage_users');
+  const canViewReports =
+    isAdminUser || permissions.includes('can_view_reports');
+
+  const allMenuItems = [
     {
       id: 'dashboard',
       label: 'ڈیش بورڈ',
       hotkey: 'Esc',
       icon: <Home size={18} />,
       onClick: () => onSelectTab('dashboard'),
+      visible: true,
     },
     {
       id: 'billing',
@@ -47,6 +60,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       hotkey: 'F8',
       icon: <ShoppingCart size={18} />,
       onClick: () => onSelectTab('billing'),
+      visible: true,
     },
     {
       id: 'pisai',
@@ -54,6 +68,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       hotkey: 'F2',
       icon: <Cog size={18} />,
       onClick: () => onSelectTab('pisai'),
+      visible: true,
     },
     {
       id: 'udhaar',
@@ -61,6 +76,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       hotkey: 'Alt+K',
       icon: <BookUser size={18} />,
       onClick: () => onSelectTab('udhaar'),
+      visible: true,
     },
     {
       id: 'rates',
@@ -68,26 +84,32 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       hotkey: 'F3',
       icon: <ClipboardList size={18} />,
       onClick: onOpenPriceModal,
+      visible: true,
     },
     {
       id: 'stock',
       label: 'گودام و اسٹاک',
       icon: <Boxes size={18} />,
       onClick: () => onSelectTab('stock'),
+      visible: true,
     },
     {
       id: 'reports',
       label: 'روزنامچہ و حساب',
       icon: <Calculator size={18} />,
       onClick: () => onSelectTab('reports'),
+      visible: canViewReports,
     },
     {
       id: 'admin',
       label: 'ایڈمن و اختیارات (RBAC)',
       icon: <ShieldCheck size={18} />,
       onClick: () => onSelectTab('admin'),
+      visible: isAdminUser,
     },
   ];
+
+  const menuItems = allMenuItems.filter((item) => item.visible);
 
   return (
     <aside
@@ -167,32 +189,48 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
           }}
         >
           <div>
-            <div className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#414833' }}>
-              {operatorName}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#414833' }}>
+                {operatorName}
+              </div>
+              <span
+                style={{
+                  fontSize: '9.5px',
+                  fontWeight: 800,
+                  padding: '1px 5px',
+                  borderRadius: '4px',
+                  backgroundColor: isAdminUser ? '#7F4F24' : '#656D4A',
+                  color: '#FFFFFF',
+                }}
+              >
+                {isAdminUser ? 'ایڈمن' : 'بلر'}
+              </span>
             </div>
             <div style={{ fontSize: '11px', color: '#656D4A' }}>{counterId}</div>
           </div>
 
-          <button
-            type="button"
-            onClick={onLock}
-            className="touch-active"
-            title="Lock Terminal"
-            style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '6px',
-              border: '1px solid #cbd5e1',
-              backgroundColor: '#ffffff',
-              color: '#414833',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <Lock size={13} />
-          </button>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <button
+              type="button"
+              onClick={onLock}
+              className="touch-active"
+              title="Lock Terminal"
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e1',
+                backgroundColor: '#ffffff',
+                color: '#414833',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <Lock size={13} />
+            </button>
+          </div>
         </div>
 
         {/* Menu Navigation */}
@@ -250,38 +288,70 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         </nav>
       </div>
 
-      {/* Bottom Online & Printer Status */}
-      <div
-        style={{
-          padding: '10px 14px',
-          borderTop: '1px solid #e2e8f0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          direction: 'rtl',
-          fontSize: '11px',
-          color: '#64748b',
-          backgroundColor: '#f8fafc',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span
-            style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              backgroundColor: '#16a34a',
-              boxShadow: '0 0 4px rgba(22, 163, 74, 0.4)',
-            }}
-          />
-          <span className="font-nastaleeq" style={{ color: '#15803d', fontWeight: 700 }}>
-            آن لائن
-          </span>
-        </div>
+      {/* Bottom Section: Logout & Online Status */}
+      <div>
+        {onLogout && (
+          <div style={{ padding: '8px 10px', borderTop: '1px solid #e2e8f0' }}>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="touch-active"
+              style={{
+                width: '100%',
+                padding: '7px 10px',
+                borderRadius: '6px',
+                border: '1px solid #fee2e2',
+                backgroundColor: '#fff1f2',
+                color: '#991b1b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                direction: 'rtl',
+              }}
+            >
+              <LogOut size={14} color="#991b1b" />
+              <span className="font-nastaleeq">لاگ آؤٹ (سیشن ختم کریں)</span>
+            </button>
+          </div>
+        )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <Printer size={12} color="#64748b" />
-          <span>پرنٹر تیار</span>
+        {/* Bottom Online & Printer Status */}
+        <div
+          style={{
+            padding: '10px 14px',
+            borderTop: '1px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            direction: 'rtl',
+            fontSize: '11px',
+            color: '#64748b',
+            backgroundColor: '#f8fafc',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span
+              style={{
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: '#16a34a',
+                boxShadow: '0 0 4px rgba(22, 163, 74, 0.4)',
+              }}
+            />
+            <span className="font-nastaleeq" style={{ color: '#15803d', fontWeight: 700 }}>
+              آن لائن
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Printer size={12} color="#64748b" />
+            <span>پرنٹر تیار</span>
+          </div>
         </div>
       </div>
     </aside>
