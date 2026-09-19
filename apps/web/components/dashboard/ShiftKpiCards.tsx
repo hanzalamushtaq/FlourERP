@@ -2,7 +2,6 @@
 'use client';
 
 import React from 'react';
-import { Banknote, HandCoins, Wheat, Landmark } from 'lucide-react';
 
 interface ShiftKpiCardsProps {
   todaySales?: number;
@@ -13,125 +12,106 @@ interface ShiftKpiCardsProps {
 }
 
 export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
-  todaySales = 184500,
-  creditRecovery = 42000,
-  todayPisaiKg = 1250,
-  cashDrawerBalance = 126500,
+  todaySales = 145890,
+  creditRecovery = 25500,
+  todayPisaiKg = 12340,
+  cashDrawerBalance = 183730,
   onCardClick,
 }) => {
-  const cards = [
+  const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
+
+  const items = [
     {
-      id: 'sales' as const,
-      title: 'کل نقد سیلز',
-      value: `Rs ${todaySales.toLocaleString()}`,
-      icon: <Banknote size={20} color="#16a34a" />,
-      bg: '#f0fdf4',
-      border: '#bbf7d0',
-      textColor: '#166534',
-      valColor: '#15803d',
-    },
-    {
-      id: 'recovery' as const,
-      title: 'ادھار وصولی',
-      value: `Rs ${creditRecovery.toLocaleString()}`,
-      icon: <HandCoins size={20} color="#0284c7" />,
-      bg: '#f0f9ff',
-      border: '#bae6fd',
-      textColor: '#0369a1',
-      valColor: '#0284c7',
+      id: 'drawer' as const,
+      title: 'کیش دراز',
+      value: `Rs. ${cashDrawerBalance.toLocaleString()}`,
     },
     {
       id: 'pisai' as const,
       title: 'گندم پسائی',
-      value: `${todayPisaiKg.toLocaleString()} KG`,
-      icon: <Wheat size={20} color="#d97706" />,
-      bg: '#fffbeb',
-      border: '#fde68a',
-      textColor: '#b45309',
-      valColor: '#d97706',
+      value: `Rs. ${todayPisaiKg.toLocaleString()}`,
     },
     {
-      id: 'drawer' as const,
-      title: 'کیش دراز بیلنس',
-      value: `Rs ${cashDrawerBalance.toLocaleString()}`,
-      icon: <Landmark size={20} color="#7e22ce" />,
-      bg: '#faf5ff',
-      border: '#e9d5ff',
-      textColor: '#6b21a8',
-      valColor: '#7e22ce',
+      id: 'recovery' as const,
+      title: 'ادھار وصولی',
+      value: `Rs. ${creditRecovery.toLocaleString()}`,
+    },
+    {
+      id: 'sales' as const,
+      title: 'کل نقد سیلز',
+      value: `Rs. ${todaySales.toLocaleString()}`,
     },
   ];
 
   return (
     <div
+      className="dash-card-animated"
       style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '16px',
+        border: '1.5px solid #EBE4DA',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '12px',
-        width: '100%',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        padding: '14px 8px',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
         direction: 'rtl',
       }}
     >
-      {cards.map((card) => (
-        <div
-          key={card.id}
-          className="touch-active"
-          onClick={() => onCardClick?.(card.id)}
-          style={{
-            backgroundColor: card.bg,
-            borderRadius: '10px',
-            border: `1.5px solid ${card.border}`,
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: onCardClick ? 'pointer' : 'default',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
-          }}
-        >
-          <div>
+      {items.map((item, idx) => {
+        const isHovered = hoveredIdx === idx;
+
+        return (
+          <div
+            key={item.id}
+            className="touch-active"
+            onClick={() => onCardClick?.(item.id)}
+            onMouseEnter={() => setHoveredIdx(idx)}
+            onMouseLeave={() => setHoveredIdx(null)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              cursor: onCardClick ? 'pointer' : 'default',
+              padding: '6px 14px',
+              borderRadius: '10px',
+              backgroundColor: isHovered ? '#FAF4EA' : 'transparent',
+              borderLeft: idx !== items.length - 1 ? '1.5px solid #EBE4DA' : 'none',
+              transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: isHovered ? 'translateY(-1px)' : 'none',
+            }}
+          >
             <div
               className="font-nastaleeq"
               style={{
-                fontSize: '13px',
-                color: card.textColor,
-                fontWeight: 700,
-                lineHeight: 1.1,
+                fontSize: '16.5px',
+                fontWeight: 800,
+                color: isHovered ? '#783E15' : '#4B5563',
+                marginBottom: '4px',
+                lineHeight: 1.2,
+                transition: 'color 0.18s ease',
               }}
             >
-              {card.title}
+              {item.title}
             </div>
-
             <div
               style={{
-                fontSize: '18px',
+                fontSize: '25px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: card.valColor,
-                marginTop: '4px',
+                color: isHovered ? '#1F2937' : '#111827',
+                letterSpacing: '-0.5px',
+                lineHeight: 1.1,
+                transition: 'transform 0.18s ease',
+                transform: isHovered ? 'scale(1.035)' : 'scale(1)',
               }}
             >
-              {card.value}
+              {item.value}
             </div>
           </div>
-
-          <div
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '8px',
-              backgroundColor: '#ffffff',
-              border: `1px solid ${card.border}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
-            }}
-          >
-            {card.icon}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

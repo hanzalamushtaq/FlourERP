@@ -52,7 +52,7 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
         gap: '14px',
         width: '100%',
         direction: 'rtl',
@@ -64,15 +64,15 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
           className="touch-active"
           onClick={card.onClick}
           style={{
-            backgroundColor: card.bgLight, // Relative filled background
-            borderRadius: '12px',
-            border: `1.5px solid ${card.border}`,
-            padding: '16px 20px',
+            backgroundColor: card.bgLight,
+            borderRadius: '14px',
+            border: `2px solid ${card.border}`,
+            padding: '18px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
             transition: 'all 0.15s ease',
           }}
         >
@@ -80,17 +80,17 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div
               style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '10px',
-                backgroundColor: '#ffffff',
+                width: '50px',
+                height: '50px',
+                borderRadius: '12px',
+                backgroundColor: '#FFFFFF',
                 color: card.color,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
-                border: `1px solid ${card.border}`,
+                border: `1.5px solid ${card.border}`,
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
               }}
             >
               {card.icon}
@@ -100,9 +100,14 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
               <h2
                 className="font-nastaleeq"
                 style={{
-                  fontSize: '20px',
+                  fontSize: '21px',
                   fontWeight: 900,
-                  color: card.color === '#d97706' ? '#92400e' : card.color === '#0284c7' ? '#075985' : '#065f46',
+                  color:
+                    card.color === '#d97706'
+                      ? '#92400e'
+                      : card.color === '#0284c7'
+                      ? '#075985'
+                      : '#065f46',
                   lineHeight: 1.2,
                   margin: 0,
                 }}
@@ -115,15 +120,16 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
           {/* Left: Hotkey Badge */}
           <span
             style={{
-              fontSize: '12px',
-              fontWeight: 800,
+              fontSize: '13px',
+              fontWeight: 900,
               fontFamily: 'var(--font-mono)',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              backgroundColor: '#ffffff',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              backgroundColor: '#FFFFFF',
               color: card.color,
-              border: `1px solid ${card.border}`,
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+              border: `1.5px solid ${card.border}`,
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
+              letterSpacing: '0.5px',
             }}
           >
             {card.hotkey}

@@ -10,6 +10,8 @@ import { PisaiBillingScreen } from '../components/billing/PisaiBillingScreen';
 import { CustomerLedgerView } from '../components/admin/CustomerLedgerView';
 import { ReportsView } from '../components/admin/ReportsView';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
+import { RateListView } from '../components/rates/RateListView';
+import { WarehouseStockView } from '../components/stock/WarehouseStockView';
 import { DailyPriceModal } from '../components/admin/DailyPriceModal';
 import { PinLockOverlay } from '../components/ui/PinLockOverlay';
 import { ZReportModal } from '../components/admin/ZReportModal';
@@ -27,11 +29,12 @@ import {
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin'
+    'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates'
   >('dashboard');
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
   const [isZReportOpen, setIsZReportOpen] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
 
   // Reprint Receipt Modal State
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
@@ -68,10 +71,10 @@ export default function Home() {
         e.preventDefault();
         setActiveTab('pisai');
       }
-      // F3 -> Daily Rates Modal
+      // F3 -> Daily Rates Tab
       else if (e.key === 'F3') {
         e.preventDefault();
-        setIsPriceModalOpen(true);
+        setActiveTab('rates');
       }
       // Esc -> Home / Dashboard
       else if (e.key === 'Escape') {
@@ -163,6 +166,8 @@ export default function Home() {
         roleName={currentUser.role}
         permissions={currentUser.permissions}
         onLogout={handleLogout}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
       />
 
       {/* 2. Main Workspace Layout */}
@@ -183,8 +188,13 @@ export default function Home() {
           roleName={currentUser.role}
           canCloseDay={canCloseDay}
           onLogout={handleLogout}
+          activeTab={activeTab}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
           title={
-            activeTab === 'admin'
+            activeTab === 'dashboard'
+              ? 'کاؤنٹر بلر ڈیوٹی بورڈ'
+              : activeTab === 'admin'
               ? 'مالک و ایڈمنسٹریٹر کمانڈ سنٹر'
               : activeTab === 'billing'
               ? 'نیا بل (پروڈکٹ سیلز)'
@@ -194,6 +204,10 @@ export default function Home() {
               ? 'کسٹمر ادھار کھاتہ و وصولی'
               : activeTab === 'reports'
               ? 'مالیاتی روزنامچہ و حسابات'
+              : activeTab === 'rates'
+              ? 'روزانہ نرخ نامہ و ریٹ لسٹ'
+              : activeTab === 'stock'
+              ? 'گودام و اسٹاک انوینٹری'
               : userIsAdmin
               ? 'ایڈمن کنٹرول پینل'
               : 'کاؤنٹر بلر ورک سپیس'
@@ -223,7 +237,7 @@ export default function Home() {
                 <CounterDashboard
                   onNewBill={() => setActiveTab('billing')}
                   onNewPisaiToken={() => setActiveTab('pisai')}
-                  onEditRates={() => setIsPriceModalOpen(true)}
+                  onEditRates={() => setActiveTab('rates')}
                   onReprintReceipt={handleReprintReceipt}
                   onViewAllInvoices={() => setActiveTab('reports')}
                   onMetricCardClick={(metric) => {
@@ -309,7 +323,7 @@ export default function Home() {
             <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               {userIsAdmin ? (
                 <AdminDashboard
-                  onOpenPriceModal={() => setIsPriceModalOpen(true)}
+                  onOpenPriceModal={() => setActiveTab('rates')}
                   onNavigateTab={(tab) => {
                     if (tab === 'billing') setActiveTab('billing');
                     else if (tab === 'pisai') setActiveTab('pisai');
@@ -360,43 +374,15 @@ export default function Home() {
 
           {/* Stock Warehouse View */}
           {activeTab === 'stock' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px', textAlign: 'center' }}>
-              <div
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderRadius: '16px',
-                  border: '1.5px solid #C2C5AA',
-                  padding: '36px',
-                  maxWidth: '600px',
-                  margin: '40px auto',
-                  direction: 'rtl',
-                }}
-              >
-                <div style={{ fontSize: '40px', marginBottom: '10px' }}>📦</div>
-                <h2 className="font-nastaleeq" style={{ fontSize: '22px', fontWeight: 900, color: '#414833' }}>
-                  گودام و اسٹاک انوینٹری
-                </h2>
-                <p className="font-nastaleeq" style={{ fontSize: '15px', color: '#656D4A', marginTop: '10px' }}>
-                  میدہ بوری 50KG اور سوجی کا اسٹاک مناسب ہے۔ یومیہ پسائی کیلئے گندم موجود ہے۔
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('dashboard')}
-                  className="touch-active"
-                  style={{
-                    marginTop: '20px',
-                    padding: '10px 20px',
-                    borderRadius: '10px',
-                    backgroundColor: '#7F4F24',
-                    color: '#ffffff',
-                    border: 'none',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  ڈیش بورڈ پر واپس جائیں (Esc)
-                </button>
-              </div>
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              <WarehouseStockView />
+            </div>
+          )}
+
+          {/* Daily Rates View (F3) */}
+          {activeTab === 'rates' && (
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              <RateListView />
             </div>
           )}
         </main>

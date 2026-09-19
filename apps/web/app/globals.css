@@ -163,6 +163,22 @@ input, textarea, select, button {
   width: 100%;
 }
 
+/* 7. Daily Rates Grid */
+.rates-grid-responsive {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.4fr) minmax(300px, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+/* 8. Stock & Warehouse Grid */
+.stock-grid-responsive {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.4fr) minmax(300px, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
 /* Tablet Breakpoint (max-width: 1024px) */
 @media (max-width: 1024px) {
   .product-grid-responsive {
@@ -176,6 +192,12 @@ input, textarea, select, button {
     grid-template-columns: 1fr;
   }
   .ledger-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+  .rates-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+  .stock-grid-responsive {
     grid-template-columns: 1fr;
   }
 }
@@ -211,5 +233,40 @@ input, textarea, select, button {
     width: 100%;
     justify-content: space-between;
   }
+}
+
+/* =========================================================
+   DASHBOARD CARD ANIMATIONS & TACTILE TRANSITIONS
+   ========================================================= */
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+.pulse-dot {
+  animation: pulse-subtle 2.2s infinite ease-in-out;
+}
+
+.dash-card-animated {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.dash-card-animated:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(166, 99, 54, 0.12), 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.table-row-hover {
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+.table-row-hover:hover {
+  background-color: #FAF4EB !important;
 }
 
