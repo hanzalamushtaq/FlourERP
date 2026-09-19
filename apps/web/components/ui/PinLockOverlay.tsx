@@ -214,13 +214,17 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          20%, 60% { transform: translateX(-8px); }
-          40%, 80% { transform: translateX(8px); }
-        }
-      `}</style>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes shake {
+              0%, 100% { transform: translateX(0); }
+              20%, 60% { transform: translateX(-8px); }
+              40%, 80% { transform: translateX(8px); }
+            }
+          `,
+        }}
+      />
     </div>
   );
 };
