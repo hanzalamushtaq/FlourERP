@@ -173,10 +173,38 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   {inv.itemsDetail}
                 </td>
                 <td style={{ padding: '8px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
-                  Rs {inv.totalAmount.toLocaleString()}
-                  {inv.paymentMethod === 'udhaar' && (
-                    <span className="font-nastaleeq" style={{ fontSize: '10px', color: '#b45309', marginRight: '4px' }}>
-                      (ادھار)
+                  <span>Rs {inv.totalAmount.toLocaleString()}</span>
+                  {inv.paymentMethod === 'udhaar' ? (
+                    <span
+                      className="font-nastaleeq"
+                      style={{
+                        fontSize: '10.5px',
+                        fontWeight: 700,
+                        backgroundColor: '#fffbeb',
+                        border: '1px solid #fde68a',
+                        color: '#b45309',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        marginRight: '6px',
+                      }}
+                    >
+                      ادھار
+                    </span>
+                  ) : (
+                    <span
+                      className="font-nastaleeq"
+                      style={{
+                        fontSize: '10.5px',
+                        fontWeight: 700,
+                        backgroundColor: '#f0fdf4',
+                        border: '1px solid #bbf7d0',
+                        color: '#166534',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        marginRight: '6px',
+                      }}
+                    >
+                      نقد
                     </span>
                   )}
                 </td>

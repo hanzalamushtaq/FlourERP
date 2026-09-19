@@ -183,9 +183,9 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 padding: '8px 10px',
                 borderRadius: '8px',
-                backgroundColor: isSelected ? '#fffbeb' : '#ffffff',
-                border: isSelected ? '1.5px solid #d97706' : '1px solid #e2e8f0',
-                boxShadow: isSelected ? '0 1px 4px rgba(217, 119, 6, 0.15)' : 'none',
+                backgroundColor: isSelected ? '#fffbeb' : '#fafaf7',
+                border: isSelected ? '1.5px solid #d97706' : '1px solid #e8eae0',
+                boxShadow: isSelected ? '0 2px 6px rgba(217, 119, 6, 0.12)' : 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
@@ -580,13 +580,14 @@ export const ProductBillingScreen: React.FC = () => {
           {/* Total Bill Box */}
           <div
             style={{
-              backgroundColor: '#ffffff',
+              backgroundColor: '#fffdf5',
               borderRadius: '10px',
-              border: '1.5px solid #e2e8f0',
+              border: '1.5px solid #fde68a',
               padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               gap: '10px',
+              boxShadow: '0 2px 5px rgba(217, 119, 6, 0.05)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl' }}>

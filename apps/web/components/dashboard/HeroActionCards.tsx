@@ -64,7 +64,7 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
           className="touch-active"
           onClick={card.onClick}
           style={{
-            backgroundColor: '#ffffff',
+            backgroundColor: card.bgLight, // Relative filled background
             borderRadius: '12px',
             border: `1.5px solid ${card.border}`,
             padding: '16px 20px',
@@ -72,23 +72,25 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)',
-            transition: 'transform 0.1s ease',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+            transition: 'all 0.15s ease',
           }}
         >
           {/* Right: Icon + Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div
               style={{
-                width: '48px',
-                height: '48px',
+                width: '46px',
+                height: '46px',
                 borderRadius: '10px',
-                backgroundColor: card.bgLight,
+                backgroundColor: '#ffffff',
                 color: card.color,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
+                border: `1px solid ${card.border}`,
               }}
             >
               {card.icon}
@@ -100,7 +102,7 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
                 style={{
                   fontSize: '20px',
                   fontWeight: 900,
-                  color: '#0f172a',
+                  color: card.color === '#d97706' ? '#92400e' : card.color === '#0284c7' ? '#075985' : '#065f46',
                   lineHeight: 1.2,
                   margin: 0,
                 }}
@@ -118,8 +120,10 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
               fontFamily: 'var(--font-mono)',
               padding: '4px 10px',
               borderRadius: '6px',
-              backgroundColor: card.bgLight,
+              backgroundColor: '#ffffff',
               color: card.color,
+              border: `1px solid ${card.border}`,
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
             }}
           >
             {card.hotkey}

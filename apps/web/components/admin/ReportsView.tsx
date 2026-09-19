@@ -151,32 +151,32 @@ export const ReportsView: React.FC = () => {
 
       {/* Summary KPI Strip */}
       <div className="reports-kpi-grid-responsive">
-        <div style={{ backgroundColor: '#ffffff', padding: '14px 18px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+        <div style={{ backgroundColor: '#f0fdf4', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #bbf7d0' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>کل آمدن (سیل و فیس)</span>
-            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748b' }}>TOTAL REVENUE</span>
+            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#166534' }}>کل آمدن (سیل و فیس)</span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#15803d' }}>TOTAL REVENUE</span>
           </div>
           <div style={{ fontSize: '20px', fontWeight: 900, color: '#15803d', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             + Rs {totalInflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#ffffff', padding: '14px 18px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+        <div style={{ backgroundColor: '#fef2f2', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #fecaca' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>کل اخراجات و واپسی</span>
-            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#64748b' }}>TOTAL EXPENSES</span>
+            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b' }}>کل اخراجات و واپسی</span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#b91c1c' }}>TOTAL EXPENSES</span>
           </div>
           <div style={{ fontSize: '20px', fontWeight: 900, color: '#b91c1c', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             - Rs {totalOutflow.toLocaleString()}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#ffffff', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #d97706' }}>
+        <div style={{ backgroundColor: '#fffdf5', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #fde68a' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>خالص نقد کیش</span>
+            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#92400e' }}>خالص نقد کیش</span>
             <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#d97706' }}>NET CASH POSITION</span>
           </div>
-          <div style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, color: '#b45309', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
             Rs {netDayCash.toLocaleString()}
           </div>
         </div>

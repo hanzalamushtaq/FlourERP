@@ -24,25 +24,41 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
       id: 'sales' as const,
       title: 'کل نقد سیلز',
       value: `Rs ${todaySales.toLocaleString()}`,
-      icon: <Banknote size={20} color="#15803d" />,
+      icon: <Banknote size={20} color="#16a34a" />,
+      bg: '#f0fdf4',
+      border: '#bbf7d0',
+      textColor: '#166534',
+      valColor: '#15803d',
     },
     {
       id: 'recovery' as const,
       title: 'ادھار وصولی',
       value: `Rs ${creditRecovery.toLocaleString()}`,
       icon: <HandCoins size={20} color="#0284c7" />,
+      bg: '#f0f9ff',
+      border: '#bae6fd',
+      textColor: '#0369a1',
+      valColor: '#0284c7',
     },
     {
       id: 'pisai' as const,
       title: 'گندم پسائی',
       value: `${todayPisaiKg.toLocaleString()} KG`,
       icon: <Wheat size={20} color="#d97706" />,
+      bg: '#fffbeb',
+      border: '#fde68a',
+      textColor: '#b45309',
+      valColor: '#d97706',
     },
     {
       id: 'drawer' as const,
       title: 'کیش دراز بیلنس',
       value: `Rs ${cashDrawerBalance.toLocaleString()}`,
-      icon: <Landmark size={20} color="#475569" />,
+      icon: <Landmark size={20} color="#7e22ce" />,
+      bg: '#faf5ff',
+      border: '#e9d5ff',
+      textColor: '#6b21a8',
+      valColor: '#7e22ce',
     },
   ];
 
@@ -62,14 +78,15 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
           className="touch-active"
           onClick={() => onCardClick?.(card.id)}
           style={{
-            backgroundColor: '#ffffff',
+            backgroundColor: card.bg,
             borderRadius: '10px',
-            border: '1px solid #e2e8f0',
+            border: `1.5px solid ${card.border}`,
             padding: '12px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: onCardClick ? 'pointer' : 'default',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
           }}
         >
           <div>
@@ -77,7 +94,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               className="font-nastaleeq"
               style={{
                 fontSize: '13px',
-                color: '#64748b',
+                color: card.textColor,
                 fontWeight: 700,
                 lineHeight: 1.1,
               }}
@@ -90,7 +107,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
                 fontSize: '18px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: '#0f172a',
+                color: card.valColor,
                 marginTop: '4px',
               }}
             >
@@ -103,10 +120,12 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               width: '36px',
               height: '36px',
               borderRadius: '8px',
-              backgroundColor: '#f8fafc',
+              backgroundColor: '#ffffff',
+              border: `1px solid ${card.border}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
             }}
           >
             {card.icon}

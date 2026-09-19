@@ -470,13 +470,14 @@ export const PisaiBillingScreen: React.FC = () => {
           {/* Token Summary Card */}
           <div
             style={{
-              backgroundColor: '#ffffff',
+              backgroundColor: '#f0f9ff',
               borderRadius: '10px',
-              border: '1.5px solid #e2e8f0',
+              border: '1.5px solid #bae6fd',
               padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
               gap: '10px',
+              boxShadow: '0 2px 5px rgba(2, 132, 199, 0.05)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl' }}>
@@ -567,7 +568,7 @@ export const PisaiBillingScreen: React.FC = () => {
               style={{
                 height: '44px',
                 borderRadius: '8px',
-                backgroundColor: numWeight > 0 && numCharge > 0 ? '#15803d' : '#94a3b8',
+                backgroundColor: numWeight > 0 && numCharge > 0 ? '#0284c7' : '#94a3b8',
                 color: '#ffffff',
                 border: 'none',
                 cursor: numWeight > 0 && numCharge > 0 ? 'pointer' : 'not-allowed',
@@ -576,6 +577,7 @@ export const PisaiBillingScreen: React.FC = () => {
                 justifyContent: 'center',
                 gap: '8px',
                 padding: '0 16px',
+                boxShadow: numWeight > 0 && numCharge > 0 ? '0 2px 6px rgba(2, 132, 199, 0.25)' : 'none',
               }}
             >
               <Printer size={16} />
@@ -599,7 +601,7 @@ export const PisaiBillingScreen: React.FC = () => {
               style={{
                 height: '40px',
                 borderRadius: '8px',
-                backgroundColor: numWeight > 0 && numCharge > 0 ? '#0f172a' : '#94a3b8',
+                backgroundColor: numWeight > 0 && numCharge > 0 ? '#7F4F24' : '#94a3b8',
                 color: '#ffffff',
                 border: 'none',
                 cursor: numWeight > 0 && numCharge > 0 ? 'pointer' : 'not-allowed',
