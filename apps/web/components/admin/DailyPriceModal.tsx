@@ -1,4 +1,3 @@
-'use strict';
 'use client';
 
 import React, { useState } from 'react';
@@ -29,6 +28,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
     { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', yesterdayRate: 155, todayRate: 155 },
     { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', yesterdayRate: 160, todayRate: 160 },
     { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', yesterdayRate: 90, todayRate: 95 },
+    { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', yesterdayRate: 142, todayRate: 145 },
   ]);
 
   const [billerHoldState, setBillerHoldState] = useState<boolean>(false);
@@ -56,7 +56,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 9995,
-        backgroundColor: 'rgba(15, 23, 42, 0.75)',
+        backgroundColor: 'rgba(65, 72, 51, 0.65)',
         backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
@@ -68,11 +68,11 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '560px',
-          backgroundColor: 'var(--bg-card)',
-          borderRadius: 'var(--radius-lg)',
+          backgroundColor: '#F4F5EE',
+          borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: 'var(--shadow-xl)',
-          border: '1.5px solid var(--border-medium)',
+          boxShadow: '0 20px 35px rgba(65, 72, 51, 0.25)',
+          border: '2px solid #B6AD90',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
@@ -82,8 +82,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         <div
           style={{
             padding: '16px 20px',
-            backgroundColor: 'var(--wheat-50)',
-            borderBottom: '1.5px solid var(--wheat-200)',
+            backgroundColor: '#C2C5AA',
+            borderBottom: '1.5px solid #B6AD90',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -91,18 +91,18 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Clock size={20} color="var(--wheat-700)" />
-              <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--wheat-700)' }}>
+              <Clock size={20} color="#414833" />
+              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#414833' }}>
                 Daily Price Confirmation
               </h2>
             </div>
-            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 700, color: '#414833' }}>
               روزانہ نرخ نامہ کی تصدیق (24 گھنٹے میں ایک بار)
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#414833' }}
           >
             <X size={22} />
           </button>
@@ -112,16 +112,17 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         <div
           style={{
             padding: '12px 20px',
-            backgroundColor: 'var(--bg-subtle)',
+            backgroundColor: '#C2C5AA',
             fontSize: '13px',
-            color: 'var(--text-secondary)',
-            borderBottom: '1px solid var(--border-subtle)',
+            color: '#414833',
+            fontWeight: 700,
+            borderBottom: '1px solid #B6AD90',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
           }}
         >
-          <ShieldCheck size={18} color="var(--emerald-600)" />
+          <ShieldCheck size={18} color="#414833" />
           <span>
             First bill of the day protocol: Rates must be confirmed before counter sales proceed.
           </span>
@@ -134,10 +135,10 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
               display: 'grid',
               gridTemplateColumns: '2fr 1fr 1fr',
               fontSize: '12px',
-              fontWeight: 700,
-              color: 'var(--text-muted)',
+              fontWeight: 800,
+              color: '#414833',
               paddingBottom: '4px',
-              borderBottom: '1px solid var(--border-subtle)',
+              borderBottom: '1.5px solid #B6AD90',
             }}
           >
             <span>PRODUCT (پروڈکٹ)</span>
@@ -153,17 +154,17 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 gridTemplateColumns: '2fr 1fr 1fr',
                 alignItems: 'center',
                 padding: '10px 0',
-                borderBottom: '1px dashed var(--border-subtle)',
+                borderBottom: '1px dashed #B6AD90',
               }}
             >
               <div>
-                <div style={{ fontWeight: 700, fontSize: '14px' }}>{item.nameEn}</div>
-                <div className="font-nastaleeq" style={{ fontSize: '16px', color: 'var(--wheat-700)' }}>
+                <div style={{ fontWeight: 800, fontSize: '14px', color: '#414833' }}>{item.nameEn}</div>
+                <div className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 700, color: '#414833' }}>
                   {item.nameUr}
                 </div>
               </div>
 
-              <div style={{ textAlign: 'center', fontWeight: 600, color: 'var(--text-secondary)' }}>
+              <div style={{ textAlign: 'center', fontWeight: 700, color: '#414833' }}>
                 Rs {item.yesterdayRate}
               </div>
 
@@ -176,17 +177,19 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                     style={{
                       width: '90px',
                       padding: '8px 10px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '2px solid var(--wheat-500)',
+                      borderRadius: '8px',
+                      border: '2px solid #B6AD90',
+                      backgroundColor: '#F4F5EE',
+                      color: '#414833',
                       fontSize: '16px',
-                      fontWeight: 800,
+                      fontWeight: 900,
                       fontFamily: 'var(--font-mono)',
                       textAlign: 'right',
                       outline: 'none',
                     }}
                   />
                 ) : (
-                  <span style={{ fontWeight: 800, fontSize: '16px', color: 'var(--text-primary)' }}>
+                  <span style={{ fontWeight: 900, fontSize: '16px', color: '#414833' }}>
                     Rs {item.todayRate}
                   </span>
                 )}
@@ -198,22 +201,22 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
           {!isAdmin && (
             <div
               style={{
-                backgroundColor: billerHoldState ? '#fee2e2' : 'var(--bg-subtle)',
-                border: billerHoldState ? '1.5px solid #ef4444' : '1px solid var(--border-medium)',
-                borderRadius: 'var(--radius-md)',
+                backgroundColor: '#F4F5EE',
+                border: '1.5px solid #B6AD90',
+                borderRadius: '12px',
                 padding: '14px',
                 marginTop: '10px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <AlertCircle size={18} color={billerHoldState ? '#b91c1c' : '#4b5563'} />
-                <span style={{ fontWeight: 700, fontSize: '13px' }}>
+                <AlertCircle size={18} color="#414833" />
+                <span style={{ fontWeight: 800, fontSize: '13px', color: '#414833' }}>
                   {billerHoldState
                     ? 'BILL ON HOLD: Price change request sent to Admin!'
                     : 'Biller Notice: You cannot edit rates directly.'}
                 </span>
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              <p style={{ fontSize: '12px', color: '#414833', marginTop: '4px', fontWeight: 600 }}>
                 {billerHoldState
                   ? 'Counter bill is locked until Admin confirms or rejects new pricing.'
                   : 'Click below to request rate update from Admin or keep previous rates to proceed.'}
@@ -226,8 +229,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         <div
           style={{
             padding: '16px 20px',
-            backgroundColor: 'var(--bg-subtle)',
-            borderTop: '1.5px solid var(--border-medium)',
+            backgroundColor: '#C2C5AA',
+            borderTop: '1.5px solid #B6AD90',
             display: 'flex',
             gap: '12px',
           }}
@@ -241,12 +244,12 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 style={{
                   flex: 1,
                   height: '48px',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--emerald-600)',
-                  color: '#ffffff',
+                  borderRadius: '10px',
+                  backgroundColor: '#414833',
+                  color: '#F4F5EE',
                   border: 'none',
                   fontSize: '15px',
-                  fontWeight: 700,
+                  fontWeight: 800,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -254,7 +257,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   gap: '8px',
                 }}
               >
-                {confirmed ? <CheckCircle2 size={18} /> : <Save size={18} />}
+                {confirmed ? <CheckCircle2 size={18} color="#F4F5EE" /> : <Save size={18} color="#F4F5EE" />}
                 {confirmed ? 'Prices Confirmed & Logged!' : 'Confirm & Apply Today’s Rates'}
               </button>
 
@@ -265,12 +268,12 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 style={{
                   height: '48px',
                   padding: '0 16px',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--bg-card)',
-                  color: 'var(--text-secondary)',
-                  border: '1.5px solid var(--border-medium)',
+                  borderRadius: '10px',
+                  backgroundColor: '#F4F5EE',
+                  color: '#414833',
+                  border: '1.5px solid #B6AD90',
                   fontSize: '14px',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: 'pointer',
                 }}
               >
@@ -286,12 +289,12 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 style={{
                   flex: 1,
                   height: '48px',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--wheat-600)',
-                  color: '#ffffff',
+                  borderRadius: '10px',
+                  backgroundColor: '#414833',
+                  color: '#F4F5EE',
                   border: 'none',
                   fontSize: '14px',
-                  fontWeight: 700,
+                  fontWeight: 800,
                   cursor: 'pointer',
                 }}
               >
@@ -304,12 +307,12 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 style={{
                   height: '48px',
                   padding: '0 16px',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--bg-card)',
-                  color: 'var(--text-secondary)',
-                  border: '1.5px solid var(--border-medium)',
+                  borderRadius: '10px',
+                  backgroundColor: '#F4F5EE',
+                  color: '#414833',
+                  border: '1.5px solid #B6AD90',
                   fontSize: '14px',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   cursor: 'pointer',
                 }}
               >

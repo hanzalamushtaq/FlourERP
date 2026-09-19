@@ -1,59 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
-
-@font-face {
-  font-family: 'Jameel Noori Nastaleeq';
-  src: local('Jameel Noori Nastaleeq'), local('JameelNooriNastaleeq'),
-       url('https://cdn.jsdelivr.net/gh/m-a-k-s/urdu-fonts@master/fonts/Jameel%20Noori%20Nastaleeq.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/m-a-k-s/urdu-fonts@master/fonts/Jameel%20Noori%20Nastaleeq.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 :root {
-  /* Color Palette: Warm Flour & Wheat Theme with High Contrast */
-  --bg-main: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f1f5f9;
-  --bg-card: #ffffff;
+  /* Strict 8-Color Crop Agriculture Palette from User Image */
+  --c1: #7F4F24; /* Warm Timber (Primary CTA, Cash Buttons, Active Borders) */
+  --c2: #936639; /* Caramel Amber (Rate Badges, Highlights) */
+  --c3: #A68A64; /* Warm Khaki (Accents, Focus Outlines) */
+  --c4: #B6AD90; /* Soft Almond Khaki (Borders, Dividers, Frames) */
+  --c5: #C2C5AA; /* Pale Sage Cream (Surfaces, Card Fill, Panels) */
+  --c6: #A4AC86; /* Soft Celadon (Pills, Inactive Badges) */
+  --c7: #656D4A; /* Olive Green (Secondary CTA, Credit Buttons) */
+  --c8: #414833; /* Deep Forest Olive (Wording, Headings, Numbers, Keypad Text) */
+
+  /* Light Theme Semantic UI Tokens - Light boxes, deep dark typography */
+  --bg-main: #F4F5EE; /* Clean Light Canvas */
+  --bg-surface: var(--c5);
+  --bg-subtle: #E8EAE0;
+  --bg-card: #F4F5EE;
+  --bg-input: #F4F5EE;
   
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-inverse: #ffffff;
+  --text-primary: var(--c8); /* Deep Wording #414833 */
+  --text-secondary: var(--c8);
+  --text-muted: var(--c7);
+  --text-inverse: #F4F5EE;
 
-  /* Wheat & Gold Brand Accent */
-  --wheat-50: #fffbeb;
-  --wheat-100: #fef3c7;
-  --wheat-400: #fbbf24;
-  --wheat-500: #f59e0b;
-  --wheat-600: #d97706;
-  --wheat-700: #b45309;
+  /* Accents */
+  --accent-primary: var(--c1); /* Warm Timber #7F4F24 */
+  --accent-secondary: var(--c7); /* Olive Green #656D4A */
+  --accent-highlight: var(--c2); /* Caramel Amber #936639 */
 
-  /* Emerald (Sales & Totals) */
-  --emerald-50: #ecfdf5;
-  --emerald-500: #10b981;
-  --emerald-600: #059669;
-  --emerald-700: #047857;
-
-  /* Alert / Error / Warning */
-  --rose-50: #fff1f2;
-  --rose-500: #f43f5e;
-  --rose-600: #e11d48;
+  /* Borders & Dividers */
+  --border-subtle: var(--c4);
+  --border-medium: var(--c6);
+  --border-strong: var(--c8);
+  --border-active: var(--c1);
   
-  --amber-50: #fffbeb;
-  --amber-500: #f59e0b;
-  --amber-600: #d97706;
-
-  /* Borders & Shadows */
-  --border-subtle: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-strong: #94a3b8;
-  
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 2px 0 rgba(65, 72, 51, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(65, 72, 51, 0.12), 0 2px 4px -2px rgba(65, 72, 51, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(65, 72, 51, 0.15), 0 4px 6px -4px rgba(65, 72, 51, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(65, 72, 51, 0.2), 0 8px 10px -6px rgba(65, 72, 51, 0.15);
 
   /* Touch Target Radius */
   --radius-sm: 8px;
@@ -63,7 +47,7 @@
 
   /* Typography */
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-urdu: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+  --font-urdu: 'Segoe UI', 'Noto Sans Arabic', Tahoma, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -80,7 +64,11 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  user-select: none; /* Prevents text selection on counter tablets */
+  user-select: none;
+}
+
+input, textarea, select, button {
+  user-select: auto;
 }
 
 /* Urdu Typography Class */
@@ -88,6 +76,8 @@ body {
   font-family: var(--font-urdu);
   direction: rtl;
   line-height: 1.6;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .font-mono {
@@ -108,9 +98,118 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-subtle);
+  background: var(--bg-main);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
+  background: var(--c4);
   border-radius: var(--radius-full);
 }
+
+/* =========================================================
+   RESPONSIVE LAYOUT & EQUAL WIDTH UTILITIES
+   ========================================================= */
+
+/* 1. Navigation Tabs: Equal width grid across full width */
+.nav-tabs-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.nav-tab-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* 2. Product Selection Grid */
+.product-grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+/* 3. 2-Column POS Billing Split */
+.billing-grid-responsive {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 14px;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* 4. Pisai Service Grid */
+.service-grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+/* 5. Customer Ledger Grid */
+.ledger-grid-responsive {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) minmax(360px, 1.5fr);
+  gap: 16px;
+  width: 100%;
+}
+
+/* 6. Reports KPI Grid */
+.reports-kpi-grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+/* Tablet Breakpoint (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .product-grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Medium / Tablet Portrait Breakpoint (max-width: 860px) */
+@media (max-width: 860px) {
+  .billing-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+  .ledger-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile Tabs & Cards Breakpoint (max-width: 768px) */
+@media (max-width: 768px) {
+  .nav-tabs-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-tab-btn {
+    flex: 0 0 auto !important;
+    min-width: 130px;
+    padding: 8px 12px !important;
+  }
+  .reports-kpi-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Phone Breakpoint (max-width: 640px) */
+@media (max-width: 640px) {
+  .product-grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .service-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+  .header-actions-responsive {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+

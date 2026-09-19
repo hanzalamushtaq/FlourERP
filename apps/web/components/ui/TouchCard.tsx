@@ -1,4 +1,3 @@
-'use strict';
 'use client';
 
 import React from 'react';
@@ -38,12 +37,10 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '16px 14px',
-        borderRadius: 'var(--radius-lg)',
-        backgroundColor: isSelected ? 'var(--wheat-50)' : 'var(--bg-card)',
-        border: isSelected
-          ? '3px solid var(--wheat-600)'
-          : '2px solid var(--border-subtle)',
-        boxShadow: isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+        borderRadius: '16px',
+        backgroundColor: isSelected ? '#C2C5AA' : '#F4F5EE',
+        border: isSelected ? '3px solid #7F4F24' : '1.5px solid #B6AD90',
+        boxShadow: isSelected ? '0 8px 18px rgba(65, 72, 51, 0.22)' : '0 2px 8px rgba(65, 72, 51, 0.08)',
         cursor: 'pointer',
         minHeight: '135px',
         opacity: isRateSet ? 1 : 0.85,
@@ -62,9 +59,10 @@ export const TouchCard: React.FC<TouchCardProps> = ({
           style={{
             width: '40px',
             height: '40px',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: isSelected ? 'var(--wheat-500)' : 'var(--bg-subtle)',
-            color: isSelected ? 'var(--text-inverse)' : 'var(--wheat-700)',
+            borderRadius: '10px',
+            backgroundColor: isSelected ? '#7F4F24' : '#C2C5AA',
+            border: isSelected ? '1px solid #7F4F24' : '1px solid #B6AD90',
+            color: isSelected ? '#F4F5EE' : '#414833',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -83,9 +81,9 @@ export const TouchCard: React.FC<TouchCardProps> = ({
               right: '12px',
               width: '24px',
               height: '24px',
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: 'var(--wheat-600)',
-              color: '#ffffff',
+              borderRadius: '9999px',
+              backgroundColor: '#7F4F24',
+              color: '#F4F5EE',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -100,14 +98,12 @@ export const TouchCard: React.FC<TouchCardProps> = ({
           <div
             style={{
               padding: '4px 10px',
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: isSelected ? 'var(--wheat-200)' : 'var(--emerald-50)',
-              color: isSelected ? 'var(--wheat-700)' : 'var(--emerald-700)',
+              borderRadius: '9999px',
+              backgroundColor: isSelected ? '#7F4F24' : '#C2C5AA',
+              color: isSelected ? '#F4F5EE' : '#414833',
               fontWeight: 800,
               fontSize: '14px',
-              border: isSelected
-                ? '1px solid var(--wheat-400)'
-                : '1px solid #a7f3d0',
+              border: isSelected ? '1.5px solid #7F4F24' : '1px solid #B6AD90',
             }}
           >
             Rs {product.ratePerKg}/KG
@@ -119,38 +115,39 @@ export const TouchCard: React.FC<TouchCardProps> = ({
               alignItems: 'center',
               gap: '4px',
               padding: '4px 8px',
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: 'var(--rose-50)',
-              color: 'var(--rose-600)',
+              borderRadius: '9999px',
+              backgroundColor: '#F4F5EE',
+              color: '#414833',
+              border: '1px solid #B6AD90',
               fontWeight: 700,
               fontSize: '12px',
             }}
           >
-            <AlertTriangle size={14} /> Rate Unset
+            <AlertTriangle size={14} color="#414833" /> Rate Unset
           </div>
         )}
       </div>
 
-      {/* Main Titles: English + Prominent Urdu Nastaleeq */}
-      <div style={{ marginTop: '12px' }}>
+      {/* Main Titles: Prominent Urdu Nastaleeq + Crisp English */}
+      <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <div
           className="font-nastaleeq"
           style={{
-            fontSize: '26px',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
+            fontSize: '22px',
+            fontWeight: 800,
+            color: '#414833',
             textAlign: 'right',
-            marginBottom: '2px',
-            letterSpacing: '0.5px',
+            lineHeight: 1.3,
           }}
         >
           {product.nameUr}
         </div>
         <div
           style={{
-            fontSize: '14px',
-            fontWeight: 600,
-            color: 'var(--text-secondary)',
+            fontSize: '12px',
+            fontWeight: 700,
+            color: '#414833',
+            letterSpacing: '0.2px',
           }}
         >
           {product.nameEn}
