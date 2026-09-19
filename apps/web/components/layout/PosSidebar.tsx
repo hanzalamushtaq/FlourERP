@@ -87,8 +87,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       style={{
         width: '220px',
         minWidth: '220px',
-        backgroundColor: '#414833', // Deep Forest Olive (--c8 theme)
-        color: '#F4F5EE',
+        backgroundColor: '#ffffff', // Clean Light Theme
+        color: '#414833',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -97,7 +97,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        borderRight: '1px solid #363C2A',
+        borderRight: '1px solid #e2e8f0',
       }}
     >
       <div>
@@ -109,7 +109,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             alignItems: 'center',
             gap: '10px',
             direction: 'rtl',
-            borderBottom: '1px solid #4D563C',
+            borderBottom: '1px solid #e2e8f0',
           }}
         >
           <div
@@ -118,19 +118,19 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               height: '36px',
               borderRadius: '8px',
               backgroundColor: '#7F4F24', // Warm Timber brand
-              color: '#F4F5EE',
+              color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
             }}
           >
             <Wheat size={20} strokeWidth={2.4} />
           </div>
 
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '15px', fontWeight: 800, color: '#F4F5EE', letterSpacing: '-0.3px' }}>
+            <div style={{ fontSize: '15px', fontWeight: 800, color: '#414833', letterSpacing: '-0.3px' }}>
               FlourERP
             </div>
             <div
@@ -138,7 +138,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               style={{
                 fontSize: '13px',
                 fontWeight: 700,
-                color: '#C2C5AA', // Pale sage
+                color: '#656D4A',
                 lineHeight: 1.1,
               }}
             >
@@ -154,16 +154,16 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: '1px solid #4D563C',
-            backgroundColor: '#383F2B',
+            borderBottom: '1px solid #e2e8f0',
+            backgroundColor: '#f8fafc',
             direction: 'rtl',
           }}
         >
           <div>
-            <div className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#F4F5EE' }}>
+            <div className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#414833' }}>
               {operatorName}
             </div>
-            <div style={{ fontSize: '11px', color: '#C2C5AA' }}>{counterId}</div>
+            <div style={{ fontSize: '11px', color: '#656D4A' }}>{counterId}</div>
           </div>
 
           <button
@@ -175,9 +175,9 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               width: '28px',
               height: '28px',
               borderRadius: '6px',
-              border: '1px solid #545D43',
-              backgroundColor: '#2E3424',
-              color: '#C2C5AA',
+              border: '1px solid #cbd5e1',
+              backgroundColor: '#ffffff',
+              color: '#414833',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -206,8 +206,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   padding: '8px 12px',
                   borderRadius: '7px',
                   border: 'none',
-                  backgroundColor: isActive ? '#7F4F24' : 'transparent', // Warm Timber for Active state
-                  color: isActive ? '#F4F5EE' : '#C2C5AA',
+                  backgroundColor: isActive ? '#7F4F24' : 'transparent', // Warm Timber active
+                  color: isActive ? '#ffffff' : '#414833',
                   cursor: 'pointer',
                   fontWeight: isActive ? 800 : 600,
                   transition: 'background-color 0.1s ease',
@@ -215,7 +215,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-                  <span style={{ color: isActive ? '#F4F5EE' : '#A4AC86' }}>{item.icon}</span>
+                  <span style={{ color: isActive ? '#ffffff' : '#656D4A' }}>{item.icon}</span>
                   <span className="font-nastaleeq" style={{ fontSize: '13.5px', fontWeight: 700 }}>
                     {item.label}
                   </span>
@@ -229,9 +229,9 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                       fontWeight: 700,
                       padding: '1px 5px',
                       borderRadius: '4px',
-                      backgroundColor: isActive ? '#5E3615' : '#363C2A',
-                      color: isActive ? '#F4F5EE' : '#A4AC86',
-                      border: `1px solid ${isActive ? '#7F4F24' : '#4D563C'}`,
+                      backgroundColor: isActive ? '#5E3615' : '#f1f5f9',
+                      color: isActive ? '#ffffff' : '#64748b',
+                      border: isActive ? 'none' : '1px solid #e2e8f0',
                     }}
                   >
                     {item.hotkey}
@@ -247,14 +247,14 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       <div
         style={{
           padding: '10px 14px',
-          borderTop: '1px solid #4D563C',
+          borderTop: '1px solid #e2e8f0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           direction: 'rtl',
           fontSize: '11px',
-          color: '#A4AC86',
-          backgroundColor: '#383F2B',
+          color: '#64748b',
+          backgroundColor: '#f8fafc',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -263,18 +263,18 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               width: '7px',
               height: '7px',
               borderRadius: '50%',
-              backgroundColor: '#86efac',
-              boxShadow: '0 0 5px #86efac',
+              backgroundColor: '#16a34a',
+              boxShadow: '0 0 4px rgba(22, 163, 74, 0.4)',
             }}
           />
-          <span className="font-nastaleeq" style={{ color: '#F4F5EE', fontWeight: 700 }}>
+          <span className="font-nastaleeq" style={{ color: '#15803d', fontWeight: 700 }}>
             آن لائن
           </span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <Printer size={12} color="#C2C5AA" />
-          <span style={{ color: '#C2C5AA' }}>پرنٹر تیار</span>
+          <Printer size={12} color="#64748b" />
+          <span>پرنٹر تیار</span>
         </div>
       </div>
     </aside>
