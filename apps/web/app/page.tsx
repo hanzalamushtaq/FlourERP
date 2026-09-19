@@ -84,7 +84,7 @@ export default function Home() {
       style={{
         display: 'flex',
         minHeight: '100vh',
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'var(--bg-main, #F4F5EE)',
         width: '100%',
         overflowX: 'hidden',
       }}

@@ -96,8 +96,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({ onOpenZReport }) => {
           onClick={onOpenZReport}
           className="touch-active"
           style={{
-            backgroundColor: '#0f172a',
-            color: '#ffffff',
+            backgroundColor: '#414833',
+            color: '#F4F5EE',
             border: 'none',
             borderRadius: '8px',
             padding: '7px 14px',
@@ -109,7 +109,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({ onOpenZReport }) => {
             gap: '6px',
           }}
         >
-          <FileSpreadsheet size={15} color="#fbbf24" />
+          <FileSpreadsheet size={15} color="#C2C5AA" />
           <span className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800 }}>
             شفٹ اختتام (Z-Report)
           </span>
@@ -120,7 +120,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({ onOpenZReport }) => {
       <div style={{ textAlign: 'right', direction: 'rtl' }}>
         <h1
           className="font-nastaleeq"
-          style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a', margin: 0 }}
+          style={{ fontSize: '18px', fontWeight: 900, color: '#414833', margin: 0 }}
         >
           کاؤنٹر ڈیش بورڈ
         </h1>
