@@ -17,7 +17,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Frontend UI & Dashboard Design | 3/3 | Completed | 2026-09-18 |
-| 2. Backend Foundation & Core Setup | 0/3 | Not started | - |
+| 2. Backend Foundation & Core Setup | 3/3 | Completed | 2026-09-19 |
 | 3. Product Catalog & Price Management | 0/2 | Not started | - |
 | 4. Core Billing Engine (Standard Products) | 0/3 | Not started | - |
 | 5. Gundam Pisai (Grinding) Module | 0/2 | Not started | - |
@@ -55,9 +55,9 @@
   2. Users can log in with username/password, persist sessions securely, and log out cleanly.
   3. Admin can create custom roles and assign fine-grained permissions via backend API.
 **Plans**:
-  - [ ] 02-01: Express Monorepo Scaffolding & PostgreSQL Database Migrations
-  - [ ] 02-02: Authentication Engine, Session Management & PIN-Lock API
-  - [ ] 02-03: Dynamic RBAC Engine & Fine-Grained Permission Middleware
+  - [x] 02-01: Express Monorepo Scaffolding & PostgreSQL Database Migrations
+  - [x] 02-02: Authentication Engine, Session Management & PIN-Lock API
+  - [x] 02-03: Dynamic RBAC Engine & Fine-Grained Permission Middleware
 
 ### Phase 3: Product Catalog & Price Management
 **Goal**: Implement product catalog management, per-KG rates, price history tracking, and the daily price confirmation workflow.
