@@ -7,6 +7,7 @@ import { ShiftKpiCards } from './ShiftKpiCards';
 import { ChakkiQueueCard } from './ChakkiQueueCard';
 import { RecentInvoicesTable } from './RecentInvoicesTable';
 import { ReceiptData } from '../ui/ReceiptPreviewModal';
+import { useLanguage } from '../../context/LanguageContext';
 
 // 1. Receipt Printer SVG Illustration matching reference image
 const ReceiptPrinterIcon = () => (
@@ -84,6 +85,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   onReprintReceipt,
   onViewAllInvoices,
 }) => {
+  const { isUrdu, t } = useLanguage();
   const [hoveredCard, setHoveredCard] = React.useState<string | null>(null);
   const [pressedCard, setPressedCard] = React.useState<string | null>(null);
 
@@ -99,17 +101,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
         padding: '16px 16px 24px 16px',
       }}
     >
-      {/* Top 3 Action Cards with distinct 'Khushak Anaj' (Dry Grain) color gradients & animations */}
+      {/* Top 3 Action Cards */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '16px',
           width: '100%',
-          direction: 'rtl',
         }}
       >
-        {/* Card 1 (Right in RTL): نیا بل بنائیں - Dark Charcoal Onyx with Gold Accent */}
+        {/* Card 1: Create New Bill */}
         <div
           onClick={onNewBill}
           onMouseEnter={() => setHoveredCard('billing')}
@@ -123,29 +124,24 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           onTouchEnd={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background:
-              hoveredCard === 'billing'
-                ? 'linear-gradient(135deg, #58797D 0%, #435E62 50%, #344B4E 100%)'
-                : 'linear-gradient(135deg, #4A676B 0%, #374F52 50%, #2A3F42 100%)',
+            background: '#1877F2',
             borderRadius: '16px',
-            border: hoveredCard === 'billing' ? '2.5px solid #84A9AD' : '2px solid #5F8387',
+            border: 'none',
+            outline: 'none',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredCard === 'billing'
-                ? '0 14px 34px rgba(54, 79, 82, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(54, 79, 82, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '96px',
+            boxShadow: 'none',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'billing'
                 ? 'scale(0.975) translateY(1px)'
                 : hoveredCard === 'billing'
-                ? 'translateY(-4px)'
-                : 'none',
+                  ? 'translateY(-4px)'
+                  : 'none',
           }}
         >
           {/* Left: White Squircle Icon Tile */}
@@ -158,7 +154,8 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              border: 'none',
+              boxShadow: 'none',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
               transform: hoveredCard === 'billing' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
@@ -167,26 +164,26 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             <ReceiptPrinterIcon />
           </div>
 
-          {/* Right Text: Bold White Nastaleeq */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          {/* Right Text */}
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '24px',
+                fontSize: '18px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
+                letterSpacing: '-0.01em',
               }}
             >
-              نیا بل بنائیں
+              {t('نیا بل بنائیں', 'Create New Bill')}
             </h2>
           </div>
         </div>
 
-        {/* Card 2 (Center in RTL): گندم پسائی ٹوکن - Warm Dusty Terracotta Palette Gradient */}
+        {/* Card 2: Milling Token */}
         <div
           onClick={onNewPisaiToken}
           onMouseEnter={() => setHoveredCard('pisai')}
@@ -200,29 +197,24 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           onTouchEnd={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background:
-              hoveredCard === 'pisai'
-                ? 'linear-gradient(135deg, #DFBBB0 0%, #C9A292 50%, #B18978 100%)'
-                : 'linear-gradient(135deg, #D4ADA0 0%, #BE9685 50%, #A67E6D 100%)',
+            background: '#D97706',
             borderRadius: '16px',
-            border: hoveredCard === 'pisai' ? '2.5px solid #F4DFD7' : '2px solid #E8CDC2',
+            border: 'none',
+            outline: 'none',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredCard === 'pisai'
-                ? '0 14px 34px rgba(190, 150, 133, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(190, 150, 133, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '96px',
+            boxShadow: 'none',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'pisai'
                 ? 'scale(0.975) translateY(1px)'
                 : hoveredCard === 'pisai'
-                ? 'translateY(-4px)'
-                : 'none',
+                  ? 'translateY(-4px)'
+                  : 'none',
           }}
         >
           {/* Left: White Squircle Icon Tile */}
@@ -235,7 +227,8 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              border: 'none',
+              boxShadow: 'none',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
               transform: hoveredCard === 'pisai' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
@@ -244,26 +237,26 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             <ChakkiGrinderIcon />
           </div>
 
-          {/* Right Text: Bold White Nastaleeq */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          {/* Right Text */}
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '24px',
+                fontSize: '18px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
+                letterSpacing: '-0.01em',
               }}
             >
-              گندم پسائی ٹوکن
+              {t('گندم پسائی ٹوکن', 'Milling Token')}
             </h2>
           </div>
         </div>
 
-        {/* Card 3 (Left in RTL): ادھار کھاتے و وصولی - Dusty Slate Blue Palette Gradient */}
+        {/* Card 3: Customer Ledger */}
         <div
           onClick={onViewUdhaar}
           onMouseEnter={() => setHoveredCard('udhaar')}
@@ -277,29 +270,24 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           onTouchEnd={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background:
-              hoveredCard === 'udhaar'
-                ? 'linear-gradient(135deg, #9DB7C4 0%, #819EAD 50%, #698694 100%)'
-                : 'linear-gradient(135deg, #8DAAB8 0%, #7491A0 50%, #5E7A88 100%)',
+            background: '#0E8A54',
             borderRadius: '16px',
-            border: hoveredCard === 'udhaar' ? '2.5px solid #C4DCE8' : '2px solid #A8C4D2',
+            border: 'none',
+            outline: 'none',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredCard === 'udhaar'
-                ? '0 14px 34px rgba(116, 145, 160, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(116, 145, 160, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '96px',
+            boxShadow: 'none',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'udhaar'
                 ? 'scale(0.975) translateY(1px)'
                 : hoveredCard === 'udhaar'
-                ? 'translateY(-4px)'
-                : 'none',
+                  ? 'translateY(-4px)'
+                  : 'none',
           }}
         >
           {/* Left: White Squircle Icon Tile */}
@@ -312,7 +300,8 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              border: 'none',
+              boxShadow: 'none',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
               transform: hoveredCard === 'udhaar' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
@@ -321,21 +310,21 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             <KhataBookIcon />
           </div>
 
-          {/* Right Text: Bold White Nastaleeq */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          {/* Right Text */}
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '24px',
+                fontSize: '18px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
+                letterSpacing: '-0.01em',
               }}
             >
-              ادھار کھاتے و وصولی
+              {t('ادھار کھاتے و وصولی', 'Customer Ledger')}
             </h2>
           </div>
         </div>

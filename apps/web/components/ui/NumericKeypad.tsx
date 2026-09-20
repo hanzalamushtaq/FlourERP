@@ -20,49 +20,8 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
 }) => {
   const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0'];
 
-  const quickIncrements =
-    mode === 'weight'
-      ? [
-          { label: '+5 kg', value: 5 },
-          { label: '+10 kg', value: 10 },
-          { label: '+20 kg', value: 20 },
-          { label: '+40 kg (Bori)', value: 40 },
-        ]
-      : [
-          { label: '+100', value: 100 },
-          { label: '+200', value: 200 },
-          { label: '+500', value: 500 },
-          { label: '+1,000', value: 1000 },
-        ];
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
-      {/* Quick Add Pills */}
-      {onQuickAdd && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-          {quickIncrements.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => onQuickAdd(item.value)}
-              className="touch-active"
-              style={{
-                padding: '10px 4px',
-                borderRadius: '12px',
-                backgroundColor: '#C2C5AA',
-                color: '#414833',
-                border: '1.5px solid #B6AD90',
-                fontSize: '13px',
-                fontWeight: 800,
-                cursor: 'pointer',
-                textAlign: 'center',
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* Main Numeric Grid */}
       <div

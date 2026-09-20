@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Printer, RefreshCw, X, CheckCircle2 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export interface ReceiptData {
   type: 'product' | 'pisai';
@@ -38,6 +39,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
   onClose,
   data,
 }) => {
+  const { isUrdu, t } = useLanguage();
   const [printed, setPrinted] = React.useState(false);
 
   if (!isOpen || !data) return null;
@@ -72,7 +74,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
           borderRadius: '16px',
           border: '2px solid #B6AD90',
           overflow: 'hidden',
-          boxShadow: '0 20px 35px rgba(65, 72, 51, 0.25)',
+          boxShadow: 'none',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
@@ -91,7 +93,9 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Printer size={18} color="#414833" />
-            <span style={{ fontWeight: 800, fontSize: '15px', color: '#414833' }}>Thermal Receipt Preview</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, fontSize: '15px', color: '#414833' }}>
+              {t('تھرمل پرچی پیش نظارہ', 'Thermal Receipt Preview')}
+            </span>
           </div>
           <button
             onClick={onClose}
@@ -119,41 +123,41 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
           }}
         >
           <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-            <div className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
-              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-            </div>
+            {isUrdu && (
+              <div className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </div>
+            )}
             <div
-              className="font-nastaleeq"
-              style={{ fontSize: '18px', fontWeight: 800, marginTop: '2px', color: '#0f172a' }}
+              className={isUrdu ? 'font-nastaleeq' : ''}
+              style={{ fontSize: '16px', fontWeight: 900, marginTop: '2px', color: '#0f172a', letterSpacing: isUrdu ? 'normal' : '0.5px' }}
             >
-              المدینہ چکی و فلور ملز
+              {t('المدینہ چکی و فلور ملز', 'AL-MADINA FLOUR MILLS')}
             </div>
-            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', color: '#64748b' }}>
-              AL-MADINA FLOUR MILLS
-            </div>
-            <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>
-              Main Bazaar, Near Clock Tower • Ph: 0300-1234567
+            <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
+              {t('مین بازار، نزد گھنٹہ گھر • فون: 0300-1234567', 'Main Bazaar, Near Clock Tower • Ph: 0300-1234567')}
             </div>
             <div style={{ borderBottom: '1px dashed #cbd5e1', margin: '10px 0' }} />
           </div>
 
           {/* Bill / Token Identifiers */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-            <span>{data.type === 'pisai' ? 'PISAI TOKEN:' : 'BILL NO:'}</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{data.type === 'pisai' ? t('پسائی ٹوکن نمبر:', 'PISAI TOKEN:') : t('بل نمبر:', 'BILL NO:')}</span>
             <strong style={{ fontSize: '13px' }}>{data.billNumber}</strong>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '11px' }}>
-            <span>DATE/TIME:</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('تاریخ / وقت:', 'DATE/TIME:')}</span>
             <span>{data.timestamp}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '11px' }}>
-            <span>OPERATOR:</span>
-            <span>{data.billerName}</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('آپریٹر:', 'OPERATOR:')}</span>
+            <span className="font-nastaleeq">{data.billerName}</span>
           </div>
           {data.customerName && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '11px' }}>
-              <span>CUSTOMER:</span>
-              <strong>{data.customerName}</strong>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('گاہک کا نام:', 'CUSTOMER:')}</span>
+              {/* Customer name is kept verbatim in the language written */}
+              <strong className="font-nastaleeq">{data.customerName}</strong>
             </div>
           )}
 
@@ -171,7 +175,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 fontSize: '11px',
               }}
             >
-              *** UDHAAR / CREDIT BILL ***
+              {t('*** ادھار کھاتہ بل ***', '*** CREDIT BILL ***')}
             </div>
           )}
 
@@ -187,8 +191,11 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 backgroundColor: '#f8fafc',
               }}
             >
-              <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', color: '#64748b' }}>
-                CUSTOMER TOKEN NUMBER
+              <div
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{ fontSize: '11px', fontWeight: 700, letterSpacing: isUrdu ? 'normal' : '0.5px', color: '#64748b' }}
+              >
+                {t('گاہک ٹوکن نمبر', 'CUSTOMER TOKEN NUMBER')}
               </div>
               <div
                 style={{
@@ -202,9 +209,6 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               >
                 {data.pisaiToken}
               </div>
-              <div className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
-                ٹوکن نمبر گندم پیسائی
-              </div>
             </div>
           )}
 
@@ -214,6 +218,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
           {data.items && data.items.length > 0 && (
             <div style={{ marginBottom: '12px' }}>
               <div
+                className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '2fr 1fr 1fr',
@@ -224,9 +229,9 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                   marginBottom: '6px',
                 }}
               >
-                <span>ITEM (آئٹم)</span>
-                <span style={{ textAlign: 'center' }}>QTY x RATE</span>
-                <span style={{ textAlign: 'right' }}>TOTAL</span>
+                <span>{t('آئٹم', 'ITEM')}</span>
+                <span style={{ textAlign: 'center' }}>{t('مقدار x ریٹ', 'QTY x RATE')}</span>
+                <span style={{ textAlign: 'right' }}>{t('رقم', 'TOTAL')}</span>
               </div>
               {data.items.map((item, idx) => (
                 <div
@@ -239,31 +244,31 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: 600 }}>{item.nameEn}</div>
-                    <div className="font-nastaleeq" style={{ fontSize: '14px', lineHeight: 1.2 }}>
-                      {item.nameUr}
+                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', fontWeight: 700 }}>
+                      {isUrdu ? item.nameUr : item.nameEn}
                     </div>
                   </div>
                   <div style={{ textAlign: 'center', paddingTop: '2px' }}>
-                    {item.weightKg}kg x {item.ratePerKg}
+                    {item.weightKg} {isUrdu ? 'کلو' : 'kg'} x {item.ratePerKg}
                   </div>
                   <div style={{ textAlign: 'right', fontWeight: 700, paddingTop: '2px' }}>
-                    Rs {item.total}
+                    {isUrdu ? `${item.total} روپے` : `Rs ${item.total}`}
                   </div>
                 </div>
               ))}
             </div>
           )}
 
+          {/* Pisai Specific Details */}
           {data.type === 'pisai' && (
-            <div style={{ fontSize: '12px', marginBottom: '10px' }}>
+            <div style={{ fontSize: '13px', marginBottom: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span>SERVICE TYPE:</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('پسائی کی قسم:', 'SERVICE TYPE:')}</span>
                 <strong>{data.serviceType}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span>WHEAT WEIGHT:</span>
-                <strong>{data.pisaiWeightKg} KG</strong>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('گندم کا وزن:', 'WHEAT WEIGHT:')}</span>
+                <strong>{data.pisaiWeightKg} {isUrdu ? 'کلو' : 'KG'}</strong>
               </div>
             </div>
           )}
@@ -272,8 +277,8 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
 
           {/* Calculations */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span>Subtotal:</span>
-            <span>Rs {data.subtotal}</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سب ٹوٹل:', 'Subtotal:')}</span>
+            <span>{isUrdu ? `${data.subtotal} روپے` : `Rs ${data.subtotal}`}</span>
           </div>
           {data.discount > 0 && (
             <div
@@ -285,8 +290,8 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 fontWeight: 700,
               }}
             >
-              <span>Discount (رعایت):</span>
-              <span>- Rs {data.discount}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('رعایت:', 'Discount:')}</span>
+              <span>{isUrdu ? `- ${data.discount} روپے` : `- Rs ${data.discount}`}</span>
             </div>
           )}
           <div
@@ -300,14 +305,14 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               borderTop: '2px solid #414833',
             }}
           >
-            <span>TOTAL BILL:</span>
-            <span>Rs {data.netTotal}</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کل بل:', 'TOTAL BILL:')}</span>
+            <span>{isUrdu ? `${data.netTotal} روپے` : `Rs ${data.netTotal}`}</span>
           </div>
 
           {data.cashReceived !== undefined && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '13px', fontWeight: 700 }}>
-              <span>CASH RECEIVED (وصول):</span>
-              <span>Rs {data.cashReceived}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('وصول رقم:', 'CASH RECEIVED:')}</span>
+              <span>{isUrdu ? `${data.cashReceived} روپے` : `Rs ${data.cashReceived}`}</span>
             </div>
           )}
 
@@ -324,17 +329,19 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 paddingTop: '4px',
               }}
             >
-              <span>{data.isCredit ? 'CREDIT / UDHAAR (بقایا ادھار):' : 'WAIVED / SHORT (چھوٹ):'}</span>
-              <span>Rs {data.remainingBalance}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                {data.isCredit ? t('بقایا ادھار:', 'CREDIT BALANCE:') : t('رعایت / چھوٹ:', 'WAIVED / SHORT:')}
+              </span>
+              <span>{isUrdu ? `${data.remainingBalance} روپے` : `Rs ${data.remainingBalance}`}</span>
             </div>
           )}
 
           <div style={{ textAlign: 'center', marginTop: '18px' }}>
             <div className="font-nastaleeq" style={{ fontSize: '16px' }}>
-              مال موقع پر چیک کریں۔ بعد میں واپسی نہ ہوگی۔
+              {t('مال موقع پر چیک کریں۔ بعد میں واپسی نہ ہوگی۔', 'Please check items upon receiving. No returns afterwards.')}
             </div>
-            <div style={{ fontSize: '11px', color: '#414833', marginTop: '4px' }}>
-              Thank You for Your Business!
+            <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '11px', color: '#414833', marginTop: '4px' }}>
+              {t('آپ کی تشریف آوری کا شکریہ!', 'Thank You for Your Business!')}
             </div>
             <div style={{ fontSize: '10px', color: '#656D4A', marginTop: '6px' }}>
               * Powered by FlourERP • Continuous Sequential Audit *
@@ -372,7 +379,9 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
             }}
           >
             {printed ? <CheckCircle2 size={20} color="#F4F5EE" /> : <Printer size={20} color="#F4F5EE" />}
-            {printed ? 'Print Dispatched!' : 'Print Bill (ESC/POS)'}
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {printed ? t('پرنٹ بھیج دیا گیا!', 'Print Dispatched!') : t('بل پرنٹ کریں', 'Print Bill (ESC/POS)')}
+            </span>
           </button>
           <button
             onClick={handlePrint}
@@ -394,7 +403,10 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
             }}
             title="Reprint byte-identical copy"
           >
-            <RefreshCw size={16} color="#414833" /> Reprint
+            <RefreshCw size={16} color="#414833" />
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {t('دوبارہ پرنٹ', 'Reprint')}
+            </span>
           </button>
         </div>
       </div>

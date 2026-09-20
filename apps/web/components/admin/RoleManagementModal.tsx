@@ -17,6 +17,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { getToken } from '../../lib/auth';
+import { useLanguage } from '../../context/LanguageContext';
 
 export interface PermissionItem {
   code: string;
@@ -44,19 +45,19 @@ export interface StaffUser {
 export const ALL_PERMISSIONS: PermissionItem[] = [
   { code: 'can_bill', labelUr: 'نیا سیلز بل بنانا', labelEn: 'Standard Product Billing', category: 'billing' },
   { code: 'can_pisai', labelUr: 'گندم پسائی ٹوکن جاری کرنا', labelEn: 'Grinding Token Issuance', category: 'billing' },
-  { code: 'can_discount', labelUr: 'بل میں رعایت / ڈسکاؤنٹ دینا', labelEn: 'Apply Discretionary Discounts', category: 'billing' },
+  { code: 'can_discount', labelUr: 'بل میں رعایت دینا', labelEn: 'Apply Discretionary Discounts', category: 'billing' },
   { code: 'can_manage_prices', labelUr: 'روزانہ کے ریٹ تبدیل کرنا', labelEn: 'Manage Daily Rates', category: 'pricing' },
   { code: 'can_issue_credit', labelUr: 'ادھار کھاتہ جاری کرنا', labelEn: 'Issue Credit (Udhaar)', category: 'credit' },
   { code: 'can_view_reports', labelUr: 'روزنامچہ و منافع رپورٹس دیکھنا', labelEn: 'View Financial Reports & Ledger', category: 'reports' },
-  { code: 'can_void_bills', labelUr: 'بل منسوخ یا کینسل کرنا', labelEn: 'Void Completed Bills', category: 'admin' },
-  { code: 'can_close_day', labelUr: 'دن کا اختتام اور Z-Report', labelEn: 'Daily Closing & Shift Reports', category: 'admin' },
+  { code: 'can_void_bills', labelUr: 'بل منسوخ کرنا', labelEn: 'Void Completed Bills', category: 'admin' },
+  { code: 'can_close_day', labelUr: 'دن کا اختتام اور اختتامی رپورٹ', labelEn: 'Daily Closing & Shift Reports', category: 'admin' },
   { code: 'can_manage_users', labelUr: 'سٹاف اور رولز مینیج کرنا', labelEn: 'Manage Staff & Role Permissions', category: 'admin' },
 ];
 
 const INITIAL_ROLES: RoleItem[] = [
   {
     id: 'super-admin',
-    name: 'SuperAdmin (مالک)',
+    name: 'SuperAdmin',
     description: 'تمام اختیارات اور مکمل کنٹرول',
     isSystem: true,
     userCount: 1,
@@ -64,7 +65,7 @@ const INITIAL_ROLES: RoleItem[] = [
   },
   {
     id: 'biller',
-    name: 'Biller (کاؤنٹر آپریٹر)',
+    name: 'Biller',
     description: 'روزمرہ بلنگ اور پسائی ٹوکن بنانے کے اختیارات',
     isSystem: true,
     userCount: 1,
@@ -72,7 +73,7 @@ const INITIAL_ROLES: RoleItem[] = [
   },
   {
     id: 'shift-supervisor',
-    name: 'ShiftSupervisor (شفٹ انچارج)',
+    name: 'ShiftSupervisor',
     description: 'بلنگ، ڈسکاؤنٹ اور روزنامچہ دیکھنے کے اختیارات',
     isSystem: false,
     userCount: 0,
@@ -81,8 +82,8 @@ const INITIAL_ROLES: RoleItem[] = [
 ];
 
 const INITIAL_STAFF: StaffUser[] = [
-  { id: '1', username: 'hanzala', fullName: 'Hanzala Mushtaq (Owner)', roleName: 'SuperAdmin (مالک)' },
-  { id: '2', username: 'asif', fullName: 'محمد عاصف (کاؤنٹر 01)', roleName: 'Biller (کاؤنٹر آپریٹر)' },
+  { id: '1', username: 'hanzala', fullName: 'Hanzala Mushtaq', roleName: 'SuperAdmin' },
+  { id: '2', username: 'asif', fullName: 'محمد عاصف', roleName: 'Biller' },
 ];
 
 interface RoleManagementModalProps {
@@ -96,6 +97,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
   onClose,
   onRolesUpdated,
 }) => {
+  const { isUrdu, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'roles' | 'staff' | 'create'>('roles');
   const [roles, setRoles] = useState<RoleItem[]>(INITIAL_ROLES);
   const [staff, setStaff] = useState<StaffUser[]>(INITIAL_STAFF);
@@ -338,7 +340,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            direction: 'rtl',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -358,11 +359,14 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               <ShieldCheck size={22} strokeWidth={2.4} color="#d97706" />
             </div>
             <div>
-              <h2 className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, margin: 0, color: '#414833' }}>
-                اختیارات و رولز مینیجر (RBAC & Permissions CRUD)
+              <h2 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900, margin: 0, color: '#414833' }}>
+                {t('اختیارات و رولز مینیجر', 'Roles & Permissions Manager')}
               </h2>
               <div style={{ fontSize: '11px', color: '#656D4A', marginTop: '2px' }}>
-                ہر رول کے اختیارات کو اپنی مرضی سے بنائیں، تبدیل کریں اور سٹاف کو لگائیں
+                {t(
+                  'ہر رول کے اختیارات کو اپنی مرضی سے بنائیں، تبدیل کریں اور سٹاف کو لگائیں',
+                  'Customize role permissions and assign them to staff members'
+                )}
               </div>
             </div>
           </div>
@@ -391,7 +395,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             borderBottom: '1px solid #E2E8F0',
             backgroundColor: '#F8FAFC',
             padding: '0 16px',
-            direction: 'rtl',
             gap: '8px',
           }}
         >
@@ -416,7 +419,9 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             }}
           >
             <KeyRound size={15} />
-            <span className="font-nastaleeq">موجودہ رولز ({roles.length})</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {isUrdu ? `موجودہ رولز (${roles.length})` : `Existing Roles (${roles.length})`}
+            </span>
           </button>
 
           <button
@@ -440,7 +445,9 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             }}
           >
             <Users size={15} />
-            <span className="font-nastaleeq">سٹاف کو رول لگائیں ({staff.length})</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {isUrdu ? `سٹاف کو رول تفویض (${staff.length})` : `Staff Roles (${staff.length})`}
+            </span>
           </button>
 
           <button
@@ -464,7 +471,9 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             }}
           >
             <Plus size={15} />
-            <span className="font-nastaleeq">+ نیا رول بنائیں (Create Role)</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {t('+ نیا رول بنائیں', '+ Create Role')}
+            </span>
           </button>
         </div>
 
@@ -479,7 +488,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               fontSize: '12.5px',
               fontWeight: 700,
               textAlign: 'center',
-              direction: 'rtl',
             }}
           >
             {noticeMessage.type === 'success' ? '✓ ' : '⚠ '}
@@ -488,17 +496,17 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
         )}
 
         {/* Modal Body */}
-        <div style={{ padding: '16px', overflowY: 'auto', flex: 1, direction: 'rtl' }}>
+        <div style={{ padding: '16px', overflowY: 'auto', flex: 1 }}>
           {/* INLINE EDIT ROLE PERMISSIONS VIEW */}
           {editingRole ? (
             <div style={{ backgroundColor: '#FAF7EE', padding: '16px', borderRadius: '12px', border: '1.5px solid #E6D5C3' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
-                  <h3 className="font-nastaleeq" style={{ fontSize: '17px', fontWeight: 900, color: '#414833', margin: 0 }}>
-                    رول اختیارات میں تبدیلی: {editingRole.name}
+                  <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '17px', fontWeight: 900, color: '#414833', margin: 0 }}>
+                    {t('رول کے اختیارات:', 'Edit Role Permissions:')} {editingRole.name}
                   </h3>
                   <div style={{ fontSize: '11.5px', color: '#656D4A', marginTop: '2px' }}>
-                    اختیارات کو منتخب یا غیر منتخب کریں اور محفوظ کریں
+                    {t('اختیارات کو منتخب یا غیر منتخب کریں اور محفوظ کریں', 'Check or uncheck permissions and save')}
                   </div>
                 </div>
 
@@ -515,7 +523,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     cursor: 'pointer',
                   }}
                 >
-                  منسوخ (Cancel)
+                  {t('منسوخ کریں', 'Cancel')}
                 </button>
               </div>
 
@@ -563,10 +571,9 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                       </div>
 
                       <div>
-                        <div className="font-nastaleeq" style={{ fontSize: '12.5px', fontWeight: 800, color: isChecked ? '#92400E' : '#334155' }}>
-                          {perm.labelUr}
+                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: isChecked ? '#92400E' : '#334155' }}>
+                          {isUrdu ? perm.labelUr : perm.labelEn}
                         </div>
-                        <div style={{ fontSize: '10.5px', color: '#64748B' }}>{perm.labelEn}</div>
                       </div>
                     </div>
                   );
@@ -594,7 +601,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                   }}
                 >
                   <Save size={15} />
-                  <span className="font-nastaleeq">اختیارات محفوظ کریں (Save Permissions)</span>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('اختیارات محفوظ کریں', 'Save Permissions')}</span>
                 </button>
               </div>
             </div>
@@ -666,7 +673,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                         }}
                       >
                         <Edit2 size={12} />
-                        <span className="font-nastaleeq">اختیارات تبدیل کریں</span>
+                        <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('اختیارات تبدیل کریں', 'Edit Permissions')}</span>
                       </button>
 
                       {!r.isSystem && (
@@ -691,7 +698,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                           }}
                         >
                           <Trash2 size={12} />
-                          <span className="font-nastaleeq">ڈیلیٹ</span>
+                          <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('ڈیلیٹ', 'Delete')}</span>
                         </button>
                       )}
                     </div>
@@ -722,7 +729,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                           }}
                         >
                           <Check size={11} color="#16A34A" strokeWidth={3} />
-                          <span className="font-nastaleeq">{def ? def.labelUr : permCode}</span>
+                          <span className={isUrdu ? 'font-nastaleeq' : ''}>{def ? (isUrdu ? def.labelUr : def.labelEn) : permCode}</span>
                         </span>
                       );
                     })}
@@ -735,7 +742,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             /* TAB 2: ASSIGN ROLES TO USERS */
             <div>
               <div style={{ fontSize: '13px', color: '#64748B', marginBottom: '12px', fontWeight: 600 }}>
-                مندرجہ ذیل سٹاف ممبرز کے لیے رول منتخب کریں:
+                {t('مندرجہ ذیل سٹاف ممبرز کے لیے رول منتخب کریں:', 'Select role for following staff members:')}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -770,7 +777,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                         <UserCheck size={18} />
                       </div>
                       <div>
-                        <div className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>
+                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>
                           {member.fullName}
                         </div>
                         <div style={{ fontSize: '11px', color: '#64748B', fontFamily: 'var(--font-mono)' }}>
@@ -781,7 +788,9 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
 
                     {/* Role Selector Dropdown */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 700 }}>موجودہ رول:</span>
+                      <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 700 }}>
+                        {t('موجودہ رول:', 'Current Role:')}
+                      </span>
                       <select
                         value={member.roleName}
                         onChange={(e) => handleAssignRole(member.id, e.target.value)}
@@ -813,12 +822,12 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             /* TAB 3: CREATE NEW ROLE */
             <form onSubmit={handleCreateRole} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label className="font-nastaleeq" style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
-                  رول کا نام (Role Name):
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                  {t('رول کا نام:', 'Role Name:')}
                 </label>
                 <input
                   type="text"
-                  placeholder="مثلاً: کیشیئر مینیجر (Cashier Manager)"
+                  placeholder={t('مثلاً: کیشیئر مینیجر', 'e.g. Cashier Manager')}
                   value={newRoleName}
                   onChange={(e) => setNewRoleName(e.target.value)}
                   required
@@ -835,12 +844,12 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               </div>
 
               <div>
-                <label className="font-nastaleeq" style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
-                  تفصیل (Description):
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                  {t('تفصیل:', 'Description:')}
                 </label>
                 <input
                   type="text"
-                  placeholder="اس رول کے بنیادی اختیارات کی وضاحت لکھیں..."
+                  placeholder={t('اس رول کے بنیادی اختیارات کی وضاحت لکھیں...', 'Enter role description...')}
                   value={newRoleDesc}
                   onChange={(e) => setNewRoleDesc(e.target.value)}
                   style={{
@@ -856,8 +865,8 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               </div>
 
               <div>
-                <label className="font-nastaleeq" style={{ display: 'block', fontSize: '13.5px', fontWeight: 900, color: '#0F172A', marginBottom: '8px' }}>
-                  اس رول کے لیے اختیارات (Permissions) منتخب کریں:
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 900, color: '#0F172A', marginBottom: '8px' }}>
+                  {t('اس رول کے لیے اختیارات منتخب کریں:', 'Select permissions for this role:')}
                 </label>
 
                 <div
@@ -903,10 +912,9 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                         </div>
 
                         <div>
-                          <div className="font-nastaleeq" style={{ fontSize: '12.5px', fontWeight: 800, color: isChecked ? '#92400E' : '#334155' }}>
-                            {perm.labelUr}
+                          <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: isChecked ? '#92400E' : '#334155' }}>
+                            {isUrdu ? perm.labelUr : perm.labelEn}
                           </div>
-                          <div style={{ fontSize: '10.5px', color: '#64748B' }}>{perm.labelEn}</div>
                         </div>
                       </div>
                     );
@@ -934,7 +942,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                   }}
                 >
                   <Plus size={16} />
-                  <span className="font-nastaleeq">رول محفوظ کریں (Save Role)</span>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('رول محفوظ کریں', 'Save Role')}</span>
                 </button>
               </div>
             </form>
@@ -950,12 +958,11 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            direction: 'rtl',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#64748B' }}>
             <Lock size={12} />
-            <span>تمام اختیارات سرور لیول پر محفوظ اور مانیٹر کیے جاتے ہیں۔</span>
+            <span>{t('تمام اختیارات سرور لیول پر محفوظ اور مانیٹر کیے جاتے ہیں۔', 'All permissions are securely verified and audited.')}</span>
           </div>
 
           <button
@@ -972,7 +979,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               cursor: 'pointer',
             }}
           >
-            بند کریں (Close)
+            {t('بند کریں', 'Close')}
           </button>
         </div>
       </div>

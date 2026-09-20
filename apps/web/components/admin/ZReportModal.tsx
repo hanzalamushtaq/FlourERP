@@ -14,6 +14,7 @@ import {
   Receipt,
   HandCoins,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ZReportModalProps {
   isOpen: boolean;
@@ -38,9 +39,9 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
   onClose,
   onConfirmCloseShift,
   shiftData = {
-    shiftName: 'صبح شفٹ (Morning Shift)',
+    shiftName: 'Morning Shift',
     operatorName: 'محمد عاصف',
-    counter: 'کاؤنٹر #01',
+    counter: '01',
     openedAt: '18/09/2026, 08:00 AM',
     closedAt: '18/09/2026, 06:45 PM',
     totalSales: 184500,
@@ -50,6 +51,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
     expectedCash: 126500,
   },
 }) => {
+  const { isUrdu, t } = useLanguage();
   const [actualCashInput, setActualCashInput] = useState<string>('126500');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isClosedSuccess, setIsClosedSuccess] = useState<boolean>(false);
@@ -84,7 +86,6 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         padding: '16px',
-        direction: 'rtl',
       }}
     >
       <div
@@ -93,7 +94,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
           borderRadius: '20px',
           width: '100%',
           maxWidth: '560px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          boxShadow: 'none',
           overflow: 'hidden',
           border: '1.5px solid #cbd5e1',
           display: 'flex',
@@ -128,13 +129,13 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
             </div>
             <div>
               <h2
-                className="font-nastaleeq"
-                style={{ fontSize: '18px', fontWeight: 900, margin: 0, lineHeight: 1.2 }}
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{ fontSize: '16px', fontWeight: 900, margin: 0, lineHeight: 1.2 }}
               >
-                شفٹ کا اختتام و اختتامی رپورٹ (Z-Report)
+                {t('شفٹ کا اختتام و اختتامی رپورٹ', 'End of Shift Report')}
               </h2>
               <p style={{ fontSize: '11px', color: '#94a3b8', margin: '2px 0 0' }}>
-                End of Shift Ledger Reconciliation & Database Backup
+                {t('شفٹ لیجر کا حساب کتاب اور ڈیٹا بیس بیک اپ', 'End of Shift Ledger Reconciliation & Database Backup')}
               </p>
             </div>
           </div>
@@ -175,19 +176,21 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
             }}
           >
             <div>
-              <span style={{ color: '#64748b' }}>آپریٹر: </span>
+              <span style={{ color: '#64748b' }}>{t('آپریٹر: ', 'Operator: ')}</span>
               <strong className="font-nastaleeq">{shiftData.operatorName}</strong>
             </div>
             <div>
-              <span style={{ color: '#64748b' }}>کاؤنٹر: </span>
-              <strong>{shiftData.counter}</strong>
+              <span style={{ color: '#64748b' }}>{t('کاؤنٹر: ', 'Counter: ')}</span>
+              <strong>{isUrdu ? `کاؤنٹر #${shiftData.counter}` : `Counter #${shiftData.counter}`}</strong>
             </div>
             <div>
-              <span style={{ color: '#64748b' }}>شفٹ: </span>
-              <span className="font-nastaleeq">{shiftData.shiftName}</span>
+              <span style={{ color: '#64748b' }}>{t('شفٹ: ', 'Shift: ')}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                {isUrdu ? 'صبح شفٹ' : 'Morning Shift'}
+              </span>
             </div>
             <div>
-              <span style={{ color: '#64748b' }}>وقت: </span>
+              <span style={{ color: '#64748b' }}>{t('وقت: ', 'Time: ')}</span>
               <span style={{ fontFamily: 'var(--font-mono)' }}>{shiftData.closedAt}</span>
             </div>
           </div>
@@ -210,9 +213,12 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Banknote size={15} color="#15803d" /> کل نقد سیلز (Sales)
+                <Banknote size={15} color="#15803d" />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کل نقد سیلز', 'Total Cash Sales')}</span>
               </span>
-              <strong style={{ fontFamily: 'var(--font-mono)' }}>Rs {shiftData.totalSales.toLocaleString()}</strong>
+              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                {isUrdu ? `${shiftData.totalSales.toLocaleString()} روپے` : `Rs ${shiftData.totalSales.toLocaleString()}`}
+              </strong>
             </div>
 
             <div
@@ -224,9 +230,12 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Sparkles size={15} color="#b45309" /> گندم پسائی اجرت (Pisai)
+                <Sparkles size={15} color="#b45309" />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('گندم پسائی اجرت', 'Wheat Grinding Revenue')}</span>
               </span>
-              <strong style={{ fontFamily: 'var(--font-mono)' }}>Rs {shiftData.totalPisai.toLocaleString()}</strong>
+              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                {isUrdu ? `${shiftData.totalPisai.toLocaleString()} روپے` : `Rs ${shiftData.totalPisai.toLocaleString()}`}
+              </strong>
             </div>
 
             <div
@@ -238,9 +247,12 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <HandCoins size={15} color="#0284c7" /> ادھار وصولی (Credit Collected)
+                <HandCoins size={15} color="#0284c7" />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('ادھار وصولی', 'Credit Collected')}</span>
               </span>
-              <strong style={{ fontFamily: 'var(--font-mono)' }}>Rs {shiftData.creditRecovery.toLocaleString()}</strong>
+              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                {isUrdu ? `${shiftData.creditRecovery.toLocaleString()} روپے` : `Rs ${shiftData.creditRecovery.toLocaleString()}`}
+              </strong>
             </div>
 
             <div
@@ -254,9 +266,12 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Receipt size={15} /> دکان اخراجات (Expenses Paid)
+                <Receipt size={15} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('دکان کے اخراجات', 'Shop Expenses Paid')}</span>
               </span>
-              <strong style={{ fontFamily: 'var(--font-mono)' }}>- Rs {shiftData.expenses.toLocaleString()}</strong>
+              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                {isUrdu ? `- ${shiftData.expenses.toLocaleString()} روپے` : `- Rs ${shiftData.expenses.toLocaleString()}`}
+              </strong>
             </div>
 
             <div
@@ -269,9 +284,11 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                 fontWeight: 900,
               }}
             >
-              <span>سسٹم کیش دراز بیلنس (Expected)</span>
-              <span style={{ fontFamily: 'var(--font-mono)', color: '#0f172a' }}>
-                Rs {shiftData.expectedCash.toLocaleString()}
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                {t('سسٹم کیش دراز بیلنس', 'Expected Drawer Cash Balance')}
+              </span>
+              <span style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)', color: '#0f172a' }}>
+                {isUrdu ? `${shiftData.expectedCash.toLocaleString()} روپے` : `Rs ${shiftData.expectedCash.toLocaleString()}`}
               </span>
             </div>
           </div>
@@ -286,16 +303,16 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
             }}
           >
             <label
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 display: 'block',
-                fontSize: '14px',
+                fontSize: '13px',
                 fontWeight: 800,
                 color: '#92400e',
                 marginBottom: '6px',
               }}
             >
-              کاؤنٹر پر گنی گئی اصل رقم (Physical Cash Count):
+              {t('کاؤنٹر پر گنی گئی اصل رقم:', 'Physical Cash Counted on Counter:')}
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <input
@@ -312,10 +329,12 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
                   direction: 'ltr',
-                  textAlign: 'right',
+                  textAlign: 'left',
                 }}
               />
-              <span style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>Rs</span>
+              <span style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit' }}>
+                {isUrdu ? 'روپے' : 'Rs'}
+              </span>
             </div>
 
             {discrepancy !== 0 && (
@@ -325,9 +344,13 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                   fontSize: '12px',
                   fontWeight: 700,
                   color: discrepancy > 0 ? '#15803d' : '#b91c1c',
+                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
                 }}
               >
-                فرق (Discrepancy): {discrepancy > 0 ? `+${discrepancy}` : discrepancy} Rs
+                {t('فرق:', 'Discrepancy:')}{' '}
+                {isUrdu
+                  ? `${discrepancy > 0 ? `+${discrepancy}` : discrepancy} روپے`
+                  : `${discrepancy > 0 ? `+${discrepancy}` : discrepancy} Rs`}
               </div>
             )}
           </div>
@@ -349,6 +372,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={isProcessing}
+            className={isUrdu ? 'font-nastaleeq' : ''}
             style={{
               padding: '10px 18px',
               borderRadius: '10px',
@@ -360,7 +384,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               cursor: 'pointer',
             }}
           >
-            منسوخ کریں
+            {t('منسوخ کریں', 'Cancel')}
           </button>
 
           <button
@@ -382,27 +406,29 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.2)',
+              boxShadow: 'none',
             }}
           >
             {isClosedSuccess ? (
               <>
                 <CheckCircle2 size={18} />
-                <span className="font-nastaleeq" style={{ fontSize: '14px' }}>
-                  شفٹ محفوظ اور ڈیٹا بیس بیک اپ مکمل!
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px' }}>
+                  {t('شفٹ محفوظ اور ڈیٹا بیس بیک اپ مکمل!', 'Shift Closed & Backup Complete!')}
                 </span>
               </>
             ) : isProcessing ? (
               <>
                 <Database size={18} className="animate-spin" />
-                <span>شفٹ بند ہو رہی ہے اور بیک اپ بن رہا ہے...</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('شفٹ بند ہو رہی ہے اور بیک اپ بن رہا ہے...', 'Locking shift and generating backup...')}
+                </span>
               </>
             ) : (
               <>
                 <Lock size={16} />
                 <Printer size={16} />
-                <span className="font-nastaleeq" style={{ fontSize: '14px' }}>
-                  شفٹ لاک کریں اور Z-Report پرنٹ کریں
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px' }}>
+                  {t('شفٹ لاک کریں اور اختتامی رپورٹ پرنٹ کریں', 'Lock Shift & Print Z-Report')}
                 </span>
               </>
             )}

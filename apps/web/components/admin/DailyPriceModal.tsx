@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { Clock, Check, AlertCircle, ShieldCheck, X } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface DailyPriceModalProps {
   isOpen: boolean;
@@ -19,11 +20,11 @@ interface PriceItem {
 }
 
 const INITIAL_PRICES: PriceItem[] = [
-  { id: '1', nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (گندم)', yesterdayRate: 140, todayRate: 140 },
+  { id: '1', nameEn: 'Chakki Atta', nameUr: 'چکی آٹا', yesterdayRate: 140, todayRate: 140 },
   { id: '2', nameEn: 'Fine Atta', nameUr: 'فائن آٹا', yesterdayRate: 148, todayRate: 148 },
   { id: '3', nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', yesterdayRate: 155, todayRate: 155 },
   { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', yesterdayRate: 160, todayRate: 160 },
-  { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر (کھل)', yesterdayRate: 95, todayRate: 95 },
+  { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر', yesterdayRate: 95, todayRate: 95 },
   { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', yesterdayRate: 145, todayRate: 145 },
 ];
 
@@ -32,6 +33,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   onClose,
   isAdmin,
 }) => {
+  const { isUrdu, t } = useLanguage();
   const [prices, setPrices] = useState<PriceItem[]>(INITIAL_PRICES);
   const [billerHoldState, setBillerHoldState] = useState<boolean>(false);
 
@@ -44,17 +46,17 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   };
 
   const handleConfirmAll = () => {
-    alert('آج کے ریٹس محفوظ اور تصدیق کر لیے گئے ہیں۔');
+    alert(t('آج کے ریٹس محفوظ اور تصدیق کر لیے گئے ہیں۔', 'Today rates have been confirmed and saved.'));
     onClose();
   };
 
   const handleBillerRequestUpdate = () => {
     setBillerHoldState(true);
-    alert('ایڈمن کو ریٹ تبدیلی کی درخواست بھیج دی گئی ہے۔');
+    alert(t('ایڈمن کو ریٹ تبدیلی کی درخواست بھیج دی گئی ہے۔', 'Rate update request sent to admin.'));
   };
 
   const handleBillerKeepPrevious = () => {
-    alert('کل والے ریٹس پر بلنگ جاری رکھی گئی ہے۔');
+    alert(t('کل والے ریٹس پر بلنگ جاری رکھی گئی ہے۔', 'Continuing billing on previous rates.'));
     onClose();
   };
 
@@ -70,7 +72,6 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         justifyContent: 'center',
         padding: '16px',
         zIndex: 2000,
-        direction: 'rtl',
       }}
     >
       <div
@@ -80,7 +81,7 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
           backgroundColor: '#ffffff',
           borderRadius: '14px',
           overflow: 'hidden',
-          boxShadow: '0 20px 35px rgba(0, 0, 0, 0.2)',
+          boxShadow: 'none',
           border: '1px solid #cbd5e1',
           display: 'flex',
           flexDirection: 'column',
@@ -101,10 +102,12 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Clock size={18} color="#fbbf24" />
             <div>
-              <h2 className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 900, margin: 0 }}>
-                روزانہ نرخ نامہ کی تصدیق
+              <h2 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 900, margin: 0 }}>
+                {t('روزانہ نرخ نامہ کی تصدیق', 'Daily Price Confirmation')}
               </h2>
-              <div style={{ fontSize: '11px', color: '#94a3b8' }}>Daily Price Confirmation Protocol</div>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                {t('آج کے نرخوں کا اندراج و تصدیق', 'Daily Price Confirmation Protocol')}
+              </div>
             </div>
           </div>
           <button
@@ -119,19 +122,20 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
         {/* Product Rates Table */}
         <div style={{ padding: '16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div
+            className={isUrdu ? 'font-nastaleeq' : ''}
             style={{
               display: 'grid',
               gridTemplateColumns: '2fr 1fr 1fr',
-              fontSize: '11.5px',
+              fontSize: '12px',
               fontWeight: 800,
               color: '#64748b',
               paddingBottom: '6px',
               borderBottom: '1px solid #e2e8f0',
             }}
           >
-            <span>پروڈکٹ (Product)</span>
-            <span style={{ textAlign: 'center' }}>کل کا ریٹ</span>
-            <span style={{ textAlign: 'left' }}>آج کا ریٹ (Rs/KG)</span>
+            <span>{t('پروڈکٹ', 'Product')}</span>
+            <span style={{ textAlign: 'center' }}>{t('کل کا ریٹ', 'Yesterday')}</span>
+            <span style={{ textAlign: 'right' }}>{t('آج کا ریٹ', 'Today Rate')}</span>
           </div>
 
           {prices.map((item) => (
@@ -146,17 +150,16 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
               }}
             >
               <div>
-                <div className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
-                  {item.nameUr}
+                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
+                  {isUrdu ? item.nameUr : item.nameEn}
                 </div>
-                <div style={{ fontSize: '11px', color: '#64748b' }}>{item.nameEn}</div>
               </div>
 
-              <div style={{ textAlign: 'center', fontWeight: 700, color: '#64748b', fontSize: '13px', fontFamily: 'var(--font-mono)' }}>
-                Rs {item.yesterdayRate}
+              <div style={{ textAlign: 'center', fontWeight: 700, color: '#64748b', fontSize: '13px', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                {isUrdu ? `${item.yesterdayRate} روپے` : `Rs ${item.yesterdayRate}`}
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 {isAdmin ? (
                   <input
                     type="number"
@@ -173,13 +176,14 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                       fontSize: '14px',
                       fontWeight: 800,
                       fontFamily: 'var(--font-mono)',
-                      textAlign: 'left',
+                      textAlign: 'right',
+                      direction: 'ltr',
                       outline: 'none',
                     }}
                   />
                 ) : (
-                  <span style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
-                    Rs {item.todayRate}
+                  <span style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                    {isUrdu ? `${item.todayRate} روپے` : `Rs ${item.todayRate}`}
                   </span>
                 )}
               </div>
@@ -220,7 +224,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                 }}
               >
                 <Check size={16} />
-                <span className="font-nastaleeq">ریٹس کی تصدیق کریں (Save)</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('ریٹس کی تصدیق کریں', 'Save & Confirm Rates')}
+                </span>
               </button>
               <button
                 type="button"
@@ -238,7 +244,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   cursor: 'pointer',
                 }}
               >
-                بند کریں
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('بند کریں', 'Close')}
+                </span>
               </button>
             </>
           ) : (
@@ -259,7 +267,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   cursor: 'pointer',
                 }}
               >
-                سابقہ ریٹس پر جاری رکھیں
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('سابقہ ریٹس پر جاری رکھیں', 'Continue with Previous Rates')}
+                </span>
               </button>
               <button
                 type="button"
@@ -277,7 +287,9 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
                   cursor: 'pointer',
                 }}
               >
-                ایڈمن سے ریٹ تبدیلی کی درخواست
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('ایڈمن سے ریٹ تبدیلی کی درخواست', 'Request Rate Update from Admin')}
+                </span>
               </button>
             </>
           )}

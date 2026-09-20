@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { ShoppingCart, Cog, Tag } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface HeroActionCardsProps {
   onNewBill: () => void;
@@ -15,35 +16,34 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
   onNewPisaiToken,
   onEditRates,
 }) => {
+  const { isUrdu, t } = useLanguage();
+
   const cards = [
     {
       id: 'billing',
-      title: 'نیا بل بنائیں',
+      title: t('نیا بل بنائیں', 'Create New Bill'),
       hotkey: 'F8',
       icon: <ShoppingCart size={28} />,
-      color: '#d97706',
-      bgLight: '#fffbeb',
-      border: '#fde68a',
+      color: '#1877F2',
+      bgLight: '#1877F2',
       onClick: onNewBill,
     },
     {
       id: 'pisai',
-      title: 'گندم پسائی ٹوکن',
+      title: t('گندم پسائی ٹوکن', 'Milling Token'),
       hotkey: 'F2',
       icon: <Cog size={28} />,
-      color: '#0284c7',
-      bgLight: '#f0f9ff',
-      border: '#bae6fd',
+      color: '#D97706',
+      bgLight: '#D97706',
       onClick: onNewPisaiToken,
     },
     {
       id: 'rates',
-      title: 'ریٹ لسٹ (نرخ)',
+      title: t('ریٹ لسٹ', 'Daily Rate List'),
       hotkey: 'F3',
       icon: <Tag size={28} />,
-      color: '#059669',
-      bgLight: '#ecfdf5',
-      border: '#a7f3d0',
+      color: '#0E8A54',
+      bgLight: '#0E8A54',
       onClick: onEditRates,
     },
   ];
@@ -55,7 +55,6 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
         gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
         gap: '14px',
         width: '100%',
-        direction: 'rtl',
       }}
     >
       {cards.map((card) => (
@@ -65,14 +64,16 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
           onClick={card.onClick}
           style={{
             backgroundColor: card.bgLight,
-            borderRadius: '14px',
-            border: `2px solid ${card.border}`,
-            padding: '18px 22px',
+            borderRadius: '16px',
+            border: 'none',
+            outline: 'none',
+            padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+            minHeight: '96px',
+            boxShadow: 'none',
             transition: 'all 0.15s ease',
           }}
         >
@@ -80,17 +81,17 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div
               style={{
-                width: '50px',
-                height: '50px',
-                borderRadius: '12px',
+                width: '52px',
+                height: '52px',
+                borderRadius: '13px',
                 backgroundColor: '#FFFFFF',
                 color: card.color,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                border: `1.5px solid ${card.border}`,
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                border: 'none',
+                boxShadow: 'none',
               }}
             >
               {card.icon}
@@ -98,16 +99,11 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
 
             <div>
               <h2
-                className="font-nastaleeq"
+                className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: '21px',
+                  fontSize: '22px',
                   fontWeight: 900,
-                  color:
-                    card.color === '#d97706'
-                      ? '#92400e'
-                      : card.color === '#0284c7'
-                      ? '#075985'
-                      : '#065f46',
+                  color: '#FFFFFF',
                   lineHeight: 1.2,
                   margin: 0,
                 }}
@@ -127,8 +123,8 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
               borderRadius: '8px',
               backgroundColor: '#FFFFFF',
               color: card.color,
-              border: `1.5px solid ${card.border}`,
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
+              border: 'none',
+              boxShadow: 'none',
               letterSpacing: '0.5px',
             }}
           >

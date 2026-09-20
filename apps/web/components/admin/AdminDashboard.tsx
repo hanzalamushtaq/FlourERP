@@ -15,6 +15,7 @@ import {
   ShoppingCart,
   CheckCircle,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface AdminDashboardProps {
   onOpenPriceModal: () => void;
@@ -25,17 +26,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onOpenPriceModal,
   onNavigateTab,
 }) => {
+  const { isUrdu, t } = useLanguage();
   const [closingTriggered, setClosingTriggered] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
   const handleDailyClosing = () => {
     const confirmClosing = window.confirm(
-      'کیا آپ واقعی یومیہ کلوزنگ اور ڈیٹابیس بیک اپ کرنا چاہتے ہیں؟ اس سے آج کا لیجر محفوظ ہو جائے گا۔'
+      isUrdu
+        ? 'کیا آپ واقعی یومیہ کلوزنگ اور ڈیٹابیس بیک اپ کرنا چاہتے ہیں؟ اس سے آج کا لیجر محفوظ ہو جائے گا۔'
+        : 'Are you sure you want to perform daily closing and database backup?'
     );
     if (confirmClosing) {
       setClosingTriggered(true);
       setTimeout(() => {
-        alert('یومیہ کلوزنگ اور SQLite/PostgreSQL ڈیٹابیس بیک اپ کامیابی سے مکمل ہو گیا ہے!');
+        alert(
+          isUrdu
+            ? 'یومیہ کلوزنگ اور ڈیٹابیس بیک اپ کامیابی سے مکمل ہو گیا ہے!'
+            : 'Daily closing and database backup completed successfully!'
+        );
         setClosingTriggered(false);
       }, 1200);
     }
@@ -44,12 +52,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const summaryCards = [
     {
       id: 'sales',
-      titleUrdu: 'آج کی پراڈکٹ سیل',
-      titleEn: "TODAY'S PRODUCT SALES",
-      value: 'Rs 42,850',
-      subtitle: '38 بلز جاری ہوئے • آٹا، میدہ، سوجی',
+      title: isUrdu ? 'آج کی پراڈکٹ سیل' : "Today's Product Sales",
+      value: isUrdu ? '42,850 روپے' : 'Rs 42,850',
+      subtitle: isUrdu ? '38 بلز جاری ہوئے • آٹا، میدہ، سوجی' : '38 bills issued • Atta, Maida, Suji',
       icon: <TrendingUp size={20} color="#d97706" />,
-      bg: '#fffbeb', // Relative soft amber
+      bg: '#fffbeb',
       border: '#fde68a',
       textColor: '#92400e',
       valColor: '#b45309',
@@ -57,12 +64,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     },
     {
       id: 'pisai',
-      titleUrdu: 'گندم پسائی آمدن',
-      titleEn: 'PISAI GRINDING FEES',
-      value: 'Rs 8,640',
-      subtitle: '54 ٹوکنز پراسیسڈ • 1,440 کلو گرام',
+      title: isUrdu ? 'گندم پسائی آمدن' : 'Pisai Milling Revenue',
+      value: isUrdu ? '8,640 روپے' : 'Rs 8,640',
+      subtitle: isUrdu ? '54 ٹوکنز مکمل • 1,440 کلو' : '54 tokens processed • 1,440 KG',
       icon: <Sparkles size={20} color="#0284c7" />,
-      bg: '#f0f9ff', // Relative soft cyan/blue
+      bg: '#f0f9ff',
       border: '#bae6fd',
       textColor: '#075985',
       valColor: '#0369a1',
@@ -70,12 +76,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     },
     {
       id: 'expenses',
-      titleUrdu: 'دکان کے اخراجات',
-      titleEn: 'SHOP EXPENSES & BILLS',
-      value: 'Rs 3,625',
-      subtitle: 'بجلی، ورکر چائے، دکان خرچ',
+      title: isUrdu ? 'دکان کے اخراجات' : 'Shop Expenses & Bills',
+      value: isUrdu ? '3,625 روپے' : 'Rs 3,625',
+      subtitle: isUrdu ? 'بجلی، ورکر چائے، دکان خرچ' : 'Electricity, tea, maintenance',
       icon: <Receipt size={20} color="#e11d48" />,
-      bg: '#fff1f2', // Relative soft rose
+      bg: '#fff1f2',
       border: '#fecdd3',
       textColor: '#9f1239',
       valColor: '#be123c',
@@ -83,12 +88,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     },
     {
       id: 'udhaar',
-      titleUrdu: 'کل گاہک ادھار کھاتہ',
-      titleEn: 'TOTAL CUSTOMER UDHAAR',
-      value: 'Rs 61,100',
-      subtitle: '14 ایکٹو ادھار کھاتہ داران',
+      title: isUrdu ? 'کل گاہک ادھار کھاتہ' : 'Total Customer Udhaar',
+      value: isUrdu ? '61,100 روپے' : 'Rs 61,100',
+      subtitle: isUrdu ? '14 فعال ادھار کھاتہ داران' : '14 active credit accounts',
       icon: <Users size={20} color="#7e22ce" />,
-      bg: '#faf5ff', // Relative soft purple
+      bg: '#faf5ff',
       border: '#e9d5ff',
       textColor: '#6b21a8',
       valColor: '#7e22ce',
@@ -96,12 +100,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     },
     {
       id: 'drawer',
-      titleUrdu: 'دکان کا موجودہ کیش',
-      titleEn: 'NET CASH IN DRAWER',
-      value: 'Rs 47,865',
-      subtitle: 'سیلز + پسائی + وصولی - اخراجات',
+      title: isUrdu ? 'دکان کا موجودہ کیش' : 'Net Cash in Drawer',
+      value: isUrdu ? '47,865 روپے' : 'Rs 47,865',
+      subtitle: isUrdu ? 'سیلز + پسائی + وصولی - اخراجات' : 'Sales + Pisai + Recovery - Expenses',
       icon: <Wallet size={20} color="#16a34a" />,
-      bg: '#f0fdf4', // Relative soft green
+      bg: '#f0fdf4',
       border: '#bbf7d0',
       textColor: '#166534',
       valColor: '#15803d',
@@ -123,28 +126,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           padding: '16px 20px',
           flexWrap: 'wrap',
           gap: '14px',
-          boxShadow: '0 2px 6px rgba(65, 72, 51, 0.04)',
-          direction: 'rtl',
+          boxShadow: 'none',
         }}
       >
         <div>
           <h1
-            className="font-nastaleeq"
-            style={{ fontSize: '20px', fontWeight: 900, color: '#414833', margin: 0, lineHeight: 1.2 }}
+            className={isUrdu ? 'font-nastaleeq' : ''}
+            style={{ fontSize: '18px', fontWeight: 900, color: '#414833', margin: 0, lineHeight: 1.2 }}
           >
-            المدینہ فلور ملز - ایڈمن کمانڈ سنٹر (Shop Owner Command Center)
+            {t('المدینہ فلور ملز - ایڈمن کمانڈ سنٹر', 'Al-Madina Flour Mills - Admin Command Center')}
           </h1>
           <p
-            className="font-nastaleeq"
-            style={{ fontSize: '13.5px', color: '#656D4A', marginTop: '3px', fontWeight: 700 }}
+            className={isUrdu ? 'font-nastaleeq' : ''}
+            style={{ fontSize: '12px', color: '#656D4A', marginTop: '3px', fontWeight: 700 }}
           >
-            لائیو مالیاتی صورتحال، روزانہ کے ریٹس، چکی پسائی کیو اور سٹاف پرمیشنز کنٹرول
+            {t(
+              'لائیو مالیاتی صورتحال، روزانہ کے ریٹس، چکی پسائی کیو اور سٹاف اختیارات کنٹرول',
+              'Live financial status, daily rates, milling queue and staff permissions control'
+            )}
           </p>
         </div>
 
-        {/* Action Buttons styled with relative pastel fills */}
+        {/* Action Buttons */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-          {/* RBAC Button (Warm Amber) */}
+          {/* RBAC Button */}
           <button
             type="button"
             onClick={() => setIsRoleModalOpen(true)}
@@ -162,14 +167,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+              boxShadow: 'none',
             }}
           >
             <ShieldCheck size={16} color="#d97706" />
-            <span className="font-nastaleeq">سٹاف رولز و اختیارات (RBAC)</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سٹاف رولز و اختیارات', 'Staff Roles & Permissions')}</span>
           </button>
 
-          {/* Today's Prices (Soft Green) */}
+          {/* Today's Prices */}
           <button
             type="button"
             onClick={onOpenPriceModal}
@@ -187,14 +192,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+              boxShadow: 'none',
             }}
           >
             <Clock size={16} color="#059669" />
-            <span className="font-nastaleeq">روزانہ کے ریٹس اپڈیٹ کریں</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('روزانہ کے ریٹس', 'Daily Rates')}</span>
           </button>
 
-          {/* Daily Closing & Backup (Soft Blue) */}
+          {/* Daily Closing & Backup */}
           <button
             type="button"
             onClick={handleDailyClosing}
@@ -213,16 +218,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+              boxShadow: 'none',
             }}
           >
             <Database size={16} color="#0284c7" />
-            <span className="font-nastaleeq">
-              {closingTriggered ? 'بیک اپ ہو رہا ہے...' : 'یومیہ کلوزنگ و بیک اپ'}
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {closingTriggered
+                ? t('بیک اپ ہو رہا ہے...', 'Backing up...')
+                : t('یومیہ کلوزنگ و بیک اپ', 'Daily Closing & Backup')}
             </span>
           </button>
 
-          {/* Counter Mode (Soft Purple) */}
+          {/* Counter Mode */}
           <button
             type="button"
             onClick={() => onNavigateTab('billing')}
@@ -240,22 +247,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+              boxShadow: 'none',
             }}
           >
             <ShoppingCart size={16} color="#7e22ce" />
-            <span className="font-nastaleeq">کاؤنٹر پی او ایس (F8)</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کاؤنٹر پی او ایس', 'Counter POS')}</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Relative Color Filled Summary KPI Cards */}
+      {/* 2. Summary KPI Cards */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
           gap: '12px',
-          direction: 'rtl',
         }}
       >
         {summaryCards.map((card) => (
@@ -264,12 +270,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onClick={card.onClick}
             className="touch-active"
             style={{
-              backgroundColor: card.bg, // Relative filled background
+              backgroundColor: card.bg,
               border: `1.5px solid ${card.border}`,
               borderRadius: '12px',
               padding: '14px 16px',
               cursor: 'pointer',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+              boxShadow: 'none',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -278,25 +284,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           >
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span
-                    className="font-nastaleeq"
-                    style={{ fontSize: '15px', fontWeight: 800, color: card.textColor, lineHeight: 1.1 }}
-                  >
-                    {card.titleUrdu}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '9.5px',
-                      fontWeight: 800,
-                      color: card.textColor,
-                      letterSpacing: '0.2px',
-                      opacity: 0.8,
-                    }}
-                  >
-                    {card.titleEn}
-                  </span>
-                </div>
+                <span
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{ fontSize: '14px', fontWeight: 800, color: card.textColor, lineHeight: 1.1 }}
+                >
+                  {card.title}
+                </span>
 
                 {/* White rounded square for icon */}
                 <div
@@ -309,7 +302,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+                    boxShadow: 'none',
                     flexShrink: 0,
                   }}
                 >
@@ -322,7 +315,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 style={{
                   fontSize: '20px',
                   fontWeight: 900,
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                   color: card.valColor,
                   margin: '8px 0 2px',
                 }}
@@ -333,7 +326,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {/* Subtitle */}
             <div
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{ fontSize: '12px', color: card.textColor, opacity: 0.9, marginTop: '4px' }}
             >
               {card.subtitle}
@@ -342,15 +335,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         ))}
       </div>
 
-      {/* 3. Synchronous Activity Audit Log Preview */}
+      {/* 3. Activity Audit Log */}
       <div
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '12px',
           border: '1.5px solid #C2C5AA',
           padding: '16px 20px',
-          boxShadow: '0 2px 6px rgba(65, 72, 51, 0.03)',
-          direction: 'rtl',
+          boxShadow: 'none',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -369,22 +361,62 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               <ShieldCheck size={16} color="#d97706" />
             </div>
-            <h3 className="font-nastaleeq" style={{ fontSize: '16px', fontWeight: 800, color: '#414833', margin: 0 }}>
-              سسٹم سرگرمی اور مالیاتی لاگ (`activity_log`)
+            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 800, color: '#414833', margin: 0 }}>
+              {t('سسٹم سرگرمی اور مالیاتی لاگ', 'System Activity & Financial Audit Log')}
             </h3>
           </div>
-          <span className="font-nastaleeq" style={{ fontSize: '12.5px', color: '#656D4A', fontWeight: 600 }}>
-            غیر متغیر سکیورٹی و مالیاتی ٹریل
+          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12.5px', color: '#656D4A', fontWeight: 600 }}>
+            {t('غیر متغیر سکیورٹی و مالیاتی ٹریل', 'Immutable security and audit trail')}
           </span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {[
-            { time: 'آج، 02:30 PM', actor: 'Biller (محمد عاصف)', action: 'PRINT_BILL', actionColor: '#0284c7', actionBg: '#f0f9ff', actionBorder: '#bae6fd', detail: 'BILL-00481 (چکی آٹا، 40 کلو، Rs 5600)' },
-            { time: 'آج، 02:15 PM', actor: 'Biller (محمد عاصف)', action: 'GENERATE_PISAI_TOKEN', actionColor: '#059669', actionBg: '#ecfdf5', actionBorder: '#a7f3d0', detail: 'ٹوکن #0482 (صفائی+پسائی، 25 کلو، Rs 150)' },
-            { time: 'آج، 01:45 PM', actor: 'Admin (Hanzala)', action: 'LOG_EXPENSE', actionColor: '#e11d48', actionBg: '#fff1f2', actionBorder: '#fecdd3', detail: 'EXP-109 (بجلی ایڈوانس، Rs 2500)' },
-            { time: 'آج، 01:10 PM', actor: 'Admin (Hanzala)', action: 'LOG_UDHAAR_PAYMENT', actionColor: '#7e22ce', actionBg: '#faf5ff', actionBorder: '#e9d5ff', detail: 'PAY-055 (کسٹمر حاجی رشید احمد، Rs 2000)' },
-            { time: 'آج، 08:00 AM', actor: 'Admin (Hanzala)', action: 'CONFIRM_DAILY_PRICE', actionColor: '#d97706', actionBg: '#fffbeb', actionBorder: '#fde68a', detail: 'یومیہ ریٹس کی تصدیق برائے 5 پروڈکٹس' },
+            {
+              time: isUrdu ? 'آج، 02:30 PM' : 'Today, 02:30 PM',
+              actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
+              action: 'PRINT_BILL',
+              actionColor: '#0284c7',
+              actionBg: '#f0f9ff',
+              actionBorder: '#bae6fd',
+              detail: isUrdu ? 'بل #00481 (چکی آٹا، 40 کلو، 5,600 روپے)' : 'BILL-00481 (Chakki Atta, 40 KG, Rs 5,600)',
+            },
+            {
+              time: isUrdu ? 'آج، 02:15 PM' : 'Today, 02:15 PM',
+              actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
+              action: 'GENERATE_PISAI_TOKEN',
+              actionColor: '#059669',
+              actionBg: '#ecfdf5',
+              actionBorder: '#a7f3d0',
+              detail: isUrdu ? 'ٹوکن #0482 (صفائی و پسائی، 25 کلو، 150 روپے)' : 'Token #0482 (Cleaning & Grinding, 25 KG, Rs 150)',
+            },
+            {
+              time: isUrdu ? 'آج، 01:45 PM' : 'Today, 01:45 PM',
+              actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
+              action: 'LOG_EXPENSE',
+              actionColor: '#e11d48',
+              actionBg: '#fff1f2',
+              actionBorder: '#fecdd3',
+              detail: isUrdu ? 'خرچہ #109 (بجلی ایڈوانس، 2,500 روپے)' : 'EXP-109 (Electricity Advance, Rs 2,500)',
+            },
+            {
+              time: isUrdu ? 'آج، 01:10 PM' : 'Today, 01:10 PM',
+              actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
+              action: 'LOG_UDHAAR_PAYMENT',
+              actionColor: '#7e22ce',
+              actionBg: '#faf5ff',
+              actionBorder: '#e9d5ff',
+              detail: isUrdu ? 'وصولی #055 (گاہک حاجی رشید، 2,000 روپے)' : 'PAY-055 (Customer Haji Rasheed, Rs 2,000)',
+            },
+            {
+              time: isUrdu ? 'آج، 08:00 AM' : 'Today, 08:00 AM',
+              actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
+              action: 'CONFIRM_DAILY_PRICE',
+              actionColor: '#d97706',
+              actionBg: '#fffbeb',
+              actionBorder: '#fde68a',
+              detail: isUrdu ? 'یومیہ ریٹس کی تصدیق برائے 5 پراڈکٹس' : 'Daily rates confirmed for 5 products',
+            },
           ].map((log, idx) => (
             <div
               key={idx}
@@ -401,7 +433,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               }}
             >
               <span style={{ color: '#64748b', fontWeight: 600, fontSize: '11.5px' }}>{log.time}</span>
-              <span className="font-nastaleeq" style={{ fontWeight: 800, color: '#414833' }}>{log.actor}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#414833' }}>{log.actor}</span>
               <div>
                 <span
                   style={{
@@ -418,7 +450,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {log.action}
                 </span>
               </div>
-              <span className="font-nastaleeq" style={{ color: '#414833', fontWeight: 600, fontSize: '12px' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#414833', fontWeight: 600, fontSize: '12px' }}>
                 {log.detail}
               </span>
             </div>

@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ShiftKpiCardsProps {
   todaySales?: number;
@@ -18,43 +19,42 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
   cashDrawerBalance = 183730,
   onCardClick,
 }) => {
+  const { isUrdu, t } = useLanguage();
   const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
 
   const items = [
     {
-      id: 'drawer' as const,
-      title: 'کیش دراز',
-      value: `Rs. ${cashDrawerBalance.toLocaleString()}`,
-    },
-    {
-      id: 'pisai' as const,
-      title: 'گندم پسائی',
-      value: `Rs. ${todayPisaiKg.toLocaleString()}`,
+      id: 'sales' as const,
+      title: t('کل نقد سیلز', 'Net Cash Sales'),
+      value: isUrdu ? `${todaySales.toLocaleString()} روپے` : `Rs ${todaySales.toLocaleString()}`,
     },
     {
       id: 'recovery' as const,
-      title: 'ادھار وصولی',
-      value: `Rs. ${creditRecovery.toLocaleString()}`,
+      title: t('ادھار وصولی', 'Credit Recovered'),
+      value: isUrdu ? `${creditRecovery.toLocaleString()} روپے` : `Rs ${creditRecovery.toLocaleString()}`,
     },
     {
-      id: 'sales' as const,
-      title: 'کل نقد سیلز',
-      value: `Rs. ${todaySales.toLocaleString()}`,
+      id: 'pisai' as const,
+      title: t('گندم پسائی', 'Milling Revenue'),
+      value: isUrdu ? `${todayPisaiKg.toLocaleString()} روپے` : `Rs ${todayPisaiKg.toLocaleString()}`,
+    },
+    {
+      id: 'drawer' as const,
+      title: t('کیش دراز', 'Cash Drawer'),
+      value: isUrdu ? `${cashDrawerBalance.toLocaleString()} روپے` : `Rs ${cashDrawerBalance.toLocaleString()}`,
     },
   ];
 
   return (
     <div
-      className="dash-card-animated"
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F8FAFC',
         borderRadius: '16px',
-        border: '1.5px solid #EBE4DA',
+        border: 'none',
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         padding: '14px 8px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-        direction: 'rtl',
+        boxShadow: 'none',
       }}
     >
       {items.map((item, idx) => {
@@ -76,21 +76,21 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               cursor: onCardClick ? 'pointer' : 'default',
               padding: '6px 14px',
               borderRadius: '10px',
-              backgroundColor: isHovered ? '#FAF4EA' : 'transparent',
-              borderLeft: idx !== items.length - 1 ? '1.5px solid #EBE4DA' : 'none',
+              backgroundColor: isHovered ? '#FFFFFF' : 'transparent',
+              border: 'none',
               transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
               transform: isHovered ? 'translateY(-1px)' : 'none',
             }}
           >
             <div
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '16.5px',
-                fontWeight: 800,
-                color: isHovered ? '#783E15' : '#4B5563',
+                fontSize: '13px',
+                fontWeight: 700,
+                color: '#64748B',
                 marginBottom: '4px',
                 lineHeight: 1.2,
-                transition: 'color 0.18s ease',
+                letterSpacing: '-0.01em',
               }}
             >
               {item.title}
@@ -100,7 +100,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
                 fontSize: '25px',
                 fontWeight: 900,
                 fontFamily: 'var(--font-mono)',
-                color: isHovered ? '#1F2937' : '#111827',
+                color: '#0F172A',
                 letterSpacing: '-0.5px',
                 lineHeight: 1.1,
                 transition: 'transform 0.18s ease',

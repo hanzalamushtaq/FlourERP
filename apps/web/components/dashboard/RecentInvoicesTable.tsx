@@ -4,28 +4,33 @@
 import React from 'react';
 import { Printer } from 'lucide-react';
 import { ReceiptData } from '../ui/ReceiptPreviewModal';
+import { useLanguage } from '../../context/LanguageContext';
 
 export interface ShiftInvoiceItem {
   invoiceNumber: string;
   customerName: string;
   itemsDetail: string;
+  itemsDetailUr?: string;
+  itemsDetailEn?: string;
   totalAmount: number;
-  paymentMethod: 'cash' | 'udhaar' | 'cheque';
+  paymentMethod: 'cash' | 'credit' | 'cheque';
   rawReceiptData?: ReceiptData;
 }
 
 const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   {
     invoiceNumber: 'B-5001',
-    customerName: 'نامعلوم',
-    itemsDetail: '2x20KG آٹا',
+    customerName: 'حاجی رشید',
+    itemsDetail: '40 کلو آٹا',
+    itemsDetailUr: '40 کلو آٹا',
+    itemsDetailEn: '40 KG Atta',
     totalAmount: 4300,
     paymentMethod: 'cash',
     rawReceiptData: {
       type: 'product',
       billNumber: 'B-5001',
-      customerName: 'نامعلوم',
-      items: [{ nameEn: 'Chakki Atta', nameUr: '2x20KG آٹا', weightKg: 40, ratePerKg: 107.5, total: 4300 }],
+      customerName: 'حاجی رشید',
+      items: [{ nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (40 کلو)', weightKg: 40, ratePerKg: 107.5, total: 4300 }],
       subtotal: 4300,
       discount: 0,
       netTotal: 4300,
@@ -39,7 +44,9 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   {
     invoiceNumber: 'B-5002',
     customerName: 'فہیم احمد',
-    itemsDetail: '15KG پسائی',
+    itemsDetail: '15 کلو پسائی',
+    itemsDetailUr: '15 کلو پسائی',
+    itemsDetailEn: '15 KG Grinding',
     totalAmount: 127.5,
     paymentMethod: 'cash',
     rawReceiptData: {
@@ -63,6 +70,8 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
     invoiceNumber: 'B-5003',
     customerName: 'صادق ٹریڈرز',
     itemsDetail: 'ادھار کھاتہ',
+    itemsDetailUr: 'ادھار کھاتہ',
+    itemsDetailEn: 'Credit Ledger',
     totalAmount: 25000,
     paymentMethod: 'cheque',
     rawReceiptData: {
@@ -84,6 +93,8 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
     invoiceNumber: 'B-5004',
     customerName: 'صادق ٹریڈرز',
     itemsDetail: 'ادھار کھاتہ',
+    itemsDetailUr: 'ادھار کھاتہ',
+    itemsDetailEn: 'Credit Ledger',
     totalAmount: 25000,
     paymentMethod: 'cheque',
     rawReceiptData: {
@@ -103,14 +114,16 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   },
   {
     invoiceNumber: 'B-5005',
-    customerName: 'نامعلوم',
+    customerName: 'بابر ہوٹل',
     itemsDetail: 'ادھار کھاتہ',
+    itemsDetailUr: 'ادھار کھاتہ',
+    itemsDetailEn: 'Credit Ledger',
     totalAmount: 25000,
     paymentMethod: 'cheque',
     rawReceiptData: {
       type: 'product',
       billNumber: 'B-5005',
-      customerName: 'نامعلوم',
+      customerName: 'بابر ہوٹل',
       items: [{ nameEn: 'Chokar Flour', nameUr: 'خالص چوکر', weightKg: 250, ratePerKg: 100, total: 25000 }],
       subtotal: 25000,
       discount: 0,
@@ -134,32 +147,34 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
   invoices = SAMPLE_INVOICES,
   onReprint,
 }) => {
+  const { isUrdu, t } = useLanguage();
+
   return (
     <div
       className="dash-card-animated"
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F8FAFC',
         borderRadius: '16px',
-        border: '1.5px solid #EBE4DA',
+        border: 'none',
         padding: '16px 20px',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+        boxShadow: 'none',
       }}
     >
       {/* Centered Title */}
       <h3
+        className={isUrdu ? 'font-nastaleeq' : ''}
         style={{
-          fontFamily: 'var(--font-urdu)',
+          fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
           fontSize: '18px',
           fontWeight: 900,
-          color: '#1F2937',
+          color: '#0F172A',
           textAlign: 'center',
           margin: '0 0 14px 0',
-          direction: 'rtl',
         }}
       >
-        Recent Bills / حالیہ بلز شفٹ لاگ
+        {t('حالیہ بلز شفٹ لاگ', 'Recent Shift Bills')}
       </h3>
 
       {/* Table Container */}
@@ -175,96 +190,109 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
             width: '100%',
             minWidth: '550px',
             borderCollapse: 'collapse',
-            direction: 'rtl',
             tableLayout: 'fixed',
           }}
         >
           <thead>
             <tr
               style={{
-                backgroundColor: '#A66336', // Solid brown spanning full width matching reference
+                backgroundColor: '#1877F2',
                 color: '#FFFFFF',
               }}
             >
               <th
                 style={{
+                  display: 'table-cell',
                   width: '13%',
                   padding: '11px 8px',
                   fontWeight: 800,
                   fontSize: '14px',
-                  fontFamily: 'var(--font-urdu)',
-                  borderTopRightRadius: '8px',
+                  borderTopLeftRadius: '8px',
+                  borderTopRightRadius: '0',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
               >
-                بل نمبر
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('بل نمبر', 'Bill #')}
+                </span>
               </th>
               <th
                 style={{
+                  display: 'table-cell',
                   width: '24%',
                   padding: '11px 8px',
                   fontWeight: 800,
                   fontSize: '14px',
-                  fontFamily: 'var(--font-urdu)',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
               >
-                گاہک
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('گاہک', 'Customer')}
+                </span>
               </th>
               <th
                 style={{
+                  display: 'table-cell',
                   width: '22%',
                   padding: '11px 8px',
                   fontWeight: 800,
                   fontSize: '14px',
-                  fontFamily: 'var(--font-urdu)',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
               >
-                تفصیل
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('تفصیل', 'Details')}
+                </span>
               </th>
               <th
                 style={{
+                  display: 'table-cell',
                   width: '19%',
                   padding: '11px 8px',
                   fontWeight: 800,
                   fontSize: '14px',
-                  fontFamily: 'var(--font-urdu)',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
               >
-                رقم
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('رقم', 'Amount')}
+                </span>
               </th>
               <th
                 style={{
+                  display: 'table-cell',
                   width: '12%',
                   padding: '11px 6px',
                   fontWeight: 800,
                   fontSize: '14px',
-                  fontFamily: 'var(--font-urdu)',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
               >
-                ادائیگی
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('ادائیگی', 'Payment')}
+                </span>
               </th>
               <th
                 style={{
+                  display: 'table-cell',
                   width: '10%',
                   padding: '11px 4px',
                   fontWeight: 800,
                   fontSize: '14px',
-                  fontFamily: 'var(--font-urdu)',
-                  borderTopLeftRadius: '8px',
+                  borderTopRightRadius: '8px',
+                  borderTopLeftRadius: '0',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
               >
-                پرنٹ
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('پرنٹ', 'Print')}
+                </span>
               </th>
             </tr>
           </thead>
@@ -272,17 +300,31 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
             {invoices.map((inv) => {
               const paymentLabel =
                 inv.paymentMethod === 'cash'
-                  ? 'نقد'
+                  ? t('نقد', 'Cash')
                   : inv.paymentMethod === 'cheque'
-                  ? 'چیک'
-                  : 'ادھار';
+                  ? t('چیک', 'Cheque')
+                  : t('ادھار', 'Credit');
+
+              const chipBg =
+                inv.paymentMethod === 'cash'
+                  ? '#ECFDF5'
+                  : inv.paymentMethod === 'cheque'
+                  ? '#EFF6FF'
+                  : '#FFFBEB';
+
+              const chipText =
+                inv.paymentMethod === 'cash'
+                  ? '#0E8A54'
+                  : inv.paymentMethod === 'cheque'
+                  ? '#1D4ED8'
+                  : '#B45309';
 
               return (
                 <tr
                   key={inv.invoiceNumber}
                   className="table-row-hover"
                   style={{
-                    borderBottom: '1px solid #F3EDE4',
+                    borderBottom: 'none',
                     backgroundColor: '#FFFFFF',
                     transition: 'background-color 0.15s ease',
                   }}
@@ -293,7 +335,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       padding: '13px 8px',
                       fontFamily: 'var(--font-mono)',
                       fontWeight: 800,
-                      color: '#1F2937',
+                      color: '#0F172A',
                       fontSize: '13.5px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
@@ -308,7 +350,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       padding: '13px 10px',
                       fontFamily: 'var(--font-urdu)',
                       fontWeight: 800,
-                      color: '#1F2937',
+                      color: '#0F172A',
                       fontSize: '14.5px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
@@ -321,18 +363,18 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   <td
                     style={{
                       padding: '13px 10px',
-                      fontFamily: 'var(--font-urdu)',
-                      color: '#4B5563',
+                      fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
+                      color: '#64748B',
                       fontSize: '13.5px',
                       fontWeight: 700,
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {inv.itemsDetail}
+                    {isUrdu ? (inv.itemsDetailUr || inv.itemsDetail) : (inv.itemsDetailEn || inv.itemsDetail)}
                   </td>
 
-                  {/* Amount: LTR formatted for clean Rs. symbol alignment */}
+                  {/* Amount: formatted for active language */}
                   <td
                     style={{
                       padding: '13px 8px',
@@ -341,20 +383,21 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     }}
                   >
                     <span
-                      dir="ltr"
                       style={{
                         fontWeight: 900,
-                        fontFamily: 'var(--font-mono)',
-                        color: '#111827',
+                        fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                        color: '#0F172A',
                         fontSize: '14px',
                         display: 'inline-block',
                       }}
                     >
-                      Rs. {inv.totalAmount % 1 !== 0 ? inv.totalAmount.toFixed(2) : inv.totalAmount.toLocaleString()}
+                      {isUrdu
+                        ? `${inv.totalAmount % 1 !== 0 ? inv.totalAmount.toFixed(2) : inv.totalAmount.toLocaleString()} روپے`
+                        : `Rs ${inv.totalAmount % 1 !== 0 ? inv.totalAmount.toFixed(2) : inv.totalAmount.toLocaleString()}`}
                     </span>
                   </td>
 
-                  {/* Payment: Pure clean typography - NO COLOR DOT */}
+                  {/* Payment: Flat tinted badge/chip */}
                   <td
                     style={{
                       padding: '13px 6px',
@@ -363,11 +406,17 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     }}
                   >
                     <span
-                      className="font-nastaleeq"
+                      className={isUrdu ? 'font-nastaleeq' : ''}
                       style={{
                         fontWeight: 800,
-                        color: '#1F2937',
-                        fontSize: '14px',
+                        backgroundColor: chipBg,
+                        color: chipText,
+                        fontSize: '13px',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        display: 'inline-block',
+                        border: 'none',
+                        boxShadow: 'none',
                       }}
                     >
                       {paymentLabel}
@@ -380,32 +429,27 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       type="button"
                       onClick={() => inv.rawReceiptData && onReprint(inv.rawReceiptData)}
                       className="touch-active"
-                      title="رسید پرنٹ کریں"
+                      title={t('رسید پرنٹ کریں', 'Print Receipt')}
                       style={{
                         width: '28px',
                         height: '28px',
                         borderRadius: '7px',
-                        border: '1.5px solid #D5C9B8',
-                        backgroundColor: '#FFFFFF',
-                        color: '#4A2810',
+                        border: 'none',
+                        backgroundColor: '#EFF6FF',
+                        color: '#1877F2',
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         cursor: 'pointer',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        boxShadow: 'none',
+                        outline: 'none',
+                        transition: 'background-color 0.2s ease',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#FAF3E8';
-                        e.currentTarget.style.borderColor = '#B26E3A';
-                        e.currentTarget.style.transform = 'scale(1.15) rotate(-2deg)';
-                        e.currentTarget.style.boxShadow = '0 3px 8px rgba(178, 110, 58, 0.25)';
+                        e.currentTarget.style.backgroundColor = '#DBEAFE';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#FFFFFF';
-                        e.currentTarget.style.borderColor = '#D5C9B8';
-                        e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+                        e.currentTarget.style.backgroundColor = '#EFF6FF';
                       }}
                     >
                       <Printer size={15} strokeWidth={2} />

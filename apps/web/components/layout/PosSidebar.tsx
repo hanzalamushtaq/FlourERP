@@ -13,46 +13,47 @@ import {
   LogOut,
   Menu,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Wheat-Ear Cogwheel Logo matching user's reference image
-const WheatGearLogo = () => (
+const WheatGearLogo = ({ size = 32 }: { size?: number }) => (
   <svg
-    width="92"
-    height="92"
+    width={size}
+    height={size}
     viewBox="0 0 100 100"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    style={{ display: 'block', margin: '0 auto' }}
+    style={{ display: 'block', flexShrink: 0 }}
   >
-    {/* Outer Cogwheel / Gear in warm golden-brown */}
+    {/* Outer Cogwheel / Gear in cobalt blue */}
     <path
       d="M32 12V21C26.5 24 22 28.5 18.5 34L10 30L4 41L12 45.5C11.5 48.5 11 51.5 11 55C11 58.5 11.5 61.5 12 64.5L4 69L10 80L18.5 76C22 81.5 26.5 86 32 89V98H44V90C46 90.5 48 90.5 50 90.5C52 90.5 54 90.5 56 90V98H68V89C73.5 86 78 81.5 81.5 76L90 80L96 69L88 64.5C88.5 61.5 89 58.5 89 55C89 51.5 88.5 48.5 88 45.5L96 41L90 30L81.5 34C78 28.5 73.5 24 68 21V12H61V28.5C57.5 27.5 53.8 27 50 27C46.2 27 42.5 27.5 39 28.5V12H32Z"
-      fill="#B26E3A"
+      fill="#1877F2"
     />
     {/* Inner White Cutout circle */}
     <circle cx="50" cy="56" r="20" fill="#FFFFFF" />
 
     {/* Center Wheat Stalk */}
-    <line x1="50" y1="20" x2="50" y2="78" stroke="#B26E3A" strokeWidth="3" strokeLinecap="round" />
+    <line x1="50" y1="20" x2="50" y2="78" stroke="#1877F2" strokeWidth="3" strokeLinecap="round" />
 
     {/* Top Grains */}
-    <path d="M50 12C46 17 46 22 50 26C54 22 54 17 50 12Z" fill="#B26E3A" />
+    <path d="M50 12C46 17 46 22 50 26C54 22 54 17 50 12Z" fill="#1877F2" />
 
     {/* Row 1 Grains */}
-    <path d="M48 26C41 27 38 32 43 36C47 36 49 33 48 26Z" fill="#B26E3A" />
-    <path d="M52 26C59 27 62 32 57 36C53 36 51 33 52 26Z" fill="#B26E3A" />
+    <path d="M48 26C41 27 38 32 43 36C47 36 49 33 48 26Z" fill="#1877F2" />
+    <path d="M52 26C59 27 62 32 57 36C53 36 51 33 52 26Z" fill="#1877F2" />
 
     {/* Row 2 Grains */}
-    <path d="M48 35C40 36 36 41 41 45C46 45 49 42 48 35Z" fill="#B26E3A" />
-    <path d="M52 35C60 36 64 41 59 45C54 45 51 42 52 35Z" fill="#B26E3A" />
+    <path d="M48 35C40 36 36 41 41 45C46 45 49 42 48 35Z" fill="#1877F2" />
+    <path d="M52 35C60 36 64 41 59 45C54 45 51 42 52 35Z" fill="#1877F2" />
 
     {/* Row 3 Grains */}
-    <path d="M48 44C39 46 36 51 41 55C46 55 49 51 48 44Z" fill="#B26E3A" />
-    <path d="M52 44C61 46 64 51 59 55C54 55 51 51 52 44Z" fill="#B26E3A" />
+    <path d="M48 44C39 46 36 51 41 55C46 55 49 51 48 44Z" fill="#1877F2" />
+    <path d="M52 44C61 46 64 51 59 55C54 55 51 51 52 44Z" fill="#1877F2" />
 
     {/* Row 4 Grains */}
-    <path d="M48 54C40 56 37 61 42 65C47 65 49 61 48 54Z" fill="#B26E3A" />
-    <path d="M52 54C60 56 63 61 58 65C53 65 51 61 52 54Z" fill="#B26E3A" />
+    <path d="M48 54C40 56 37 61 42 65C47 65 49 61 48 54Z" fill="#1877F2" />
+    <path d="M52 54C60 56 63 61 58 65C53 65 51 61 52 54Z" fill="#1877F2" />
   </svg>
 );
 
@@ -100,6 +101,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
   isCollapsed: isCollapsedProp,
   onToggleCollapse,
 }) => {
+  const { language, isUrdu, t } = useLanguage();
   const [internalCollapsed, setInternalCollapsed] = React.useState<boolean>(false);
   const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : internalCollapsed;
   const toggleCollapse = onToggleCollapse || (() => setInternalCollapsed((prev) => !prev));
@@ -112,56 +114,56 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
   const allMenuItems = [
     {
       id: 'dashboard',
-      label: 'ڈیش بورڈ',
+      label: t('ڈیش بورڈ', 'Dashboard'),
       icon: (color: string) => <Home size={22} color={color} strokeWidth={2} />,
       onClick: () => onSelectTab('dashboard'),
       visible: true,
     },
     {
       id: 'billing',
-      label: 'نیا بل',
+      label: t('نیا بل', 'New Bill'),
       icon: (color: string) => <PlusCircle size={22} color={color} strokeWidth={1.8} />,
       onClick: () => onSelectTab('billing'),
       visible: true,
     },
     {
       id: 'pisai',
-      label: 'گندم پسائی',
+      label: t('گندم پسائی', 'Wheat Grinding'),
       icon: (color: string) => <ChakkiMachineIcon size={22} color={color} />,
       onClick: () => onSelectTab('pisai'),
       visible: true,
     },
     {
       id: 'udhaar',
-      label: 'ادھار کھاتے',
+      label: t('ادھار کھاتے', 'Customer Ledger'),
       icon: (color: string) => <BookOpen size={22} color={color} strokeWidth={1.8} />,
       onClick: () => onSelectTab('udhaar'),
       visible: true,
     },
     {
       id: 'rates',
-      label: 'ریٹ لسٹ',
+      label: t('ریٹ لسٹ', 'Daily Rates'),
       icon: (color: string) => <Tag size={22} color={color} strokeWidth={2} />,
       onClick: () => onSelectTab('rates'),
       visible: true,
     },
     {
       id: 'stock',
-      label: 'گودام و اسٹاک',
+      label: t('گودام و اسٹاک', 'Inventory & Stock'),
       icon: (color: string) => <Boxes size={22} color={color} strokeWidth={1.8} />,
       onClick: () => onSelectTab('stock'),
       visible: true,
     },
     {
       id: 'reports',
-      label: 'روزنامچہ و حساب',
+      label: t('روزنامچہ و حساب', 'Reports & Accounts'),
       icon: (color: string) => <Calculator size={22} color={color} strokeWidth={1.8} />,
       onClick: () => onSelectTab('reports'),
       visible: canViewReports,
     },
     {
       id: 'admin',
-      label: 'ایڈمن و اختیارات',
+      label: t('ایڈمن و اختیارات', 'Admin & Settings'),
       icon: (color: string) => <ShieldCheck size={22} color={color} strokeWidth={1.8} />,
       onClick: () => onSelectTab('admin'),
       visible: isAdminUser,
@@ -180,7 +182,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         minWidth: isCollapsed ? '68px' : '232px',
         maxWidth: isCollapsed ? '68px' : '232px',
         backgroundColor: '#FFFFFF',
-        color: '#1F2937',
+        color: '#0F172A',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -189,60 +191,63 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        borderRight: '1.5px solid #EBE4DA',
-        boxShadow: '1px 0 5px rgba(0, 0, 0, 0.03)',
+        borderRight: 'none',
+        boxShadow: 'none',
         transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
         overflow: 'hidden',
       }}
     >
       <div>
-        {/* Top Header Row: Three Lines Toggle Button on Top Right */}
+        {/* Top Header Row: Small Logo aligned with Toggle Button */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: isCollapsed ? 'center' : 'flex-end',
-            padding: isCollapsed ? '14px 0 8px 0' : '12px 14px 2px 14px',
+            justifyContent: isCollapsed ? 'center' : 'space-between',
+            padding: isCollapsed ? '14px 0 8px 0' : '14px 14px 12px 14px',
           }}
         >
+          {!isCollapsed && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <WheatGearLogo size={32} />
+              <span
+                style={{
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  letterSpacing: '-0.2px',
+                }}
+              >
+                Flour ERP
+              </span>
+            </div>
+          )}
+
           <button
             type="button"
             onClick={toggleCollapse}
-            title={isCollapsed ? 'سائیڈ بار کھولیں' : 'سائیڈ بار بند کریں'}
+            title={isCollapsed ? t('سائیڈ بار کھولیں', 'Expand Sidebar') : t('سائیڈ بار بند کریں', 'Collapse Sidebar')}
             className="touch-active"
             style={{
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              backgroundColor: '#F5EFE6',
-              border: '1.5px solid #E8DED1',
+              backgroundColor: '#F8FAFC',
+              border: 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: '#6B4A28',
-              boxShadow: '0 1px 3px rgba(60, 40, 20, 0.05)',
+              color: '#0F172A',
+              boxShadow: 'none',
               transition: 'all 0.15s ease',
               outline: 'none',
+              flexShrink: 0,
             }}
           >
             <Menu size={20} strokeWidth={2.2} />
           </button>
         </div>
-
-        {/* Top Centered Brand Emblem (visible when expanded) */}
-        {!isCollapsed && (
-          <div
-            style={{
-              padding: '6px 16px 16px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <WheatGearLogo />
-          </div>
-        )}
 
         {/* Menu Navigation Items with Tactile Button / Card Feel */}
         <nav
@@ -283,83 +288,61 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   minHeight: isCollapsed ? '46px' : '50px',
                   height: isCollapsed ? '46px' : 'auto',
                   padding: isCollapsed ? '0' : '7px 12px',
-                  borderRadius: '13px',
-                  border: isActive
-                    ? '2px solid #B26E3A'
-                    : isHovered
-                      ? '1.5px solid #CDB59E'
-                      : '1.5px solid #EDE4D8',
-                  borderRight: !isCollapsed && isActive ? '5px solid #B26E3A' : undefined,
+                  borderRadius: '12px',
+                  border: 'none',
                   backgroundColor: isActive
-                    ? '#FBF3E8'
+                    ? '#EFF6FF'
                     : isHovered
-                      ? '#FAF4EC'
-                      : '#FFFFFF',
+                      ? '#F8FAFC'
+                      : 'transparent',
                   cursor: 'pointer',
                   direction: 'rtl',
-                  transition: 'all 0.12s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: isActive
-                    ? '0 4px 12px rgba(178, 110, 58, 0.18), 0 1px 3px rgba(0, 0, 0, 0.04)'
-                    : isHovered
-                      ? '0 4px 10px rgba(178, 110, 58, 0.10)'
-                      : '0 1px 3px rgba(60, 40, 20, 0.04)',
-                  transform: isPressed
-                    ? 'scale(0.975) translateY(1px)'
-                    : isHovered
-                      ? 'translateY(-1.5px)'
-                      : 'none',
+                  transition: 'background-color 0.12s ease',
+                  boxShadow: 'none',
+                  transform: 'none',
                   outline: 'none',
                 }}
               >
-                {/* Right: Bold Urdu Nastaleeq Text */}
+                {/* Right: Bold Urdu Nastaleeq Text or Clean English */}
                 {!isCollapsed && (
                   <span
-                    className="font-nastaleeq"
+                    className={isUrdu ? 'font-nastaleeq' : ''}
                     style={{
-                      fontSize: '19.5px',
-                      fontWeight: 900,
-                      color: isActive ? '#783E15' : isHovered ? '#111827' : '#2B231D',
-                      lineHeight: 1.15,
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: isActive ? '#1877F2' : '#0F172A',
+                      lineHeight: 1.25,
                       whiteSpace: 'nowrap',
                       marginRight: '2px',
+                      letterSpacing: '-0.01em',
                     }}
                   >
                     {item.label}
                   </span>
                 )}
 
-                {/* Left: Dedicated Tactile Icon Squircle */}
+                {/* Left: Dedicated Icon Squircle */}
                 <div
                   style={{
                     width: '36px',
                     height: '36px',
                     borderRadius: '10px',
                     backgroundColor: isActive
-                      ? '#B26E3A'
-                      : isHovered
-                        ? '#EDE0D0'
-                        : '#F5EFE6',
-                    border: isActive
-                      ? '1px solid #995A2B'
-                      : isHovered
-                        ? '1px solid #D6C2B0'
-                        : '1px solid #E8DED1',
+                      ? '#1877F2'
+                      : '#F8FAFC',
+                    border: 'none',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    boxShadow: isActive
-                      ? '0 2px 6px rgba(178, 110, 58, 0.35)'
-                      : 'none',
+                    boxShadow: 'none',
                     transition: 'all 0.12s ease',
                   }}
                 >
                   {item.icon(
                     isActive
                       ? '#FFFFFF'
-                      : isHovered
-                        ? '#B26E3A'
-                        : '#6E5844'
+                      : '#64748B'
                   )}
                 </div>
               </button>
@@ -371,20 +354,20 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       {/* Bottom Section: Clean Logout Button & Online Indicator */}
       <div>
         {onLogout && (
-          <div style={{ padding: isCollapsed ? '8px 10px' : '8px 12px', borderTop: '1px solid #F3EDE4', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ padding: isCollapsed ? '8px 10px' : '8px 12px', borderTop: 'none', display: 'flex', justifyContent: 'center' }}>
             <button
               type="button"
               onClick={onLogout}
-              title="لاگ آؤٹ"
+              title={t('لاگ آؤٹ', 'Logout')}
               className="touch-active"
               style={{
                 width: isCollapsed ? '46px' : '100%',
                 minHeight: isCollapsed ? '42px' : 'auto',
                 padding: isCollapsed ? '0' : '9px 12px',
                 borderRadius: '10px',
-                border: '1.5px solid #F3D3CC',
-                backgroundColor: '#FFF8F6',
-                color: '#B91C1C',
+                border: 'none',
+                backgroundColor: '#FEF2F2',
+                color: '#DC2626',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -393,25 +376,24 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 fontWeight: 800,
                 cursor: 'pointer',
                 direction: 'rtl',
-                transition: 'all 0.15s ease',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
+                transition: 'background-color 0.15s ease',
+                boxShadow: 'none',
+                outline: 'none',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#FEE2E2';
-                e.currentTarget.style.borderColor = '#EF4444';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#FFF8F6';
-                e.currentTarget.style.borderColor = '#F3D3CC';
+                e.currentTarget.style.backgroundColor = '#FEF2F2';
               }}
             >
               <LogOut size={16} color="#DC2626" />
               {!isCollapsed && (
                 <span
-                  className="font-nastaleeq"
-                  style={{ fontSize: '15px', fontWeight: 900, color: '#B91C1C' }}
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{ fontSize: '13px', fontWeight: 800, color: '#DC2626' }}
                 >
-                  لاگ آؤٹ
+                  {t('لاگ آؤٹ', 'Logout')}
                 </span>
               )}
             </button>
@@ -422,14 +404,14 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         <div
           style={{
             padding: isCollapsed ? '8px 0' : '8px 14px',
-            borderTop: '1px solid #F3EDE4',
+            borderTop: 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: isCollapsed ? 'center' : 'space-between',
             direction: 'rtl',
             fontSize: '11.5px',
-            color: '#6B7280',
-            backgroundColor: '#FAF7F2',
+            color: '#64748B',
+            backgroundColor: '#FFFFFF',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -438,21 +420,21 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 width: '8px',
                 height: '8px',
                 borderRadius: '50%',
-                backgroundColor: '#16A34A',
-                boxShadow: '0 0 6px rgba(22, 163, 74, 0.6)',
+                backgroundColor: '#0E8A54',
+                boxShadow: 'none',
               }}
             />
             {!isCollapsed && (
               <span
-                className="font-nastaleeq"
-                style={{ color: '#15803D', fontWeight: 800, fontSize: '14px' }}
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{ color: '#0E8A54', fontWeight: 800, fontSize: '12px' }}
               >
-                آن لائن
+                {t('آن لائن', 'Online')}
               </span>
             )}
           </div>
           {!isCollapsed && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: '#8C7E72' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: '#64748B' }}>
               v1.0 POS
             </span>
           )}

@@ -1,43 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 :root {
-  /* Strict 8-Color Crop Agriculture Palette from User Image */
-  --c1: #7F4F24; /* Warm Timber (Primary CTA, Cash Buttons, Active Borders) */
-  --c2: #936639; /* Caramel Amber (Rate Badges, Highlights) */
-  --c3: #A68A64; /* Warm Khaki (Accents, Focus Outlines) */
-  --c4: #B6AD90; /* Soft Almond Khaki (Borders, Dividers, Frames) */
-  --c5: #C2C5AA; /* Pale Sage Cream (Surfaces, Card Fill, Panels) */
-  --c6: #A4AC86; /* Soft Celadon (Pills, Inactive Badges) */
-  --c7: #656D4A; /* Olive Green (Secondary CTA, Credit Buttons) */
-  --c8: #414833; /* Deep Forest Olive (Wording, Headings, Numbers, Keypad Text) */
+  /* Flat Aesthetic Palette */
+  --c1: #1877F2; /* Cobalt Blue */
+  --c2: #D97706; /* Warm Amber */
+  --c3: #0E8A54; /* Emerald Green */
+  --c4: transparent;
+  --c5: #F8FAFC;
+  --c6: transparent;
+  --c7: #64748B;
+  --c8: #0F172A;
 
-  /* Light Theme Semantic UI Tokens - Light boxes, deep dark typography */
-  --bg-main: #F4F5EE; /* Clean Light Canvas */
-  --bg-surface: var(--c5);
-  --bg-subtle: #E8EAE0;
-  --bg-card: #F4F5EE;
-  --bg-input: #F4F5EE;
+  /* Canvas & Containers */
+  --bg-main: #FFFFFF; /* Pure white canvas across entire app */
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F8FAFC; /* Flat light tone */
+  --bg-card: #F8FAFC;
+  --bg-input: #F8FAFC;
   
-  --text-primary: var(--c8); /* Deep Wording #414833 */
-  --text-secondary: var(--c8);
-  --text-muted: var(--c7);
-  --text-inverse: #F4F5EE;
+  --text-primary: #0F172A; /* Deep Slate */
+  --text-secondary: #0F172A;
+  --text-muted: #64748B; /* Cool Gray */
+  --text-inverse: #FFFFFF;
 
   /* Accents */
-  --accent-primary: var(--c1); /* Warm Timber #7F4F24 */
-  --accent-secondary: var(--c7); /* Olive Green #656D4A */
-  --accent-highlight: var(--c2); /* Caramel Amber #936639 */
+  --accent-primary: #1877F2;
+  --accent-secondary: #0E8A54;
+  --accent-highlight: #D97706;
 
-  /* Borders & Dividers */
-  --border-subtle: var(--c4);
-  --border-medium: var(--c6);
-  --border-strong: var(--c8);
-  --border-active: var(--c1);
+  /* Flat: Zero borders & zero shadows */
+  --border-subtle: transparent;
+  --border-medium: transparent;
+  --border-strong: transparent;
+  --border-active: transparent;
   
-  --shadow-sm: 0 1px 2px 0 rgba(65, 72, 51, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(65, 72, 51, 0.12), 0 2px 4px -2px rgba(65, 72, 51, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(65, 72, 51, 0.15), 0 4px 6px -4px rgba(65, 72, 51, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(65, 72, 51, 0.2), 0 8px 10px -6px rgba(65, 72, 51, 0.15);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
 
   /* Touch Target Radius */
   --radius-sm: 8px;
@@ -71,13 +71,26 @@ input, textarea, select, button {
   user-select: auto;
 }
 
+/* Remove increment and decrement spin buttons on number inputs */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type='number'],
+input[inputmode='decimal'],
+input[inputmode='numeric'] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+}
+
 /* Urdu Typography Class */
 .font-nastaleeq {
   font-family: var(--font-urdu);
-  direction: rtl;
-  line-height: 1.6;
-  display: inline-block;
-  vertical-align: middle;
+  line-height: 1.4;
 }
 
 .font-mono {
@@ -259,8 +272,8 @@ input, textarea, select, button {
 }
 
 .dash-card-animated:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 24px rgba(166, 99, 54, 0.12), 0 2px 6px rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
+  box-shadow: none;
 }
 
 .table-row-hover {

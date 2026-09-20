@@ -13,6 +13,7 @@ import {
   X,
   Scale,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 // --- 1. Custom Handcrafted Vector SVGs matching Dashboard & Billing aesthetic ---
 
@@ -132,40 +133,40 @@ interface RateItem {
   id: string;
   nameUr: string;
   nameEn: string;
-  yesterdayRate: number;
-  todayRate: number;
+  yesterdayMaund: number;
+  todayMaund: number;
 }
+
+const INITIAL_RATES: RateItem[] = [
+  { id: '1', nameUr: 'چکی آٹا', nameEn: 'Chakki Whole Wheat Atta', yesterdayMaund: 5600, todayMaund: 5600 },
+  { id: '2', nameUr: 'فائن آٹا', nameEn: 'Fine Quality Atta', yesterdayMaund: 5920, todayMaund: 5920 },
+  { id: '3', nameUr: 'میدہ اسپیشل', nameEn: 'Maida Special Grade', yesterdayMaund: 6200, todayMaund: 6200 },
+  { id: '4', nameUr: 'خالص سوجی', nameEn: 'Pure Suji / Semolina', yesterdayMaund: 6400, todayMaund: 6400 },
+  { id: '5', nameUr: 'چوکر', nameEn: 'Wheat Chokar / Bran', yesterdayMaund: 3800, todayMaund: 3800 },
+  { id: '6', nameUr: 'دیسی گندم آٹا', nameEn: 'Desi Organic Atta', yesterdayMaund: 5800, todayMaund: 5800 },
+];
 
 interface PisaiRateItem {
   id: string;
   titleUr: string;
   titleEn: string;
-  ratePerKg: number;
+  ratePerMaund: number;
   note: string;
 }
-
-const INITIAL_RATES: RateItem[] = [
-  { id: '1', nameUr: 'چکی آٹا (گندم)', nameEn: 'Chakki Whole Wheat Atta', yesterdayRate: 140, todayRate: 140 },
-  { id: '2', nameUr: 'فائن آٹا', nameEn: 'Fine Quality Atta', yesterdayRate: 148, todayRate: 148 },
-  { id: '3', nameUr: 'میدہ اسپیشل', nameEn: 'Maida Special Grade', yesterdayRate: 155, todayRate: 155 },
-  { id: '4', nameUr: 'خالص سوجی', nameEn: 'Pure Suji / Semolina', yesterdayRate: 160, todayRate: 160 },
-  { id: '5', nameUr: 'چوکر (کھل)', nameEn: 'Wheat Chokar / Bran', yesterdayRate: 95, todayRate: 95 },
-  { id: '6', nameUr: 'دیسی گندم آٹا', nameEn: 'Desi Organic Atta', yesterdayRate: 145, todayRate: 145 },
-];
 
 const INITIAL_PISAI_RATES: PisaiRateItem[] = [
   {
     id: 'safai_pisai',
     titleUr: 'صفائی و پسائی',
     titleEn: 'Cleaning & Milling',
-    ratePerKg: 12,
+    ratePerMaund: 480,
     note: 'مکمل چھانٹی و چکی پسائی چارجز',
   },
   {
     id: 'pisai_only',
     titleUr: 'صرف پسائی',
     titleEn: 'Grinding Only',
-    ratePerKg: 10,
+    ratePerMaund: 400,
     note: 'صاف شدہ گندم کی چکی پسائی',
   },
 ];
@@ -183,6 +184,7 @@ const renderProductSvg = (id: string) => {
 };
 
 export const RateListView: React.FC = () => {
+  const { isUrdu, t } = useLanguage();
   const [rates, setRates] = useState<RateItem[]>(INITIAL_RATES);
   const [pisaiRates, setPisaiRates] = useState<PisaiRateItem[]>(INITIAL_PISAI_RATES);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
@@ -196,33 +198,21 @@ export const RateListView: React.FC = () => {
   const [newItemName, setNewItemName] = useState<string>('');
   const [newItemRate, setNewItemRate] = useState<string>('');
 
-  const updateRate = (id: string, delta: number) => {
+  const setDirectMaundRate = (id: string, val: number) => {
     setRates((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          const next = Math.max(1, item.todayRate + delta);
-          return { ...item, todayRate: next };
-        }
-        return item;
-      })
+      prev.map((item) => (item.id === id ? { ...item, todayMaund: Math.max(0, val) } : item))
     );
   };
 
-  const setDirectRate = (id: string, val: number) => {
-    setRates((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, todayRate: Math.max(0, val) } : item))
-    );
-  };
-
-  const updatePisaiRate = (id: string, delta: number) => {
+  const setDirectPisaiRate = (id: string, val: number) => {
     setPisaiRates((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ratePerKg: Math.max(1, p.ratePerKg + delta) } : p))
+      prev.map((p) => (p.id === id ? { ...p, ratePerMaund: Math.max(0, val) } : p))
     );
   };
 
   const handleResetToYesterday = () => {
     setRates((prev) =>
-      prev.map((item) => ({ ...item, todayRate: item.yesterdayRate }))
+      prev.map((item) => ({ ...item, todayMaund: item.yesterdayMaund }))
     );
     setSavedBanner(true);
     setTimeout(() => setSavedBanner(false), 3000);
@@ -235,13 +225,13 @@ export const RateListView: React.FC = () => {
 
   const handleAddNewItem = () => {
     if (!newItemName.trim() || !newItemRate) return;
-    const rateVal = parseFloat(newItemRate) || 100;
+    const maundVal = parseFloat(newItemRate) || 4000;
     const newItem: RateItem = {
       id: Date.now().toString(),
       nameUr: newItemName.trim(),
       nameEn: 'Special Item',
-      yesterdayRate: rateVal,
-      todayRate: rateVal,
+      yesterdayMaund: maundVal,
+      todayMaund: maundVal,
     };
     setRates((prev) => [...prev, newItem]);
     setNewItemName('');
@@ -249,7 +239,7 @@ export const RateListView: React.FC = () => {
     setIsAddItemModalOpen(false);
   };
 
-  const todayDateUrdu = '19 ستمبر 2026';
+  const todayDateStr = isUrdu ? '19 ستمبر 2026' : '19 September 2026';
 
   return (
     <div
@@ -275,7 +265,6 @@ export const RateListView: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             boxShadow: '0 6px 20px rgba(16, 185, 129, 0.2)',
-            direction: 'rtl',
             animation: 'fadeIn 0.2s ease',
           }}
         >
@@ -296,11 +285,11 @@ export const RateListView: React.FC = () => {
               <Check size={22} strokeWidth={3} />
             </div>
             <div>
-              <div className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, color: '#065F46' }}>
-                آج کے تمام نرخ نامے تصدیق اور لاگو ہو چکے ہیں!
+              <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900, color: '#065F46' }}>
+                {t('آج کے تمام نرخ نامے تصدیق اور لاگو ہو چکے ہیں!', 'All daily rates have been verified and applied!')}
               </div>
               <div style={{ fontSize: '12px', color: '#047857', fontWeight: 700 }}>
-                بلنگ کاؤنٹرز (F8) اور پسائی ٹوکن (F2) پر نیا ریٹ فوری نافذ العمل ہے۔
+                {t('بلنگ کاؤنٹرز (F8) اور پسائی ٹوکن (F2) پر نیا ریٹ فوری نافذ العمل ہے۔', 'New rates are now active across all billing and milling counters.')}
               </div>
             </div>
           </div>
@@ -314,17 +303,16 @@ export const RateListView: React.FC = () => {
         </div>
       )}
 
-      {/* 1. TOP 3 DASHBOARD ACTION CARDS (Exactly matching BillerDashboard Set D Design) */}
+      {/* 1. TOP 3 DASHBOARD ACTION CARDS */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '16px',
           width: '100%',
-          direction: 'rtl',
         }}
       >
-        {/* Card 1 (Right in RTL): روزانہ نرخ نامہ کنٹرول - Charcoal Onyx with Gold Accent */}
+        {/* Card 1: روزانہ نرخ نامہ لسٹ */}
         <div
           onMouseEnter={() => setHoveredCard('total')}
           onMouseLeave={() => {
@@ -335,31 +323,23 @@ export const RateListView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="dash-card-animated"
           style={{
-            background:
-              hoveredCard === 'total'
-                ? 'linear-gradient(135deg, #58797D 0%, #435E62 50%, #344B4E 100%)'
-                : 'linear-gradient(135deg, #4A676B 0%, #374F52 50%, #2A3F42 100%)',
+            background: '#1877f2',
             borderRadius: '16px',
-            border: hoveredCard === 'total' ? '2.5px solid #84A9AD' : '2px solid #5F8387',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            boxShadow:
-              hoveredCard === 'total'
-                ? '0 14px 34px rgba(54, 79, 82, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(54, 79, 82, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
+            cursor: 'pointer',
             minHeight: '96px',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'total'
                 ? 'scale(0.975) translateY(1px)'
                 : hoveredCard === 'total'
-                ? 'translateY(-4px)'
-                : 'none',
+                  ? 'translateY(-4px)'
+                  : 'none',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
           <div
             style={{
               width: '56px',
@@ -378,10 +358,9 @@ export const RateListView: React.FC = () => {
             <RateBadgeSvg />
           </div>
 
-          {/* Right Text: Bold White Nastaleeq */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 fontSize: '24px',
                 fontWeight: 900,
@@ -389,15 +368,14 @@ export const RateListView: React.FC = () => {
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
               }}
             >
-              روزانہ نرخ نامہ لسٹ
+              {t('روزانہ نرخ نامہ لسٹ', 'Daily Rate List')}
             </h2>
           </div>
         </div>
 
-        {/* Card 2 (Center in RTL): تمام ریٹس محفوظ و لاگو کریں - Warm Terracotta Clay Gradient */}
+        {/* Card 2: تمام ریٹس لاگو کریں */}
         <div
           onClick={handleSaveAndBroadcast}
           onMouseEnter={() => setHoveredCard('save')}
@@ -409,32 +387,23 @@ export const RateListView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background:
-              hoveredCard === 'save'
-                ? 'linear-gradient(135deg, #DFBBB0 0%, #C9A292 50%, #B18978 100%)'
-                : 'linear-gradient(135deg, #D4ADA0 0%, #BE9685 50%, #A67E6D 100%)',
+            background: '#DC3545',
             borderRadius: '16px',
-            border: hoveredCard === 'save' ? '2.5px solid #F4DFD7' : '2px solid #E8CDC2',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredCard === 'save'
-                ? '0 14px 34px rgba(190, 150, 133, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(190, 150, 133, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '96px',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'save'
                 ? 'scale(0.975) translateY(1px)'
                 : hoveredCard === 'save'
-                ? 'translateY(-4px)'
-                : 'none',
+                  ? 'translateY(-4px)'
+                  : 'none',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
           <div
             style={{
               width: '56px',
@@ -450,13 +419,12 @@ export const RateListView: React.FC = () => {
               transform: hoveredCard === 'save' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
             }}
           >
-            <Check size={32} color="#A67E6D" strokeWidth={2.8} />
+            <Check size={32} color="#DC3545" strokeWidth={2.8} />
           </div>
 
-          {/* Right Text: Bold White Nastaleeq */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 fontSize: '24px',
                 fontWeight: 900,
@@ -464,15 +432,14 @@ export const RateListView: React.FC = () => {
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
               }}
             >
-              تمام ریٹس لاگو کریں
+              {t('تمام ریٹس لاگو کریں', 'Apply All Rates')}
             </h2>
           </div>
         </div>
 
-        {/* Card 3 (Left in RTL): ریٹ لسٹ پرنٹ کریں - Dusty Slate Blue Gradient */}
+        {/* Card 3: ریٹ لسٹ پرنٹ کریں */}
         <div
           onClick={() => setIsPrintModalOpen(true)}
           onMouseEnter={() => setHoveredCard('print')}
@@ -484,32 +451,23 @@ export const RateListView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background:
-              hoveredCard === 'print'
-                ? 'linear-gradient(135deg, #9DB7C4 0%, #819EAD 50%, #698694 100%)'
-                : 'linear-gradient(135deg, #8DAAB8 0%, #7491A0 50%, #5E7A88 100%)',
+            background: '#0E8A54',
             borderRadius: '16px',
-            border: hoveredCard === 'print' ? '2.5px solid #C4DCE8' : '2px solid #A8C4D2',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredCard === 'print'
-                ? '0 14px 34px rgba(116, 145, 160, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(116, 145, 160, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '96px',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'print'
                 ? 'scale(0.975) translateY(1px)'
                 : hoveredCard === 'print'
-                ? 'translateY(-4px)'
-                : 'none',
+                  ? 'translateY(-4px)'
+                  : 'none',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
           <div
             style={{
               width: '56px',
@@ -528,10 +486,9 @@ export const RateListView: React.FC = () => {
             <RatePrinterSvg />
           </div>
 
-          {/* Right Text: Bold White Nastaleeq */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 fontSize: '24px',
                 fontWeight: 900,
@@ -539,21 +496,20 @@ export const RateListView: React.FC = () => {
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
               }}
             >
-              ریٹ لسٹ پرنٹ کریں
+              {t('ریٹ لسٹ پرنٹ کریں', 'Print Rate List')}
             </h2>
           </div>
         </div>
       </div>
 
       {/* 2. FLOUR PRODUCTS SECTION HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl', marginTop: '4px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '24px' }}>🌾</span>
-          <h3 className="font-nastaleeq" style={{ fontSize: '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
-            آٹا و تیار اناج مصنوعات کے یومیہ ریٹس
+          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+            {t('آٹا و تیار اناج مصنوعات کے یومیہ ریٹس', 'Flour & Grain Products Daily Rates')}
           </h3>
           <span
             style={{
@@ -566,7 +522,7 @@ export const RateListView: React.FC = () => {
               border: '1px solid #FDE68A',
             }}
           >
-            فی کلو گرام (Rs / KG)
+            {t('فی من ریٹ (روپے / 40 کلو)', 'Rate per Maund (Rs / 40 KG)')}
           </span>
         </div>
 
@@ -590,10 +546,9 @@ export const RateListView: React.FC = () => {
           }}
         >
           <Plus size={16} strokeWidth={2.5} />
-          <span className="font-nastaleeq">+ نئی پروڈکٹ شامل کریں</span>
+          <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('+ نئی پروڈکٹ شامل کریں', '+ Add Product')}</span>
         </button>
       </div>
-
       {/* 3. FLOUR PRODUCTS DASHBOARD CARDS GRID (3-Columns x 2-Rows) */}
       <div
         style={{
@@ -601,12 +556,11 @@ export const RateListView: React.FC = () => {
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '16px',
           width: '100%',
-          direction: 'rtl',
         }}
       >
         {rates.map((item) => {
-          const diff = item.todayRate - item.yesterdayRate;
-          const perMaund = item.todayRate * 40;
+          const diff = item.todayMaund - item.yesterdayMaund;
+          const perKg = item.todayMaund > 0 ? item.todayMaund / 40 : 0;
           const isItemHovered = hoveredItem === item.id;
 
           return (
@@ -631,9 +585,8 @@ export const RateListView: React.FC = () => {
                 transform: isItemHovered ? 'translateY(-3px)' : 'none',
               }}
             >
-              {/* Card Top: Squircle Icon Tile + Per Maund Badge */}
+              {/* Card Top: Squircle Icon Tile + Derived Per KG Badge */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                {/* White Squircle Tile matching Dashboard */}
                 <div
                   style={{
                     width: '50px',
@@ -653,8 +606,8 @@ export const RateListView: React.FC = () => {
                   {renderProductSvg(item.id)}
                 </div>
 
-                {/* Per Maund (40 KG) Badge */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '3px' }}>
+                {/* Per KG Derived Badge & Yesterday Rate */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-end', gap: '3px' }}>
                   <span
                     style={{
                       fontSize: '12.5px',
@@ -665,165 +618,84 @@ export const RateListView: React.FC = () => {
                       borderRadius: '8px',
                       border: '1px solid #FDE68A',
                       fontFamily: 'var(--font-mono)',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                      boxShadow: 'none',
                     }}
                   >
-                    40 KG: Rs {perMaund.toLocaleString()}
+                    {isUrdu ? `1 کلو: ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)} روپے` : `1 KG: Rs ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)}`}
                   </span>
                   <span style={{ fontSize: '11px', color: '#78716C', fontWeight: 700 }}>
-                    کل کا ریٹ: Rs {item.yesterdayRate}
+                    {t('کل کا من ریٹ:', 'Yesterday Maund:')} {isUrdu ? `${item.yesterdayMaund.toLocaleString()} روپے` : `Rs ${item.yesterdayMaund.toLocaleString()}`}
                   </span>
                 </div>
               </div>
 
-              {/* Card Middle: Product Name */}
+              {/* Card Middle: Product Name (Only active language) */}
               <div>
                 <h4
-                  className="font-nastaleeq"
+                  className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: '20px',
+                    fontSize: '18px',
                     fontWeight: 900,
                     color: '#1F2937',
                     margin: 0,
                     lineHeight: 1.2,
                   }}
                 >
-                  {item.nameUr}
+                  {isUrdu ? item.nameUr : item.nameEn}
                 </h4>
-                <div style={{ fontSize: '11.5px', color: '#6B7280', fontWeight: 600, marginTop: '2px' }}>
-                  {item.nameEn}
-                </div>
               </div>
 
-              {/* Card Bottom: Tactile Price Steppers & Numeric Box */}
+              {/* Card Bottom: Direct Price Input */}
               <div
                 style={{
                   backgroundColor: '#FAF8F5',
                   border: '1.5px solid #EBE4DA',
                   borderRadius: '12px',
-                  padding: '8px 10px',
+                  padding: '8px 14px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '6px',
+                  justifyContent: 'center',
+                  gap: '8px',
                 }}
               >
-                {/* Stepper Buttons (-5, -1) */}
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <button
-                    type="button"
-                    onClick={() => updateRate(item.id, -5)}
-                    className="touch-active"
-                    title="-5 روپے"
-                    style={{
-                      width: '28px',
-                      height: '34px',
-                      borderRadius: '7px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
-                      color: '#64748B',
-                      fontSize: '11px',
-                      fontWeight: 900,
-                      cursor: 'pointer',
-                      fontFamily: 'var(--font-mono)',
-                    }}
-                  >
-                    -5
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => updateRate(item.id, -1)}
-                    className="touch-active"
-                    title="-1 روپیہ"
-                    style={{
-                      width: '28px',
-                      height: '34px',
-                      borderRadius: '7px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
-                      color: '#1E293B',
-                      fontSize: '14px',
-                      fontWeight: 900,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Minus size={14} strokeWidth={2.6} />
-                  </button>
-                </div>
-
-                {/* Price Display & Editable Input */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#8C582B' }}>Rs</span>
-                  <input
-                    type="number"
-                    value={item.todayRate}
-                    onChange={(e) => setDirectRate(item.id, parseFloat(e.target.value) || 0)}
-                    style={{
-                      width: '66px',
-                      height: '34px',
-                      textAlign: 'center',
-                      borderRadius: '8px',
-                      border: '2px solid #8C582B',
-                      backgroundColor: '#FFFFFF',
-                      color: '#1F2937',
-                      fontSize: '18px',
-                      fontWeight: 900,
-                      fontFamily: 'var(--font-mono)',
-                      outline: 'none',
-                      boxShadow: '0 2px 5px rgba(140, 88, 43, 0.12)',
-                    }}
-                  />
-                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#6B7280' }}>/KG</span>
-                </div>
-
-                {/* Stepper Buttons (+1, +5) */}
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <button
-                    type="button"
-                    onClick={() => updateRate(item.id, 1)}
-                    className="touch-active"
-                    title="+1 روپیہ"
-                    style={{
-                      width: '28px',
-                      height: '34px',
-                      borderRadius: '7px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
-                      color: '#1E293B',
-                      fontSize: '14px',
-                      fontWeight: 900,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Plus size={14} strokeWidth={2.6} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => updateRate(item.id, 5)}
-                    className="touch-active"
-                    title="+5 روپے"
-                    style={{
-                      width: '28px',
-                      height: '34px',
-                      borderRadius: '7px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
-                      color: '#64748B',
-                      fontSize: '11px',
-                      fontWeight: 900,
-                      cursor: 'pointer',
-                      fontFamily: 'var(--font-mono)',
-                    }}
-                  >
-                    +5
-                  </button>
-                </div>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: '#8C582B' }}>
+                  {t('روپے', 'Rs')}
+                </span>
+                <input
+                  type="number"
+                  value={item.todayMaund === 0 ? '' : item.todayMaund}
+                  placeholder="0"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDirectMaundRate(item.id, val === '' ? 0 : parseFloat(val) || 0);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                      e.preventDefault();
+                    }
+                  }}
+                  onWheel={(e) => (e.target as HTMLElement).blur()}
+                  onFocus={(e) => e.target.select()}
+                  style={{
+                    width: '105px',
+                    height: '38px',
+                    textAlign: 'center',
+                    direction: 'ltr',
+                    unicodeBidi: 'isolate',
+                    borderRadius: '8px',
+                    border: '2px solid #8C582B',
+                    backgroundColor: '#FFFFFF',
+                    color: '#1F2937',
+                    fontSize: '19px',
+                    fontWeight: 900,
+                    fontFamily: 'var(--font-mono)',
+                    outline: 'none',
+                    boxShadow: 'none',
+                  }}
+                />
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12.5px', fontWeight: 800, color: '#6B7280' }}>
+                  {t('/ من', '/ Maund')}
+                </span>
               </div>
 
               {/* Trend Tag */}
@@ -840,7 +712,7 @@ export const RateListView: React.FC = () => {
                       fontFamily: 'var(--font-mono)',
                     }}
                   >
-                    +{diff} روپے اضافہ 🔺
+                    {isUrdu ? `+${diff.toLocaleString()} روپے اضافہ (فی من) ▲` : `+Rs ${diff.toLocaleString()} Increase (per maund) ▲`}
                   </span>
                 ) : diff < 0 ? (
                   <span
@@ -854,11 +726,11 @@ export const RateListView: React.FC = () => {
                       fontFamily: 'var(--font-mono)',
                     }}
                   >
-                    {diff} روپے کمی 🔻
+                    {isUrdu ? `${diff.toLocaleString()} روپے کمی (فی من) ▼` : `Rs ${diff.toLocaleString()} Decrease (per maund) ▼`}
                   </span>
                 ) : (
                   <span style={{ fontSize: '11px', color: '#9CA3AF', fontWeight: 700 }}>
-                    ● قیمت مستحکم (No change)
+                    {t('قیمت مستحکم', 'Price Stable')}
                   </span>
                 )}
               </div>
@@ -869,10 +741,10 @@ export const RateListView: React.FC = () => {
 
       {/* 4. PISAI SERVICE CHARGES (2 Large Dashboard Cards matching PisaiBillingScreen) */}
       <div style={{ marginTop: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', direction: 'rtl', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           <span style={{ fontSize: '24px' }}>⚙️</span>
-          <h3 className="font-nastaleeq" style={{ fontSize: '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
-            گندم چکی پسائی و صفائی کے ریٹس
+          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+            {t('گندم چکی پسائی و صفائی کے ریٹس', 'Wheat Cleaning & Milling Rates')}
           </h3>
           <span
             style={{
@@ -884,7 +756,7 @@ export const RateListView: React.FC = () => {
               borderRadius: '6px',
             }}
           >
-            ٹوکن اجرت
+            {t('فی من نرخ (روپے / 40 کلو)', 'Rate per Maund (Rs / 40 KG)')}
           </span>
         </div>
 
@@ -894,11 +766,16 @@ export const RateListView: React.FC = () => {
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '16px',
             width: '100%',
-            direction: 'rtl',
           }}
         >
           {pisaiRates.map((p) => {
-            const perMaund = p.ratePerKg * 40;
+            const perKg = p.ratePerMaund > 0 ? p.ratePerMaund / 40 : 0;
+            const pisaiTitle = p.id === 'safai_pisai'
+              ? t('صفائی و پسائی', 'Cleaning & Milling')
+              : t('صرف پسائی', 'Grinding Only');
+            const pisaiNote = p.id === 'safai_pisai'
+              ? t('گندم واشنگ، چھانٹی، صفائی اور چکی پتھر پسائی', 'Washing, sorting, cleaning & stone milling')
+              : t('کسٹمر کی لائی گئی صاف گندم کی پسائی', 'Direct milling of customer cleaned wheat');
 
             return (
               <div
@@ -912,11 +789,11 @@ export const RateListView: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
+                  boxShadow: 'none',
                   transition: 'all 0.22s ease',
                 }}
               >
-                {/* Right Side: Squircle Tile + Titles */}
+                {/* Squircle Tile + Titles */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <div
                     style={{
@@ -927,7 +804,7 @@ export const RateListView: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                      boxShadow: 'none',
                       border: '1.5px solid #EBE4DA',
                       flexShrink: 0,
                     }}
@@ -936,13 +813,14 @@ export const RateListView: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: '#1F2937', margin: 0, lineHeight: 1.2 }}>
-                      {p.titleUr}
+                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '20px', fontWeight: 900, color: '#1F2937', margin: 0, lineHeight: 1.2 }}>
+                      {pisaiTitle}
                     </h4>
-                    <div style={{ fontSize: '12px', color: '#6B7280', fontWeight: 600, marginTop: '2px' }}>
-                      {p.note}
+                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', color: '#6B7280', fontWeight: 600, marginTop: '2px' }}>
+                      {pisaiNote}
                     </div>
                     <div
+                      className={isUrdu ? 'font-nastaleeq' : ''}
                       style={{
                         fontSize: '12.5px',
                         color: '#78350F',
@@ -952,77 +830,52 @@ export const RateListView: React.FC = () => {
                         borderRadius: '6px',
                         display: 'inline-block',
                         marginTop: '4px',
-                        fontFamily: 'var(--font-mono)',
+                        fontFamily: isUrdu ? 'inherit' : 'var(--font-mono)',
                       }}
                     >
-                      فی من (40 KG): Rs {perMaund}
+                      {isUrdu ? `فی کلو: ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)} روپے` : `Per KG: Rs ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)}`}
                     </div>
                   </div>
                 </div>
 
-                {/* Left Side: Tactile Adjust Controls */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => updatePisaiRate(p.id, -1)}
-                    className="touch-active"
-                    style={{
-                      width: '36px',
-                      height: '42px',
-                      borderRadius: '8px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
-                      color: '#1E293B',
-                      fontWeight: 900,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                {/* Direct Price Input (Rate Per Mann / 40 KG) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#8C582B' }}>Rs</span>
+                  <input
+                    type="number"
+                    value={p.ratePerMaund === 0 ? '' : p.ratePerMaund}
+                    placeholder="0"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setDirectPisaiRate(p.id, val === '' ? 0 : parseFloat(val) || 0);
                     }}
-                  >
-                    <Minus size={16} strokeWidth={2.8} />
-                  </button>
-
-                  <div
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                      }
+                    }}
+                    onWheel={(e) => (e.target as HTMLElement).blur()}
+                    onFocus={(e) => e.target.select()}
                     style={{
-                      minWidth: '92px',
-                      height: '42px',
-                      backgroundColor: '#FFFFFF',
+                      width: '95px',
+                      height: '38px',
+                      textAlign: 'center',
+                      direction: 'ltr',
+                      unicodeBidi: 'isolate',
+                      borderRadius: '8px',
                       border: '2px solid #8C582B',
-                      borderRadius: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      backgroundColor: '#FFFFFF',
+                      color: '#1F2937',
                       fontSize: '18px',
                       fontWeight: 900,
-                      color: '#8C582B',
                       fontFamily: 'var(--font-mono)',
-                      boxShadow: '0 2px 6px rgba(140, 88, 43, 0.12)',
+                      outline: 'none',
+                      boxShadow: 'none',
                     }}
-                  >
-                    Rs {p.ratePerKg} / KG
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => updatePisaiRate(p.id, 1)}
-                    className="touch-active"
-                    style={{
-                      width: '36px',
-                      height: '42px',
-                      borderRadius: '8px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
-                      color: '#1E293B',
-                      fontWeight: 900,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Plus size={16} strokeWidth={2.8} />
-                  </button>
+                  />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12.5px', fontWeight: 800, color: '#6B7280' }}>
+                    {t('/ من (40 KG)', '/ Maund (40 KG)')}
+                  </span>
                 </div>
               </div>
             );
@@ -1040,7 +893,6 @@ export const RateListView: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          direction: 'rtl',
           gap: '16px',
           boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
         }}
@@ -1048,11 +900,11 @@ export const RateListView: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <ShieldCheck size={24} color="#15803D" />
           <div>
-            <div className="font-nastaleeq" style={{ fontSize: '15.5px', fontWeight: 900, color: '#166534' }}>
-              روزانہ نرخ نامہ تصدیق پروٹوکول فعال ہے
+            <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15.5px', fontWeight: 900, color: '#166534' }}>
+              {t('روزانہ نرخ نامہ تصدیق پروٹوکول فعال ہے', 'Daily Rate Confirmation Protocol Active')}
             </div>
             <div style={{ fontSize: '11.5px', color: '#4B5563', fontWeight: 600 }}>
-              آخری تبدیلی: آج، صبح 08:30 بجے | تصدیق کنندہ: سپروائزر و ایڈمن
+              {t('آخری تبدیلی: آج، صبح 08:30 بجے | تصدیق کنندہ: سپروائزر و ایڈمن', 'Last modified: Today, 08:30 AM | Verified by: Supervisor & Admin')}
             </div>
           </div>
         </div>
@@ -1076,7 +928,7 @@ export const RateListView: React.FC = () => {
           }}
         >
           <RotateCcw size={16} color="#64748B" />
-          <span className="font-nastaleeq">سابقہ (کل والے) ریٹس بحال کریں</span>
+          <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سابقہ (کل والے) ریٹس بحال کریں', "Restore Yesterday's Rates")}</span>
         </button>
       </div>
 
@@ -1093,7 +945,6 @@ export const RateListView: React.FC = () => {
             justifyContent: 'center',
             padding: '16px',
             zIndex: 3000,
-            direction: 'rtl',
           }}
         >
           <div
@@ -1122,8 +973,8 @@ export const RateListView: React.FC = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Printer size={18} color="#FDE047" />
-                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900 }}>
-                  روزانہ نرخ نامہ پرنٹ پریویو
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900 }}>
+                  {t('روزانہ نرخ نامہ پرنٹ پریویو', 'Daily Rate List Print Preview')}
                 </span>
               </div>
               <button
@@ -1146,11 +997,11 @@ export const RateListView: React.FC = () => {
                 }}
               >
                 <div style={{ textAlign: 'center', borderBottom: '2px solid #E7E5E4', paddingBottom: '12px' }}>
-                  <h3 className="font-nastaleeq" style={{ fontSize: '22px', fontWeight: 900, color: '#1C1917', margin: 0 }}>
-                    فلور ملز و چکی روزانہ نرخ نامہ
+                  <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: '#1C1917', margin: 0 }}>
+                    {t('فلور ملز و چکی روزانہ نرخ نامہ', 'Al-Madina Flour Mills Daily Rates')}
                   </h3>
                   <div style={{ fontSize: '12px', color: '#78716C', fontWeight: 700, marginTop: '3px' }}>
-                    تاریخ: {todayDateUrdu}
+                    {t('تاریخ:', 'Date:')} {todayDateStr}
                   </div>
                 </div>
 
@@ -1166,37 +1017,46 @@ export const RateListView: React.FC = () => {
                         fontSize: '13.5px',
                       }}
                     >
-                      <span className="font-nastaleeq" style={{ fontWeight: 800, color: '#1F2937' }}>
-                        {r.nameUr}
+                      <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#1F2937' }}>
+                        {isUrdu ? r.nameUr : r.nameEn}
                       </span>
                       <span style={{ fontWeight: 900, color: '#8C582B', fontFamily: 'var(--font-mono)' }}>
-                        Rs {r.todayRate} / KG (Rs {r.todayRate * 40} / من)
+                        {isUrdu
+                          ? `${r.todayMaund.toLocaleString()} روپے / من (${(r.todayMaund / 40).toFixed(2).replace(/\.00$/, '')} روپے / کلو)`
+                          : `Rs ${r.todayMaund.toLocaleString()} / Maund (Rs ${(r.todayMaund / 40).toFixed(2).replace(/\.00$/, '')} / KG)`}
                       </span>
                     </div>
                   ))}
                 </div>
 
                 <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #E7E5E4' }}>
-                  <div className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 900, color: '#44403C' }}>
-                    پسائی چارجز:
+                  <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 900, color: '#44403C' }}>
+                    {t('پسائی چارجز:', 'Milling Charges:')}
                   </div>
-                  {pisaiRates.map((p) => (
-                    <div
-                      key={p.id}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: '3px 0',
-                        fontSize: '13px',
-                        color: '#57534E',
-                      }}
-                    >
-                      <span className="font-nastaleeq">{p.titleUr}</span>
-                      <span style={{ fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
-                        Rs {p.ratePerKg} / KG (Rs {p.ratePerKg * 40} / من)
-                      </span>
-                    </div>
-                  ))}
+                  {pisaiRates.map((p) => {
+                    const title = p.id === 'safai_pisai'
+                      ? t('صفائی اور پسائی', 'Cleaning & Milling')
+                      : t('صرف پسائی', 'Milling Only');
+                    return (
+                      <div
+                        key={p.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: '3px 0',
+                          fontSize: '13px',
+                          color: '#57534E',
+                        }}
+                      >
+                        <span className={isUrdu ? 'font-nastaleeq' : ''}>{title}</span>
+                        <span style={{ fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+                          {isUrdu
+                            ? `${p.ratePerMaund.toLocaleString()} روپے / من (${(p.ratePerMaund / 40).toFixed(2).replace(/\.00$/, '')} روپے / کلو)`
+                            : `Rs ${p.ratePerMaund.toLocaleString()} / Maund (Rs ${(p.ratePerMaund / 40).toFixed(2).replace(/\.00$/, '')} / KG)`}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -1235,7 +1095,7 @@ export const RateListView: React.FC = () => {
                 }}
               >
                 <Printer size={16} />
-                <span className="font-nastaleeq">پرنٹ نکالیں (Print Now)</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('پرنٹ نکالیں (Print Now)', 'Print Now')}</span>
               </button>
               <button
                 type="button"
@@ -1253,7 +1113,7 @@ export const RateListView: React.FC = () => {
                   cursor: 'pointer',
                 }}
               >
-                بند کریں
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('بند کریں', 'Close')}</span>
               </button>
             </div>
           </div>
@@ -1273,7 +1133,6 @@ export const RateListView: React.FC = () => {
             justifyContent: 'center',
             padding: '16px',
             zIndex: 3000,
-            direction: 'rtl',
           }}
         >
           <div
@@ -1301,8 +1160,8 @@ export const RateListView: React.FC = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Plus size={18} color="#FDE047" />
-                <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900 }}>
-                  نئی آئٹم ریٹ لسٹ میں شامل کریں
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900 }}>
+                  {t('نئی آئٹم ریٹ لسٹ میں شامل کریں', 'Add New Item to Rate List')}
                 </span>
               </div>
               <button
@@ -1316,12 +1175,12 @@ export const RateListView: React.FC = () => {
 
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
-                  پروڈکٹ کا نام (اردو میں):
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
+                  {t('پروڈکٹ کا نام:', 'Product Name:')}
                 </label>
                 <input
                   type="text"
-                  placeholder="مثلاً: دلیا، مکئی آٹا، بیسن..."
+                  placeholder={t('مثلاً: دلیا، مکئی آٹا، بیسن...', 'e.g. Corn Flour, Gram Flour...')}
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
                   style={{
@@ -1337,12 +1196,12 @@ export const RateListView: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
-                  فی کلو گرام ریٹ (Rs / KG):
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
+                  {t('فی من ریٹ (روپے / 40 کلو):', 'Rate per Maund (Rs / 40 KG):')}
                 </label>
                 <input
                   type="number"
-                  placeholder="120"
+                  placeholder="5600"
                   value={newItemRate}
                   onChange={(e) => setNewItemRate(e.target.value)}
                   style={{
@@ -1353,6 +1212,8 @@ export const RateListView: React.FC = () => {
                     border: '1.5px solid #D1D5DB',
                     fontSize: '16px',
                     fontFamily: 'var(--font-mono)',
+                    direction: 'ltr',
+                    unicodeBidi: 'isolate',
                     outline: 'none',
                   }}
                 />
@@ -1375,7 +1236,7 @@ export const RateListView: React.FC = () => {
                     cursor: 'pointer',
                   }}
                 >
-                  <span className="font-nastaleeq">شامل کریں</span>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('شامل کریں', 'Add Item')}</span>
                 </button>
                 <button
                   type="button"
@@ -1393,7 +1254,7 @@ export const RateListView: React.FC = () => {
                     cursor: 'pointer',
                   }}
                 >
-                  منسوخ کریں
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('منسوخ کریں', 'Cancel')}</span>
                 </button>
               </div>
             </div>

@@ -2,28 +2,31 @@
 
 import React, { useState } from 'react';
 import { Calendar, Download, PlusCircle, ArrowUpRight, ArrowDownLeft, RotateCcw, Filter, X } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface LedgerItem {
   id: string;
   timestamp: string;
   category: 'SALE' | 'PISAI' | 'CREDIT' | 'PAYMENT' | 'EXPENSE' | 'RETURN';
   description: string;
+  descriptionUr?: string;
   reference: string;
   amount: number;
   type: 'inflow' | 'outflow' | 'neutral';
 }
 
 const INITIAL_LEDGER: LedgerItem[] = [
-  { id: '1', timestamp: 'Today, 2:30 PM', category: 'SALE', description: '40 KG Chakki Atta', reference: 'BILL-00481', amount: 5600, type: 'inflow' },
-  { id: '2', timestamp: 'Today, 2:15 PM', category: 'PISAI', description: '25 KG Safai + Pisai (Token #0482)', reference: 'PISAI-0482', amount: 150, type: 'inflow' },
-  { id: '3', timestamp: 'Today, 1:45 PM', category: 'EXPENSE', description: 'Mill Electricity Advance Bill', reference: 'EXP-109', amount: 2500, type: 'outflow' },
-  { id: '4', timestamp: 'Today, 1:10 PM', category: 'PAYMENT', description: 'Haji Rasheed Cash Repayment', reference: 'PAY-055', amount: 2000, type: 'inflow' },
-  { id: '5', timestamp: 'Today, 12:30 PM', category: 'SALE', description: '10 KG Fine Atta', reference: 'BILL-00480', amount: 1480, type: 'inflow' },
-  { id: '6', timestamp: 'Today, 11:15 AM', category: 'RETURN', description: 'Return 5 KG Maida (Damaged Bag)', reference: 'RET-012', amount: 775, type: 'outflow' },
-  { id: '7', timestamp: 'Today, 10:00 AM', category: 'EXPENSE', description: 'Worker Daily Lunch / Tea', reference: 'EXP-108', amount: 350, type: 'outflow' },
+  { id: '1', timestamp: 'Today, 2:30 PM', category: 'SALE', description: '40 KG Chakki Atta', descriptionUr: '40 کلو چکی آٹا', reference: 'BILL-00481', amount: 5600, type: 'inflow' },
+  { id: '2', timestamp: 'Today, 2:15 PM', category: 'PISAI', description: '25 KG Safai + Pisai (Token #0482)', descriptionUr: '25 کلو صفائی + پسائی (ٹوکن #0482)', reference: 'PISAI-0482', amount: 150, type: 'inflow' },
+  { id: '3', timestamp: 'Today, 1:45 PM', category: 'EXPENSE', description: 'Mill Electricity Advance Bill', descriptionUr: 'مل بجلی کا پیشگی بل', reference: 'EXP-109', amount: 2500, type: 'outflow' },
+  { id: '4', timestamp: 'Today, 1:10 PM', category: 'PAYMENT', description: 'Haji Rasheed Cash Repayment', descriptionUr: 'حاجی رشید نقد وصولی کھاتہ', reference: 'PAY-055', amount: 2000, type: 'inflow' },
+  { id: '5', timestamp: 'Today, 12:30 PM', category: 'SALE', description: '10 KG Fine Atta', descriptionUr: '10 کلو فائن آٹا', reference: 'BILL-00480', amount: 1480, type: 'inflow' },
+  { id: '6', timestamp: 'Today, 11:15 AM', category: 'RETURN', description: 'Return 5 KG Maida (Damaged Bag)', descriptionUr: 'واپسی 5 کلو میدہ (خراب تھیلا)', reference: 'RET-012', amount: 775, type: 'outflow' },
+  { id: '7', timestamp: 'Today, 10:00 AM', category: 'EXPENSE', description: 'Worker Daily Lunch / Tea', descriptionUr: 'ملازمین کا کھانا و چائے', reference: 'EXP-108', amount: 350, type: 'outflow' },
 ];
 
 export const ReportsView: React.FC = () => {
+  const { isUrdu, t } = useLanguage();
   const [ledger, setLedger] = useState<LedgerItem[]>(INITIAL_LEDGER);
   const [dateFilter, setDateFilter] = useState<'today' | 'yesterday' | '7days' | 'month'>('today');
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
@@ -37,9 +40,10 @@ export const ReportsView: React.FC = () => {
 
     const newExpense: LedgerItem = {
       id: `exp_${Date.now()}`,
-      timestamp: 'Today, Just Now',
+      timestamp: isUrdu ? 'آج، ابھی' : 'Today, Just Now',
       category: 'EXPENSE',
       description: `${expenseCategory}: ${expenseDesc.trim()}`,
+      descriptionUr: `${expenseCategory}: ${expenseDesc.trim()}`,
       reference: `EXP-${Math.floor(100 + Math.random() * 900)}`,
       amount: amt,
       type: 'outflow',
@@ -61,6 +65,25 @@ export const ReportsView: React.FC = () => {
 
   const netDayCash = totalInflow - totalOutflow;
 
+  const getCategoryLabel = (cat: string) => {
+    switch (cat) {
+      case 'SALE':
+        return t('سیل', 'SALE');
+      case 'PISAI':
+        return t('پسائی', 'PISAI');
+      case 'EXPENSE':
+        return t('خرچہ', 'EXPENSE');
+      case 'PAYMENT':
+        return t('وصولی', 'PAYMENT');
+      case 'RETURN':
+        return t('واپسی', 'RETURN');
+      case 'CREDIT':
+        return t('ادھار', 'CREDIT');
+      default:
+        return cat;
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
       {/* Top Filter Bar & Actions */}
@@ -73,21 +96,24 @@ export const ReportsView: React.FC = () => {
           padding: '12px 18px',
           borderRadius: '12px',
           border: '1.5px solid #B6AD90',
-          boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)',
+          boxShadow: 'none',
           flexWrap: 'wrap',
           gap: '12px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <Calendar size={18} color="#414833" />
-          <span style={{ fontWeight: 800, fontSize: '13.5px', color: '#414833' }}>Date Range:</span>
+          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, fontSize: '13.5px', color: '#414833' }}>
+            {t('تاریخ:', 'Date Range:')}
+          </span>
           {(['today', 'yesterday', '7days', 'month'] as const).map((period) => (
             <button
               key={period}
               type="button"
               onClick={() => setDateFilter(period)}
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                padding: '6px 12px',
+                padding: '6px 14px',
                 borderRadius: '7px',
                 border: dateFilter === period ? 'none' : '1.5px solid #B6AD90',
                 backgroundColor: dateFilter === period ? '#414833' : '#C2C5AA',
@@ -97,7 +123,13 @@ export const ReportsView: React.FC = () => {
                 cursor: 'pointer',
               }}
             >
-              {period === 'today' ? 'Today' : period === 'yesterday' ? 'Yesterday' : period === '7days' ? 'Last 7 Days' : 'This Month'}
+              {period === 'today'
+                ? t('آج', 'Today')
+                : period === 'yesterday'
+                  ? t('گزشتہ کل', 'Yesterday')
+                  : period === '7days'
+                    ? t('پچھلے 7 دن', 'Last 7 Days')
+                    : t('اس ماہ', 'This Month')}
             </button>
           ))}
         </div>
@@ -122,12 +154,15 @@ export const ReportsView: React.FC = () => {
               gap: '8px',
             }}
           >
-            <PlusCircle size={16} color="#F4F5EE" /> Log Expense (اخراجات)
+            <PlusCircle size={16} color="#F4F5EE" />
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {t('اخراجات درج کریں', 'Log Expense')}
+            </span>
           </button>
 
           <button
             type="button"
-            onClick={() => alert('Simulated CSV export generated: Ledger_Export_18_09_2026.csv')}
+            onClick={() => alert(isUrdu ? 'CSV فائل ڈاؤنلوڈ ہو گئی' : 'Simulated CSV export generated')}
             className="touch-active"
             style={{
               height: '42px',
@@ -144,7 +179,10 @@ export const ReportsView: React.FC = () => {
               gap: '8px',
             }}
           >
-            <Download size={16} color="#414833" /> Export CSV
+            <Download size={16} color="#414833" />
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {t('ایکسپورٹ CSV', 'Export CSV')}
+            </span>
           </button>
         </div>
       </div>
@@ -153,31 +191,43 @@ export const ReportsView: React.FC = () => {
       <div className="reports-kpi-grid-responsive">
         <div style={{ backgroundColor: '#f0fdf4', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #bbf7d0' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#166534' }}>کل آمدن (سیل و فیس)</span>
-            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#15803d' }}>TOTAL REVENUE</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: '#166534' }}>
+              {isUrdu ? 'کل آمدن (سیل و فیس)' : 'Total Revenue'}
+            </span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#15803d' }}>
+              {isUrdu ? 'آمدن' : 'TOTAL INFLOW'}
+            </span>
           </div>
-          <div style={{ fontSize: '20px', fontWeight: 900, color: '#15803d', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
-            + Rs {totalInflow.toLocaleString()}
+          <div style={{ fontSize: '20px', fontWeight: 900, color: '#15803d', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)', marginTop: '4px' }}>
+            {isUrdu ? `+ ${totalInflow.toLocaleString()} روپے` : `+ Rs ${totalInflow.toLocaleString()}`}
           </div>
         </div>
 
         <div style={{ backgroundColor: '#fef2f2', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #fecaca' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b' }}>کل اخراجات و واپسی</span>
-            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#b91c1c' }}>TOTAL EXPENSES</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: '#991b1b' }}>
+              {isUrdu ? 'کل اخراجات و واپسی' : 'Total Expenses'}
+            </span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#b91c1c' }}>
+              {isUrdu ? 'اخراجات' : 'TOTAL OUTFLOW'}
+            </span>
           </div>
-          <div style={{ fontSize: '20px', fontWeight: 900, color: '#b91c1c', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
-            - Rs {totalOutflow.toLocaleString()}
+          <div style={{ fontSize: '20px', fontWeight: 900, color: '#b91c1c', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)', marginTop: '4px' }}>
+            {isUrdu ? `- ${totalOutflow.toLocaleString()} روپے` : `- Rs ${totalOutflow.toLocaleString()}`}
           </div>
         </div>
 
         <div style={{ backgroundColor: '#fffdf5', padding: '14px 18px', borderRadius: '10px', border: '1.5px solid #fde68a' }}>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-            <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#92400e' }}>خالص نقد کیش</span>
-            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#d97706' }}>NET CASH POSITION</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: '#92400e' }}>
+              {isUrdu ? 'خالص نقد کیش' : 'Net Cash Position'}
+            </span>
+            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#d97706' }}>
+              {isUrdu ? 'کاؤنٹر نقد بیلنس' : 'CLOSING BALANCE'}
+            </span>
           </div>
-          <div style={{ fontSize: '20px', fontWeight: 900, color: '#b45309', fontFamily: 'var(--font-mono)', marginTop: '4px' }}>
-            Rs {netDayCash.toLocaleString()}
+          <div style={{ fontSize: '20px', fontWeight: 900, color: '#b45309', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)', marginTop: '4px' }}>
+            {isUrdu ? `${netDayCash.toLocaleString()} روپے` : `Rs ${netDayCash.toLocaleString()}`}
           </div>
         </div>
       </div>
@@ -189,10 +239,11 @@ export const ReportsView: React.FC = () => {
           borderRadius: '12px',
           border: '1.5px solid #B6AD90',
           overflow: 'hidden',
-          boxShadow: '0 2px 6px rgba(65, 72, 51, 0.05)',
+          boxShadow: 'none',
         }}
       >
         <div
+          className={isUrdu ? 'font-nastaleeq' : ''}
           style={{
             display: 'grid',
             gridTemplateColumns: '1.5fr 1fr 2fr 1.2fr 1fr',
@@ -200,15 +251,15 @@ export const ReportsView: React.FC = () => {
             backgroundColor: '#C2C5AA',
             borderBottom: '1.5px solid #B6AD90',
             fontWeight: 800,
-            fontSize: '12.5px',
+            fontSize: '12px',
             color: '#414833',
           }}
         >
-          <span>DATE / TIME</span>
-          <span>CATEGORY</span>
-          <span>DESCRIPTION</span>
-          <span>REFERENCE</span>
-          <span style={{ textAlign: 'right' }}>AMOUNT (Rs)</span>
+          <span>{t('تاریخ / وقت', 'DATE / TIME')}</span>
+          <span>{t('قسم', 'CATEGORY')}</span>
+          <span>{t('تفصیل', 'DESCRIPTION')}</span>
+          <span>{t('حوالہ نمبر', 'REFERENCE')}</span>
+          <span style={{ textAlign: 'right' }}>{t('رقم', 'AMOUNT')}</span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -228,8 +279,9 @@ export const ReportsView: React.FC = () => {
 
               <div>
                 <span
+                  className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: '11.5px',
+                    fontSize: '11px',
                     fontWeight: 800,
                     padding: '3px 9px',
                     borderRadius: 'var(--radius-full)',
@@ -238,22 +290,34 @@ export const ReportsView: React.FC = () => {
                     border: '1px solid #414833',
                   }}
                 >
-                  {item.category}
+                  {getCategoryLabel(item.category)}
                 </span>
               </div>
 
-              <span style={{ color: '#414833', fontWeight: 700 }}>{item.description}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#414833', fontWeight: 700 }}>
+                {isUrdu && item.descriptionUr ? item.descriptionUr : item.description}
+              </span>
               <span style={{ color: '#656D4A', fontFamily: 'var(--font-mono)', fontSize: '12.5px', fontWeight: 700 }}>{item.reference}</span>
               <span
                 style={{
                   textAlign: 'right',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                   fontWeight: 900,
                   fontSize: '15px',
                   color: item.type === 'inflow' ? '#414833' : '#7F4F24',
                 }}
               >
-                {item.type === 'inflow' ? `+ Rs ${item.amount}` : item.type === 'outflow' ? `- Rs ${item.amount}` : `Rs ${item.amount}`}
+                {isUrdu
+                  ? item.type === 'inflow'
+                    ? `+ ${item.amount} روپے`
+                    : item.type === 'outflow'
+                    ? `- ${item.amount} روپے`
+                    : `${item.amount} روپے`
+                  : item.type === 'inflow'
+                  ? `+ Rs ${item.amount}`
+                  : item.type === 'outflow'
+                  ? `- Rs ${item.amount}`
+                  : `Rs ${item.amount}`}
               </span>
             </div>
           ))}
@@ -283,11 +347,13 @@ export const ReportsView: React.FC = () => {
               borderRadius: 'var(--radius-lg)',
               padding: '20px',
               border: '2px solid #B6AD90',
-              boxShadow: '0 20px 25px -5px rgba(65, 72, 51, 0.25)',
+              boxShadow: 'none',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 900, color: '#414833', margin: 0 }}>Log Shop Expense</h3>
+              <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '16px', fontWeight: 900, color: '#414833', margin: 0 }}>
+                {t('دکان کا خرچہ درج کریں', 'Log Shop Expense')}
+              </h3>
               <button onClick={() => setIsExpenseOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#414833' }}>
                 <X size={20} />
               </button>
@@ -295,10 +361,13 @@ export const ReportsView: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '18px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#414833' }}>Category (قسم)</label>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', fontWeight: 800, color: '#414833' }}>
+                  {t('قسم:', 'Category:')}
+                </label>
                 <select
                   value={expenseCategory}
                   onChange={(e) => setExpenseCategory(e.target.value)}
+                  className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -311,19 +380,21 @@ export const ReportsView: React.FC = () => {
                     fontWeight: 700,
                   }}
                 >
-                  <option value="Electricity">Electricity (بجلی کا بل)</option>
-                  <option value="Labor">Labor / Mazdoori (مزدوری)</option>
-                  <option value="Maintenance">Chakki Machine Maintenance (مرمت)</option>
-                  <option value="Tea & Refreshment">Tea & Refreshment (چائے پانی)</option>
-                  <option value="Other">Other Miscellaneous</option>
+                  <option value="Electricity">{t('بجلی کا بل', 'Electricity Bill')}</option>
+                  <option value="Labor">{t('مزدوری', 'Labor Mazdoori')}</option>
+                  <option value="Maintenance">{t('چکی مشین مرمت', 'Mill Maintenance')}</option>
+                  <option value="Tea & Refreshment">{t('چائے پانی و راشن', 'Tea & Refreshment')}</option>
+                  <option value="Other">{t('دیگر متفرق اخراجات', 'Other Miscellaneous')}</option>
                 </select>
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#414833' }}>Description (تفصیل)</label>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', fontWeight: 800, color: '#414833' }}>
+                  {t('تفصیل:', 'Description:')}
+                </label>
                 <input
                   type="text"
-                  placeholder="e.g. Belt greasing, generator diesel..."
+                  placeholder={t('مثلاً بیلٹ گریسنگ، جنریٹر ڈیزل...', 'e.g. Belt greasing, generator diesel...')}
                   value={expenseDesc}
                   onChange={(e) => setExpenseDesc(e.target.value)}
                   style={{
@@ -341,10 +412,12 @@ export const ReportsView: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#414833' }}>Amount (رقم - Rs)</label>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', fontWeight: 800, color: '#414833' }}>
+                  {t('رقم:', 'Amount (Rs):')}
+                </label>
                 <input
                   type="number"
-                  placeholder="Rs 0"
+                  placeholder={isUrdu ? '0 روپے' : 'Rs 0'}
                   value={expenseAmount}
                   onChange={(e) => setExpenseAmount(e.target.value)}
                   style={{
@@ -379,7 +452,9 @@ export const ReportsView: React.FC = () => {
                 cursor: 'pointer',
               }}
             >
-              Record Expense
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                {t('خرچہ محفوظ کریں', 'Record Expense')}
+              </span>
             </button>
           </div>
         </div>

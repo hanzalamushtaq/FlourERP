@@ -25,8 +25,10 @@ import {
   isBiller,
   hasPermission,
 } from '../lib/auth';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Home() {
+  const { t } = useLanguage();
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates'
@@ -150,7 +152,7 @@ export default function Home() {
       style={{
         display: 'flex',
         minHeight: '100vh',
-        backgroundColor: 'var(--bg-main, #F4F5EE)',
+        backgroundColor: '#FFFFFF',
         width: '100%',
         overflowX: 'hidden',
       }}
@@ -193,24 +195,24 @@ export default function Home() {
           onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
           title={
             activeTab === 'dashboard'
-              ? 'کاؤنٹر بلر ڈیوٹی بورڈ'
+              ? t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')
               : activeTab === 'admin'
-              ? 'مالک و ایڈمنسٹریٹر کمانڈ سنٹر'
+              ? t('مالک و ایڈمنسٹریٹر کمانڈ سنٹر', 'Administrator Command Center')
               : activeTab === 'billing'
-              ? 'نیا بل (پروڈکٹ سیلز)'
+              ? t('نیا بل (پروڈکٹ سیلز)', 'New Bill (Product Sales)')
               : activeTab === 'pisai'
-              ? 'گندم پسائی و ٹوکن جاری کریں'
+              ? t('گندم پسائی و ٹوکن جاری کریں', 'Wheat Milling & Token Issue')
               : activeTab === 'udhaar'
-              ? 'کسٹمر ادھار کھاتہ و وصولی'
+              ? t('کسٹمر ادھار کھاتہ و وصولی', 'Customer Ledger & Recovery')
               : activeTab === 'reports'
-              ? 'مالیاتی روزنامچہ و حسابات'
+              ? t('مالیاتی روزنامچہ و حسابات', 'Financial Journal & Reports')
               : activeTab === 'rates'
-              ? 'روزانہ نرخ نامہ و ریٹ لسٹ'
+              ? t('روزانہ نرخ نامہ و ریٹ لسٹ', 'Daily Rate List & Pricing')
               : activeTab === 'stock'
-              ? 'گودام و اسٹاک انوینٹری'
+              ? t('گودام و اسٹاک انوینٹری', 'Warehouse & Stock Inventory')
               : userIsAdmin
-              ? 'ایڈمن کنٹرول پینل'
-              : 'کاؤنٹر بلر ورک سپیس'
+              ? t('ایڈمن کنٹرول پینل', 'Admin Control Panel')
+              : t('کاؤنٹر بلر ورک سپیس', 'Counter Biller Workspace')
           }
         />
 

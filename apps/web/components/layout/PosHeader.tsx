@@ -15,7 +15,9 @@ import {
   Boxes,
   Calculator,
   ShieldCheck,
+  Globe,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Chakki Grinder Outline Icon matching sidebar
 const ChakkiMachineIcon = ({ size = 21, color = '#6B4A28' }: { size?: number; color?: string }) => (
@@ -29,7 +31,7 @@ const ChakkiMachineIcon = ({ size = 21, color = '#6B4A28' }: { size?: number; co
 );
 
 const renderHeaderIcon = (tab?: string) => {
-  const iconColor = '#6B4A28';
+  const iconColor = '#1877F2';
   switch (tab) {
     case 'dashboard':
       return <Home size={21} color={iconColor} strokeWidth={2} />;
@@ -76,6 +78,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
   onToggleSidebar,
   isSidebarCollapsed = false,
 }) => {
+  const { language, setLanguage, isUrdu, t } = useLanguage();
   const [currentTime, setCurrentTime] = useState<string>('06:45 PM');
 
   const isAdmin =
@@ -96,8 +99,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
   return (
     <header
       style={{
-        backgroundColor: '#ffffff',
-        borderBottom: '1.5px solid #EBE4DA',
+        backgroundColor: '#FFFFFF',
+        borderBottom: 'none',
         padding: '9px 20px',
         display: 'flex',
         alignItems: 'center',
@@ -105,6 +108,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         gap: '12px',
         userSelect: 'none',
         direction: 'rtl',
+        boxShadow: 'none',
       }}
     >
       {/* Right Corner (in RTL): Icon Squircle + Title */}
@@ -114,56 +118,121 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             width: '38px',
             height: '38px',
             borderRadius: '11px',
-            backgroundColor: '#F5EFE6',
-            border: '1.5px solid #E8DED1',
+            backgroundColor: '#F8FAFC',
+            border: 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            boxShadow: '0 2px 6px rgba(60, 40, 20, 0.05)',
+            boxShadow: 'none',
           }}
         >
           {renderHeaderIcon(activeTab)}
         </div>
         <h1
-          className="font-nastaleeq"
+          className={isUrdu ? 'font-nastaleeq' : ''}
           style={{
-            fontSize: '26px',
+            fontSize: '20px',
             fontWeight: 900,
-            color: '#1F2937',
+            color: '#0F172A',
             margin: 0,
             lineHeight: 1.1,
+            letterSpacing: '-0.02em',
           }}
         >
-          {title || 'کاؤنٹر بلر ڈیوٹی بورڈ'}
+          {title || t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')}
         </h1>
       </div>
 
       {/* Left Corner (in RTL): Search Bar & Action Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {/* Search Bar moved to left corner */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Language Switcher Segmented Control */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#F1F5F9',
+            borderRadius: '8px',
+            padding: '2px',
+            gap: '2px',
+            userSelect: 'none',
+            flexShrink: 0,
+          }}
+          title={isUrdu ? 'زبان تبدیل کریں' : 'Switch Language'}
+        >
+          <button
+            type="button"
+            onClick={() => setLanguage('ur')}
+            className={`touch-active ${language === 'ur' ? 'font-nastaleeq' : ''}`}
+            style={{
+              border: 'none',
+              borderRadius: '6px',
+              padding: '4px 10px',
+              fontSize: '13px',
+              fontWeight: language === 'ur' ? 900 : 600,
+              backgroundColor: language === 'ur' ? '#1877F2' : 'transparent',
+              color: language === 'ur' ? '#FFFFFF' : '#64748B',
+              cursor: 'pointer',
+              lineHeight: 1.2,
+              boxShadow: 'none',
+              outline: 'none',
+              transition: 'background-color 0.15s ease, color 0.15s ease',
+            }}
+          >
+            اردو
+          </button>
+          <button
+            type="button"
+            onClick={() => setLanguage('en')}
+            className="touch-active"
+            style={{
+              border: 'none',
+              borderRadius: '6px',
+              padding: '4px 9px',
+              fontSize: '11.5px',
+              fontWeight: language === 'en' ? 800 : 600,
+              fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              backgroundColor: language === 'en' ? '#1877F2' : 'transparent',
+              color: language === 'en' ? '#FFFFFF' : '#64748B',
+              cursor: 'pointer',
+              lineHeight: 1.2,
+              boxShadow: 'none',
+              outline: 'none',
+              transition: 'background-color 0.15s ease, color 0.15s ease',
+            }}
+          >
+            EN
+          </button>
+        </div>
+
+        {/* Search Bar */}
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <input
             type="text"
-            placeholder="تلاش کریں..."
-            className="font-nastaleeq"
+            placeholder={t('تلاش کریں...', 'Search...')}
+            className={isUrdu ? 'font-nastaleeq' : ''}
             style={{
               height: '35px',
-              padding: '0 32px 0 12px',
+              padding: '0 12px 0 32px',
               borderRadius: '8px',
-              border: '1.5px solid #E2E8F0',
+              border: 'none',
               backgroundColor: '#F8FAFC',
               fontSize: '13px',
-              width: '260px',
+              width: '240px',
               outline: 'none',
-              textAlign: 'right',
-              color: '#1F2937',
+              boxShadow: 'none',
+              textAlign: 'left',
+              color: '#0F172A',
             }}
           />
           <Search
             size={15}
-            color="#94A3B8"
-            style={{ position: 'absolute', right: '10px', pointerEvents: 'none' }}
+            color="#64748B"
+            style={{
+              position: 'absolute',
+              left: '10px',
+              pointerEvents: 'none',
+            }}
           />
         </div>
 
@@ -174,8 +243,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             onClick={onOpenZReport}
             className="touch-active"
             style={{
-              backgroundColor: '#414833',
-              color: '#F4F5EE',
+              backgroundColor: '#1877F2',
+              color: '#FFFFFF',
               border: 'none',
               borderRadius: '7px',
               padding: '6px 12px',
@@ -187,11 +256,16 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               gap: '6px',
               whiteSpace: 'nowrap',
               flexShrink: 0,
+              boxShadow: 'none',
+              outline: 'none',
             }}
           >
-            <FileSpreadsheet size={14} color="#C2C5AA" />
-            <span className="font-nastaleeq" style={{ fontSize: '12.5px', fontWeight: 800 }}>
-              شفٹ اختتام (Z-Report)
+            <FileSpreadsheet size={14} color="#FFFFFF" />
+            <span
+              className={isUrdu ? 'font-nastaleeq' : ''}
+              style={{ fontSize: '12px', fontWeight: 800 }}
+            >
+              {t('شفٹ اختتام', 'End Shift (Z-Report)')}
             </span>
           </button>
         )}

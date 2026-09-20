@@ -8,6 +8,7 @@ import {
   Check,
   X,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 // --- Handcrafted Vector SVGs matching Dashboard aesthetic ---
 
@@ -117,7 +118,7 @@ const INITIAL_STOCK_ITEMS: StockItem[] = [
   { id: '3', nameUr: 'فائن آٹا', nameEn: 'Fine Quality Atta (50 KG)', quantityBags: 65, weightPerBagKg: 50, ratePerKg: 148 },
   { id: '4', nameUr: 'میدہ اسپیشل', nameEn: 'Maida Special (50 KG)', quantityBags: 30, weightPerBagKg: 50, ratePerKg: 155 },
   { id: '5', nameUr: 'خالص سوجی', nameEn: 'Pure Suji (50 KG)', quantityBags: 25, weightPerBagKg: 50, ratePerKg: 160 },
-  { id: '6', nameUr: 'چوکر (کھل)', nameEn: 'Wheat Chokar (35 KG)', quantityBags: 110, weightPerBagKg: 35, ratePerKg: 95 },
+  { id: '6', nameUr: 'چوکر', nameEn: 'Wheat Chokar (35 KG)', quantityBags: 110, weightPerBagKg: 35, ratePerKg: 95 },
 ];
 
 const renderStockSvg = (id: string) => {
@@ -133,6 +134,7 @@ const renderStockSvg = (id: string) => {
 };
 
 export const WarehouseStockView: React.FC = () => {
+  const { isUrdu, t } = useLanguage();
   const [stockItems, setStockItems] = useState<StockItem[]>(INITIAL_STOCK_ITEMS);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [pressedCard, setPressedCard] = useState<string | null>(null);
@@ -143,9 +145,6 @@ export const WarehouseStockView: React.FC = () => {
   const [selectedItemId, setSelectedItemId] = useState<string>(INITIAL_STOCK_ITEMS[0].id);
   const [modalQuantity, setModalQuantity] = useState<string>('10');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Calculations
-
 
   const updateQuantity = (id: string, delta: number) => {
     setStockItems((prev) =>
@@ -167,10 +166,11 @@ export const WarehouseStockView: React.FC = () => {
     updateQuantity(selectedItemId, delta);
 
     const target = stockItems.find((i) => i.id === selectedItemId);
+    const itemName = isUrdu ? target?.nameUr : target?.nameEn;
     setToastMessage(
       modalMode === 'inward'
-        ? `+${qty} بوریاں ${target?.nameUr} گودام میں داخل کر دی گئیں!`
-        : `-${qty} بوریاں ${target?.nameUr} کی نکاسی درج کر لی گئی!`
+        ? `+${qty} ${t('بوریاں', 'bags')} ${itemName} ${t('گودام میں داخل کر دی گئیں!', 'added to warehouse!')}`
+        : `-${qty} ${t('بوریاں', 'bags')} ${itemName} ${t('کی نکاسی درج کر لی گئی!', 'dispatched from warehouse!')}`
     );
     setTimeout(() => setToastMessage(null), 3000);
 
@@ -202,7 +202,6 @@ export const WarehouseStockView: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             boxShadow: '0 4px 14px rgba(16, 185, 129, 0.18)',
-            direction: 'rtl',
             animation: 'fadeIn 0.2s ease',
           }}
         >
@@ -221,7 +220,7 @@ export const WarehouseStockView: React.FC = () => {
             >
               <Check size={18} strokeWidth={3} />
             </div>
-            <div className="font-nastaleeq" style={{ fontSize: '16.5px', fontWeight: 900, color: '#065F46' }}>
+            <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '16.5px', fontWeight: 900, color: '#065F46' }}>
               {toastMessage}
             </div>
           </div>
@@ -235,17 +234,16 @@ export const WarehouseStockView: React.FC = () => {
         </div>
       )}
 
-      {/* 1. TOP DASHBOARD ACTION CARDS (Clean Set D Design Language) */}
+      {/* 1. TOP DASHBOARD ACTION CARDS */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
           gap: '16px',
           width: '100%',
-          direction: 'rtl',
         }}
       >
-        {/* Card 1: نیا اسٹاک آمد - Warm Terracotta Clay */}
+        {/* Card 1: نیا اسٹاک آمد - Cobalt Blue */}
         <div
           onClick={() => setModalMode('inward')}
           onMouseEnter={() => setHoveredCard('inward')}
@@ -257,32 +255,20 @@ export const WarehouseStockView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background:
-              hoveredCard === 'inward'
-                ? 'linear-gradient(135deg, #DFBBB0 0%, #C9A292 50%, #B18978 100%)'
-                : 'linear-gradient(135deg, #D4ADA0 0%, #BE9685 50%, #A67E6D 100%)',
+            backgroundColor: '#1877F2',
             borderRadius: '16px',
-            border: hoveredCard === 'inward' ? '2.5px solid #F4DFD7' : '2px solid #E8CDC2',
+            border: 'none',
+            boxShadow: 'none',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredCard === 'inward'
-                ? '0 14px 34px rgba(190, 150, 133, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(190, 150, 133, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '96px',
-            transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transform:
-              pressedCard === 'inward'
-                ? 'scale(0.975) translateY(1px)'
-                : hoveredCard === 'inward'
-                ? 'translateY(-4px)'
-                : 'none',
+            transition: 'background-color 0.15s ease',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
+          {/* Icon Tile */}
           <div
             style={{
               width: '56px',
@@ -292,19 +278,18 @@ export const WarehouseStockView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              boxShadow: 'none',
+              border: 'none',
               flexShrink: 0,
-              transition: 'transform 0.25s ease',
-              transform: hoveredCard === 'inward' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
             }}
           >
             <StockInwardSvg />
           </div>
 
-          {/* Right Text */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          {/* Text */}
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 fontSize: '24px',
                 fontWeight: 900,
@@ -312,15 +297,14 @@ export const WarehouseStockView: React.FC = () => {
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
               }}
             >
-              + نیا اسٹاک آمد
+              {t('+ نیا اسٹاک آمد', '+ Stock Inward')}
             </h2>
           </div>
         </div>
 
-        {/* Card 3: اسٹاک نکاسی و ترسیل - Dusty Slate Blue */}
+        {/* Card 2: اسٹاک نکاسی و ترسیل - Emerald Green */}
         <div
           onClick={() => setModalMode('outward')}
           onMouseEnter={() => setHoveredCard('outward')}
@@ -332,32 +316,20 @@ export const WarehouseStockView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background:
-              hoveredCard === 'outward'
-                ? 'linear-gradient(135deg, #9DB7C4 0%, #819EAD 50%, #698694 100%)'
-                : 'linear-gradient(135deg, #8DAAB8 0%, #7491A0 50%, #5E7A88 100%)',
+            backgroundColor: '#0E8A54',
             borderRadius: '16px',
-            border: hoveredCard === 'outward' ? '2.5px solid #C4DCE8' : '2px solid #A8C4D2',
+            border: 'none',
+            boxShadow: 'none',
             padding: '16px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredCard === 'outward'
-                ? '0 14px 34px rgba(116, 145, 160, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(116, 145, 160, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '96px',
-            transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transform:
-              pressedCard === 'outward'
-                ? 'scale(0.975) translateY(1px)'
-                : hoveredCard === 'outward'
-                ? 'translateY(-4px)'
-                : 'none',
+            transition: 'background-color 0.15s ease',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
+          {/* Icon Tile */}
           <div
             style={{
               width: '56px',
@@ -367,19 +339,18 @@ export const WarehouseStockView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              boxShadow: 'none',
+              border: 'none',
               flexShrink: 0,
-              transition: 'transform 0.25s ease',
-              transform: hoveredCard === 'outward' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
             }}
           >
             <StockOutwardSvg />
           </div>
 
-          {/* Right Text */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          {/* Text */}
+          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 fontSize: '24px',
                 fontWeight: 900,
@@ -387,28 +358,25 @@ export const WarehouseStockView: React.FC = () => {
                 margin: 0,
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
               }}
             >
-              اسٹاک نکاسی و ترسیل
+              {t('اسٹاک نکاسی و ترسیل', 'Stock Outward')}
             </h2>
           </div>
         </div>
       </div>
 
-      {/* 2. STOCK ITEMS DASHBOARD CARDS GRID (Clean, Lite, No Bloat) */}
+      {/* 2. STOCK ITEMS DASHBOARD CARDS GRID */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '16px',
           width: '100%',
-          direction: 'rtl',
           marginTop: '4px',
         }}
       >
         {stockItems.map((item) => {
-          const isItemHovered = hoveredItem === item.id;
           const totalItemValue = item.quantityBags * item.weightPerBagKg * item.ratePerKg;
 
           return (
@@ -418,19 +386,16 @@ export const WarehouseStockView: React.FC = () => {
               onMouseLeave={() => setHoveredItem(null)}
               className="dash-card-animated"
               style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#F8FAFC',
                 borderRadius: '16px',
-                border: isItemHovered ? '2px solid #C2410C' : '1.5px solid #EBE4DA',
+                border: 'none',
                 padding: '16px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '14px',
-                boxShadow: isItemHovered
-                  ? '0 10px 24px rgba(194, 65, 12, 0.12), 0 2px 6px rgba(0,0,0,0.04)'
-                  : '0 4px 14px rgba(0, 0, 0, 0.03)',
-                transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                transform: isItemHovered ? 'translateY(-3px)' : 'none',
+                boxShadow: 'none',
+                transition: 'background-color 0.15s ease',
               }}
             >
               {/* Card Header: Squircle Icon + Status */}
@@ -444,68 +409,66 @@ export const WarehouseStockView: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.09)',
-                    border: '1.5px solid #EBE4DA',
+                    boxShadow: 'none',
+                    border: 'none',
                     flexShrink: 0,
-                    transition: 'transform 0.22s ease',
-                    transform: isItemHovered ? 'scale(1.1) rotate(-2deg)' : 'scale(1)',
                   }}
                 >
                   {renderStockSvg(item.id)}
                 </div>
 
                 <span
+                  className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
                     fontSize: '11px',
                     fontWeight: 800,
                     padding: '3px 8px',
                     borderRadius: '6px',
-                    border: '1px solid #86EFAC',
-                    backgroundColor: '#F0FDF4',
-                    color: '#166534',
+                    border: 'none',
+                    backgroundColor: '#ECFDF5',
+                    color: '#0E8A54',
+                    boxShadow: 'none',
                   }}
                 >
-                  ● اسٹاک دستیاب
+                  ● {t('اسٹاک دستیاب', 'In Stock')}
                 </span>
               </div>
 
-              {/* Title & English Subtitle */}
+              {/* Title (Only active language) */}
               <div>
                 <h4
-                  className="font-nastaleeq"
+                  className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: '20px',
+                    fontSize: '18px',
                     fontWeight: 900,
-                    color: '#1F2937',
+                    color: '#0F172A',
                     margin: 0,
                     lineHeight: 1.2,
                   }}
                 >
-                  {item.nameUr}
+                  {isUrdu ? item.nameUr : item.nameEn}
                 </h4>
-                <div style={{ fontSize: '11.5px', color: '#6B7280', fontWeight: 600, marginTop: '2px' }}>
-                  {item.nameEn}
-                </div>
               </div>
 
               {/* Quantity Box & Steppers */}
               <div
                 style={{
-                  backgroundColor: '#FAF8F5',
-                  border: '1.5px solid #EBE4DA',
+                  backgroundColor: '#FFFFFF',
+                  border: 'none',
                   borderRadius: '12px',
                   padding: '8px 12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  boxShadow: 'none',
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '24px', fontWeight: 900, color: '#1F2937', fontFamily: 'var(--font-mono)' }}>
+                  <span style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
                     {item.quantityBags}
                   </span>
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#6B7280', marginRight: '4px' }}>
-                    بوریاں
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', fontWeight: 800, color: '#64748B', marginLeft: '4px' }}>
+                    {t('بوریاں', 'Bags')}
                   </span>
                 </div>
 
@@ -514,13 +477,13 @@ export const WarehouseStockView: React.FC = () => {
                     type="button"
                     onClick={() => updateQuantity(item.id, -1)}
                     className="touch-active"
-                    title="1 بوری نکاسی"
+                    title={t('1 بوری نکاسی', '1 Bag Outward')}
                     style={{
                       width: '32px',
                       height: '34px',
                       borderRadius: '7px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
+                      border: 'none',
+                      backgroundColor: '#FEF2F2',
                       color: '#DC2626',
                       fontSize: '14px',
                       fontWeight: 900,
@@ -528,6 +491,8 @@ export const WarehouseStockView: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      boxShadow: 'none',
+                      outline: 'none',
                     }}
                   >
                     <Minus size={15} strokeWidth={2.8} />
@@ -537,20 +502,22 @@ export const WarehouseStockView: React.FC = () => {
                     type="button"
                     onClick={() => updateQuantity(item.id, 1)}
                     className="touch-active"
-                    title="1 بوری آمد"
+                    title={t('1 بوری آمد', '1 Bag Inward')}
                     style={{
                       width: '32px',
                       height: '34px',
                       borderRadius: '7px',
-                      border: '1.5px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
-                      color: '#059669',
+                      border: 'none',
+                      backgroundColor: '#ECFDF5',
+                      color: '#0E8A54',
                       fontSize: '14px',
                       fontWeight: 900,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      boxShadow: 'none',
+                      outline: 'none',
                     }}
                   >
                     <Plus size={15} strokeWidth={2.8} />
@@ -559,8 +526,8 @@ export const WarehouseStockView: React.FC = () => {
               </div>
 
               {/* Valuation */}
-              <div style={{ textAlign: 'left', fontSize: '12px', fontWeight: 800, color: '#8C582B', fontFamily: 'var(--font-mono)' }}>
-                مالیت: Rs {totalItemValue.toLocaleString()}
+              <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 800, color: '#0F172A', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                {isUrdu ? `${t('مالیت:', 'Valuation:')} ${totalItemValue.toLocaleString()} روپے` : `Valuation: Rs ${totalItemValue.toLocaleString()}`}
               </div>
             </div>
           );
@@ -580,7 +547,6 @@ export const WarehouseStockView: React.FC = () => {
             justifyContent: 'center',
             padding: '16px',
             zIndex: 3000,
-            direction: 'rtl',
           }}
         >
           <div
@@ -607,8 +573,8 @@ export const WarehouseStockView: React.FC = () => {
                 justifyContent: 'space-between',
               }}
             >
-              <span className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900 }}>
-                {modalMode === 'inward' ? '+ نیا اسٹاک داخل کریں' : 'اسٹاک نکاسی و ترسیل'}
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900 }}>
+                {modalMode === 'inward' ? t('+ نیا اسٹاک داخل کریں', '+ Stock Inward') : t('اسٹاک نکاسی و ترسیل', 'Stock Outward / Dispatch')}
               </span>
               <button
                 type="button"
@@ -622,8 +588,8 @@ export const WarehouseStockView: React.FC = () => {
             {/* Form */}
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
-                  پروڈکٹ منتخب کریں:
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
+                  {t('پروڈکٹ منتخب کریں:', 'Select Product:')}
                 </label>
                 <select
                   value={selectedItemId}
@@ -642,15 +608,15 @@ export const WarehouseStockView: React.FC = () => {
                 >
                   {stockItems.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.nameUr} ({item.quantityBags} بوری دستیاب)
+                      {isUrdu ? item.nameUr : item.nameEn} ({item.quantityBags} {t('بوری دستیاب', 'bags available')})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
-                  تعداد (بوریاں):
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
+                  {t('تعداد (بوریاں):', 'Quantity (Bags):')}
                 </label>
                 <input
                   type="number"
@@ -686,7 +652,7 @@ export const WarehouseStockView: React.FC = () => {
                     cursor: 'pointer',
                   }}
                 >
-                  <span className="font-nastaleeq">محفوظ کریں</span>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('محفوظ کریں', 'Save')}</span>
                 </button>
                 <button
                   type="button"
@@ -704,7 +670,7 @@ export const WarehouseStockView: React.FC = () => {
                     cursor: 'pointer',
                   }}
                 >
-                  منسوخ
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('منسوخ', 'Cancel')}</span>
                 </button>
               </div>
             </div>

@@ -15,6 +15,7 @@ import {
   Calendar,
   User,
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Handcrafted Vector SVG for Ledger Book
 const UdhaarBookSvg = () => (
@@ -81,6 +82,7 @@ const INITIAL_CUSTOMERS: Customer[] = [
 ];
 
 export const CustomerLedgerView: React.FC = () => {
+  const { isUrdu, t } = useLanguage();
   const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>(INITIAL_CUSTOMERS[0]);
@@ -109,13 +111,13 @@ export const CustomerLedgerView: React.FC = () => {
     const updatedCustomer: Customer = {
       ...selectedCustomer,
       balance: Math.max(0, selectedCustomer.balance - amount),
-      lastActivity: 'ابھی',
+      lastActivity: isUrdu ? 'ابھی' : 'Just now',
       transactions: [
         {
           id: `t_${Date.now()}`,
-          date: 'آج (ابھی)',
+          date: isUrdu ? 'آج (ابھی)' : 'Today (Now)',
           type: 'payment',
-          description: 'نقد ادھار وصولی',
+          description: t('نقد ادھار وصولی', 'Cash Payment Received'),
           amount,
           runningBalance: Math.max(0, selectedCustomer.balance - amount),
         },
@@ -138,7 +140,7 @@ export const CustomerLedgerView: React.FC = () => {
       name: newName.trim(),
       phone: newPhone.trim() || 'No phone',
       balance: 0,
-      lastActivity: 'نیا کھاتہ',
+      lastActivity: isUrdu ? 'نیا کھاتہ' : 'New Account',
       transactions: [],
     };
     setCustomers([newCust, ...customers]);
@@ -154,55 +156,46 @@ export const CustomerLedgerView: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
       {/* 1. TOP DASHBOARD ACTION CARDS (Aligned with bottom 2-column grid) */}
       <div className="ledger-grid-responsive">
-        {/* Card 2 (Left Column): نیا کھاتہ کھولیں - Sapphire Blue Dashboard Action Card */}
+        {/* Card 2 (Left Column): نیا کھاتہ کھولیں - Cobalt Blue Action Card */}
         <div
           onClick={() => setIsNewCustomerOpen(true)}
           onMouseEnter={() => setHoveredTopCard('new')}
           onMouseLeave={() => setHoveredTopCard(null)}
           className="touch-active"
           style={{
-            direction: 'rtl',
-            background:
-              hoveredTopCard === 'new'
-                ? 'linear-gradient(135deg, #9DB7C4 0%, #819EAD 50%, #698694 100%)'
-                : 'linear-gradient(135deg, #8DAAB8 0%, #7491A0 50%, #5E7A88 100%)',
+            backgroundColor: '#1877F2',
             borderRadius: '16px',
-            border: hoveredTopCard === 'new' ? '2.5px solid #C4DCE8' : '2px solid #A8C4D2',
+            border: 'none',
+            boxShadow: 'none',
             padding: '14px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            boxShadow:
-              hoveredTopCard === 'new'
-                ? '0 12px 28px rgba(116, 145, 160, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(116, 145, 160, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '84px',
-            transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transform: hoveredTopCard === 'new' ? 'translateY(-3px)' : 'none',
+            transition: 'background-color 0.15s ease',
           }}
         >
-          {/* Right: Text */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          {/* Text */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
             <h2
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 fontSize: '18px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
                 lineHeight: 1.2,
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
               }}
             >
-              + نیا کھاتہ کھولیں
+              {t('+ نیا کھاتہ کھولیں', '+ Open New Ledger')}
             </h2>
-            <span style={{ fontSize: '11px', color: '#F0F7FA', fontWeight: 700, marginTop: '2px' }}>
-              نیا کسٹمر اکاؤنٹ رجسٹر کریں
+            <span style={{ fontSize: '11px', color: '#FFFFFF', fontWeight: 700, marginTop: '2px', opacity: 0.9 }}>
+              {t('نیا کسٹمر اکاؤنٹ رجسٹر کریں', 'Register New Customer Account')}
             </span>
           </div>
 
-          {/* Left: White Squircle Icon Tile */}
+          {/* Icon Tile */}
           <div
             style={{
               width: '46px',
@@ -212,63 +205,54 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 3px 10px rgba(0, 0, 0, 0.20)',
+              boxShadow: 'none',
+              border: 'none',
               flexShrink: 0,
-              transition: 'transform 0.22s ease',
-              transform: hoveredTopCard === 'new' ? 'scale(1.08) rotate(2deg)' : 'scale(1)',
             }}
           >
-            <UserPlus size={22} color="#5E7A88" strokeWidth={2.4} />
+            <UserPlus size={22} color="#1877F2" strokeWidth={2.4} />
           </div>
         </div>
 
-        {/* Card 1 (Right Column): مجموعی ادھار کھاتہ - Slate Pine Teal Palette */}
+        {/* Card 1 (Right Column): مجموعی ادھار کھاتہ - Emerald Green */}
         <div
           onMouseEnter={() => setHoveredTopCard('total')}
           onMouseLeave={() => setHoveredTopCard(null)}
           className="dash-card-animated"
           style={{
-            direction: 'rtl',
-            background:
-              hoveredTopCard === 'total'
-                ? 'linear-gradient(135deg, #58797D 0%, #435E62 50%, #344B4E 100%)'
-                : 'linear-gradient(135deg, #4A676B 0%, #374F52 50%, #2A3F42 100%)',
+            backgroundColor: '#0E8A54',
             borderRadius: '16px',
-            border: hoveredTopCard === 'total' ? '2.5px solid #84A9AD' : '2px solid #5F8387',
+            border: 'none',
+            boxShadow: 'none',
             padding: '14px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            boxShadow:
-              hoveredTopCard === 'total'
-                ? '0 12px 28px rgba(54, 79, 82, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 6px 18px rgba(54, 79, 82, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
             minHeight: '84px',
-            transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transform: hoveredTopCard === 'total' ? 'translateY(-3px)' : 'none',
+            transition: 'background-color 0.15s ease',
           }}
         >
-          {/* Right: Text & Figure */}
+          {/* Text & Figure */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
-                className="font-nastaleeq"
-                style={{ fontSize: '16px', fontWeight: 900, color: '#FFFFFF', textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{ fontSize: '16px', fontWeight: 900, color: '#FFFFFF' }}
               >
-                مجموعی ادھار کھاتہ
+                {t('مجموعی ادھار کھاتہ', 'Total Outstanding Ledger')}
               </span>
               <span
                 style={{
                   fontSize: '11px',
                   fontWeight: 800,
-                  backgroundColor: 'rgba(234, 179, 8, 0.2)',
-                  color: '#FDE047',
-                  border: '1px solid rgba(253, 224, 71, 0.4)',
+                  backgroundColor: '#ECFDF5',
+                  color: '#0E8A54',
+                  border: 'none',
                   padding: '1px 7px',
                   borderRadius: '6px',
                 }}
               >
-                {customers.length} کھاتے
+                {customers.length} {t('کھاتے', 'Accounts')}
               </span>
             </div>
 
@@ -277,11 +261,10 @@ export const CustomerLedgerView: React.FC = () => {
               style={{
                 fontSize: '26px',
                 fontWeight: 900,
-                color: '#FDE047',
+                color: '#FFFFFF',
                 fontFamily: 'var(--font-mono)',
                 lineHeight: 1.15,
                 marginTop: '3px',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.4)',
               }}
             >
               Rs {totalOutstandingUdhaar.toLocaleString()}
@@ -298,10 +281,9 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 3px 10px rgba(0, 0, 0, 0.22)',
+              boxShadow: 'none',
+              border: 'none',
               flexShrink: 0,
-              transition: 'transform 0.22s ease',
-              transform: hoveredTopCard === 'total' ? 'scale(1.08) rotate(-2deg)' : 'scale(1)',
             }}
           >
             <UdhaarBookSvg />
@@ -315,36 +297,37 @@ export const CustomerLedgerView: React.FC = () => {
         <div
           className="dash-card-animated"
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: '#F8FAFC',
             borderRadius: '16px',
-            border: '1.5px solid #EBE4DA',
+            border: 'none',
             padding: '16px',
             display: 'flex',
             flexDirection: 'column',
             gap: '10px',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'none',
           }}
         >
           {/* Header with Search */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', direction: 'rtl' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontSize: '16px' }}>👥</span>
-              <span className="font-nastaleeq" style={{ fontSize: '16.5px', fontWeight: 900, color: '#1F2937' }}>
-                گاہک کھاتہ جات
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '16.5px', fontWeight: 900, color: '#0F172A' }}>
+                {t('گاہک کھاتہ جات', 'Customer Accounts')}
               </span>
             </div>
             <span
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#78350F',
-                backgroundColor: '#FEF3C7',
+                color: '#B45309',
+                backgroundColor: '#FFFBEB',
                 padding: '2px 8px',
                 borderRadius: '6px',
                 fontFamily: 'var(--font-mono)',
+                border: 'none',
               }}
             >
-              {filteredCustomers.length} کسٹمرز
+              {filteredCustomers.length} {t('کسٹمرز', 'Customers')}
             </span>
           </div>
 
@@ -354,20 +337,21 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: '#FCFBF9',
-              border: '1.5px solid #D5C9B8',
+              backgroundColor: '#FFFFFF',
+              border: 'none',
               borderRadius: '9px',
               padding: '0 10px',
               height: '40px',
+              boxShadow: 'none',
             }}
           >
-            <Search size={15} color="#8C582B" />
+            <Search size={15} color="#64748B" />
             <input
               type="text"
-              placeholder="گاہک تلاش کریں..."
+              placeholder={t('گاہک تلاش کریں...', 'Search customers...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 border: 'none',
                 background: 'transparent',
@@ -375,8 +359,8 @@ export const CustomerLedgerView: React.FC = () => {
                 width: '100%',
                 fontSize: '13px',
                 fontWeight: 700,
-                color: '#1F2937',
-                textAlign: 'right',
+                color: '#0F172A',
+                textAlign: isUrdu ? 'right' : 'left',
               }}
             />
           </div>
@@ -394,12 +378,11 @@ export const CustomerLedgerView: React.FC = () => {
           >
             {filteredCustomers.length === 0 ? (
               <div style={{ padding: '24px', textAlign: 'center', color: '#64748B', fontSize: '13px', fontWeight: 700 }}>
-                کوئی کسٹمر نہیں ملا
+                {t('کوئی کسٹمر نہیں ملا', 'No customers found')}
               </div>
             ) : (
               filteredCustomers.map((cust) => {
                 const isSelected = selectedCustomer.id === cust.id;
-                const isHovered = hoveredCustomer === cust.id;
 
                 return (
                   <div
@@ -411,56 +394,42 @@ export const CustomerLedgerView: React.FC = () => {
                     style={{
                       padding: '10px 12px',
                       borderRadius: '12px',
-                      backgroundColor: isSelected ? '#FAF5F2' : '#FFFFFF',
-                      background: isSelected
-                        ? 'linear-gradient(135deg, #FAF5F2 0%, #F5EBE5 50%, #ECE0D8 100%)'
-                        : '#FFFFFF',
-                      border: isSelected
-                        ? '2.5px solid #BE9685'
-                        : isHovered
-                        ? '2px solid #D4ADA0'
-                        : '1.5px solid #EBE4DA',
+                      backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                      border: 'none',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      boxShadow: isSelected
-                        ? '0 6px 16px rgba(190, 150, 133, 0.25)'
-                        : isHovered
-                        ? '0 4px 12px rgba(0, 0, 0, 0.05)'
-                        : 'none',
-                      transition: 'all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                      transform: isSelected || isHovered ? 'translateY(-2px)' : 'none',
-                      direction: 'rtl',
+                      boxShadow: 'none',
+                      transition: 'background-color 0.15s ease',
                     }}
                   >
-                    {/* Right: Squircle Avatar + Customer Info */}
+                    {/* Squircle Avatar + Customer Info (Customer Name remains as written) */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
-                      {/* White Squircle Avatar Tile */}
                       <div
                         style={{
                           width: '36px',
                           height: '36px',
                           borderRadius: '10px',
-                          backgroundColor: isSelected ? '#FFFFFF' : '#FAF5EE',
-                          border: isSelected ? '1.5px solid #D4ADA0' : '1px solid #EAE0D3',
+                          backgroundColor: isSelected ? '#DBEAFE' : '#F8FAFC',
+                          border: 'none',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
-                          boxShadow: isSelected ? '0 2px 6px rgba(190, 150, 133, 0.20)' : 'none',
+                          boxShadow: 'none',
                         }}
                       >
-                        <User size={16} color={isSelected ? '#8A5848' : '#64748B'} />
+                        <User size={16} color={isSelected ? '#1877F2' : '#64748B'} />
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                         <span
-                          className="font-nastaleeq"
+                          className={isUrdu ? 'font-nastaleeq' : ''}
                           style={{
                             fontWeight: 900,
                             fontSize: '15.5px',
-                            color: isSelected ? '#4A2A20' : '#1F2937',
+                            color: isSelected ? '#1877F2' : '#0F172A',
                             lineHeight: 1.2,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
@@ -473,10 +442,10 @@ export const CustomerLedgerView: React.FC = () => {
                         <span
                           style={{
                             fontSize: '11px',
-                            color: isSelected ? '#8A5848' : '#64748B',
+                            color: '#64748B',
                             fontWeight: 600,
                             direction: 'ltr',
-                            textAlign: 'right',
+                            textAlign: isUrdu ? 'right' : 'left',
                             marginTop: '2px',
                           }}
                         >
@@ -485,14 +454,14 @@ export const CustomerLedgerView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Left: Balance Figure & Last Activity */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, marginRight: '10px' }}>
+                    {/* Balance Figure & Last Activity */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-end', flexShrink: 0, [isUrdu ? 'marginRight' : 'marginLeft']: '10px' }}>
                       <span
                         dir="ltr"
                         style={{
                           fontSize: '15.5px',
                           fontWeight: 900,
-                          color: isSelected ? '#991B1B' : '#B91C1C',
+                          color: '#DC2626',
                           fontFamily: 'var(--font-mono)',
                         }}
                       >
@@ -502,20 +471,20 @@ export const CustomerLedgerView: React.FC = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                         {isSelected && (
                           <span
+                            className={isUrdu ? 'font-nastaleeq' : ''}
                             style={{
                               fontSize: '10px',
                               fontWeight: 900,
-                              color: '#8A5848',
-                              fontFamily: 'var(--font-urdu)',
+                              color: '#1877F2',
                             }}
                           >
-                            ● منتخب
+                            ● {t('منتخب', 'Selected')}
                           </span>
                         )}
                         <span
                           style={{
                             fontSize: '10px',
-                            color: isSelected ? '#8A5848' : '#64748B',
+                            color: '#64748B',
                             fontWeight: 700,
                           }}
                         >
@@ -534,14 +503,14 @@ export const CustomerLedgerView: React.FC = () => {
         <div
           className="dash-card-animated"
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: '#F8FAFC',
             borderRadius: '16px',
-            border: '1.5px solid #EBE4DA',
+            border: 'none',
             padding: '18px 20px',
             display: 'flex',
             flexDirection: 'column',
             gap: '14px',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'none',
           }}
         >
           {/* Profile Header Banner */}
@@ -550,34 +519,33 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottom: '1.5px solid #F3EDE4',
+              borderBottom: 'none',
               paddingBottom: '12px',
-              direction: 'rtl',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {/* White Squircle Avatar Tile */}
+              {/* Squircle Avatar Tile */}
               <div
                 style={{
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  backgroundColor: '#FAF5F2',
-                  border: '1.5px solid #D4ADA0',
+                  backgroundColor: '#EFF6FF',
+                  border: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 8px rgba(190, 150, 133, 0.20)',
+                  boxShadow: 'none',
                   flexShrink: 0,
                 }}
               >
-                <BookOpen size={20} color="#8A5848" />
+                <BookOpen size={20} color="#1877F2" />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <h3
-                  className="font-nastaleeq"
-                  style={{ fontSize: '19px', fontWeight: 900, color: '#1F2937', margin: 0, lineHeight: 1.2 }}
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{ fontSize: '19px', fontWeight: 900, color: '#0F172A', margin: 0, lineHeight: 1.2 }}
                 >
                   {selectedCustomer.name}
                 </h3>
@@ -588,16 +556,16 @@ export const CustomerLedgerView: React.FC = () => {
             </div>
 
             {/* Current Balance Callout */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-              <span className="font-nastaleeq" style={{ fontSize: '12px', fontWeight: 800, color: '#64748B' }}>
-                بقایا ادھار:
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-end' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', fontWeight: 800, color: '#64748B' }}>
+                {t('بقایا ادھار:', 'Credit Balance:')}
               </span>
               <span
                 dir="ltr"
                 style={{
                   fontSize: '22px',
                   fontWeight: 900,
-                  color: selectedCustomer.balance > 0 ? '#B91C1C' : '#047857',
+                  color: selectedCustomer.balance > 0 ? '#DC2626' : '#0E8A54',
                   fontFamily: 'var(--font-mono)',
                   lineHeight: 1.1,
                   marginTop: '2px',
@@ -625,31 +593,20 @@ export const CustomerLedgerView: React.FC = () => {
             style={{
               height: '48px',
               borderRadius: '14px',
-              background:
-                hoveredRepayBtn
-                  ? 'linear-gradient(135deg, #DFBBB0 0%, #C9A292 50%, #B18978 100%)'
-                  : 'linear-gradient(135deg, #D4ADA0 0%, #BE9685 50%, #A67E6D 100%)',
+              background: '#0E8A54',
               color: '#FFFFFF',
-              border: hoveredRepayBtn ? '2px solid #F4DFD7' : '1.5px solid #E8CDC2',
+              border: 'none',
+              boxShadow: 'none',
+              outline: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '0 16px 0 18px',
-              boxShadow:
-                hoveredRepayBtn
-                  ? '0 10px 24px rgba(190, 150, 133, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                  : '0 4px 14px rgba(190, 150, 133, 0.30), 0 1px 3px rgba(0, 0, 0, 0.06)',
-              transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              transform:
-                pressedRepayBtn
-                  ? 'scale(0.975) translateY(1px)'
-                  : hoveredRepayBtn
-                  ? 'translateY(-2px)'
-                  : 'none',
+              transition: 'background-color 0.15s ease',
             }}
           >
-            {/* Left: White Squircle Icon Tile */}
+            {/* White Squircle Icon Tile */}
             <div
               style={{
                 width: '34px',
@@ -659,36 +616,33 @@ export const CustomerLedgerView: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.20)',
+                boxShadow: 'none',
                 flexShrink: 0,
-                transition: 'transform 0.22s ease',
-                transform: hoveredRepayBtn ? 'scale(1.08) rotate(-2deg)' : 'scale(1)',
               }}
             >
-              <DollarSign size={18} color="#A67E6D" strokeWidth={2.5} />
+              <DollarSign size={18} color="#0E8A54" strokeWidth={2.5} />
             </div>
 
-            {/* Right: Bold Nastaleeq Text */}
+            {/* Bold Text */}
             <span
-              className="font-nastaleeq"
+              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 fontSize: '17px',
                 fontWeight: 900,
                 color: '#FFFFFF',
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.35)',
               }}
             >
-              ادھار وصولی درج کریں
+              {t('ادھار وصولی درج کریں', 'Log Cash Repayment')}
             </span>
           </button>
 
           {/* Chronological Append-Only Transactions Ledger */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', direction: 'rtl' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <History size={15} color="#D97706" />
-                <span className="font-nastaleeq" style={{ fontSize: '14.5px', fontWeight: 900, color: '#1F2937' }}>
-                  کھاتہ ہسٹری
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14.5px', fontWeight: 900, color: '#0F172A' }}>
+                  {t('کھاتہ ہسٹری', 'Ledger History')}
                 </span>
               </div>
 
@@ -697,13 +651,13 @@ export const CustomerLedgerView: React.FC = () => {
                   fontSize: '11px',
                   fontWeight: 800,
                   color: '#64748B',
-                  backgroundColor: '#FAF5EE',
+                  backgroundColor: '#FFFFFF',
                   padding: '2px 7px',
                   borderRadius: '5px',
-                  border: '1px solid #EAE0D3',
+                  border: 'none',
                 }}
               >
-                {selectedCustomer.transactions.length} اندراج
+                {selectedCustomer.transactions.length} {t('اندراج', 'entries')}
               </span>
             </div>
 
@@ -719,7 +673,7 @@ export const CustomerLedgerView: React.FC = () => {
             >
               {selectedCustomer.transactions.length === 0 ? (
                 <div style={{ padding: '20px', textAlign: 'center', color: '#64748B', fontSize: '12px', fontWeight: 700 }}>
-                  کوئی ٹرانزیکشن موجود نہیں ہے۔
+                  {t('کوئی ٹرانزیکشن موجود نہیں ہے۔', 'No transactions found.')}
                 </div>
               ) : (
                 selectedCustomer.transactions.map((tx) => (
@@ -731,8 +685,9 @@ export const CustomerLedgerView: React.FC = () => {
                       justifyContent: 'space-between',
                       padding: '8px 12px',
                       borderRadius: '10px',
-                      backgroundColor: '#FCFBF9',
-                      border: '1px solid #EBE4DA',
+                      backgroundColor: '#FFFFFF',
+                      border: 'none',
+                      boxShadow: 'none',
                       transition: 'all 0.15s ease',
                     }}
                   >
@@ -744,8 +699,8 @@ export const CustomerLedgerView: React.FC = () => {
                           height: '28px',
                           borderRadius: '8px',
                           backgroundColor: tx.type === 'purchase' ? '#FEF2F2' : '#ECFDF5',
-                          border: tx.type === 'purchase' ? '1px solid #FECACA' : '1px solid #A7F3D0',
-                          color: tx.type === 'purchase' ? '#DC2626' : '#047857',
+                          border: 'none',
+                          color: tx.type === 'purchase' ? '#DC2626' : '#0E8A54',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -756,7 +711,7 @@ export const CustomerLedgerView: React.FC = () => {
                       </div>
 
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: '13px', color: '#1F2937' }}>
+                        <div style={{ fontWeight: 800, fontSize: '13px', color: '#0F172A' }}>
                           {tx.description}
                         </div>
                         <div style={{ fontSize: '10.5px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '1px' }}>
@@ -771,7 +726,7 @@ export const CustomerLedgerView: React.FC = () => {
                         style={{
                           fontWeight: 900,
                           fontSize: '14px',
-                          color: tx.type === 'purchase' ? '#DC2626' : '#047857',
+                          color: tx.type === 'purchase' ? '#DC2626' : '#0E8A54',
                           fontFamily: 'var(--font-mono)',
                           direction: 'ltr',
                         }}
@@ -779,7 +734,7 @@ export const CustomerLedgerView: React.FC = () => {
                         {tx.type === 'purchase' ? `+ Rs ${tx.amount.toLocaleString()}` : `- Rs ${tx.amount.toLocaleString()}`}
                       </div>
                       <div style={{ fontSize: '10px', color: '#64748B', fontWeight: 700, marginTop: '1px' }}>
-                        بقایا: Rs {tx.runningBalance.toLocaleString()}
+                        {t('بقایا:', 'Balance:')} Rs {tx.runningBalance.toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -820,8 +775,8 @@ export const CustomerLedgerView: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontSize: '18px' }}>💵</span>
-                <h3 className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
-                  ادھار وصولی درج کریں
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+                  {t('ادھار وصولی درج کریں', 'Log Cash Repayment')}
                 </h3>
               </div>
               <button
@@ -854,11 +809,10 @@ export const CustomerLedgerView: React.FC = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                direction: 'rtl',
               }}
             >
               <div>
-                <span className="font-nastaleeq" style={{ fontSize: '14px', fontWeight: 800, color: '#1F2937' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#1F2937' }}>
                   {selectedCustomer.name}
                 </span>
                 <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>
@@ -866,53 +820,19 @@ export const CustomerLedgerView: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ textAlign: 'left' }}>
-                <span className="font-nastaleeq" style={{ fontSize: '10.5px', color: '#B91C1C', fontWeight: 800 }}>
-                  کل بقایا
+              <div style={{ textAlign: 'right' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '10.5px', color: '#B91C1C', fontWeight: 800 }}>
+                  {t('کل بقایا', 'Total Balance')}
                 </span>
-                <div style={{ fontSize: '15px', fontWeight: 900, color: '#B91C1C', fontFamily: 'var(--font-mono)' }}>
-                  Rs {selectedCustomer.balance.toLocaleString()}
+                <div style={{ fontSize: '15px', fontWeight: 900, color: '#B91C1C', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                  {isUrdu ? `${selectedCustomer.balance.toLocaleString()} روپے` : `Rs ${selectedCustomer.balance.toLocaleString()}`}
                 </div>
               </div>
             </div>
 
-            {/* Quick Repayment Amount Presets */}
-            <div style={{ marginBottom: '12px' }}>
-              <span className="font-nastaleeq" style={{ fontSize: '12px', fontWeight: 800, color: '#64748B', display: 'block', marginBottom: '5px', textAlign: 'right' }}>
-                تیز رفتار بٹنز:
-              </span>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '5px' }}>
-                {[
-                  { label: '500', val: 500 },
-                  { label: '1,000', val: 1000 },
-                  { label: '2,000', val: 2000 },
-                  { label: 'کل رقم', val: selectedCustomer.balance },
-                ].map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => setRepaymentAmount(String(preset.val))}
-                    className="touch-active"
-                    style={{
-                      height: '32px',
-                      borderRadius: '6px',
-                      backgroundColor: repaymentAmount === String(preset.val) ? '#364E51' : '#FAF5EE',
-                      color: repaymentAmount === String(preset.val) ? '#FFFFFF' : '#374151',
-                      border: repaymentAmount === String(preset.val) ? '1.5px solid #5F8387' : '1px solid #E2D8CC',
-                      fontSize: '11.5px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Input */}
-            <label className="font-nastaleeq" style={{ fontSize: '12.5px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'right' }}>
-              وصول رقم (Rs):
+            <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12.5px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
+              {t('وصول رقم:', 'Amount Received (Rs):')}
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
               <input
@@ -930,22 +850,25 @@ export const CustomerLedgerView: React.FC = () => {
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
                   outline: 'none',
-                  padding: '0 40px 0 12px',
+                  padding: '0 12px 0 40px',
+                  direction: 'ltr',
+                  textAlign: 'right',
                 }}
               />
               <span
                 style={{
                   position: 'absolute',
-                  right: '10px',
+                  left: '10px',
                   fontSize: '12px',
                   fontWeight: 900,
                   color: '#4A2810',
                   backgroundColor: '#FAF3E8',
                   padding: '2px 6px',
                   borderRadius: '5px',
+                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
                 }}
               >
-                Rs
+                {isUrdu ? 'روپے' : 'Rs'}
               </span>
             </div>
 
@@ -958,9 +881,9 @@ export const CustomerLedgerView: React.FC = () => {
                 width: '100%',
                 height: '44px',
                 borderRadius: '10px',
-                background: 'linear-gradient(135deg, #D4ADA0 0%, #BE9685 50%, #A67E6D 100%)',
+                background: '#21BF06',
                 color: '#FFFFFF',
-                border: '1.5px solid #E8CDC2',
+                border: 'none',
                 fontSize: '14.5px',
                 fontWeight: 900,
                 cursor: 'pointer',
@@ -968,11 +891,10 @@ export const CustomerLedgerView: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                boxShadow: '0 4px 12px rgba(190, 150, 133, 0.30)',
               }}
             >
               <Check size={16} strokeWidth={2.5} />
-              <span className="font-nastaleeq">وصولی محفوظ کریں</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('وصولی محفوظ کریں', 'Save Payment')}</span>
             </button>
           </div>
         </div>
@@ -1008,8 +930,8 @@ export const CustomerLedgerView: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontSize: '18px' }}>👤➕</span>
-                <h3 className="font-nastaleeq" style={{ fontSize: '18px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
-                  نیا کھاتہ کھولیں
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+                  {t('نیا کھاتہ کھولیں', 'Open New Ledger')}
                 </h3>
               </div>
               <button
@@ -1033,15 +955,15 @@ export const CustomerLedgerView: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
               <div>
-                <label className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'right' }}>
-                  گاہک کا نام:
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
+                  {t('گاہک کا نام:', 'Customer Name:')}
                 </label>
                 <input
                   type="text"
-                  placeholder="مثلاً: حاجی آصف"
+                  placeholder={t('مثلاً: حاجی آصف', 'e.g. Asif Khan')}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="font-nastaleeq"
+                  className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
                     width: '100%',
                     height: '40px',
@@ -1053,14 +975,14 @@ export const CustomerLedgerView: React.FC = () => {
                     outline: 'none',
                     fontWeight: 700,
                     fontSize: '13px',
-                    textAlign: 'right',
+                    textAlign: 'left',
                   }}
                 />
               </div>
 
               <div>
-                <label className="font-nastaleeq" style={{ fontSize: '13px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'right' }}>
-                  موبائل نمبر:
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
+                  {t('موبائل نمبر:', 'Mobile Phone:')}
                 </label>
                 <input
                   type="text"
@@ -1078,6 +1000,8 @@ export const CustomerLedgerView: React.FC = () => {
                     outline: 'none',
                     fontWeight: 700,
                     fontSize: '13px',
+                    textAlign: 'left',
+                    direction: 'ltr',
                   }}
                 />
               </div>
@@ -1091,9 +1015,9 @@ export const CustomerLedgerView: React.FC = () => {
                 width: '100%',
                 height: '42px',
                 borderRadius: '10px',
-                background: 'linear-gradient(135deg, #4A676B 0%, #374F52 50%, #2A3F42 100%)',
+                background: '#1877f2',
                 color: '#FFFFFF',
-                border: '1.5px solid #5F8387',
+                border: 'none',
                 fontSize: '14px',
                 fontWeight: 900,
                 cursor: 'pointer',
@@ -1101,11 +1025,10 @@ export const CustomerLedgerView: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                boxShadow: '0 4px 12px rgba(54, 79, 82, 0.25)',
               }}
             >
               <UserPlus size={15} color="#FFFFFF" />
-              <span className="font-nastaleeq">کھاتہ بنائیں</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کھاتہ بنائیں', 'Create Account')}</span>
             </button>
           </div>
         </div>
