@@ -646,7 +646,8 @@ billingRouter.post(
           });
 
           if (customer) {
-            const newBalance = customer.currentBalance - bill.netTotal;
+            const debtToReverse = Math.max(0, bill.netTotal - bill.receivedAmount);
+            const newBalance = customer.currentBalance - debtToReverse;
             await tx.customer.update({
               where: { id: customer.id },
               data: { currentBalance: newBalance },
@@ -657,7 +658,7 @@ billingRouter.post(
                 customerId: customer.id,
                 billId: bill.id,
                 type: 'ADJUSTMENT',
-                amount: bill.netTotal,
+                amount: debtToReverse,
                 description: `منسوخی بل #${bill.billNumber}: ${reason.trim()} (Void Bill)`,
                 balanceAfter: newBalance,
                 recordedById: req.user!.id,
