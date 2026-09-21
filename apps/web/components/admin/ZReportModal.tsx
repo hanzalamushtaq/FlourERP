@@ -15,6 +15,7 @@ import {
   HandCoins,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { getSession, ensureValidToken } from '../../lib/auth';
 
 interface ZReportModalProps {
   isOpen: boolean;
@@ -44,34 +45,111 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
     counter: '01',
     openedAt: '18/09/2026, 08:00 AM',
     closedAt: '18/09/2026, 06:45 PM',
-    totalSales: 184500,
-    totalPisai: 8640,
-    creditRecovery: 42000,
-    expenses: 3625,
-    expectedCash: 126500,
+    totalSales: 0,
+    totalPisai: 0,
+    creditRecovery: 0,
+    expenses: 0,
+    expectedCash: 0,
   },
 }) => {
   const { isUrdu, t } = useLanguage();
-  const [actualCashInput, setActualCashInput] = useState<string>('126500');
+  const [actualCashInput, setActualCashInput] = useState<string>('0');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isClosedSuccess, setIsClosedSuccess] = useState<boolean>(false);
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [backupFilename, setBackupFilename] = useState<string | null>(null);
+
+  const [liveData, setLiveData] = useState({
+    totalSales: shiftData.totalSales,
+    totalPisai: shiftData.totalPisai,
+    creditRecovery: shiftData.creditRecovery,
+    expenses: shiftData.expenses,
+    expectedCash: shiftData.expectedCash,
+    billCount: 0,
+    pisaiCount: 0,
+    isClosed: false,
+  });
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchPreview = async () => {
+      setIsLoadingMetrics(true);
+      setErrorMessage(null);
+      try {
+        const sess = getSession();
+        const token = await ensureValidToken(sess);
+        const res = await fetch('http://localhost:5000/api/closing/preview', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          const d = json.data;
+          setLiveData({
+            totalSales: d.cashSales ?? d.totalSales,
+            totalPisai: d.cashPisai ?? d.totalPisai,
+            creditRecovery: d.totalUdhaarCollected ?? 0,
+            expenses: d.totalExpenses ?? 0,
+            expectedCash: d.expectedCashInDrawer ?? 0,
+            billCount: d.billCount ?? 0,
+            pisaiCount: d.pisaiCount ?? 0,
+            isClosed: d.isClosed ?? false,
+          });
+          setActualCashInput(String(Math.round(d.expectedCashInDrawer ?? 0)));
+        }
+      } catch (err: any) {
+        console.error('Failed to load closing preview:', err);
+      } finally {
+        setIsLoadingMetrics(false);
+      }
+    };
+
+    fetchPreview();
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const activeExpectedCash = liveData.expectedCash;
   const actualCash = parseFloat(actualCashInput) || 0;
-  const discrepancy = actualCash - shiftData.expectedCash;
+  const discrepancy = actualCash - activeExpectedCash;
 
-  const handleExecuteClosing = () => {
+  const handleExecuteClosing = async () => {
     setIsProcessing(true);
-    setTimeout(() => {
+    setErrorMessage(null);
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch('http://localhost:5000/api/closing', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          actualCashInDrawer: actualCash,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setErrorMessage(json.error?.message || 'Failed to execute daily closing');
+        setIsProcessing(false);
+        return;
+      }
+
+      setBackupFilename(json.data?.backup?.filename || 'Backup Complete');
       setIsProcessing(false);
       setIsClosedSuccess(true);
       setTimeout(() => {
         onConfirmCloseShift();
         onClose();
         setIsClosedSuccess(false);
-      }, 1500);
-    }, 1200);
+      }, 2000);
+    } catch (err: any) {
+      setErrorMessage(`Network error: ${err.message}`);
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -195,6 +273,40 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
             </div>
           </div>
 
+          {/* Error / Closed status banner */}
+          {errorMessage && (
+            <div
+              style={{
+                backgroundColor: '#fef2f2',
+                border: '1.5px solid #f87171',
+                borderRadius: '10px',
+                padding: '10px 14px',
+                color: '#991b1b',
+                fontSize: '13px',
+                fontWeight: 700,
+              }}
+            >
+              {errorMessage}
+            </div>
+          )}
+
+          {liveData.isClosed && (
+            <div
+              style={{
+                backgroundColor: '#eff6ff',
+                border: '1.5px solid #60a5fa',
+                borderRadius: '10px',
+                padding: '10px 14px',
+                color: '#1e40af',
+                fontSize: '13px',
+                fontWeight: 800,
+              }}
+              className={isUrdu ? 'font-nastaleeq' : ''}
+            >
+              {t('یہ دن پہلے ہی بند اور محفوظ ہو چکا ہے۔ مزید ترمیم ممکن نہیں ہے۔', 'This business day is already closed and locked against backdated edits.')}
+            </div>
+          )}
+
           {/* Financial Breakdown Table */}
           <div
             style={{
@@ -217,7 +329,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کل نقد سیلز', 'Total Cash Sales')}</span>
               </span>
               <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `${shiftData.totalSales.toLocaleString()} روپے` : `Rs ${shiftData.totalSales.toLocaleString()}`}
+                {isUrdu ? `${liveData.totalSales.toLocaleString()} روپے` : `Rs ${liveData.totalSales.toLocaleString()}`}
               </strong>
             </div>
 
@@ -234,7 +346,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('گندم پسائی اجرت', 'Wheat Grinding Revenue')}</span>
               </span>
               <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `${shiftData.totalPisai.toLocaleString()} روپے` : `Rs ${shiftData.totalPisai.toLocaleString()}`}
+                {isUrdu ? `${liveData.totalPisai.toLocaleString()} روپے` : `Rs ${liveData.totalPisai.toLocaleString()}`}
               </strong>
             </div>
 
@@ -251,7 +363,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('ادھار وصولی', 'Credit Collected')}</span>
               </span>
               <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `${shiftData.creditRecovery.toLocaleString()} روپے` : `Rs ${shiftData.creditRecovery.toLocaleString()}`}
+                {isUrdu ? `${liveData.creditRecovery.toLocaleString()} روپے` : `Rs ${liveData.creditRecovery.toLocaleString()}`}
               </strong>
             </div>
 
@@ -270,7 +382,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('دکان کے اخراجات', 'Shop Expenses Paid')}</span>
               </span>
               <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `- ${shiftData.expenses.toLocaleString()} روپے` : `- Rs ${shiftData.expenses.toLocaleString()}`}
+                {isUrdu ? `- ${liveData.expenses.toLocaleString()} روپے` : `- Rs ${liveData.expenses.toLocaleString()}`}
               </strong>
             </div>
 
@@ -288,7 +400,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                 {t('سسٹم کیش دراز بیلنس', 'Expected Drawer Cash Balance')}
               </span>
               <span style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)', color: '#0f172a' }}>
-                {isUrdu ? `${shiftData.expectedCash.toLocaleString()} روپے` : `Rs ${shiftData.expectedCash.toLocaleString()}`}
+                {isUrdu ? `${activeExpectedCash.toLocaleString()} روپے` : `Rs ${activeExpectedCash.toLocaleString()}`}
               </span>
             </div>
           </div>

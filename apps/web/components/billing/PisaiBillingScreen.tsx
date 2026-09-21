@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
-import { Printer, BookOpen, Check, Cog, Ticket, Sparkles } from 'lucide-react';
+import { Printer, BookOpen, Check, Cog, Ticket, Sparkles, Tag, Lock, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { getSession, ensureValidToken, clearSession } from '../../lib/auth';
+import { sound } from '../../lib/audioFeedback';
 
 // 1. Handcrafted Vector SVGs matching the Dashboard & Billing Aesthetic
 const SafaiPisaiSvg = () => (
@@ -57,8 +59,15 @@ export const PisaiBillingScreen: React.FC = () => {
   const [weightKg, setWeightKg] = useState<string>('25');
   const [serviceType, setServiceType] = useState<'safai_pisai' | 'pisai'>('safai_pisai');
   const [chargeAmount, setChargeAmount] = useState<string>('150');
+  const [discountValue, setDiscountValue] = useState<string>('0');
+  const [showDiscount, setShowDiscount] = useState<boolean>(false);
   const [receivedAmount, setReceivedAmount] = useState<string>('150');
   const [isReceivedAutoUpdated, setIsReceivedAutoUpdated] = useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const session = getSession();
+  const canDiscount = !!(session?.permissions?.includes('can_discount') || session?.role === 'SuperAdmin');
+  const canCredit = !!(session?.permissions?.includes('can_issue_credit') || session?.role === 'SuperAdmin');
 
   // Customer State & Autocomplete
   const [customerName, setCustomerName] = useState<string>('');
@@ -71,7 +80,7 @@ export const PisaiBillingScreen: React.FC = () => {
   const [hoveredBtn, setHoveredBtn] = useState<'print' | 'credit' | null>(null);
   const [pressedBtn, setPressedBtn] = useState<'print' | 'credit' | null>(null);
 
-  const [tokenCounter, setTokenCounter] = useState<number>(482);
+  const [currentTokenFormatted, setCurrentTokenFormatted] = useState<string>('0101');
 
   // Receipt Modal State
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
@@ -86,17 +95,19 @@ export const PisaiBillingScreen: React.FC = () => {
   const currentRate = PISAI_RATES[serviceType];
   const numWeight = parseFloat(weightKg) || 0;
   const numCharge = parseFloat(chargeAmount) || 0;
+  const numDiscount = parseFloat(discountValue) || 0;
+  const netTotal = Math.max(0, numCharge - numDiscount);
 
-  // Sync received amount when charge amount changes
+  // Sync received amount when charge or discount changes
   useEffect(() => {
     if (isReceivedAutoUpdated) {
-      setReceivedAmount(chargeAmount);
+      setReceivedAmount(String(netTotal));
     }
-  }, [chargeAmount, isReceivedAutoUpdated]);
+  }, [netTotal, isReceivedAutoUpdated]);
 
   const numReceived = parseFloat(receivedAmount) || 0;
-  const balanceRemaining = Math.max(0, numCharge - numReceived);
-  const changeToReturn = Math.max(0, numReceived - numCharge);
+  const balanceRemaining = Math.max(0, netTotal - numReceived);
+  const changeToReturn = Math.max(0, numReceived - netTotal);
 
   // Auto-focus weight input on service switch
   useEffect(() => {
@@ -104,24 +115,59 @@ export const PisaiBillingScreen: React.FC = () => {
     weightInputRef.current?.select();
   }, [serviceType]);
 
-  // Autocomplete
+  // Fetch next upcoming token on mount
+  useEffect(() => {
+    const sess = getSession();
+    fetch('http://localhost:5000/api/pisai?limit=1', {
+      headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data?.records && json.data.records.length > 0) {
+          const latestToken = json.data.records[0].tokenNumber;
+          setCurrentTokenFormatted(String(latestToken + 1).padStart(4, '0'));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Autocomplete via /api/customers/search with local fallback
   const handleCustomerNameChange = (val: string) => {
     setCustomerName(val);
     if (val.trim().length > 0) {
-      const filtered = MOCK_CUSTOMERS.filter((c) =>
-        c.name.toLowerCase().includes(val.toLowerCase())
-      );
-      setSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
+      const sess = getSession();
+      fetch(`http://localhost:5000/api/customers/search?q=${encodeURIComponent(val)}`, {
+        headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data.customers && json.data.customers.length > 0) {
+            setSuggestions(json.data.customers);
+            setShowSuggestions(true);
+          } else {
+            const filtered = MOCK_CUSTOMERS.filter((c) =>
+              c.name.toLowerCase().includes(val.toLowerCase())
+            );
+            setSuggestions(filtered);
+            setShowSuggestions(filtered.length > 0);
+          }
+        })
+        .catch(() => {
+          const filtered = MOCK_CUSTOMERS.filter((c) =>
+            c.name.toLowerCase().includes(val.toLowerCase())
+          );
+          setSuggestions(filtered);
+          setShowSuggestions(filtered.length > 0);
+        });
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
     }
   };
 
-  const handleSelectCustomer = (cust: { name: string; phone: string }) => {
+  const handleSelectCustomer = (cust: { name: string; phone?: string | null }) => {
     setCustomerName(cust.name);
-    setCustomerPhone(cust.phone);
+    setCustomerPhone(cust.phone || '');
     setShowSuggestions(false);
     feeInputRef.current?.focus();
   };
@@ -148,39 +194,112 @@ export const PisaiBillingScreen: React.FC = () => {
     }
   };
 
-  // Submit Logic
-  const handleFinalSubmit = (forcedCredit?: boolean) => {
+  // Submit Logic connecting to backend /api/pisai
+  const handleFinalSubmit = async (forcedCredit?: boolean) => {
     if (numWeight <= 0 || numCharge <= 0) {
-      alert('برائے مہربانی وزن اور اجرت کی رقم درج کریں۔');
+      alert(isUrdu ? 'برائے مہربانی وزن اور اجرت کی رقم درج کریں۔' : 'Please enter wheat weight and fee.');
       weightInputRef.current?.focus();
+      return;
+    }
+
+    if (numDiscount > 0 && !canDiscount) {
+      alert(isUrdu ? 'آپ کو رعایت دینے کا اختیار حاصل نہیں ہے۔' : 'You do not have permission to apply discounts.');
       return;
     }
 
     const hasCustomerDetails = customerName.trim().length > 0;
     const isCreditSale = forcedCredit !== undefined ? forcedCredit : (hasCustomerDetails || balanceRemaining > 0);
 
-    const tokenFormatted = String(tokenCounter).padStart(4, '0');
-    setTokenCounter((prev) => prev + 1);
+    if (isCreditSale && !canCredit) {
+      alert(isUrdu ? 'آپ کو ادھار جاری کرنے کا اختیار حاصل نہیں ہے۔' : 'You do not have permission to issue credit.');
+      return;
+    }
 
-    const receipt: ReceiptData = {
-      type: 'pisai',
-      billNumber: `PISAI-${tokenFormatted}`,
-      pisaiToken: tokenFormatted,
-      timestamp: new Date().toLocaleString('en-US', { hour12: true }),
-      billerName: 'محمد عاصف (کاؤنٹر 01)',
-      customerName: customerName.trim() || undefined,
-      isCredit: isCreditSale,
-      serviceType: serviceType === 'safai_pisai' ? 'صفائی و پسائی' : 'صرف پسائی',
-      pisaiWeightKg: numWeight,
-      subtotal: numCharge,
-      discount: 0,
-      netTotal: numCharge,
-      cashReceived: numReceived,
-      remainingBalance: balanceRemaining,
-    };
+    const sess = getSession();
+    setIsSubmitting(true);
 
-    setReceiptData(receipt);
-    setIsReceiptOpen(true);
+    try {
+      let token = await ensureValidToken(sess);
+
+      const payload = {
+        serviceType: serviceType === 'safai_pisai' ? 'SAFAI_PISAI' : 'PISAI_ONLY',
+        weightKg: numWeight,
+        ratePerKg: currentRate,
+        feeAmount: numCharge,
+        discount: numDiscount,
+        receivedAmount: isCreditSale ? 0 : numReceived,
+        paymentMethod: isCreditSale ? 'CREDIT' : 'CASH',
+        customerName: customerName.trim() || undefined,
+        customerPhone: customerPhone.trim() || undefined,
+      };
+
+      let res = await fetch('http://localhost:5000/api/pisai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.status === 401) {
+        token = await ensureValidToken(sess);
+        if (token) {
+          res = await fetch('http://localhost:5000/api/pisai', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          });
+        }
+      }
+
+      if (res.status === 401) {
+        alert(isUrdu ? 'سیشن ختم ہو چکا ہے۔ برائے مہربانی دوبارہ لاگ ان کریں۔' : 'Session expired. Please log in again.');
+        clearSession();
+        window.location.reload();
+        return;
+      }
+
+      const json = await res.json();
+      if (!json.success) {
+        sound.playWarningSound();
+        alert(json.error?.message || 'Error generating grinding ticket');
+        return;
+      }
+
+      const created = json.data.ticket;
+      sound.playSuccessChime();
+      // Advance next token counter for upcoming ticket
+      setCurrentTokenFormatted(String(created.tokenNumber + 1).padStart(4, '0'));
+
+      const receipt: ReceiptData = {
+        type: 'pisai',
+        billNumber: `PISAI-${created.tokenFormatted}`,
+        pisaiToken: created.tokenFormatted,
+        timestamp: new Date(created.createdAt).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        billerName: created.biller?.fullName || sess?.fullName || (isUrdu ? 'محمد عاصف (کاؤنٹر 01)' : 'Muhammad Asif'),
+        customerName: created.customerName || undefined,
+        isCredit: created.paymentMethod === 'CREDIT',
+        serviceType: created.serviceType === 'SAFAI_PISAI' ? 'صفائی و پسائی' : 'صرف پسائی',
+        pisaiWeightKg: created.weightKg,
+        subtotal: created.feeAmount,
+        discount: created.discount,
+        netTotal: created.netTotal,
+        cashReceived: created.receivedAmount,
+        remainingBalance: created.paymentMethod === 'CREDIT' ? created.netTotal : 0,
+      };
+
+      setReceiptData(receipt);
+      setIsReceiptOpen(true);
+    } catch (err: any) {
+      sound.playWarningSound();
+      alert(`Network error: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -568,6 +687,85 @@ export const PisaiBillingScreen: React.FC = () => {
                 {isUrdu ? 'روپے' : 'Rs'}
               </span>
             </div>
+
+            {/* 2b. Optional RBAC Discount Control */}
+            {canDiscount && (
+              <div style={{ marginTop: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (showDiscount) {
+                        setDiscountValue('0');
+                      }
+                      setShowDiscount(!showDiscount);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#D97706',
+                      fontSize: '12px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {showDiscount ? t('− رعایت ہٹائیں', '− Remove Discount') : t('+ رعایت درج کریں (مجاز)', '+ Add Discount (Authorized)')}
+                    </span>
+                  </button>
+                  {showDiscount && (
+                    <span style={{ fontSize: '11px', color: '#16A34A', fontWeight: 800 }}>
+                      {isUrdu ? 'مجاز رعایت' : 'Authorized'}
+                    </span>
+                  )}
+                </div>
+
+                {showDiscount && (
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input
+                      type="number"
+                      step="any"
+                      min="0"
+                      value={discountValue}
+                      onChange={(e) => {
+                        setDiscountValue(e.target.value);
+                        setIsReceivedAutoUpdated(true);
+                      }}
+                      placeholder="0"
+                      style={{
+                        width: '100%',
+                        height: '42px',
+                        borderRadius: '10px',
+                        border: '1.5px dashed #F59E0B',
+                        backgroundColor: '#FFFBEB',
+                        fontSize: '18px',
+                        fontWeight: 900,
+                        fontFamily: 'var(--font-mono)',
+                        color: '#B45309',
+                        padding: '0 54px 0 14px',
+                        direction: 'ltr',
+                        outline: 'none',
+                      }}
+                    />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: '#B45309',
+                      }}
+                    >
+                      {isUrdu ? 'روپے رعایت' : 'Rs Off'}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 3. Cash Received */}
@@ -791,7 +989,7 @@ export const PisaiBillingScreen: React.FC = () => {
                 }}
               >
                 <Ticket size={14} color="#D97706" />
-                <span>#{String(tokenCounter).padStart(4, '0')}</span>
+                <span>#{currentTokenFormatted}</span>
               </div>
             </div>
 
@@ -806,8 +1004,15 @@ export const PisaiBillingScreen: React.FC = () => {
                 letterSpacing: '-0.5px',
               }}
             >
-              {isUrdu ? `${numCharge.toLocaleString()} روپے` : `Rs ${numCharge.toLocaleString()}`}
+              {isUrdu ? `${netTotal.toLocaleString()} روپے` : `Rs ${netTotal.toLocaleString()}`}
             </div>
+
+            {numDiscount > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#16A34A', fontSize: '13px', fontWeight: 800, marginTop: '-4px' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('رعایت:', 'Discount:')}</span>
+                <span style={{ fontFamily: 'var(--font-mono)' }}>-Rs {numDiscount.toLocaleString()}</span>
+              </div>
+            )}
 
             {/* Breakdown Subtitle */}
             <div

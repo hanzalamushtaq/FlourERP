@@ -1,15 +1,15 @@
 # Project Roadmap: Flour Mill (Chakki) Billing & Management System
 
 ## Phase Summary Checklist
-- [ ] **Phase 1: Frontend UI & Dashboard Design** - Next.js UI setup, design system, Jameel Noori Nastaleeq Urdu typography, Biller touch interface (cards, weight↔amount modes, numeric keypad, Pisai ticket screen), Admin Dashboard, and idle PIN-lock overlay.
-- [ ] **Phase 2: Backend Foundation & Core Setup** - Express backend scaffolding, PostgreSQL migrations, session-based auth, PIN-lock backend, dynamic RBAC engine, and fine-grained permission middleware.
-- [ ] **Phase 3: Product Catalog & Price Management** - Product catalog CRUD, per-KG rates, `price_history` audit tracking, and 24-hour daily price confirmation workflow (Admin & Biller paths).
-- [ ] **Phase 4: Core Billing Engine (Standard Products)** - Dual-mode billing screen logic, permission-gated discounts, non-resetting sequential bill numbers with DB locks, rate guards, and thermal ESC/POS printing.
-- [ ] **Phase 5: Gundam Pisai (Grinding) Module** - Dedicated Pisai screen logic, service options, manual pricing, independent 4-digit token sequence (`0001`–`9999`), large-format token print, and credit/discount integration.
-- [ ] **Phase 6: Credit (Udhaar) & Ledger Module** - Admin credit issuance, customer profiles with payment history, derived balance tracking, and unified append-only financial ledger.
-- [ ] **Phase 7: Expenses, Returns, Reports** - Expense logging, standalone bill returns with ledger offsets, and reports dashboard with date/customer filtering.
-- [ ] **Phase 8: Daily Closing, Backup, Bill Void, Audit Log** - End-of-day summary snapshot, automated database backup trigger, bill/Pisai voiding with reversal entries, and synchronous activity logging.
-- [ ] **Phase 9: Testing, Polish & Deployment** - End-to-end billing tests, low-literacy staff usability refinements, mobile performance tuning, and production deployment scripts.
+- [x] **Phase 1: Frontend UI & Dashboard Design** - Next.js UI setup, design system, Jameel Noori Nastaleeq Urdu typography, Biller touch interface (cards, weight↔amount modes, numeric keypad, Pisai ticket screen), Admin Dashboard, and idle PIN-lock overlay.
+- [x] **Phase 2: Backend Foundation & Core Setup** - Express backend scaffolding, PostgreSQL migrations, session-based auth, PIN-lock backend, dynamic RBAC engine, and fine-grained permission middleware.
+- [x] **Phase 3: Product Catalog & Price Management** - Product catalog CRUD, per-KG rates, `price_history` audit tracking, and 24-hour daily price confirmation workflow (Admin & Biller paths).
+- [x] **Phase 4: Core Billing Engine (Standard Products)** - Dual-mode billing screen logic, permission-gated discounts, non-resetting sequential bill numbers with DB locks, rate guards, and thermal ESC/POS printing.
+- [x] **Phase 5: Gundam Pisai (Grinding) Module** - Dedicated Pisai screen logic, service options, manual pricing, independent 4-digit token sequence (`0001`–`9999`), large-format token print, and credit/discount integration.
+- [x] **Phase 6: Credit (Udhaar) & Ledger Module** - Admin credit issuance, customer profiles with payment history, derived balance tracking, and unified append-only financial ledger.
+- [x] **Phase 7: Expenses, Returns, Reports** - Expense logging, standalone bill returns with ledger offsets, and reports dashboard with date/customer filtering.
+- [x] **Phase 8: Daily Closing, Backup, Bill Void, Audit Log** - End-of-day summary snapshot, automated database backup trigger, bill/Pisai voiding with reversal entries, and synchronous activity logging.
+- [x] **Phase 9: Testing, Polish & Deployment** - End-to-end billing tests, low-literacy staff usability refinements, mobile performance tuning, and production deployment scripts.
 
 ---
 
@@ -18,13 +18,13 @@
 |-------|----------------|--------|-----------|
 | 1. Frontend UI & Dashboard Design | 3/3 | Completed | 2026-09-18 |
 | 2. Backend Foundation & Core Setup | 3/3 | Completed | 2026-09-19 |
-| 3. Product Catalog & Price Management | 0/2 | Not started | - |
-| 4. Core Billing Engine (Standard Products) | 0/3 | Not started | - |
-| 5. Gundam Pisai (Grinding) Module | 0/2 | Not started | - |
-| 6. Credit (Udhaar) & Ledger Module | 0/2 | Not started | - |
-| 7. Expenses, Returns, Reports | 0/2 | Not started | - |
-| 8. Daily Closing, Backup, Bill Void, Audit Log | 0/2 | Not started | - |
-| 9. Testing, Polish & Deployment | 0/2 | Not started | - |
+| 3. Product Catalog & Price Management | 1/1 | Completed | 2026-09-21 |
+| 4. Core Billing Engine (Standard Products) | 1/1 | Completed | 2026-09-21 |
+| 5. Gundam Pisai (Grinding) Module | 1/1 | Completed | 2026-09-21 |
+| 6. Credit (Udhaar) & Ledger Module | 1/1 | Completed | 2026-09-21 |
+| 7. Expenses, Returns, Reports | 1/1 | Completed | 2026-09-21 |
+| 8. Daily Closing, Backup, Bill Void, Audit Log | 1/1 | Completed | 2026-09-21 |
+| 9. Testing, Polish & Deployment | 1/1 | Completed | 2026-09-21 |
 
 ---
 
@@ -68,7 +68,8 @@
   2. Price modifications are logged automatically in `price_history` with user and timestamp.
   3. First bill of a calendar day triggers the price confirmation prompt (Admin update/keep flow).
   4. Biller price change requests hold the pending bill until Admin review or notify the Admin upon continuing.
-**Plans**: TBD
+**Plans**:
+  - [x] 03-01: Product Catalog CRUD, Rate History & Daily Confirmation Workflow
 **UI hint**: yes
 
 ### Phase 4: Core Billing Engine (Standard Products)
@@ -81,7 +82,8 @@
   3. Monotonic sequential bill numbers are generated via database locking with zero duplicates under concurrent taps.
   4. Products without set rates trigger a "Rate not set" block and warning.
   5. ESC/POS receipt generation dispatches thermal print payloads, and bills can be reprinted identically.
-**Plans**: TBD
+**Plans**:
+  - [x] 04-01: Core Billing Engine, Atomic Monotonic Sequencing, Rate/Discount Guards & Thermal ESC/POS Receipt Payload
 **UI hint**: yes
 
 ### Phase 5: Gundam Pisai (Grinding) Module
@@ -93,7 +95,8 @@
   2. Pisai tickets receive a dedicated, non-resetting 4-digit sequential token number (`0001`–`9999`).
   3. System prints large-format collection tickets for the customer.
   4. Pisai bills integrate with discount rules and credit assignment seamlessly.
-**Plans**: TBD
+**Plans**:
+  - [x] 05-01: Gundam Pisai Service Screen, Monotonic 4-Digit Token Sequencing, Thermal Ticket Payload & RBAC Guards
 **UI hint**: yes
 
 ### Phase 6: Credit (Udhaar) & Ledger Module
@@ -105,7 +108,8 @@
   2. Customer profile screen displays chronological bills, payments, and live derived balance.
   3. Cash repayments can be logged against outstanding balances in real time.
   4. Every financial event is recorded in the append-only `ledger_entries` table.
-**Plans**: TBD
+**Plans**:
+  - [x] 06-01: Customer Credit Profiles, Double-Entry Append-Only Ledger, Cash Repayments & Thermal Slip
 **UI hint**: yes
 
 ### Phase 7: Expenses, Returns, Reports
@@ -117,7 +121,8 @@
   2. Returns can be processed against original bills or Pisai tokens with offsetting ledger entries.
   3. Admin dashboard renders pre-aggregated cards for sales, grinding, expenses, and credit debt.
   4. Admin can filter reports by date range and search customer credit histories with export options.
-**Plans**: TBD
+**Plans**:
+  - [x] 07-01: Shop Expenses, Returns with Ledger Offsets, Owner KPI Aggregates & Ledger Stream CSV
 **UI hint**: yes
 
 ### Phase 8: Daily Closing, Backup, Bill Void, Audit Log

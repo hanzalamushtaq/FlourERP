@@ -78,6 +78,49 @@ export function clearSession(): void {
   }
 }
 
+export async function ensureValidToken(user?: UserSession | null): Promise<string | null> {
+  const current = user || getSession();
+  if (!current) return null;
+
+  // If token is already a real 3-part JWT
+  if (current.token && current.token.split('.').length === 3) {
+    return current.token;
+  }
+
+  // Token is local or mock, automatically obtain real JWT from backend API
+  const uname = current.username?.toLowerCase();
+  const preset = PRESET_USERS[uname];
+  if (preset) {
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: preset.username,
+          password: preset.pass,
+        }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data?.token) {
+          const updated: UserSession = {
+            ...current,
+            id: json.data.user.id,
+            token: json.data.token,
+            permissions: json.data.user.permissions || current.permissions,
+          };
+          saveSession(updated);
+          return json.data.token;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to auto-upgrade session token', e);
+    }
+  }
+
+  return current.token || null;
+}
+
 export function hasPermission(user: UserSession | null, permissionCode: string): boolean {
   if (!user) return false;
   // SuperAdmin has wildcard access

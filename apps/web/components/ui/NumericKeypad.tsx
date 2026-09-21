@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Delete, XCircle } from 'lucide-react';
+import { sound } from '../../lib/audioFeedback';
 
 interface NumericKeypadProps {
   onKeyPress: (key: string) => void;
@@ -20,6 +21,21 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
 }) => {
   const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0'];
 
+  const handlePress = (digit: string) => {
+    sound.playKeyClick();
+    onKeyPress(digit);
+  };
+
+  const handleClear = () => {
+    sound.playKeyClick();
+    onClear();
+  };
+
+  const handleBackspace = () => {
+    sound.playKeyClick();
+    onBackspace();
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
 
@@ -35,7 +51,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
           <button
             key={digit}
             type="button"
-            onClick={() => onKeyPress(digit)}
+            onClick={() => handlePress(digit)}
             className="touch-active"
             style={{
               height: '48px',
@@ -59,7 +75,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
         {/* Backspace Key */}
         <button
           type="button"
-          onClick={onBackspace}
+          onClick={handleBackspace}
           className="touch-active"
           style={{
             height: '62px',
@@ -81,7 +97,7 @@ export const NumericKeypad: React.FC<NumericKeypadProps> = ({
       {/* Clear Button */}
       <button
         type="button"
-        onClick={onClear}
+        onClick={handleClear}
         className="touch-active"
         style={{
           height: '46px',

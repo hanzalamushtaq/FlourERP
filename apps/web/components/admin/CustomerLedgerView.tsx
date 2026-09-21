@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getSession, ensureValidToken } from '../../lib/auth';
 import {
   Search,
   UserPlus,
@@ -98,56 +99,147 @@ export const CustomerLedgerView: React.FC = () => {
   const [hoveredRepayBtn, setHoveredRepayBtn] = useState<boolean>(false);
   const [pressedRepayBtn, setPressedRepayBtn] = useState<boolean>(false);
 
+  // Load Customers on mount and search change
+  const loadCustomers = async (q?: string) => {
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const url = q && q.trim().length > 0
+        ? `http://localhost:5000/api/customers?q=${encodeURIComponent(q.trim())}`
+        : 'http://localhost:5000/api/customers';
+      const res = await fetch(url, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (json.success && json.data.customers && json.data.customers.length > 0) {
+        const enriched: Customer[] = json.data.customers.map((c: any) => ({
+          ...c,
+          transactions: Array.isArray(c.transactions) ? c.transactions : [],
+        }));
+        setCustomers(enriched);
+        setSelectedCustomer((curr) => {
+          const match = enriched.find((c: Customer) => c.id === curr?.id);
+          if (match) {
+            return {
+              ...match,
+              transactions: (curr?.transactions && curr.transactions.length > 0) ? curr.transactions : match.transactions,
+            };
+          }
+          return enriched[0];
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load customers from API:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadCustomers(searchQuery);
+  }, [searchQuery]);
+
+  // Load detailed transactions when selected customer changes
+  useEffect(() => {
+    if (!selectedCustomer?.id || selectedCustomer.id === 'c1' || selectedCustomer.id === 'c2') return;
+    const sess = getSession();
+    ensureValidToken(sess).then((token) => {
+      fetch(`http://localhost:5000/api/customers/${selectedCustomer.id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data.customer) {
+            setSelectedCustomer((prev) => ({
+              ...prev,
+              ...json.data.customer,
+            }));
+          }
+        })
+        .catch(() => {});
+    });
+  }, [selectedCustomer?.id]);
+
   const filteredCustomers = customers.filter(
     (c) =>
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.phone.includes(searchQuery)
   );
 
-  const handleRecordPayment = () => {
+  const handleRecordPayment = async () => {
     const amount = parseFloat(repaymentAmount) || 0;
-    if (amount <= 0) return;
+    if (amount <= 0 || !selectedCustomer?.id) return;
 
-    const updatedCustomer: Customer = {
-      ...selectedCustomer,
-      balance: Math.max(0, selectedCustomer.balance - amount),
-      lastActivity: isUrdu ? 'ابھی' : 'Just now',
-      transactions: [
-        {
-          id: `t_${Date.now()}`,
-          date: isUrdu ? 'آج (ابھی)' : 'Today (Now)',
-          type: 'payment',
-          description: t('نقد ادھار وصولی', 'Cash Payment Received'),
-          amount,
-          runningBalance: Math.max(0, selectedCustomer.balance - amount),
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch(`http://localhost:5000/api/customers/${selectedCustomer.id}/repayments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        ...selectedCustomer.transactions,
-      ],
-    };
+        body: JSON.stringify({
+          amount,
+          paymentMethod: 'CASH',
+        }),
+      });
 
-    setCustomers((prev) =>
-      prev.map((c) => (c.id === selectedCustomer.id ? updatedCustomer : c))
-    );
-    setSelectedCustomer(updatedCustomer);
-    setIsRepaymentOpen(false);
-    setRepaymentAmount('');
+      const json = await res.json();
+      if (!json.success) {
+        alert(json.error?.message || 'Repayment failed');
+        return;
+      }
+
+      setIsRepaymentOpen(false);
+      setRepaymentAmount('');
+
+      // Refresh customer profile & list
+      await loadCustomers(searchQuery);
+      if (selectedCustomer?.id) {
+        const detailRes = await fetch(`http://localhost:5000/api/customers/${selectedCustomer.id}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const detailJson = await detailRes.json();
+        if (detailJson.success && detailJson.data.customer) {
+          setSelectedCustomer(detailJson.data.customer);
+        }
+      }
+    } catch (err: any) {
+      alert(`Network error: ${err.message}`);
+    }
   };
 
-  const handleCreateCustomer = () => {
+  const handleCreateCustomer = async () => {
     if (!newName.trim()) return;
-    const newCust: Customer = {
-      id: `c_${Date.now()}`,
-      name: newName.trim(),
-      phone: newPhone.trim() || 'No phone',
-      balance: 0,
-      lastActivity: isUrdu ? 'نیا کھاتہ' : 'New Account',
-      transactions: [],
-    };
-    setCustomers([newCust, ...customers]);
-    setSelectedCustomer(newCust);
-    setIsNewCustomerOpen(false);
-    setNewName('');
-    setNewPhone('');
+
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch('http://localhost:5000/api/customers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          name: newName.trim(),
+          phone: newPhone.trim() || undefined,
+        }),
+      });
+
+      const json = await res.json();
+      if (!json.success) {
+        alert(json.error?.message || 'Failed to create customer');
+        return;
+      }
+
+      setIsNewCustomerOpen(false);
+      setNewName('');
+      setNewPhone('');
+
+      await loadCustomers(searchQuery);
+    } catch (err: any) {
+      alert(`Network error: ${err.message}`);
+    }
   };
 
   const totalOutstandingUdhaar = customers.reduce((sum, c) => sum + c.balance, 0);
@@ -657,7 +749,7 @@ export const CustomerLedgerView: React.FC = () => {
                   border: 'none',
                 }}
               >
-                {selectedCustomer.transactions.length} {t('اندراج', 'entries')}
+                {(selectedCustomer?.transactions?.length || 0)} {t('اندراج', 'entries')}
               </span>
             </div>
 
@@ -671,12 +763,12 @@ export const CustomerLedgerView: React.FC = () => {
                 padding: '4px 2px 6px 2px',
               }}
             >
-              {selectedCustomer.transactions.length === 0 ? (
+              {(!selectedCustomer?.transactions || selectedCustomer.transactions.length === 0) ? (
                 <div style={{ padding: '20px', textAlign: 'center', color: '#64748B', fontSize: '12px', fontWeight: 700 }}>
                   {t('کوئی ٹرانزیکشن موجود نہیں ہے۔', 'No transactions found.')}
                 </div>
               ) : (
-                selectedCustomer.transactions.map((tx) => (
+                (selectedCustomer.transactions || []).map((tx) => (
                   <div
                     key={tx.id}
                     style={{

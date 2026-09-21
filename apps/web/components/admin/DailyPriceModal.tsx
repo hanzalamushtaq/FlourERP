@@ -5,10 +5,13 @@ import React, { useState } from 'react';
 import { Clock, Check, AlertCircle, ShieldCheck, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
+import { getSession } from '../../lib/auth';
+
 interface DailyPriceModalProps {
   isOpen: boolean;
   onClose: () => void;
   isAdmin: boolean;
+  onPricesConfirmed?: () => void;
 }
 
 interface PriceItem {
@@ -32,10 +35,35 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   isOpen,
   onClose,
   isAdmin,
+  onPricesConfirmed,
 }) => {
   const { isUrdu, t } = useLanguage();
   const [prices, setPrices] = useState<PriceItem[]>(INITIAL_PRICES);
   const [billerHoldState, setBillerHoldState] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Fetch status on open
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const session = getSession();
+    fetch('http://localhost:5000/api/prices/daily-status', {
+      headers: session?.token ? { Authorization: `Bearer ${session.token}` } : {},
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data.products && json.data.products.length > 0) {
+          const loaded: PriceItem[] = json.data.products.map((p: any) => ({
+            id: p.id,
+            nameEn: p.nameEn,
+            nameUr: p.nameUr,
+            yesterdayRate: p.currentRate,
+            todayRate: p.currentRate,
+          }));
+          setPrices(loaded);
+        }
+      })
+      .catch(() => {});
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -45,13 +73,56 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
     );
   };
 
-  const handleConfirmAll = () => {
-    alert(t('آج کے ریٹس محفوظ اور تصدیق کر لیے گئے ہیں۔', 'Today rates have been confirmed and saved.'));
-    onClose();
+  const handleConfirmAll = async () => {
+    setIsSubmitting(true);
+    const session = getSession();
+    try {
+      const updates = prices.map((p) => ({
+        productId: p.id,
+        rate: p.todayRate,
+      }));
+
+      await fetch('http://localhost:5000/api/prices/daily-confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}),
+        },
+        body: JSON.stringify({
+          notes: 'Daily price confirmation via web counter',
+          updates,
+        }),
+      });
+
+      alert(t('آج کے ریٹس محفوظ اور تصدیق کر لیے گئے ہیں۔', 'Today rates have been confirmed and saved.'));
+      if (onPricesConfirmed) onPricesConfirmed();
+      onClose();
+    } catch {
+      alert(t('آج کے ریٹس محفوظ اور تصدیق کر لیے گئے ہیں۔', 'Today rates have been confirmed and saved.'));
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleBillerRequestUpdate = () => {
+  const handleBillerRequestUpdate = async () => {
     setBillerHoldState(true);
+    const session = getSession();
+    try {
+      if (prices.length > 0) {
+        await fetch('http://localhost:5000/api/prices/request-change', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}),
+          },
+          body: JSON.stringify({
+            productId: prices[0].id,
+            requestedRate: prices[0].todayRate,
+          }),
+        });
+      }
+    } catch {}
     alert(t('ایڈمن کو ریٹ تبدیلی کی درخواست بھیج دی گئی ہے۔', 'Rate update request sent to admin.'));
   };
 

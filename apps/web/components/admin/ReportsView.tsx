@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Calendar, Download, PlusCircle, ArrowUpRight, ArrowDownLeft, RotateCcw, Filter, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { getSession, ensureValidToken } from '../../lib/auth';
+import { Calendar, Download, PlusCircle, ArrowUpRight, ArrowDownLeft, RotateCcw, Filter, X, Ban, ShieldAlert, History, FileText } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface LedgerItem {
@@ -27,6 +28,7 @@ const INITIAL_LEDGER: LedgerItem[] = [
 
 export const ReportsView: React.FC = () => {
   const { isUrdu, t } = useLanguage();
+  const [activeSubTab, setActiveSubTab] = useState<'financial' | 'audit'>('financial');
   const [ledger, setLedger] = useState<LedgerItem[]>(INITIAL_LEDGER);
   const [dateFilter, setDateFilter] = useState<'today' | 'yesterday' | '7days' | 'month'>('today');
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
@@ -34,25 +36,160 @@ export const ReportsView: React.FC = () => {
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('Electricity');
 
-  const handleAddExpense = () => {
+  // Void Modal State
+  const [voidModalOpen, setVoidModalOpen] = useState(false);
+  const [targetVoidItem, setTargetVoidItem] = useState<{ id: string; type: 'bill' | 'pisai'; ref: string } | null>(null);
+  const [voidReason, setVoidReason] = useState('');
+  const [isVoiding, setIsVoiding] = useState(false);
+
+  // Audit Logs State
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [isLoadingAudit, setIsLoadingAudit] = useState(false);
+
+  // Fetch Ledger Stream from API
+  const fetchLedgerStream = async (range: string) => {
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch(`http://localhost:5000/api/reports/ledger-stream?range=${range}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (json.success && json.data.items) {
+        setLedger(json.data.items);
+      }
+    } catch (err) {
+      console.error('Failed to load ledger stream:', err);
+    }
+  };
+
+  // Fetch Audit Logs from API (AUDIT-01)
+  const fetchAuditLogs = async () => {
+    setIsLoadingAudit(true);
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch('http://localhost:5000/api/audit-logs?limit=50', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (json.success && json.data.logs) {
+        setAuditLogs(json.data.logs);
+      }
+    } catch (err) {
+      console.error('Failed to load audit logs:', err);
+    } finally {
+      setIsLoadingAudit(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSubTab === 'financial') {
+      fetchLedgerStream(dateFilter);
+    } else {
+      fetchAuditLogs();
+    }
+  }, [dateFilter, activeSubTab]);
+
+  const handleExecuteVoid = async () => {
+    if (!targetVoidItem || !voidReason.trim()) return;
+    setIsVoiding(true);
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const endpoint = targetVoidItem.type === 'bill'
+        ? `http://localhost:5000/api/bills/${targetVoidItem.id}/void`
+        : `http://localhost:5000/api/pisai/${targetVoidItem.id}/void`;
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ reason: voidReason.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        alert(json.error?.message || 'Failed to void transaction');
+        return;
+      }
+      setVoidModalOpen(false);
+      setVoidReason('');
+      setTargetVoidItem(null);
+      await fetchLedgerStream(dateFilter);
+    } catch (err: any) {
+      alert(`Network error: ${err.message}`);
+    } finally {
+      setIsVoiding(false);
+    }
+  };
+
+  const handleAddExpense = async () => {
     const amt = parseFloat(expenseAmount) || 0;
     if (amt <= 0 || !expenseDesc.trim()) return;
 
-    const newExpense: LedgerItem = {
-      id: `exp_${Date.now()}`,
-      timestamp: isUrdu ? 'آج، ابھی' : 'Today, Just Now',
-      category: 'EXPENSE',
-      description: `${expenseCategory}: ${expenseDesc.trim()}`,
-      descriptionUr: `${expenseCategory}: ${expenseDesc.trim()}`,
-      reference: `EXP-${Math.floor(100 + Math.random() * 900)}`,
-      amount: amt,
-      type: 'outflow',
+    const catMap: Record<string, 'ELECTRICITY' | 'LABOR' | 'TEA_FOOD' | 'MAINTENANCE' | 'TRANSPORT' | 'MISC'> = {
+      Electricity: 'ELECTRICITY',
+      'Worker Tea / Food': 'TEA_FOOD',
+      Labor: 'LABOR',
+      'Shop Maintenance': 'MAINTENANCE',
+      Transport: 'TRANSPORT',
+      'Other / Miscellaneous': 'MISC',
     };
 
-    setLedger([newExpense, ...ledger]);
-    setIsExpenseOpen(false);
-    setExpenseDesc('');
-    setExpenseAmount('');
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch('http://localhost:5000/api/expenses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          category: catMap[expenseCategory] || 'MISC',
+          description: expenseDesc.trim(),
+          amount: amt,
+        }),
+      });
+
+      const json = await res.json();
+      if (!json.success) {
+        alert(json.error?.message || 'Failed to record expense');
+        return;
+      }
+
+      setIsExpenseOpen(false);
+      setExpenseDesc('');
+      setExpenseAmount('');
+
+      // Reload ledger stream
+      await fetchLedgerStream(dateFilter);
+    } catch (err: any) {
+      alert(`Network error: ${err.message}`);
+    }
+  };
+
+  const handleExportCsv = async () => {
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch(`http://localhost:5000/api/reports/export-csv?range=${dateFilter}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `flour-erp-${dateFilter}-report.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(`Export error: ${err.message}`);
+    }
   };
 
   const totalInflow = ledger
@@ -86,8 +223,57 @@ export const ReportsView: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
-      {/* Top Filter Bar & Actions */}
-      <div
+      {/* Sub-Tab Navigation */}
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid #C2C5AA', paddingBottom: '8px' }}>
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('financial')}
+          style={{
+            padding: '8px 18px',
+            borderRadius: '8px',
+            backgroundColor: activeSubTab === 'financial' ? '#414833' : '#F4F5EE',
+            color: activeSubTab === 'financial' ? '#F4F5EE' : '#414833',
+            border: '1.5px solid #414833',
+            fontSize: '13.5px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+          className={isUrdu ? 'font-nastaleeq' : ''}
+        >
+          <FileText size={16} />
+          <span>{t('مالیاتی لیجر و رپورٹس', 'Financial Ledger & Reports')}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('audit')}
+          style={{
+            padding: '8px 18px',
+            borderRadius: '8px',
+            backgroundColor: activeSubTab === 'audit' ? '#414833' : '#F4F5EE',
+            color: activeSubTab === 'audit' ? '#F4F5EE' : '#414833',
+            border: '1.5px solid #414833',
+            fontSize: '13.5px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+          className={isUrdu ? 'font-nastaleeq' : ''}
+        >
+          <History size={16} />
+          <span>{t('سرگرمی اور آڈٹ ٹریل (Audit Log)', 'Activity & Audit Trail')}</span>
+        </button>
+      </div>
+
+      {activeSubTab === 'financial' ? (
+        <>
+          {/* Top Filter Bar & Actions */}
+          <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -162,7 +348,7 @@ export const ReportsView: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => alert(isUrdu ? 'CSV فائل ڈاؤنلوڈ ہو گئی' : 'Simulated CSV export generated')}
+            onClick={handleExportCsv}
             className="touch-active"
             style={{
               height: '42px',
@@ -246,7 +432,7 @@ export const ReportsView: React.FC = () => {
           className={isUrdu ? 'font-nastaleeq' : ''}
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.5fr 1fr 2fr 1.2fr 1fr',
+            gridTemplateColumns: '1.4fr 0.9fr 1.8fr 1.1fr 1fr 0.8fr',
             padding: '12px 18px',
             backgroundColor: '#C2C5AA',
             borderBottom: '1.5px solid #B6AD90',
@@ -260,69 +446,362 @@ export const ReportsView: React.FC = () => {
           <span>{t('تفصیل', 'DESCRIPTION')}</span>
           <span>{t('حوالہ نمبر', 'REFERENCE')}</span>
           <span style={{ textAlign: 'right' }}>{t('رقم', 'AMOUNT')}</span>
+          <span style={{ textAlign: 'center' }}>{t('کارروائی', 'ACTION')}</span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {ledger.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.5fr 1fr 2fr 1.2fr 1fr',
-                padding: '12px 18px',
-                borderBottom: '1px solid #E8EAE0',
-                fontSize: '13.5px',
-                alignItems: 'center',
-              }}
-            >
-              <span style={{ color: '#414833', fontSize: '13px', fontWeight: 600 }}>{item.timestamp}</span>
+          {ledger.map((item) => {
+            const isVoidable =
+              (item.category === 'SALE' || item.category === 'PISAI') &&
+              !item.description.includes('منسوخ') &&
+              !item.description.includes('VOID');
 
-              <div>
-                <span
-                  className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    padding: '3px 9px',
-                    borderRadius: 'var(--radius-full)',
-                    backgroundColor: '#414833',
-                    color: '#F4F5EE',
-                    border: '1px solid #414833',
-                  }}
-                >
-                  {getCategoryLabel(item.category)}
-                </span>
-              </div>
-
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#414833', fontWeight: 700 }}>
-                {isUrdu && item.descriptionUr ? item.descriptionUr : item.description}
-              </span>
-              <span style={{ color: '#656D4A', fontFamily: 'var(--font-mono)', fontSize: '12.5px', fontWeight: 700 }}>{item.reference}</span>
-              <span
+            return (
+              <div
+                key={item.id}
                 style={{
-                  textAlign: 'right',
-                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
-                  fontWeight: 900,
-                  fontSize: '15px',
-                  color: item.type === 'inflow' ? '#414833' : '#7F4F24',
+                  display: 'grid',
+                  gridTemplateColumns: '1.4fr 0.9fr 1.8fr 1.1fr 1fr 0.8fr',
+                  padding: '12px 18px',
+                  borderBottom: '1px solid #E8EAE0',
+                  fontSize: '13.5px',
+                  alignItems: 'center',
                 }}
               >
-                {isUrdu
-                  ? item.type === 'inflow'
-                    ? `+ ${item.amount} روپے`
+                <span style={{ color: '#414833', fontSize: '13px', fontWeight: 600 }}>{item.timestamp}</span>
+
+                <div>
+                  <span
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      padding: '3px 9px',
+                      borderRadius: 'var(--radius-full)',
+                      backgroundColor: '#414833',
+                      color: '#F4F5EE',
+                      border: '1px solid #414833',
+                    }}
+                  >
+                    {getCategoryLabel(item.category)}
+                  </span>
+                </div>
+
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#414833', fontWeight: 700 }}>
+                  {isUrdu && item.descriptionUr ? item.descriptionUr : item.description}
+                </span>
+                <span style={{ color: '#656D4A', fontFamily: 'var(--font-mono)', fontSize: '12.5px', fontWeight: 700 }}>{item.reference}</span>
+                <span
+                  style={{
+                    textAlign: 'right',
+                    fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                    fontWeight: 900,
+                    fontSize: '15px',
+                    color: item.type === 'inflow' ? '#414833' : '#7F4F24',
+                  }}
+                >
+                  {isUrdu
+                    ? item.type === 'inflow'
+                      ? `+ ${item.amount} روپے`
+                      : item.type === 'outflow'
+                      ? `- ${item.amount} روپے`
+                      : `${item.amount} روپے`
+                    : item.type === 'inflow'
+                    ? `+ Rs ${item.amount}`
                     : item.type === 'outflow'
-                    ? `- ${item.amount} روپے`
-                    : `${item.amount} روپے`
-                  : item.type === 'inflow'
-                  ? `+ Rs ${item.amount}`
-                  : item.type === 'outflow'
-                  ? `- Rs ${item.amount}`
-                  : `Rs ${item.amount}`}
-              </span>
-            </div>
-          ))}
+                    ? `- Rs ${item.amount}`
+                    : `Rs ${item.amount}`}
+                </span>
+
+                <div style={{ textAlign: 'center' }}>
+                  {isVoidable ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const rawId = item.id.replace('bill-', '').replace('pisai-', '');
+                        setTargetVoidItem({
+                          id: rawId,
+                          type: item.category === 'SALE' ? 'bill' : 'pisai',
+                          ref: item.reference,
+                        });
+                        setVoidModalOpen(true);
+                      }}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        backgroundColor: '#fff1f2',
+                        color: '#b91c1c',
+                        border: '1px solid #fecaca',
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                      }}
+                      className={isUrdu ? 'font-nastaleeq' : ''}
+                    >
+                      {t('منسوخ کریں', 'Void')}
+                    </button>
+                  ) : (
+                    <span style={{ color: '#94a3b8', fontSize: '11px' }}>-</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
+      </>
+    ) : (
+      /* Audit Trail View */
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          border: '1.5px solid #B6AD90',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            padding: '14px 18px',
+            backgroundColor: '#C2C5AA',
+            borderBottom: '1.5px solid #B6AD90',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ShieldAlert size={18} color="#414833" />
+            <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, fontSize: '14px', color: '#414833' }}>
+              {t('محفوظ سسٹم لاگز (Synchronous Activity Audit Trail)', 'Immutable Activity Audit Trail')}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={fetchAuditLogs}
+            style={{
+              padding: '4px 10px',
+              borderRadius: '6px',
+              border: '1px solid #B6AD90',
+              backgroundColor: '#F4F5EE',
+              color: '#414833',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {t('تازہ کریں', 'Refresh')}
+          </button>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1.3fr 1.3fr 1.2fr 1fr 2fr',
+            padding: '10px 18px',
+            backgroundColor: '#E8EAE0',
+            fontWeight: 800,
+            fontSize: '12px',
+            color: '#414833',
+            borderBottom: '1px solid #B6AD90',
+          }}
+        >
+          <span>{t('تاریخ و وقت', 'TIMESTAMP')}</span>
+          <span>{t('ایکشن', 'ACTION')}</span>
+          <span>{t('صارف', 'USER')}</span>
+          <span>{t('شعبہ', 'ENTITY')}</span>
+          <span>{t('تفصیل', 'DETAILS')}</span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {isLoadingAudit ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+              {t('لاگز لوڈ ہو رہے ہیں...', 'Loading audit logs...')}
+            </div>
+          ) : auditLogs.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+              {t('کوئی سرگرمی لاگ موجود نہیں', 'No audit logs found.')}
+            </div>
+          ) : (
+            auditLogs.map((log) => {
+              let badgeColor = '#414833';
+              let badgeBg = '#E8EAE0';
+
+              if (log.action.includes('VOID')) {
+                badgeColor = '#991b1b';
+                badgeBg = '#fee2e2';
+              } else if (log.action.includes('CLOSING')) {
+                badgeColor = '#065f46';
+                badgeBg = '#d1fae5';
+              } else if (log.action.includes('DISCOUNT')) {
+                badgeColor = '#92400e';
+                badgeBg = '#fef3c7';
+              }
+
+              return (
+                <div
+                  key={log.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1.3fr 1.3fr 1.2fr 1fr 2fr',
+                    padding: '10px 18px',
+                    borderBottom: '1px solid #E8EAE0',
+                    fontSize: '12.5px',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span style={{ fontFamily: 'var(--font-mono)', color: '#64748b' }}>
+                    {new Date(log.createdAt).toLocaleString('en-PK')}
+                  </span>
+
+                  <div>
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        backgroundColor: badgeBg,
+                        color: badgeColor,
+                        border: `1px solid ${badgeColor}33`,
+                      }}
+                    >
+                      {log.action}
+                    </span>
+                  </div>
+
+                  <span style={{ fontWeight: 700, color: '#334155' }}>
+                    {log.user?.fullName || 'System'} ({log.user?.roleName || 'System'})
+                  </span>
+
+                  <span style={{ color: '#64748b', fontSize: '12px' }}>
+                    {log.entityType} {log.entityId ? `#${log.entityId.slice(0, 8)}` : ''}
+                  </span>
+
+                  <span style={{ color: '#475569', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
+                    {log.details ? JSON.stringify(log.details) : '-'}
+                  </span>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    )}
+
+      {/* Modal: Void Confirmation (VOID-01) */}
+      {voidModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9997,
+            backgroundColor: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '420px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '22px',
+              border: '1.5px solid #cbd5e1',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Ban size={20} color="#b91c1c" />
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: '16px', fontWeight: 900, color: '#991b1b' }}>
+                  {t('بل یا ٹوکن منسوخ کریں', 'Void Transaction')} ({targetVoidItem?.ref})
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setVoidModalOpen(false);
+                  setVoidReason('');
+                }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '13px', color: '#475569', margin: '0 0 14px' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+              {t(
+                'منسوخی کے بعد یہ بل باطل ہو جائے گا اور اگر ادھار پر تھا تو کھاتہ سے خودکار کٹوتی ہو جائے گی۔ اصل ڈیٹا ریکارڈ محفوظ رہے گا۔',
+                'Voiding marks this transaction as VOID and atomically reverses any customer credit balance. Original audit record is preserved.'
+              )}
+            </p>
+
+            <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '12.5px', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
+              {t('منسوخی کی وجہ (لازمی):', 'Void Reason (Required):')}
+            </label>
+            <input
+              type="text"
+              value={voidReason}
+              onChange={(e) => setVoidReason(e.target.value)}
+              placeholder={isUrdu ? 'مثلاً: غلط اندراج / کسٹمر نے واپسی کی' : 'e.g. Incorrect weight entry / customer cancelled'}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                border: '1.5px solid #cbd5e1',
+                fontSize: '13.5px',
+                marginBottom: '18px',
+                outline: 'none',
+              }}
+              className={isUrdu ? 'font-nastaleeq' : ''}
+            />
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setVoidModalOpen(false);
+                  setVoidReason('');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1.5px solid #cbd5e1',
+                  backgroundColor: '#ffffff',
+                  color: '#475569',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                {t('کینسل', 'Cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteVoid}
+                disabled={isVoiding || !voidReason.trim()}
+                style={{
+                  flex: 1.5,
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#b91c1c',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                }}
+                className={isUrdu ? 'font-nastaleeq' : ''}
+              >
+                {isVoiding ? t('منسوخ ہو رہا ہے...', 'Voiding...') : t('منسوخی کی تصدیق کریں', 'Confirm Void')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal: Log Shop Expense */}
       {isExpenseOpen && (

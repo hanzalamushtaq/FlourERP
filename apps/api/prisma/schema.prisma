@@ -58,6 +58,17 @@ model User {
   role         Role          @relation(fields: [roleId], references: [id])
   activities   ActivityLog[]
 
+  priceHistories         PriceHistory[]
+  dailyConfirmations     DailyPriceConfirmation[]
+  submittedPriceRequests PriceChangeRequest[]     @relation("BillerRequests")
+  reviewedPriceRequests  PriceChangeRequest[]     @relation("AdminReviews")
+  bills                  Bill[]
+  pisaiRecords           PisaiRecord[]
+  ledgerEntries          LedgerEntry[]
+  expenses               Expense[]
+  returns                BillReturn[]
+  dailyClosings          DailyClosingRecord[]
+
   @@map("users")
 }
 
@@ -75,3 +86,255 @@ model ActivityLog {
 
   @@map("activity_logs")
 }
+
+model Product {
+  id          String               @id @default(uuid())
+  nameEn      String
+  nameUr      String
+  unit        String               @default("KG")
+  currentRate Float                @default(0)
+  isActive    Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  priceHistory  PriceHistory[]
+  billItems     BillItem[]
+  priceRequests PriceChangeRequest[]
+
+  @@map("products")
+}
+
+model PriceHistory {
+  id          String   @id @default(uuid())
+  productId   String
+  oldRate     Float
+  newRate     Float
+  changedById String
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  changedBy   User     @relation(fields: [changedById], references: [id])
+
+  @@map("price_history")
+}
+
+model DailyPriceConfirmation {
+  id               String   @id @default(uuid())
+  confirmationDate String   @unique // Format: YYYY-MM-DD
+  confirmedById    String
+  notes            String?
+  createdAt        DateTime @default(now())
+
+  confirmedBy      User     @relation(fields: [confirmedById], references: [id])
+
+  @@map("daily_price_confirmations")
+}
+
+model PriceChangeRequest {
+  id            String   @id @default(uuid())
+  productId     String
+  requestedRate Float
+  billerId      String
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedById  String?
+  holdBillData  String?  // JSON string of pending bill
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  biller        User     @relation("BillerRequests", fields: [billerId], references: [id])
+  reviewedBy    User?    @relation("AdminReviews", fields: [reviewedById], references: [id])
+
+  @@map("price_change_requests")
+}
+
+model Customer {
+  id             String        @id @default(uuid())
+  name           String
+  phone          String?
+  address        String?
+  currentBalance Float         @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  bills          Bill[]
+  pisaiRecords   PisaiRecord[]
+  ledgerEntries  LedgerEntry[]
+  returns        BillReturn[]
+
+  @@map("customers")
+}
+
+model BillSequence {
+  name       String   @id // e.g. "STANDARD_BILL"
+  lastNumber Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  @@map("bill_sequences")
+}
+
+model Bill {
+  id              String     @id @default(uuid())
+  billNumber      Int        @unique
+  customerId      String?
+  customerName    String?
+  customerPhone   String?
+  billerId        String
+  calculationMode String     @default("WEIGHT_TO_AMOUNT") // WEIGHT_TO_AMOUNT, AMOUNT_TO_WEIGHT
+  subtotal        Float      @default(0)
+  discount        Float      @default(0)
+  netTotal        Float      @default(0)
+  receivedAmount  Float      @default(0)
+  changeReturned  Float      @default(0)
+  paymentMethod   String     @default("CASH") // CASH, CREDIT
+  status          String     @default("PAID") // PAID, CREDIT, VOIDED
+  printPayload    String?    // JSON string containing ESC/POS receipt data
+  voidReason      String?
+  voidedById      String?
+  voidedAt        DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  biller          User       @relation(fields: [billerId], references: [id])
+  customer        Customer?     @relation(fields: [customerId], references: [id])
+  items           BillItem[]
+  ledgerEntries   LedgerEntry[]
+  returns         BillReturn[]
+
+  @@map("bills")
+}
+
+model BillItem {
+  id          String   @id @default(uuid())
+  billId      String
+  productId   String
+  productName String
+  quantityKg  Float
+  ratePerKg   Float
+  totalAmount Float
+  createdAt   DateTime @default(now())
+
+  bill        Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("bill_items")
+}
+
+model PisaiRecord {
+  id             String    @id @default(uuid())
+  tokenNumber    Int       @unique
+  tokenFormatted String    // 4-digit zero-padded string "0001" - "9999"
+  customerId     String?
+  customerName   String?
+  customerPhone  String?
+  billerId       String
+  serviceType    String    @default("SAFAI_PISAI") // SAFAI_PISAI, PISAI_ONLY
+  weightKg       Float
+  ratePerKg      Float
+  feeAmount      Float     // Subtotal
+  discount       Float     @default(0)
+  netTotal       Float
+  receivedAmount Float     @default(0)
+  changeReturned Float     @default(0)
+  paymentMethod  String    @default("CASH") // CASH, CREDIT
+  status         String    @default("PAID") // PAID, CREDIT, VOIDED, COMPLETED
+  printPayload   String?   // Large-format thermal ticket JSON/text
+  voidReason     String?
+  voidedById     String?
+  voidedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  biller         User      @relation(fields: [billerId], references: [id])
+  customer       Customer?     @relation(fields: [customerId], references: [id])
+  ledgerEntries  LedgerEntry[]
+  returns        BillReturn[]
+
+  @@map("pisai_records")
+}
+
+model LedgerEntry {
+  id             String        @id @default(uuid())
+  customerId     String
+  billId         String?
+  pisaiId        String?
+  type           String        // DEBIT_PURCHASE, CREDIT_PAYMENT, ADJUSTMENT
+  amount         Float
+  description    String
+  balanceAfter   Float         // Snapshot of customer's running balance after this entry
+  recordedById   String
+  receiptPayload String?       // Large-format thermal repayment slip ESC/POS payload
+  createdAt      DateTime      @default(now())
+
+  customer       Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  bill           Bill?         @relation(fields: [billId], references: [id])
+  pisaiRecord    PisaiRecord?  @relation(fields: [pisaiId], references: [id])
+  recordedBy     User          @relation(fields: [recordedById], references: [id])
+
+  @@map("ledger_entries")
+}
+
+model Expense {
+  id           String   @id @default(uuid())
+  category     String   // ELECTRICITY, LABOR, TEA_FOOD, MAINTENANCE, TRANSPORT, MISC
+  description  String
+  amount       Float
+  recordedById String
+  createdAt    DateTime @default(now())
+
+  recordedBy   User     @relation(fields: [recordedById], references: [id])
+
+  @@map("expenses")
+}
+
+model BillReturn {
+  id           String       @id @default(uuid())
+  returnNumber String       @unique // e.g. "RET-1001"
+  billId       String?
+  pisaiId      String?
+  customerId   String?
+  amount       Float
+  reason       String
+  refundMethod String       @default("CASH") // CASH, CREDIT_OFFSET
+  recordedById String
+  createdAt    DateTime     @default(now())
+
+  bill         Bill?        @relation(fields: [billId], references: [id])
+  pisaiRecord  PisaiRecord? @relation(fields: [pisaiId], references: [id])
+  customer     Customer?    @relation(fields: [customerId], references: [id])
+  recordedBy   User         @relation(fields: [recordedById], references: [id])
+
+  @@map("bill_returns")
+}
+
+model DailyClosingRecord {
+  id                   String   @id @default(uuid())
+  closingDate          String   @unique // Format: YYYY-MM-DD
+  totalSales           Float    @default(0)
+  cashSales            Float    @default(0)
+  creditSales          Float    @default(0)
+  totalPisai           Float    @default(0)
+  cashPisai            Float    @default(0)
+  creditPisai          Float    @default(0)
+  totalExpenses        Float    @default(0)
+  totalUdhaarCollected Float    @default(0)
+  totalReturns         Float    @default(0)
+  cashReturns          Float    @default(0)
+  expectedCashInDrawer Float    @default(0)
+  actualCashInDrawer   Float    @default(0)
+  cashDifference       Float    @default(0)
+  billCount            Int      @default(0)
+  pisaiCount           Int      @default(0)
+  notes                String?
+  backupPath           String?
+  backupSizeBytes      Int?
+  zReportPayload       String?  // Formatted thermal Z-report receipt
+  status               String   @default("CLOSED") // CLOSED
+  closedById           String
+  createdAt            DateTime @default(now())
+
+  closedBy             User     @relation(fields: [closedById], references: [id])
+
+  @@map("daily_closing_records")
+}
+

@@ -1,7 +1,8 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getSession, ensureValidToken } from '../../lib/auth';
 import { RoleManagementModal } from './RoleManagementModal';
 import {
   TrendingUp,
@@ -29,6 +30,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const { isUrdu, t } = useLanguage();
   const [closingTriggered, setClosingTriggered] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [kpiData, setKpiData] = useState<{
+    sales: { totalAmount: number; billsCount: number; cashCollected: number };
+    pisai: { totalRevenue: number; tokensCount: number; weightKg: number; cashCollected: number };
+    expenses: { totalAmount: number; count: number };
+    udhaar: { totalOutstanding: number; debtorsCount: number };
+    cash: { netCashInHand: number; inflows: number; outflows: number };
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchKpis = async () => {
+      try {
+        const sess = getSession();
+        const token = await ensureValidToken(sess);
+        const res = await fetch('http://localhost:5000/api/reports/dashboard-kpis?range=today', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          setKpiData(json.data);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard KPIs:', err);
+      }
+    };
+    fetchKpis();
+  }, []);
 
   const handleDailyClosing = () => {
     const confirmClosing = window.confirm(
@@ -53,8 +80,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     {
       id: 'sales',
       title: isUrdu ? 'آج کی پراڈکٹ سیل' : "Today's Product Sales",
-      value: isUrdu ? '42,850 روپے' : 'Rs 42,850',
-      subtitle: isUrdu ? '38 بلز جاری ہوئے • آٹا، میدہ، سوجی' : '38 bills issued • Atta, Maida, Suji',
+      value: kpiData
+        ? isUrdu
+          ? `${kpiData.sales.totalAmount.toLocaleString()} روپے`
+          : `Rs ${kpiData.sales.totalAmount.toLocaleString()}`
+        : isUrdu ? '42,850 روپے' : 'Rs 42,850',
+      subtitle: kpiData
+        ? isUrdu
+          ? `${kpiData.sales.billsCount} بلز جاری ہوئے • آٹا، میدہ، سوجی`
+          : `${kpiData.sales.billsCount} bills issued • Atta, Maida, Suji`
+        : isUrdu ? '38 بلز جاری ہوئے • آٹا، میدہ، سوجی' : '38 bills issued • Atta, Maida, Suji',
       icon: <TrendingUp size={20} color="#d97706" />,
       bg: '#fffbeb',
       border: '#fde68a',
@@ -65,8 +100,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     {
       id: 'pisai',
       title: isUrdu ? 'گندم پسائی آمدن' : 'Pisai Milling Revenue',
-      value: isUrdu ? '8,640 روپے' : 'Rs 8,640',
-      subtitle: isUrdu ? '54 ٹوکنز مکمل • 1,440 کلو' : '54 tokens processed • 1,440 KG',
+      value: kpiData
+        ? isUrdu
+          ? `${kpiData.pisai.totalRevenue.toLocaleString()} روپے`
+          : `Rs ${kpiData.pisai.totalRevenue.toLocaleString()}`
+        : isUrdu ? '8,640 روپے' : 'Rs 8,640',
+      subtitle: kpiData
+        ? isUrdu
+          ? `${kpiData.pisai.tokensCount} ٹوکنز مکمل • ${kpiData.pisai.weightKg} کلو`
+          : `${kpiData.pisai.tokensCount} tokens processed • ${kpiData.pisai.weightKg} KG`
+        : isUrdu ? '54 ٹوکنز مکمل • 1,440 کلو' : '54 tokens processed • 1,440 KG',
       icon: <Sparkles size={20} color="#0284c7" />,
       bg: '#f0f9ff',
       border: '#bae6fd',
@@ -77,8 +120,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     {
       id: 'expenses',
       title: isUrdu ? 'دکان کے اخراجات' : 'Shop Expenses & Bills',
-      value: isUrdu ? '3,625 روپے' : 'Rs 3,625',
-      subtitle: isUrdu ? 'بجلی، ورکر چائے، دکان خرچ' : 'Electricity, tea, maintenance',
+      value: kpiData
+        ? isUrdu
+          ? `${kpiData.expenses.totalAmount.toLocaleString()} روپے`
+          : `Rs ${kpiData.expenses.totalAmount.toLocaleString()}`
+        : isUrdu ? '3,625 روپے' : 'Rs 3,625',
+      subtitle: kpiData
+        ? isUrdu
+          ? `${kpiData.expenses.count} اخراجات درج • بجلی، دکان خرچ`
+          : `${kpiData.expenses.count} recorded • Electricity, tea, maintenance`
+        : isUrdu ? 'بجلی، ورکر چائے، دکان خرچ' : 'Electricity, tea, maintenance',
       icon: <Receipt size={20} color="#e11d48" />,
       bg: '#fff1f2',
       border: '#fecdd3',
@@ -89,8 +140,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     {
       id: 'udhaar',
       title: isUrdu ? 'کل گاہک ادھار کھاتہ' : 'Total Customer Udhaar',
-      value: isUrdu ? '61,100 روپے' : 'Rs 61,100',
-      subtitle: isUrdu ? '14 فعال ادھار کھاتہ داران' : '14 active credit accounts',
+      value: kpiData
+        ? isUrdu
+          ? `${kpiData.udhaar.totalOutstanding.toLocaleString()} روپے`
+          : `Rs ${kpiData.udhaar.totalOutstanding.toLocaleString()}`
+        : isUrdu ? '61,100 روپے' : 'Rs 61,100',
+      subtitle: kpiData
+        ? isUrdu
+          ? `${kpiData.udhaar.debtorsCount} فعال ادھار کھاتہ داران`
+          : `${kpiData.udhaar.debtorsCount} active credit accounts`
+        : isUrdu ? '14 فعال ادھار کھاتہ داران' : '14 active credit accounts',
       icon: <Users size={20} color="#7e22ce" />,
       bg: '#faf5ff',
       border: '#e9d5ff',
@@ -101,7 +160,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     {
       id: 'drawer',
       title: isUrdu ? 'دکان کا موجودہ کیش' : 'Net Cash in Drawer',
-      value: isUrdu ? '47,865 روپے' : 'Rs 47,865',
+      value: kpiData
+        ? isUrdu
+          ? `${kpiData.cash.netCashInHand.toLocaleString()} روپے`
+          : `Rs ${kpiData.cash.netCashInHand.toLocaleString()}`
+        : isUrdu ? '47,865 روپے' : 'Rs 47,865',
       subtitle: isUrdu ? 'سیلز + پسائی + وصولی - اخراجات' : 'Sales + Pisai + Recovery - Expenses',
       icon: <Wallet size={20} color="#16a34a" />,
       bg: '#f0fdf4',

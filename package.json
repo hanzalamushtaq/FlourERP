@@ -11,8 +11,11 @@
     "start": "npm --prefix apps/web start",
     "dev:api": "npm --prefix apps/api run dev",
     "build:api": "npm --prefix apps/api run build",
+    "build:all": "npm --prefix apps/api run build && npm --prefix apps/web run build",
     "start:api": "npm --prefix apps/api start",
     "db:push": "npm --prefix apps/api run db:push",
-    "db:seed": "npm --prefix apps/api run db:seed"
+    "db:seed": "npm --prefix apps/api run db:seed",
+    "test:e2e": "npm --prefix apps/api run test:e2e",
+    "test:journey": "npm --prefix apps/api run test:journey"
   }
 }

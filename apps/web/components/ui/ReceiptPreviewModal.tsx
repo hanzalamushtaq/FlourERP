@@ -26,6 +26,10 @@ export interface ReceiptData {
   cashReceived?: number;
   remainingBalance?: number;
   isCredit?: boolean;
+  shortDiscount?: number;
+  prevBalance?: number;
+  creditAdded?: number;
+  newBalance?: number;
 }
 
 interface ReceiptPreviewModalProps {
@@ -280,18 +284,20 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
             <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سب ٹوٹل:', 'Subtotal:')}</span>
             <span>{isUrdu ? `${data.subtotal} روپے` : `Rs ${data.subtotal}`}</span>
           </div>
-          {data.discount > 0 && (
+          {(data.discount > 0 || (data.shortDiscount && data.shortDiscount > 0)) && (
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 marginBottom: '4px',
-                color: '#414833',
+                color: '#B91C1C',
                 fontWeight: 700,
               }}
             >
-              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('رعایت:', 'Discount:')}</span>
-              <span>{isUrdu ? `- ${data.discount} روپے` : `- Rs ${data.discount}`}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                {t('رعایت / کٹوتی (Less):', 'Discount / Less:')}
+              </span>
+              <span>{isUrdu ? `- ${((data.discount || 0) + (data.shortDiscount || 0))} روپے` : `- Rs ${((data.discount || 0) + (data.shortDiscount || 0))}`}</span>
             </div>
           )}
           <div
@@ -311,28 +317,61 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
 
           {data.cashReceived !== undefined && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '13px', fontWeight: 700 }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('وصول رقم:', 'CASH RECEIVED:')}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('وصول رقم (نقد):', 'CASH RECEIVED:')}</span>
               <span>{isUrdu ? `${data.cashReceived} روپے` : `Rs ${data.cashReceived}`}</span>
             </div>
           )}
 
-          {data.remainingBalance !== undefined && data.remainingBalance > 0 && (
+          {/* Credit Ledger Card on Receipt */}
+          {(data.isCredit || (data.newBalance !== undefined && data.newBalance > 0)) && (
             <div
               style={{
+                marginTop: '10px',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                backgroundColor: '#EFECE6',
+                border: '1.5px dashed #A39B8B',
                 display: 'flex',
-                justifyContent: 'space-between',
-                marginTop: '4px',
-                fontSize: '14px',
-                fontWeight: 800,
-                color: '#414833',
-                borderTop: '1px dashed #B6AD90',
-                paddingTop: '4px',
+                flexDirection: 'column',
+                gap: '6px',
               }}
             >
-              <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                {data.isCredit ? t('بقایا ادھار:', 'CREDIT BALANCE:') : t('رعایت / چھوٹ:', 'WAIVED / SHORT:')}
-              </span>
-              <span>{isUrdu ? `${data.remainingBalance} روپے` : `Rs ${data.remainingBalance}`}</span>
+              <div
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  color: '#5C3617',
+                  textAlign: 'center',
+                  borderBottom: '1px solid #D5CEBF',
+                  paddingBottom: '4px',
+                }}
+              >
+                {t('ادھار کھاتہ تفصیل (Customer Ledger)', 'Customer Udhaar Ledger')}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 700, color: '#414833' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('موجودہ بل ادھار:', 'Current Bill Credit:')}</span>
+                <span>{isUrdu ? `${data.creditAdded ?? (data.netTotal - (data.cashReceived || 0))} روپے` : `Rs ${data.creditAdded ?? (data.netTotal - (data.cashReceived || 0))}`}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 700, color: '#64748B' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سابقہ بقایا ادھار:', 'Previous Credit:')}</span>
+                <span>{isUrdu ? `${(data.prevBalance || 0).toLocaleString()} روپے` : `Rs ${(data.prevBalance || 0).toLocaleString()}`}</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '15px',
+                  fontWeight: 900,
+                  color: '#B91C1C',
+                  borderTop: '1.5px solid #8C582B',
+                  paddingTop: '6px',
+                  marginTop: '2px',
+                }}
+              >
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کل واجب الادا رقم:', 'TOTAL OUTSTANDING:')}</span>
+                <span>{isUrdu ? `${(data.newBalance ?? ((data.prevBalance || 0) + (data.creditAdded ?? (data.netTotal - (data.cashReceived || 0))))).toLocaleString()} روپے` : `Rs ${(data.newBalance ?? ((data.prevBalance || 0) + (data.creditAdded ?? (data.netTotal - (data.cashReceived || 0))))).toLocaleString()}`}</span>
+              </div>
             </div>
           )}
 

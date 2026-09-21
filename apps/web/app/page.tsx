@@ -21,6 +21,7 @@ import {
   UserSession,
   getSession,
   clearSession,
+  ensureValidToken,
   isAdmin,
   isBiller,
   hasPermission,
@@ -52,6 +53,13 @@ export default function Home() {
       } else {
         setActiveTab('dashboard');
       }
+      // Silently upgrade token if it was an offline mock token
+      ensureValidToken(saved).then((token) => {
+        if (token && token !== saved.token) {
+          const refreshed = getSession();
+          if (refreshed) setCurrentUser(refreshed);
+        }
+      });
     }
   }, []);
 

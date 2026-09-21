@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Product } from '../ui/TouchCard';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
-import { Printer, Tag, Check, BookOpen, Plus, Trash2, X } from 'lucide-react';
+import { Printer, Tag, Check, BookOpen, Plus, Trash2, X, AlertTriangle, Lock } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { getSession, ensureValidToken, clearSession } from '../../lib/auth';
+import { sound } from '../../lib/audioFeedback';
 
 // 1. Custom SVG Product Illustrations matching Dashboard aesthetic
 const ChakkiAttaSvg = () => (
@@ -180,7 +182,46 @@ export interface BillItem {
 
 export const ProductBillingScreen: React.FC = () => {
   const { isUrdu, t } = useLanguage();
-  const [products] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+
+  // Load products dynamically from backend API
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products?active=true')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data.products && json.data.products.length > 0) {
+          const mapped: Product[] = json.data.products.map((p: any) => ({
+            id: p.id,
+            nameEn: p.nameEn,
+            nameUr: p.nameUr,
+            ratePerKg: p.currentRate,
+            unit: p.unit || 'KG',
+            isActive: p.isActive,
+          }));
+          setProducts(mapped);
+          setBillItems((prev) =>
+            prev.map((item) => {
+              const matched =
+                mapped.find(
+                  (p) =>
+                    p.id === item.productId ||
+                    p.nameEn.toLowerCase() === item.itemName.toLowerCase() ||
+                    p.nameUr === item.itemName
+                ) || mapped[0];
+              return {
+                ...item,
+                productId: matched.id,
+                ratePerKg: matched.ratePerKg,
+              };
+            })
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const session = getSession();
+  const canDiscount = !!(session?.permissions?.includes('can_discount') || session?.role === 'SuperAdmin');
 
   // Multi-item rows state
   const [billItems, setBillItems] = useState<BillItem[]>([
@@ -203,7 +244,8 @@ export const ProductBillingScreen: React.FC = () => {
   // Customer State & Autocomplete
   const [customerName, setCustomerName] = useState<string>('');
   const [customerPhone, setCustomerPhone] = useState<string>('');
-  const [suggestions, setSuggestions] = useState<typeof MOCK_CUSTOMERS>([]);
+  const [selectedCustomerCredit, setSelectedCustomerCredit] = useState<number | null>(null);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   // Hover & Tactile States
@@ -214,7 +256,7 @@ export const ProductBillingScreen: React.FC = () => {
   // Receipt Modal State
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
-  const [billCounter, setBillCounter] = useState<number>(482);
+  const [isSubmittingBill, setIsSubmittingBill] = useState<boolean>(false);
 
   // Dynamic Input Refs for Navigation
   const itemInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -222,6 +264,12 @@ export const ProductBillingScreen: React.FC = () => {
   const receivedInputRef = useRef<HTMLInputElement>(null);
   const customerNameInputRef = useRef<HTMLInputElement>(null);
   const customerPhoneInputRef = useRef<HTMLInputElement>(null);
+
+  // Rate guard check (BILL-04)
+  const unpricedItems = billItems.filter(
+    (item) => (parseFloat(item.quantity) || 0) > 0 && (!item.ratePerKg || item.ratePerKg <= 0)
+  );
+  const hasRateNotSetError = unpricedItems.length > 0;
 
   // Calculations across all multi-item rows
   const subtotal = billItems.reduce((acc, item) => {
@@ -413,30 +461,62 @@ export const ProductBillingScreen: React.FC = () => {
     setActiveRowIndex(newActive);
   };
 
-  // Customer name autocomplete suggestions
+  // Customer name autocomplete suggestions (Live API with fallback)
   const handleCustomerNameChange = (val: string) => {
     setCustomerName(val);
+    setSelectedCustomerCredit(null);
     if (val.trim().length > 0) {
-      const filtered = MOCK_CUSTOMERS.filter((c) =>
-        c.name.toLowerCase().includes(val.toLowerCase())
-      );
-      setSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
+      const sess = getSession();
+      fetch(`http://localhost:5000/api/customers/search?q=${encodeURIComponent(val)}`, {
+        headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data.customers && json.data.customers.length > 0) {
+            setSuggestions(json.data.customers);
+            setShowSuggestions(true);
+          } else {
+            const filtered = MOCK_CUSTOMERS.filter((c) =>
+              c.name.toLowerCase().includes(val.toLowerCase())
+            );
+            setSuggestions(filtered);
+            setShowSuggestions(filtered.length > 0);
+          }
+        })
+        .catch(() => {
+          const filtered = MOCK_CUSTOMERS.filter((c) =>
+            c.name.toLowerCase().includes(val.toLowerCase())
+          );
+          setSuggestions(filtered);
+          setShowSuggestions(filtered.length > 0);
+        });
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
     }
   };
 
-  const handleSelectCustomer = (cust: { name: string; phone: string }) => {
+  const handleSelectCustomer = (cust: { name: string; phone?: string | null; currentBalance?: number }) => {
     setCustomerName(cust.name);
-    setCustomerPhone(cust.phone);
+    setCustomerPhone(cust.phone || '');
+    setSelectedCustomerCredit(cust.currentBalance ?? null);
     setShowSuggestions(false);
     customerPhoneInputRef.current?.focus();
   };
 
-  // Submit Handler
-  const handleFinalSubmit = (forcedCredit?: boolean) => {
+  // Submit Handler (Atomic Sequence, Rate Guard, Discount Guard via /api/bills)
+  const handleFinalSubmit = async (forcedCredit?: boolean) => {
+    // 1. Rate Guard Check (BILL-04)
+    if (hasRateNotSetError) {
+      const badItem = unpricedItems[0];
+      alert(
+        isUrdu
+          ? `ریٹ مقرر نہیں: "${badItem.itemName}" کا ریٹ صفر یا غیر معین ہے۔ برائے مہربانی پہلے ریٹ مقرر کریں۔`
+          : `Rate not set for "${badItem.itemName}". Bill creation is blocked until rate is set.`
+      );
+      return;
+    }
+
     const validRows = billItems.filter(
       (item) => (parseFloat(item.quantity) || 0) > 0 && item.ratePerKg > 0
     );
@@ -451,41 +531,132 @@ export const ProductBillingScreen: React.FC = () => {
       return;
     }
 
+    // 2. Discount Guard Check (BILL-02)
+    if (numDiscount > 0 && !canDiscount) {
+      alert(
+        isUrdu
+          ? 'آپ کو رعایت دینے کا اختیار حاصل نہیں ہے۔ ایڈمن سے رجوع کریں۔'
+          : 'You do not have permission to apply discounts (can_discount required).'
+      );
+      return;
+    }
+
     const hasCustomerDetails = customerName.trim().length > 0;
     const isCreditSale = forcedCredit !== undefined ? forcedCredit : (hasCustomerDetails || balanceRemaining > 0);
+    const sess = getSession();
 
-    const billNumberFormatted = String(billCounter).padStart(5, '0');
-    setBillCounter((prev) => prev + 1);
+    setIsSubmittingBill(true);
 
-    const receiptItems = validRows.map((it) => {
-      const prod = products.find((p) => p.id === it.productId);
-      const qty = parseFloat(it.quantity) || 0;
-      return {
-        nameEn: prod ? prod.nameEn : it.itemName,
-        nameUr: prod ? prod.nameUr : it.itemName,
-        weightKg: qty,
-        ratePerKg: it.ratePerKg,
-        total: Math.round(qty * it.ratePerKg),
+    try {
+      // Ensure we have a valid signed backend JWT token
+      let token = await ensureValidToken(sess);
+
+      const payload = {
+        calculationMode: 'WEIGHT_TO_AMOUNT',
+        customerName: customerName.trim() || undefined,
+        customerPhone: customerPhone.trim() || undefined,
+        items: validRows.map((r) => {
+          const matched =
+            products.find(
+              (p) =>
+                p.id === r.productId ||
+                p.nameEn.toLowerCase() === r.itemName.toLowerCase() ||
+                p.nameUr === r.itemName
+            ) || products[0];
+          return {
+            productId: matched ? matched.id : r.productId,
+            quantityKg: parseFloat(r.quantity) || 0,
+            totalAmount: Math.round((parseFloat(r.quantity) || 0) * r.ratePerKg),
+          };
+        }),
+        discount: numDiscount,
+        receivedAmount: isCreditSale ? (numReceived > 0 && numReceived < netTotal ? numReceived : 0) : numReceived,
+        paymentMethod: isCreditSale ? 'CREDIT' : 'CASH',
       };
-    });
 
-    const receipt: ReceiptData = {
-      type: 'product',
-      billNumber: billNumberFormatted,
-      timestamp: new Date().toLocaleString('en-US', { hour12: true }),
-      billerName: isUrdu ? 'محمد عاصف (کاؤنٹر 01)' : 'Muhammad Asif (Counter 01)',
-      customerName: customerName.trim() || undefined,
-      isCredit: isCreditSale,
-      items: receiptItems,
-      subtotal,
-      discount: numDiscount,
-      netTotal,
-      cashReceived: numReceived,
-      remainingBalance: balanceRemaining,
-    };
+      let res = await fetch('http://localhost:5000/api/bills', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
 
-    setReceiptData(receipt);
-    setIsReceiptOpen(true);
+      // If token expired or was rejected, retry once with a fresh token
+      if (res.status === 401) {
+        token = await ensureValidToken(sess);
+        if (token) {
+          res = await fetch('http://localhost:5000/api/bills', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          });
+        }
+      }
+
+      if (res.status === 401) {
+        alert(isUrdu ? 'سیشن ختم ہو چکا ہے۔ برائے مہربانی دوبارہ لاگ ان کریں۔' : 'Session expired. Please log in again.');
+        clearSession();
+        window.location.reload();
+        return;
+      }
+
+      const json = await res.json();
+      if (!json.success) {
+        sound.playWarningSound();
+        alert(json.error?.message || 'Error creating bill');
+        return;
+      }
+
+      const createdBill = json.data.bill;
+      const customerLedger = json.data.customerLedger || createdBill.customerLedger;
+      const shortDiscount = json.data.shortDiscount ?? createdBill.shortDiscount ?? 0;
+      sound.playSuccessChime();
+      const billNumberFormatted = String(createdBill.billNumber).padStart(6, '0');
+
+      const receiptItems = validRows.map((it) => {
+        const prod = products.find((p) => p.id === it.productId);
+        const qty = parseFloat(it.quantity) || 0;
+        return {
+          nameEn: prod ? prod.nameEn : it.itemName,
+          nameUr: prod ? prod.nameUr : it.itemName,
+          weightKg: qty,
+          ratePerKg: it.ratePerKg,
+          total: Math.round(qty * it.ratePerKg),
+        };
+      });
+
+      const receipt: ReceiptData = {
+        type: 'product',
+        billNumber: billNumberFormatted,
+        timestamp: new Date(createdBill.createdAt).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        billerName: createdBill.biller?.fullName || sess?.fullName || (isUrdu ? 'محمد عاصف (کاؤنٹر 01)' : 'Muhammad Asif'),
+        customerName: createdBill.customerName || undefined,
+        isCredit: createdBill.paymentMethod === 'CREDIT',
+        items: receiptItems,
+        subtotal: createdBill.subtotal,
+        discount: createdBill.discount,
+        shortDiscount: shortDiscount,
+        netTotal: createdBill.netTotal,
+        cashReceived: createdBill.receivedAmount,
+        remainingBalance: createdBill.paymentMethod === 'CREDIT' ? (customerLedger?.creditAdded ?? createdBill.netTotal) : 0,
+        prevBalance: customerLedger?.prevBalance ?? (selectedCustomerCredit || 0),
+        creditAdded: customerLedger?.creditAdded ?? (createdBill.paymentMethod === 'CREDIT' ? (createdBill.netTotal - (createdBill.receivedAmount || 0)) : 0),
+        newBalance: customerLedger?.newTotalBalance ?? ((customerLedger?.prevBalance ?? (selectedCustomerCredit || 0)) + (customerLedger?.creditAdded ?? (createdBill.paymentMethod === 'CREDIT' ? (createdBill.netTotal - (createdBill.receivedAmount || 0)) : 0))),
+      };
+
+      setReceiptData(receipt);
+      setIsReceiptOpen(true);
+    } catch (err: any) {
+      sound.playWarningSound();
+      alert(`Network error: ${err.message}`);
+    } finally {
+      setIsSubmittingBill(false);
+    }
   };
 
   // Current active product for styling cues
@@ -1086,6 +1257,31 @@ export const ProductBillingScreen: React.FC = () => {
               }}
             />
 
+            {/* Selected Customer Previous Balance Badge */}
+            {selectedCustomerCredit !== null && (
+              <div
+                style={{
+                  marginTop: '6px',
+                  padding: '5px 10px',
+                  borderRadius: '6px',
+                  backgroundColor: selectedCustomerCredit > 0 ? '#FEF2F2' : '#F0FDF4',
+                  border: `1px solid ${selectedCustomerCredit > 0 ? '#FCA5A5' : '#86EFAC'}`,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                }}
+              >
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: selectedCustomerCredit > 0 ? '#991B1B' : '#166534' }}>
+                  {t('سابقہ واجب الادا ادھار:', 'Previous Customer Credit:')}
+                </span>
+                <span style={{ color: selectedCustomerCredit > 0 ? '#DC2626' : '#16A34A', fontSize: '13px' }}>
+                  {isUrdu ? `${selectedCustomerCredit.toLocaleString()} روپے` : `Rs ${selectedCustomerCredit.toLocaleString()}`}
+                </span>
+              </div>
+            )}
+
             {/* Suggestions Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
               <div
@@ -1099,7 +1295,7 @@ export const ProductBillingScreen: React.FC = () => {
                   border: '1px solid #CBD5E1',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
                   zIndex: 20,
-                  maxHeight: '140px',
+                  maxHeight: '160px',
                   overflowY: 'auto',
                   marginTop: '4px',
                 }}
@@ -1118,12 +1314,30 @@ export const ProductBillingScreen: React.FC = () => {
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
                   >
-                    <span className="font-nastaleeq" style={{ fontWeight: 800, color: '#0F172A' }}>
-                      {c.name}
-                    </span>
-                    <span style={{ color: '#64748B', fontSize: '11.5px' }}>
-                      {c.phone}
-                    </span>
+                    <div>
+                      <span className="font-nastaleeq" style={{ fontWeight: 800, color: '#0F172A' }}>
+                        {c.name}
+                      </span>
+                      {c.phone && (
+                        <span style={{ color: '#64748B', fontSize: '11px', marginLeft: '6px' }}>
+                          ({c.phone})
+                        </span>
+                      )}
+                    </div>
+                    {c.currentBalance !== undefined && c.currentBalance > 0 && (
+                      <span
+                        style={{
+                          color: '#DC2626',
+                          backgroundColor: '#FEE2E2',
+                          padding: '1px 6px',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                        }}
+                      >
+                        {isUrdu ? `${c.currentBalance.toLocaleString()} ادھار` : `Rs ${c.currentBalance.toLocaleString()} Due`}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1283,30 +1497,38 @@ export const ProductBillingScreen: React.FC = () => {
               </div>
             ) : null}
 
-            {/* Discount Option Toggle */}
+            {/* Discount Option Toggle (RBAC Guard BILL-02) */}
             <div style={{ borderTop: 'none', paddingTop: '6px' }}>
               <button
                 type="button"
-                onClick={() => setShowDiscount(!showDiscount)}
+                onClick={() => {
+                  if (!canDiscount) {
+                    alert(t('آپ کو رعایت دینے کا اختیار حاصل نہیں ہے۔ (can_discount درکار ہے)', 'You do not have permission to apply discounts. (can_discount required)'));
+                    return;
+                  }
+                  setShowDiscount(!showDiscount);
+                }}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#64748B',
+                  color: canDiscount ? '#64748B' : '#94A3B8',
                   fontSize: '12px',
                   fontWeight: 800,
-                  cursor: 'pointer',
+                  cursor: canDiscount ? 'pointer' : 'not-allowed',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '5px',
                 }}
               >
-                <Tag size={13} />
+                {canDiscount ? <Tag size={13} /> : <Lock size={13} color="#DC2626" />}
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                  {t('رعایت شامل کریں', 'Add Discount')}
+                  {canDiscount
+                    ? t('رعایت شامل کریں', 'Add Discount')
+                    : t('رعایت (اختیار نہیں ہے)', 'Discount (Locked - No Permission)')}
                 </span>
               </button>
 
-              {showDiscount && (
+              {canDiscount && showDiscount && (
                 <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <input
                     type="number"
@@ -1344,13 +1566,38 @@ export const ProductBillingScreen: React.FC = () => {
             </div>
           </div>
 
+          {/* Rate Guard Alert Banner (BILL-04) */}
+          {hasRateNotSetError && (
+            <div
+              style={{
+                backgroundColor: '#FEF2F2',
+                border: '1.5px solid #F87171',
+                borderRadius: '12px',
+                padding: '10px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+              }}
+            >
+              <AlertTriangle size={20} color="#DC2626" />
+              <div>
+                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 900, color: '#991B1B' }}>
+                  {t('انتباہ: ریٹ مقرر نہیں (Rate Not Set)', 'Warning: Rate Not Set')}
+                </div>
+                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '11.5px', color: '#B91C1C' }}>
+                  {t('آئٹم کا ریٹ صفر ہے۔ ریٹ مقرر کیے بغیر بل تیار نہیں ہو سکتا۔', 'Rate not set for selected item. Bill generation is blocked.')}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {/* Button 1: Print Cash Bill */}
             <button
               type="button"
               onClick={() => handleFinalSubmit(false)}
-              disabled={subtotal <= 0}
+              disabled={subtotal <= 0 || hasRateNotSetError || isSubmittingBill}
               onMouseEnter={() => setHoveredBtn('cash')}
               onMouseLeave={() => {
                 setHoveredBtn(null);
@@ -1364,12 +1611,12 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 height: '56px',
                 borderRadius: '16px',
-                background: subtotal <= 0 ? '#94A3B8' : '#1877F2',
+                background: subtotal <= 0 || hasRateNotSetError || isSubmittingBill ? '#94A3B8' : '#1877F2',
                 color: '#FFFFFF',
                 border: 'none',
                 boxShadow: 'none',
                 outline: 'none',
-                cursor: subtotal > 0 ? 'pointer' : 'not-allowed',
+                cursor: subtotal > 0 && !hasRateNotSetError && !isSubmittingBill ? 'pointer' : 'not-allowed',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -1416,7 +1663,7 @@ export const ProductBillingScreen: React.FC = () => {
                   handleFinalSubmit(true);
                 }
               }}
-              disabled={subtotal <= 0}
+              disabled={subtotal <= 0 || hasRateNotSetError || isSubmittingBill}
               onMouseEnter={() => setHoveredBtn('credit')}
               onMouseLeave={() => {
                 setHoveredBtn(null);
@@ -1430,12 +1677,12 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 height: '52px',
                 borderRadius: '16px',
-                background: subtotal <= 0 ? '#94A3B8' : '#0E8A54',
+                background: subtotal <= 0 || hasRateNotSetError || isSubmittingBill ? '#94A3B8' : '#0E8A54',
                 color: '#FFFFFF',
                 border: 'none',
                 boxShadow: 'none',
                 outline: 'none',
-                cursor: subtotal > 0 ? 'pointer' : 'not-allowed',
+                cursor: subtotal > 0 && !hasRateNotSetError && !isSubmittingBill ? 'pointer' : 'not-allowed',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',

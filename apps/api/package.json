@@ -8,7 +8,9 @@
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx src/db/seed.ts",
+    "test:e2e": "tsx src/test-e2e-suite.ts",
+    "test:journey": "tsx src/test-full-user-journey.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
