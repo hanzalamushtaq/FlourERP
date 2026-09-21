@@ -88,6 +88,12 @@ const INITIAL_PRODUCTS: Product[] = [
   { id: '4', nameEn: 'Suji / Semolina', nameUr: 'خالص سوجی', ratePerKg: 160, unit: 'KG', isActive: true },
   { id: '5', nameEn: 'Chokar / Bran', nameUr: 'چوکر', ratePerKg: 95, unit: 'KG', isActive: true },
   { id: '6', nameEn: 'Desi Atta', nameUr: 'دیسی گندم آٹا', ratePerKg: 145, unit: 'KG', isActive: true },
+  { id: '7', nameEn: 'Barley Flour / Jau Atta', nameUr: 'جو کا آٹا', ratePerKg: 205, unit: 'KG', isActive: true },
+  { id: '8', nameEn: 'Unpriced Special Atta', nameUr: 'بغیر ریٹ آٹا', ratePerKg: 0, unit: 'KG', isActive: true },
+  { id: '9', nameEn: 'Barley Flour / Jau Atta', nameUr: 'جو کا آٹا', ratePerKg: 205, unit: 'KG', isActive: true },
+  { id: '10', nameEn: 'Unpriced Special Atta', nameUr: 'بغیر ریٹ آٹا', ratePerKg: 0, unit: 'KG', isActive: true },
+  { id: '11', nameEn: 'Barley Flour / Jau Atta', nameUr: 'جو کا آٹا', ratePerKg: 205, unit: 'KG', isActive: true },
+  { id: '12', nameEn: 'Unpriced Special Atta', nameUr: 'بغیر ریٹ آٹا', ratePerKg: 0, unit: 'KG', isActive: true },
 ];
 
 const MOCK_CUSTOMERS = [
