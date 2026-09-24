@@ -234,16 +234,16 @@ export const WarehouseStockView: React.FC = () => {
         </div>
       )}
 
-      {/* 1. TOP DASHBOARD ACTION CARDS */}
+      {/* 1. TOP DASHBOARD ACTION CARDS (Centered Dual Cards - Exact Match to Picture 2) */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '16px',
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '14px',
           width: '100%',
         }}
       >
-        {/* Card 1: نیا اسٹاک آمد - Cobalt Blue */}
+        {/* Card 1: نیا اسٹاک آمد - Cobalt Blue Action Card */}
         <div
           onClick={() => setModalMode('inward')}
           onMouseEnter={() => setHoveredCard('inward')}
@@ -255,56 +255,65 @@ export const WarehouseStockView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            backgroundColor: '#1877F2',
-            borderRadius: '16px',
-            border: 'none',
-            boxShadow: 'none',
-            padding: '16px 20px',
+            width: '360px',
+            background: 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)',
+            borderRadius: '14px',
+            border: '2px solid #1E40AF',
+            boxShadow: '0 6px 16px rgba(24, 119, 242, 0.26)',
+            padding: '10px 20px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
+            direction: 'rtl',
             cursor: 'pointer',
-            minHeight: '96px',
-            transition: 'background-color 0.15s ease',
+            minHeight: '62px',
+            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            transform:
+              pressedCard === 'inward'
+                ? 'scale(0.975) translateY(1px)'
+                : hoveredCard === 'inward'
+                  ? 'translateY(-2px)'
+                  : 'none',
           }}
         >
-          {/* Icon Tile */}
-          <div
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: 'none',
-              border: 'none',
-              flexShrink: 0,
-            }}
-          >
-            <StockInwardSvg />
-          </div>
-
-          {/* Text */}
-          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <h2
-              className={isUrdu ? 'font-nastaleeq' : ''}
+          {/* Icon + Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div
               style={{
-                fontSize: '24px',
-                fontWeight: 900,
-                color: '#FFFFFF',
-                margin: 0,
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                flexShrink: 0,
               }}
             >
-              {t('+ نیا اسٹاک آمد', '+ Stock Inward')}
-            </h2>
+              <StockInwardSvg />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <h2
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '26px' : '19px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  letterSpacing: '0',
+                }}
+              >
+                {t('+ نیا اسٹاک آمد', '+ Stock Inward')}
+              </h2>
+            </div>
           </div>
         </div>
 
-        {/* Card 2: اسٹاک نکاسی و ترسیل - Emerald Green */}
+        {/* Card 2: اسٹاک نکاسی و ترسیل - Emerald Green Action Card */}
         <div
           onClick={() => setModalMode('outward')}
           onMouseEnter={() => setHoveredCard('outward')}
@@ -316,52 +325,61 @@ export const WarehouseStockView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            backgroundColor: '#0E8A54',
-            borderRadius: '16px',
-            border: 'none',
-            boxShadow: 'none',
-            padding: '16px 20px',
+            width: '360px',
+            background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
+            borderRadius: '14px',
+            border: '2px solid #065F46',
+            boxShadow: '0 6px 16px rgba(14, 138, 84, 0.26)',
+            padding: '10px 20px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
+            direction: 'rtl',
             cursor: 'pointer',
-            minHeight: '96px',
-            transition: 'background-color 0.15s ease',
+            minHeight: '62px',
+            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            transform:
+              pressedCard === 'outward'
+                ? 'scale(0.975) translateY(1px)'
+                : hoveredCard === 'outward'
+                  ? 'translateY(-2px)'
+                  : 'none',
           }}
         >
-          {/* Icon Tile */}
-          <div
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: 'none',
-              border: 'none',
-              flexShrink: 0,
-            }}
-          >
-            <StockOutwardSvg />
-          </div>
-
-          {/* Text */}
-          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <h2
-              className={isUrdu ? 'font-nastaleeq' : ''}
+          {/* Icon + Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div
               style={{
-                fontSize: '24px',
-                fontWeight: 900,
-                color: '#FFFFFF',
-                margin: 0,
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                flexShrink: 0,
               }}
             >
-              {t('اسٹاک نکاسی و ترسیل', 'Stock Outward')}
-            </h2>
+              <StockOutwardSvg />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <h2
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '26px' : '19px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  letterSpacing: '0',
+                }}
+              >
+                {t('اسٹاک نکاسی و ترسیل', 'Stock Outward')}
+              </h2>
+            </div>
           </div>
         </div>
       </div>
@@ -420,7 +438,7 @@ export const WarehouseStockView: React.FC = () => {
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: '11px',
+                    fontSize: isUrdu ? '13px' : '11px',
                     fontWeight: 800,
                     padding: '3px 8px',
                     borderRadius: '6px',
@@ -439,7 +457,7 @@ export const WarehouseStockView: React.FC = () => {
                 <h4
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: '18px',
+                    fontSize: isUrdu ? '24px' : '18px',
                     fontWeight: 900,
                     color: '#0F172A',
                     margin: 0,
@@ -467,7 +485,7 @@ export const WarehouseStockView: React.FC = () => {
                   <span style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', fontFamily: 'var(--font-mono)' }}>
                     {item.quantityBags}
                   </span>
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', fontWeight: 800, color: '#64748B', marginLeft: '4px' }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', fontWeight: 800, color: '#64748B', marginLeft: '4px' }}>
                     {t('بوریاں', 'Bags')}
                   </span>
                 </div>
@@ -526,7 +544,7 @@ export const WarehouseStockView: React.FC = () => {
               </div>
 
               {/* Valuation */}
-              <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 800, color: '#0F172A', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+              <div style={{ textAlign: 'right', fontSize: isUrdu ? '15px' : '12px', fontWeight: 800, color: '#0F172A', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
                 {isUrdu ? `${t('مالیت:', 'Valuation:')} ${totalItemValue.toLocaleString()} روپے` : `Valuation: Rs ${totalItemValue.toLocaleString()}`}
               </div>
             </div>
@@ -573,7 +591,7 @@ export const WarehouseStockView: React.FC = () => {
                 justifyContent: 'space-between',
               }}
             >
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900 }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '18px', fontWeight: 900 }}>
                 {modalMode === 'inward' ? t('+ نیا اسٹاک داخل کریں', '+ Stock Inward') : t('اسٹاک نکاسی و ترسیل', 'Stock Outward / Dispatch')}
               </span>
               <button

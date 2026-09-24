@@ -13,6 +13,7 @@ export interface Product {
   color?: string;
   unit: string;
   isActive: boolean;
+  emoji?: string;
 }
 
 interface TouchCardProps {
@@ -112,13 +113,13 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '14px 14px 12px 14px',
-        borderRadius: '16px',
+        padding: '10px 12px 8px 12px',
+        borderRadius: '12px',
         backgroundColor: isSelected ? theme.bgSelected : theme.bg,
         border: 'none',
         boxShadow: 'none',
         cursor: 'pointer',
-        minHeight: '102px',
+        minHeight: '84px',
         opacity: isRateSet ? 1 : 0.85,
         transition: 'background-color 0.15s ease',
       }}
@@ -134,39 +135,39 @@ export const TouchCard: React.FC<TouchCardProps> = ({
       >
         <div
           style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
+            width: '36px',
+            height: '36px',
+            borderRadius: '9px',
             backgroundColor: '#FFFFFF',
             border: 'none',
             color: theme.accent,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '20px',
+            fontSize: '18px',
             boxShadow: 'none',
           }}
         >
-          {product.icon || <Wheat size={22} />}
+          {product.icon || <Wheat size={20} />}
         </div>
 
         {/* Selected Pill / Checkmark */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
           {isRateSet ? (
             <div
               style={{
-                padding: '3px 8px',
-                borderRadius: '7px',
+                padding: '2px 8px',
+                borderRadius: '6px',
                 backgroundColor: isSelected ? '#FFFFFF' : theme.badgeBg,
                 color: isSelected ? theme.text : theme.badgeText,
                 fontWeight: 900,
-                fontSize: '12px',
+                fontSize: isUrdu ? '15px' : '12px',
                 border: 'none',
                 boxShadow: 'none',
                 fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
               }}
             >
-              {isUrdu ? `${product.ratePerKg} روپے` : `Rs ${product.ratePerKg}`}
+              {isUrdu ? `${product.ratePerKg} روپے / کلو` : `Rs ${product.ratePerKg}/KG`}
             </div>
           ) : (
             <div
@@ -179,7 +180,7 @@ export const TouchCard: React.FC<TouchCardProps> = ({
                 backgroundColor: '#FEE2E2',
                 color: '#B91C1C',
                 fontWeight: 700,
-                fontSize: '11px',
+                fontSize: isUrdu ? '13px' : '11px',
               }}
             >
               <AlertTriangle size={12} /> {isUrdu ? 'غیر مقرر' : 'Unset'}
@@ -189,7 +190,7 @@ export const TouchCard: React.FC<TouchCardProps> = ({
           {isSelected && (
             <span
               style={{
-                fontSize: '11px',
+                fontSize: isUrdu ? '13px' : '11px',
                 fontWeight: 900,
                 color: theme.accent,
                 fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
@@ -207,7 +208,7 @@ export const TouchCard: React.FC<TouchCardProps> = ({
         <div
           className={isUrdu ? 'font-nastaleeq' : ''}
           style={{
-            fontSize: '15px',
+            fontSize: isUrdu ? '20px' : '16px',
             fontWeight: 900,
             color: theme.text,
             textAlign: 'left',

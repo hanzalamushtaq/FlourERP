@@ -65,6 +65,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
 
   return (
     <div
+      className="dash-interactive-card card-animate-1"
       style={{
         backgroundColor: '#F8FAFC',
         borderRadius: '16px',
@@ -74,6 +75,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
         display: 'flex',
         flexDirection: 'column',
         boxShadow: 'none',
+        width: '100%',
       }}
     >
       {/* Centered Title */}
@@ -81,22 +83,26 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
         className={isUrdu ? 'font-nastaleeq' : ''}
         style={{
           fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-          fontSize: '18px',
+          fontSize: isUrdu ? '24px' : '18px',
           fontWeight: 900,
           color: '#0F172A',
           textAlign: 'center',
-          margin: '0 0 14px 0',
+          margin: '0 0 12px 0',
+          height: '38px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
         }}
       >
         {t('چکی ٹوکن قطار', 'Milling Token Queue')}
       </h3>
 
       {/* Table Container */}
-      <div style={{ width: '100%', overflowX: 'auto', borderRadius: '8px' }}>
+      <div style={{ width: '100%', borderRadius: '8px' }}>
         <table
           style={{
             width: '100%',
-            minWidth: '450px',
             borderCollapse: 'collapse',
             tableLayout: 'fixed',
           }}
@@ -106,33 +112,21 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
               style={{
                 backgroundColor: '#D97706',
                 color: '#FFFFFF',
+                height: '46px',
               }}
             >
               <th
                 style={{
                   display: 'table-cell',
-                  width: '26%',
-                  padding: '10px 14px',
+                  width: '28%',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 8px',
                   fontWeight: 800,
-                  fontSize: '14px',
-                  textAlign: 'left',
+                  fontSize: isUrdu ? '17px' : '14px',
+                  textAlign: 'center',
                   borderTopLeftRadius: '8px',
                   borderTopRightRadius: '0',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                  {t('حیثیت', 'Status')}
-                </span>
-              </th>
-              <th
-                style={{
-                  display: 'table-cell',
-                  width: '22%',
-                  padding: '10px 14px',
-                  fontWeight: 800,
-                  fontSize: '14px',
-                  textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
               >
@@ -143,10 +137,12 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
               <th
                 style={{
                   display: 'table-cell',
-                  width: '28%',
-                  padding: '10px 14px',
+                  width: '44%',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 8px',
                   fontWeight: 800,
-                  fontSize: '14px',
+                  fontSize: isUrdu ? '17px' : '14px',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
@@ -158,11 +154,13 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
               <th
                 style={{
                   display: 'table-cell',
-                  width: '24%',
-                  padding: '10px 14px',
+                  width: '28%',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 8px',
                   fontWeight: 800,
-                  fontSize: '14px',
-                  textAlign: 'right',
+                  fontSize: isUrdu ? '17px' : '14px',
+                  textAlign: 'center',
                   borderTopRightRadius: '8px',
                   borderTopLeftRadius: '0',
                   whiteSpace: 'nowrap',
@@ -176,78 +174,26 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
           </thead>
           <tbody>
             {queue.map((item, idx) => {
-              const isReady = item.status === 'ready';
-              const isGrinding = item.status === 'grinding';
-
-              // Rule 6 Badges & Chips:
-              const chipBg = isReady ? '#ECFDF5' : isGrinding ? '#FFFBEB' : '#EFF6FF';
-              const chipText = isReady ? '#0E8A54' : isGrinding ? '#B45309' : '#1D4ED8';
-              const statusText = isReady
-                ? t('تیار', 'Ready')
-                : isGrinding
-                ? t('پسائی جاری', 'Grinding')
-                : t('قطار میں', 'In Queue');
-
               return (
                 <tr
                   key={item.id}
-                  className="table-row-hover"
+                  className="dash-table-row"
                   style={{
                     borderBottom: '1px solid #F1F5F9',
                     backgroundColor: idx % 2 === 1 ? '#FFFFFF' : '#F8FAFC',
+                    height: '52px',
                   }}
                 >
-                  {/* Status Chip matching Rule 6 */}
-                  <td
-                    style={{
-                      padding: '12px 14px',
-                      textAlign: 'left',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    <div
-                      onClick={() => isReady && handleDeliver(item.tokenNumber)}
-                      className={isReady ? 'touch-active' : ''}
-                      title={
-                        isReady
-                          ? t('مکمل وصول / ڈیلیور کرنے کے لیے کلک کریں', 'Click to mark delivered')
-                          : undefined
-                      }
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: isReady ? 'pointer' : 'default',
-                        padding: '4px 10px',
-                        borderRadius: '6px',
-                        backgroundColor: chipBg,
-                        color: chipText,
-                        border: 'none',
-                        boxShadow: 'none',
-                      }}
-                    >
-                      <span
-                        className={isUrdu ? 'font-nastaleeq' : ''}
-                        style={{
-                          fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-                          fontWeight: 800,
-                          fontSize: '13.5px',
-                          color: chipText,
-                        }}
-                      >
-                        {statusText}
-                      </span>
-                    </div>
-                  </td>
-
                   {/* Weight */}
                   <td
                     style={{
-                      padding: '12px 14px',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 8px',
                       fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                       fontWeight: 800,
                       color: '#0F172A',
-                      fontSize: '14px',
+                      fontSize: isUrdu ? '18px' : '14px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
@@ -258,11 +204,13 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
                   {/* Customer Name */}
                   <td
                     style={{
-                      padding: '12px 14px',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 8px',
                       fontFamily: 'var(--font-urdu)',
                       fontWeight: 800,
                       color: '#0F172A',
-                      fontSize: '15px',
+                      fontSize: isUrdu ? '19px' : '15px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
@@ -273,16 +221,29 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
                   {/* Token No */}
                   <td
                     style={{
-                      padding: '12px 14px',
-                      fontFamily: 'var(--font-mono)',
-                      fontWeight: 800,
-                      color: '#0F172A',
-                      fontSize: '14px',
-                      textAlign: 'right',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 8px',
+                      textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {item.tokenNumber}
+                    <span
+                      className="token-badge-animated"
+                      style={{
+                        backgroundColor: '#EFF6FF',
+                        color: '#1D4ED8',
+                        border: '1px solid #BFDBFE',
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '14px',
+                        fontWeight: 900,
+                        display: 'inline-block',
+                      }}
+                    >
+                      {item.tokenNumber}
+                    </span>
                   </td>
                 </tr>
               );

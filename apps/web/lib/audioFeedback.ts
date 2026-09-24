@@ -83,6 +83,10 @@ class SoundSynthesizer {
     }
   }
 
+  public playSuccessSound() {
+    this.playSuccessChime();
+  }
+
   /**
    * Warning alert sound on invalid action or rate not set
    */

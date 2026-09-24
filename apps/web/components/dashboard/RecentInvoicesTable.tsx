@@ -151,7 +151,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
 
   return (
     <div
-      className="dash-card-animated"
+      className="dash-interactive-card card-animate-1"
       style={{
         backgroundColor: '#F8FAFC',
         borderRadius: '16px',
@@ -160,6 +160,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
         display: 'flex',
         flexDirection: 'column',
         boxShadow: 'none',
+        width: '100%',
       }}
     >
       {/* Centered Title */}
@@ -167,11 +168,16 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
         className={isUrdu ? 'font-nastaleeq' : ''}
         style={{
           fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-          fontSize: '18px',
+          fontSize: isUrdu ? '24px' : '18px',
           fontWeight: 900,
           color: '#0F172A',
           textAlign: 'center',
-          margin: '0 0 14px 0',
+          margin: '0 0 12px 0',
+          height: '38px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
         }}
       >
         {t('حالیہ بلز شفٹ لاگ', 'Recent Shift Bills')}
@@ -181,14 +187,12 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
       <div
         style={{
           width: '100%',
-          overflowX: 'auto',
           borderRadius: '8px',
         }}
       >
         <table
           style={{
             width: '100%',
-            minWidth: '550px',
             borderCollapse: 'collapse',
             tableLayout: 'fixed',
           }}
@@ -198,15 +202,18 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
               style={{
                 backgroundColor: '#1877F2',
                 color: '#FFFFFF',
+                height: '46px',
               }}
             >
               <th
                 style={{
                   display: 'table-cell',
                   width: '13%',
-                  padding: '11px 8px',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 6px',
                   fontWeight: 800,
-                  fontSize: '14px',
+                  fontSize: isUrdu ? '17px' : '14px',
                   borderTopLeftRadius: '8px',
                   borderTopRightRadius: '0',
                   textAlign: 'center',
@@ -220,10 +227,12 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
               <th
                 style={{
                   display: 'table-cell',
-                  width: '24%',
-                  padding: '11px 8px',
+                  width: '23%',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 6px',
                   fontWeight: 800,
-                  fontSize: '14px',
+                  fontSize: isUrdu ? '17px' : '14px',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
@@ -236,9 +245,11 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                 style={{
                   display: 'table-cell',
                   width: '22%',
-                  padding: '11px 8px',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 6px',
                   fontWeight: 800,
-                  fontSize: '14px',
+                  fontSize: isUrdu ? '17px' : '14px',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
@@ -251,9 +262,11 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                 style={{
                   display: 'table-cell',
                   width: '19%',
-                  padding: '11px 8px',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 6px',
                   fontWeight: 800,
-                  fontSize: '14px',
+                  fontSize: isUrdu ? '17px' : '14px',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
@@ -266,9 +279,11 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                 style={{
                   display: 'table-cell',
                   width: '12%',
-                  padding: '11px 6px',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 4px',
                   fontWeight: 800,
-                  fontSize: '14px',
+                  fontSize: isUrdu ? '17px' : '14px',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                 }}
@@ -281,9 +296,11 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                 style={{
                   display: 'table-cell',
                   width: '10%',
-                  padding: '11px 4px',
+                  height: '46px',
+                  verticalAlign: 'middle',
+                  padding: '0 4px',
                   fontWeight: 800,
-                  fontSize: '14px',
+                  fontSize: isUrdu ? '17px' : '14px',
                   borderTopRightRadius: '8px',
                   borderTopLeftRadius: '0',
                   textAlign: 'center',
@@ -297,7 +314,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {invoices.map((inv) => {
+            {invoices.map((inv, idx) => {
               const paymentLabel =
                 inv.paymentMethod === 'cash'
                   ? t('نقد', 'Cash')
@@ -322,36 +339,51 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
               return (
                 <tr
                   key={inv.invoiceNumber}
-                  className="table-row-hover"
+                  className="dash-table-row"
                   style={{
-                    borderBottom: 'none',
-                    backgroundColor: '#FFFFFF',
-                    transition: 'background-color 0.15s ease',
+                    borderBottom: '1px solid #F1F5F9',
+                    backgroundColor: idx % 2 === 1 ? '#FFFFFF' : '#F8FAFC',
+                    height: '52px',
                   }}
                 >
                   {/* Bill Number */}
                   <td
                     style={{
-                      padding: '13px 8px',
-                      fontFamily: 'var(--font-mono)',
-                      fontWeight: 800,
-                      color: '#0F172A',
-                      fontSize: '13.5px',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 6px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {inv.invoiceNumber}
+                    <span
+                      className="token-badge-animated"
+                      style={{
+                        backgroundColor: '#EFF6FF',
+                        color: '#1D4ED8',
+                        border: '1px solid #BFDBFE',
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '14px',
+                        fontWeight: 900,
+                        display: 'inline-block',
+                      }}
+                    >
+                      {inv.invoiceNumber}
+                    </span>
                   </td>
 
                   {/* Customer: Centered with ample breathing room */}
                   <td
                     style={{
-                      padding: '13px 10px',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 6px',
                       fontFamily: 'var(--font-urdu)',
                       fontWeight: 800,
                       color: '#0F172A',
-                      fontSize: '14.5px',
+                      fontSize: isUrdu ? '19px' : '15px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
@@ -362,10 +394,12 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   {/* Detail: Centered with distinct color and clean spacing */}
                   <td
                     style={{
-                      padding: '13px 10px',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 6px',
                       fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
                       color: '#64748B',
-                      fontSize: '13.5px',
+                      fontSize: isUrdu ? '17px' : '13.5px',
                       fontWeight: 700,
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
@@ -377,7 +411,9 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   {/* Amount: formatted for active language */}
                   <td
                     style={{
-                      padding: '13px 8px',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 6px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
@@ -387,7 +423,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                         fontWeight: 900,
                         fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                         color: '#0F172A',
-                        fontSize: '14px',
+                        fontSize: isUrdu ? '17px' : '14px',
                         display: 'inline-block',
                       }}
                     >
@@ -400,18 +436,20 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   {/* Payment: Flat tinted badge/chip */}
                   <td
                     style={{
-                      padding: '13px 6px',
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 4px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
                     }}
                   >
                     <span
-                      className={isUrdu ? 'font-nastaleeq' : ''}
+                      className={`${isUrdu ? 'font-nastaleeq' : ''} payment-badge-animated`}
                       style={{
                         fontWeight: 800,
                         backgroundColor: chipBg,
                         color: chipText,
-                        fontSize: '13px',
+                        fontSize: isUrdu ? '16px' : '13px',
                         padding: '3px 8px',
                         borderRadius: '6px',
                         display: 'inline-block',
@@ -424,11 +462,18 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   </td>
 
                   {/* Print Button */}
-                  <td style={{ padding: '13px 4px', textAlign: 'center' }}>
+                  <td
+                    style={{
+                      height: '52px',
+                      verticalAlign: 'middle',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                    }}
+                  >
                     <button
                       type="button"
                       onClick={() => inv.rawReceiptData && onReprint(inv.rawReceiptData)}
-                      className="touch-active"
+                      className="touch-active print-btn-animated"
                       title={t('رسید پرنٹ کریں', 'Print Receipt')}
                       style={{
                         width: '28px',
@@ -443,7 +488,6 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                         cursor: 'pointer',
                         boxShadow: 'none',
                         outline: 'none',
-                        transition: 'background-color 0.2s ease',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = '#DBEAFE';

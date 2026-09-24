@@ -165,17 +165,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           </div>
 
           {/* Right Text */}
-          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start' }}>
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '18px',
+                fontSize: isUrdu ? '32px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.4,
                 whiteSpace: 'nowrap',
-                letterSpacing: '-0.01em',
               }}
             >
               {t('نیا بل بنائیں', 'Create New Bill')}
@@ -238,17 +237,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           </div>
 
           {/* Right Text */}
-          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start' }}>
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '18px',
+                fontSize: isUrdu ? '32px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.4,
                 whiteSpace: 'nowrap',
-                letterSpacing: '-0.01em',
               }}
             >
               {t('گندم پسائی ٹوکن', 'Milling Token')}
@@ -311,17 +309,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           </div>
 
           {/* Right Text */}
-          <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start' }}>
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '18px',
+                fontSize: isUrdu ? '32px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.4,
                 whiteSpace: 'nowrap',
-                letterSpacing: '-0.01em',
               }}
             >
               {t('ادھار کھاتے و وصولی', 'Customer Ledger')}
@@ -340,16 +337,19 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           if (metric === 'sales') onNewBill();
           else if (metric === 'pisai') onNewPisaiToken();
           else if (metric === 'recovery') onViewUdhaar();
+          else if (metric === 'drawer') onViewAllInvoices?.();
         }}
       />
 
-      {/* 4. Operational Queue & Invoices Tables with Brown Headers matching reference image */}
+      {/* 4. Operational Queue & Invoices Tables with Balanced Widths */}
       <div
+        className="dashboard-tables-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gridTemplateColumns: '1fr 1.35fr',
           gap: '16px',
           alignItems: 'stretch',
+          width: '100%',
         }}
       >
         <ChakkiQueueCard />

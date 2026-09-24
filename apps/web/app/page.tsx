@@ -29,7 +29,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { isUrdu, t } = useLanguage();
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates'
@@ -48,11 +48,7 @@ export default function Home() {
     const saved = getSession();
     if (saved) {
       setCurrentUser(saved);
-      if (isAdmin(saved)) {
-        setActiveTab('admin');
-      } else {
-        setActiveTab('dashboard');
-      }
+      setActiveTab('dashboard');
       // Silently upgrade token if it was an offline mock token
       ensureValidToken(saved).then((token) => {
         if (token && token !== saved.token) {
@@ -95,7 +91,7 @@ export default function Home() {
         } else if (isZReportOpen) {
           setIsZReportOpen(false);
         } else {
-          setActiveTab(isAdmin(currentUser) ? 'admin' : 'dashboard');
+          setActiveTab('dashboard');
         }
       }
       // Alt+K -> Customer Udhaar Ledger
@@ -111,11 +107,7 @@ export default function Home() {
 
   const handleLoginSuccess = (user: UserSession) => {
     setCurrentUser(user);
-    if (isAdmin(user)) {
-      setActiveTab('admin');
-    } else {
-      setActiveTab('dashboard');
-    }
+    setActiveTab('dashboard');
   };
 
   const handleLogout = () => {
@@ -157,6 +149,7 @@ export default function Home() {
 
   return (
     <div
+      className={isUrdu ? 'dashboard-nastaleeq-scope' : ''}
       style={{
         display: 'flex',
         minHeight: '100vh',
@@ -182,6 +175,7 @@ export default function Home() {
 
       {/* 2. Main Workspace Layout */}
       <div
+        className={isUrdu ? 'dashboard-nastaleeq-scope' : ''}
         style={{
           flex: 1,
           display: 'flex',
@@ -226,65 +220,47 @@ export default function Home() {
 
         {/* View Router based on active tab and logged-in role */}
         <main style={{ flex: 1, paddingBottom: '24px' }}>
-          {/* Dashboard Tab: Tailored by Role */}
+          {/* Dashboard Tab: Unified Approved Dashboard for both Operator and Admin */}
           {activeTab === 'dashboard' && (
-            <>
-              {userIsBiller ? (
-                /* Biller-Specific Station Dashboard */
-                <BillerDashboard
-                  billerName={currentUser.fullName}
-                  counterId="کاؤنٹر #01"
-                  onNewBill={() => setActiveTab('billing')}
-                  onNewPisaiToken={() => setActiveTab('pisai')}
-                  onViewUdhaar={() => setActiveTab('udhaar')}
-                  onReprintReceipt={handleReprintReceipt}
-                  onViewAllInvoices={() => {
-                    if (userIsAdmin) setActiveTab('reports');
-                  }}
-                />
-              ) : (
-                /* Admin Dashboard or standard POS Counter Dashboard */
-                <CounterDashboard
-                  onNewBill={() => setActiveTab('billing')}
-                  onNewPisaiToken={() => setActiveTab('pisai')}
-                  onEditRates={() => setActiveTab('rates')}
-                  onReprintReceipt={handleReprintReceipt}
-                  onViewAllInvoices={() => setActiveTab('reports')}
-                  onMetricCardClick={(metric) => {
-                    if (metric === 'sales') setActiveTab('billing');
-                    else if (metric === 'pisai') setActiveTab('pisai');
-                    else if (metric === 'recovery') setActiveTab('udhaar');
-                    else if (metric === 'drawer') setIsZReportOpen(true);
-                  }}
-                />
-              )}
-            </>
+            <div className="dashboard-nastaleeq-scope">
+              <BillerDashboard
+                billerName={currentUser.fullName}
+                counterId={userIsAdmin ? 'مرکزی کنٹرول' : 'کاؤنٹر #01'}
+                onNewBill={() => setActiveTab('billing')}
+                onNewPisaiToken={() => setActiveTab('pisai')}
+                onViewUdhaar={() => setActiveTab('udhaar')}
+                onReprintReceipt={handleReprintReceipt}
+                onViewAllInvoices={() => {
+                  if (userIsAdmin) setActiveTab('reports');
+                }}
+              />
+            </div>
           )}
 
           {/* Billing Screen (F8) */}
           {activeTab === 'billing' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               <ProductBillingScreen />
             </div>
           )}
 
           {/* Pisai Screen (F2) */}
           {activeTab === 'pisai' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               <PisaiBillingScreen />
             </div>
           )}
 
           {/* Udhaar Ledger (Alt+K) */}
           {activeTab === 'udhaar' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               <CustomerLedgerView />
             </div>
           )}
 
           {/* Reports View: Accessible to Admin or permitted staff */}
           {activeTab === 'reports' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               {userIsAdmin || hasPermission(currentUser, 'can_view_reports') ? (
                 <ReportsView />
               ) : (
@@ -330,7 +306,7 @@ export default function Home() {
 
           {/* Admin Dashboard: Accessible to SuperAdmin or users with can_manage_users */}
           {activeTab === 'admin' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               {userIsAdmin ? (
                 <AdminDashboard
                   onOpenPriceModal={() => setActiveTab('rates')}
@@ -384,14 +360,14 @@ export default function Home() {
 
           {/* Stock Warehouse View */}
           {activeTab === 'stock' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               <WarehouseStockView />
             </div>
           )}
 
           {/* Daily Rates View (F3) */}
           {activeTab === 'rates' && (
-            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               <RateListView />
             </div>
           )}

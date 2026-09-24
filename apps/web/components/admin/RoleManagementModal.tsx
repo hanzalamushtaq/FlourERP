@@ -359,10 +359,10 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               <ShieldCheck size={22} strokeWidth={2.4} color="#d97706" />
             </div>
             <div>
-              <h2 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900, margin: 0, color: '#414833' }}>
+              <h2 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '18px', fontWeight: 900, margin: 0, color: '#0F172A' }}>
                 {t('اختیارات و رولز مینیجر', 'Roles & Permissions Manager')}
               </h2>
-              <div style={{ fontSize: '11px', color: '#656D4A', marginTop: '2px' }}>
+              <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '14px' : '12px', color: '#64748B', marginTop: '2px', fontWeight: 700 }}>
                 {t(
                   'ہر رول کے اختیارات کو اپنی مرضی سے بنائیں، تبدیل کریں اور سٹاف کو لگائیں',
                   'Customize role permissions and assign them to staff members'
@@ -384,7 +384,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               justifyContent: 'center',
             }}
           >
-            <X size={20} />
+            <X size={22} />
           </button>
         </div>
 
@@ -392,10 +392,10 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
         <div
           style={{
             display: 'flex',
-            borderBottom: '1px solid #E2E8F0',
+            borderBottom: '1.5px solid #E2E8F0',
             backgroundColor: '#F8FAFC',
-            padding: '0 16px',
-            gap: '8px',
+            padding: '0 20px',
+            gap: '12px',
           }}
         >
           <button
@@ -405,20 +405,20 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               setEditingRole(null);
             }}
             style={{
-              padding: '12px 16px',
+              padding: '12px 18px',
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              borderBottom: activeTab === 'roles' ? '3px solid #7F4F24' : '3px solid transparent',
-              color: activeTab === 'roles' ? '#414833' : '#64748B',
-              fontWeight: activeTab === 'roles' ? 800 : 600,
-              fontSize: '13px',
+              borderBottom: activeTab === 'roles' ? '3px solid #2563EB' : '3px solid transparent',
+              color: activeTab === 'roles' ? '#0F172A' : '#64748B',
+              fontWeight: activeTab === 'roles' ? 900 : 700,
+              fontSize: isUrdu ? '17px' : '14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
             }}
           >
-            <KeyRound size={15} />
+            <KeyRound size={17} color={activeTab === 'roles' ? '#2563EB' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {isUrdu ? `موجودہ رولز (${roles.length})` : `Existing Roles (${roles.length})`}
             </span>
@@ -431,20 +431,20 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               setEditingRole(null);
             }}
             style={{
-              padding: '12px 16px',
+              padding: '12px 18px',
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              borderBottom: activeTab === 'staff' ? '3px solid #7F4F24' : '3px solid transparent',
-              color: activeTab === 'staff' ? '#414833' : '#64748B',
-              fontWeight: activeTab === 'staff' ? 800 : 600,
-              fontSize: '13px',
+              borderBottom: activeTab === 'staff' ? '3px solid #2563EB' : '3px solid transparent',
+              color: activeTab === 'staff' ? '#0F172A' : '#64748B',
+              fontWeight: activeTab === 'staff' ? 900 : 700,
+              fontSize: isUrdu ? '17px' : '14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
             }}
           >
-            <Users size={15} />
+            <Users size={17} color={activeTab === 'staff' ? '#2563EB' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {isUrdu ? `سٹاف کو رول تفویض (${staff.length})` : `Staff Roles (${staff.length})`}
             </span>
@@ -457,20 +457,20 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               setEditingRole(null);
             }}
             style={{
-              padding: '12px 16px',
+              padding: '12px 18px',
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              borderBottom: activeTab === 'create' ? '3px solid #7F4F24' : '3px solid transparent',
-              color: activeTab === 'create' ? '#414833' : '#64748B',
-              fontWeight: activeTab === 'create' ? 800 : 600,
-              fontSize: '13px',
+              borderBottom: activeTab === 'create' ? '3px solid #2563EB' : '3px solid transparent',
+              color: activeTab === 'create' ? '#0F172A' : '#64748B',
+              fontWeight: activeTab === 'create' ? 900 : 700,
+              fontSize: isUrdu ? '17px' : '14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
             }}
           >
-            <Plus size={15} />
+            <Plus size={17} color={activeTab === 'create' ? '#2563EB' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {t('+ نیا رول بنائیں', '+ Create Role')}
             </span>
@@ -499,13 +499,13 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
         <div style={{ padding: '16px', overflowY: 'auto', flex: 1 }}>
           {/* INLINE EDIT ROLE PERMISSIONS VIEW */}
           {editingRole ? (
-            <div style={{ backgroundColor: '#FAF7EE', padding: '16px', borderRadius: '12px', border: '1.5px solid #E6D5C3' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div style={{ backgroundColor: '#F8FAFC', padding: '18px', borderRadius: '14px', border: '1.5px solid #CBD5E1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <div>
-                  <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '17px', fontWeight: 900, color: '#414833', margin: 0 }}>
+                  <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '17px', fontWeight: 900, color: '#0F172A', margin: 0 }}>
                     {t('رول کے اختیارات:', 'Edit Role Permissions:')} {editingRole.name}
                   </h3>
-                  <div style={{ fontSize: '11.5px', color: '#656D4A', marginTop: '2px' }}>
+                  <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '14px' : '12px', color: '#64748B', marginTop: '3px', fontWeight: 700 }}>
                     {t('اختیارات کو منتخب یا غیر منتخب کریں اور محفوظ کریں', 'Check or uncheck permissions and save')}
                   </div>
                 </div>
@@ -627,7 +627,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 900, color: '#414833' }}>
+                        <span className="font-nastaleeq" style={{ fontSize: '17px', fontWeight: 900, color: '#0F172A' }}>
                           {r.name}
                         </span>
                         {r.isSystem && (
@@ -658,13 +658,13 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                         className="touch-active"
                         title="Edit Permissions"
                         style={{
-                          height: '28px',
-                          padding: '0 10px',
-                          borderRadius: '5px',
+                          height: '32px',
+                          padding: '0 12px',
+                          borderRadius: '6px',
                           border: '1px solid #CBD5E1',
                           backgroundColor: '#FFFFFF',
-                          color: '#414833',
-                          fontSize: '11px',
+                          color: '#0F172A',
+                          fontSize: '12px',
                           fontWeight: 700,
                           cursor: 'pointer',
                           display: 'flex',

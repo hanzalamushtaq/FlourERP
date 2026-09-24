@@ -30,6 +30,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+      if (language === 'ur') {
+        document.documentElement.classList.add('urdu-mode');
+        document.body.classList.add('urdu-mode', 'dashboard-nastaleeq-scope');
+      } else {
+        document.documentElement.classList.remove('urdu-mode');
+        document.body.classList.remove('urdu-mode', 'dashboard-nastaleeq-scope');
+      }
+    }
+  }, [language]);
+
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     try {

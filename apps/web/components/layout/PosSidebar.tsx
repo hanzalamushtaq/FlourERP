@@ -191,207 +191,226 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        borderRight: 'none',
+        borderRight: '1.5px solid #E2E8F0',
         boxShadow: 'none',
         transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
         overflow: 'hidden',
       }}
     >
-      <div>
-        {/* Top Header Row: Small Logo aligned with Toggle Button */}
-        <div
+      {/* Top Header Row: Small Logo aligned with Toggle Button */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: isCollapsed ? 'center' : 'space-between',
+          padding: isCollapsed ? '14px 0 10px 0' : '14px 14px 12px 14px',
+          flexShrink: 0,
+          borderBottom: '1px solid #F1F5F9',
+        }}
+      >
+        {!isCollapsed && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <WheatGearLogo size={32} />
+            <span
+              style={{
+                fontSize: '15px',
+                fontWeight: 800,
+                color: '#0F172A',
+                letterSpacing: '-0.2px',
+              }}
+            >
+              Flour ERP
+            </span>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          title={isCollapsed ? t('سائیڈ بار کھولیں', 'Expand Sidebar') : t('سائیڈ بار بند کریں', 'Collapse Sidebar')}
+          className="touch-active"
           style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            backgroundColor: '#F8FAFC',
+            border: '1.5px solid #E2E8F0',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: isCollapsed ? 'center' : 'space-between',
-            padding: isCollapsed ? '14px 0 8px 0' : '14px 14px 12px 14px',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#0F172A',
+            boxShadow: 'none',
+            transition: 'all 0.15s ease',
+            outline: 'none',
+            flexShrink: 0,
           }}
         >
-          {!isCollapsed && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <WheatGearLogo size={32} />
-              <span
-                style={{
-                  fontSize: '15px',
-                  fontWeight: 800,
-                  color: '#0F172A',
-                  letterSpacing: '-0.2px',
-                }}
-              >
-                Flour ERP
-              </span>
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={toggleCollapse}
-            title={isCollapsed ? t('سائیڈ بار کھولیں', 'Expand Sidebar') : t('سائیڈ بار بند کریں', 'Collapse Sidebar')}
-            className="touch-active"
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              backgroundColor: '#F8FAFC',
-              border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#0F172A',
-              boxShadow: 'none',
-              transition: 'all 0.15s ease',
-              outline: 'none',
-              flexShrink: 0,
-            }}
-          >
-            <Menu size={20} strokeWidth={2.2} />
-          </button>
-        </div>
-
-        {/* Menu Navigation Items with Tactile Button / Card Feel */}
-        <nav
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            padding: isCollapsed ? '6px 10px' : '4px 12px',
-            alignItems: isCollapsed ? 'center' : 'stretch',
-          }}
-        >
-          {menuItems.map((item) => {
-            const isActive = currentTab === item.id;
-            const isHovered = hoveredTab === item.id;
-            const isPressed = pressedTab === item.id;
-
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={item.onClick}
-                title={item.label}
-                onMouseEnter={() => setHoveredTab(item.id)}
-                onMouseLeave={() => {
-                  setHoveredTab(null);
-                  setPressedTab(null);
-                }}
-                onMouseDown={() => setPressedTab(item.id)}
-                onMouseUp={() => setPressedTab(null)}
-                onTouchStart={() => setPressedTab(item.id)}
-                onTouchEnd={() => setPressedTab(null)}
-                className="touch-active"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: isCollapsed ? 'center' : 'space-between',
-                  width: isCollapsed ? '46px' : '100%',
-                  minHeight: isCollapsed ? '46px' : '50px',
-                  height: isCollapsed ? '46px' : 'auto',
-                  padding: isCollapsed ? '0' : '7px 12px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  backgroundColor: isActive
-                    ? '#EFF6FF'
-                    : isHovered
-                      ? '#F8FAFC'
-                      : 'transparent',
-                  cursor: 'pointer',
-                  direction: 'rtl',
-                  transition: 'background-color 0.12s ease',
-                  boxShadow: 'none',
-                  transform: 'none',
-                  outline: 'none',
-                }}
-              >
-                {/* Right: Bold Urdu Nastaleeq Text or Clean English */}
-                {!isCollapsed && (
-                  <span
-                    className={isUrdu ? 'font-nastaleeq' : ''}
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: 700,
-                      color: isActive ? '#1877F2' : '#0F172A',
-                      lineHeight: 1.25,
-                      whiteSpace: 'nowrap',
-                      marginRight: '2px',
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    {item.label}
-                  </span>
-                )}
-
-                {/* Left: Dedicated Icon Squircle */}
-                <div
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '10px',
-                    backgroundColor: isActive
-                      ? '#1877F2'
-                      : '#F8FAFC',
-                    border: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    boxShadow: 'none',
-                    transition: 'all 0.12s ease',
-                  }}
-                >
-                  {item.icon(
-                    isActive
-                      ? '#FFFFFF'
-                      : '#64748B'
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </nav>
+          <Menu size={20} strokeWidth={2.2} />
+        </button>
       </div>
 
+      {/* Menu Navigation Items with Tactile Button / Card Feel & Scrollbar */}
+      <nav
+        className="custom-sidebar-scrollbar"
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          padding: isCollapsed ? '8px 8px' : '8px 10px',
+          alignItems: isCollapsed ? 'center' : 'stretch',
+        }}
+      >
+        {menuItems.map((item) => {
+          const isActive = currentTab === item.id;
+          const isHovered = hoveredTab === item.id;
+          const isPressed = pressedTab === item.id;
+
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={item.onClick}
+              title={item.label}
+              onMouseEnter={() => setHoveredTab(item.id)}
+              onMouseLeave={() => {
+                setHoveredTab(null);
+                setPressedTab(null);
+              }}
+              onMouseDown={() => setPressedTab(item.id)}
+              onMouseUp={() => setPressedTab(null)}
+              onTouchStart={() => setPressedTab(item.id)}
+              onTouchEnd={() => setPressedTab(null)}
+              className="touch-active"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isCollapsed ? 'center' : 'space-between',
+                width: isCollapsed ? '46px' : '100%',
+                minHeight: isCollapsed ? '46px' : '52px',
+                height: isCollapsed ? '46px' : 'auto',
+                padding: isCollapsed ? '0' : '8px 12px',
+                borderRadius: '12px',
+                border: isActive
+                  ? '1.5px solid #1877F2'
+                  : isHovered
+                    ? '1.5px solid #CBD5E1'
+                    : '1.5px solid #E2E8F0',
+                backgroundColor: isActive
+                  ? '#1877F2'
+                  : isHovered
+                    ? '#F1F5F9'
+                    : '#F8FAFC',
+                cursor: 'pointer',
+                direction: 'rtl',
+                transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: isActive
+                  ? '0 4px 12px rgba(24, 119, 242, 0.28)'
+                  : isHovered
+                    ? '0 2px 6px rgba(15, 23, 42, 0.06)'
+                    : '0 1px 3px rgba(15, 23, 42, 0.03)',
+                transform: isPressed ? 'scale(0.97)' : isHovered ? 'translateX(-2px)' : 'none',
+                outline: 'none',
+              }}
+            >
+              {/* Right: Bold Urdu Nastaleeq Text or Clean English */}
+              {!isCollapsed && (
+                <span
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{
+                    fontSize: isUrdu ? '21px' : '16px',
+                    fontWeight: isActive ? 900 : 800,
+                    color: isActive ? '#FFFFFF' : isHovered ? '#1877F2' : '#0F172A',
+                    lineHeight: 1.3,
+                    whiteSpace: 'nowrap',
+                    marginRight: '4px',
+                    letterSpacing: '0',
+                  }}
+                >
+                  {item.label}
+                </span>
+              )}
+
+              {/* Left: Dedicated Icon Squircle */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '9px',
+                  backgroundColor: isActive
+                    ? 'rgba(255, 255, 255, 0.22)'
+                    : '#FFFFFF',
+                  border: isActive
+                    ? '1px solid rgba(255, 255, 255, 0.35)'
+                    : isHovered
+                      ? '1px solid #CBD5E1'
+                      : '1px solid #E2E8F0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: isActive
+                    ? 'none'
+                    : '0 1px 2px rgba(0,0,0,0.04)',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {item.icon(
+                  isActive
+                    ? '#FFFFFF'
+                    : isHovered
+                      ? '#1877F2'
+                      : '#475569'
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </nav>
+
       {/* Bottom Section: Clean Logout Button & Online Indicator */}
-      <div>
+      <div style={{ flexShrink: 0, borderTop: '1.5px solid #F1F5F9', backgroundColor: '#FFFFFF' }}>
+        {/* Bottom Actions */}
         {onLogout && (
-          <div style={{ padding: isCollapsed ? '8px 10px' : '8px 12px', borderTop: 'none', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ padding: isCollapsed ? '8px 10px' : '8px 12px', borderTop: '1px solid #F1F5F9' }}>
             <button
               type="button"
               onClick={onLogout}
-              title={t('لاگ آؤٹ', 'Logout')}
               className="touch-active"
               style={{
-                width: isCollapsed ? '46px' : '100%',
-                minHeight: isCollapsed ? '42px' : 'auto',
-                padding: isCollapsed ? '0' : '9px 12px',
-                borderRadius: '10px',
-                border: 'none',
-                backgroundColor: '#FEF2F2',
-                color: '#DC2626',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                fontSize: '13px',
-                fontWeight: 800,
+                width: '100%',
+                height: '46px',
+                borderRadius: '12px',
+                border: '1.5px solid #FECACA',
+                backgroundColor: '#FEF2F2',
                 cursor: 'pointer',
-                direction: 'rtl',
-                transition: 'background-color 0.15s ease',
-                boxShadow: 'none',
+                transition: 'all 0.15s ease',
+                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.06)',
                 outline: 'none',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#FEE2E2';
+                e.currentTarget.style.borderColor = '#FCA5A5';
+                e.currentTarget.style.boxShadow = '0 3px 8px rgba(239, 68, 68, 0.12)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = '#FEF2F2';
+                e.currentTarget.style.borderColor = '#FECACA';
+                e.currentTarget.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.06)';
               }}
             >
-              <LogOut size={16} color="#DC2626" />
+              <LogOut size={19} color="#DC2626" />
               {!isCollapsed && (
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: '13px', fontWeight: 800, color: '#DC2626' }}
+                  style={{ fontSize: isUrdu ? '20px' : '15px', fontWeight: 900, color: '#DC2626' }}
                 >
                   {t('لاگ آؤٹ', 'Logout')}
                 </span>
@@ -409,7 +428,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             alignItems: 'center',
             justifyContent: isCollapsed ? 'center' : 'space-between',
             direction: 'rtl',
-            fontSize: '11.5px',
+            fontSize: '12px',
             color: '#64748B',
             backgroundColor: '#FFFFFF',
           }}
@@ -427,14 +446,14 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             {!isCollapsed && (
               <span
                 className={isUrdu ? 'font-nastaleeq' : ''}
-                style={{ color: '#0E8A54', fontWeight: 800, fontSize: '12px' }}
+                style={{ color: '#0E8A54', fontWeight: 800, fontSize: isUrdu ? '17px' : '13px' }}
               >
                 {t('آن لائن', 'Online')}
               </span>
             )}
           </div>
           {!isCollapsed && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10.5px', color: '#64748B' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#64748B' }}>
               v1.0 POS
             </span>
           )}

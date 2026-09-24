@@ -80,103 +80,141 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     {
       id: 'sales',
       title: isUrdu ? 'آج کی پراڈکٹ سیل' : "Today's Product Sales",
-      value: kpiData
-        ? isUrdu
-          ? `${kpiData.sales.totalAmount.toLocaleString()} روپے`
-          : `Rs ${kpiData.sales.totalAmount.toLocaleString()}`
-        : isUrdu ? '42,850 روپے' : 'Rs 42,850',
+      numValue: kpiData
+        ? kpiData.sales.totalAmount.toLocaleString()
+        : '0',
       subtitle: kpiData
         ? isUrdu
           ? `${kpiData.sales.billsCount} بلز جاری ہوئے • آٹا، میدہ، سوجی`
           : `${kpiData.sales.billsCount} bills issued • Atta, Maida, Suji`
-        : isUrdu ? '38 بلز جاری ہوئے • آٹا، میدہ، سوجی' : '38 bills issued • Atta, Maida, Suji',
-      icon: <TrendingUp size={20} color="#d97706" />,
-      bg: '#fffbeb',
-      border: '#fde68a',
-      textColor: '#92400e',
-      valColor: '#b45309',
+        : isUrdu ? '0 بلز جاری ہوئے • آٹا، میدہ، سوجی' : '0 bills issued • Atta, Maida, Suji',
+      icon: <TrendingUp size={20} color="#D97706" />,
+      bg: '#FFFBEB',
+      border: '#FDE68A',
+      textColor: '#92400E',
+      valColor: '#B45309',
       onClick: () => onNavigateTab('billing'),
     },
     {
       id: 'pisai',
       title: isUrdu ? 'گندم پسائی آمدن' : 'Pisai Milling Revenue',
-      value: kpiData
-        ? isUrdu
-          ? `${kpiData.pisai.totalRevenue.toLocaleString()} روپے`
-          : `Rs ${kpiData.pisai.totalRevenue.toLocaleString()}`
-        : isUrdu ? '8,640 روپے' : 'Rs 8,640',
+      numValue: kpiData
+        ? kpiData.pisai.totalRevenue.toLocaleString()
+        : '0',
       subtitle: kpiData
         ? isUrdu
           ? `${kpiData.pisai.tokensCount} ٹوکنز مکمل • ${kpiData.pisai.weightKg} کلو`
           : `${kpiData.pisai.tokensCount} tokens processed • ${kpiData.pisai.weightKg} KG`
-        : isUrdu ? '54 ٹوکنز مکمل • 1,440 کلو' : '54 tokens processed • 1,440 KG',
-      icon: <Sparkles size={20} color="#0284c7" />,
-      bg: '#f0f9ff',
-      border: '#bae6fd',
-      textColor: '#075985',
-      valColor: '#0369a1',
+        : isUrdu ? '0 ٹوکنز مکمل • 0 کلو' : '0 tokens processed • 0 KG',
+      icon: <Sparkles size={20} color="#0284C7" />,
+      bg: '#F0F9FF',
+      border: '#BAE6FD',
+      textColor: '#0369A1',
+      valColor: '#0284C7',
       onClick: () => onNavigateTab('pisai'),
     },
     {
       id: 'expenses',
       title: isUrdu ? 'دکان کے اخراجات' : 'Shop Expenses & Bills',
-      value: kpiData
-        ? isUrdu
-          ? `${kpiData.expenses.totalAmount.toLocaleString()} روپے`
-          : `Rs ${kpiData.expenses.totalAmount.toLocaleString()}`
-        : isUrdu ? '3,625 روپے' : 'Rs 3,625',
+      numValue: kpiData
+        ? kpiData.expenses.totalAmount.toLocaleString()
+        : '0',
       subtitle: kpiData
         ? isUrdu
           ? `${kpiData.expenses.count} اخراجات درج • بجلی، دکان خرچ`
-          : `${kpiData.expenses.count} recorded • Electricity, tea, maintenance`
-        : isUrdu ? 'بجلی، ورکر چائے، دکان خرچ' : 'Electricity, tea, maintenance',
-      icon: <Receipt size={20} color="#e11d48" />,
-      bg: '#fff1f2',
-      border: '#fecdd3',
-      textColor: '#9f1239',
-      valColor: '#be123c',
+          : `${kpiData.expenses.count} recorded • Electricity, shop`
+        : isUrdu ? '0 اخراجات درج • بجلی، دکان خرچ' : '0 recorded • Electricity, shop',
+      icon: <Receipt size={20} color="#E11D48" />,
+      bg: '#FFF1F2',
+      border: '#FECDD3',
+      textColor: '#9F1239',
+      valColor: '#BE123C',
       onClick: () => onNavigateTab('reports'),
     },
     {
       id: 'udhaar',
       title: isUrdu ? 'کل گاہک ادھار کھاتہ' : 'Total Customer Udhaar',
-      value: kpiData
-        ? isUrdu
-          ? `${kpiData.udhaar.totalOutstanding.toLocaleString()} روپے`
-          : `Rs ${kpiData.udhaar.totalOutstanding.toLocaleString()}`
-        : isUrdu ? '61,100 روپے' : 'Rs 61,100',
+      numValue: kpiData
+        ? kpiData.udhaar.totalOutstanding.toLocaleString()
+        : '83,250',
       subtitle: kpiData
         ? isUrdu
           ? `${kpiData.udhaar.debtorsCount} فعال ادھار کھاتہ داران`
           : `${kpiData.udhaar.debtorsCount} active credit accounts`
-        : isUrdu ? '14 فعال ادھار کھاتہ داران' : '14 active credit accounts',
-      icon: <Users size={20} color="#7e22ce" />,
-      bg: '#faf5ff',
-      border: '#e9d5ff',
-      textColor: '#6b21a8',
-      valColor: '#7e22ce',
+        : isUrdu ? '7 فعال ادھار کھاتہ داران' : '7 active credit accounts',
+      icon: <Users size={20} color="#7E22CE" />,
+      bg: '#FAF5FF',
+      border: '#E9D5FF',
+      textColor: '#6B21A8',
+      valColor: '#7E22CE',
       onClick: () => onNavigateTab('udhaar'),
     },
     {
       id: 'drawer',
       title: isUrdu ? 'دکان کا موجودہ کیش' : 'Net Cash in Drawer',
-      value: kpiData
-        ? isUrdu
-          ? `${kpiData.cash.netCashInHand.toLocaleString()} روپے`
-          : `Rs ${kpiData.cash.netCashInHand.toLocaleString()}`
-        : isUrdu ? '47,865 روپے' : 'Rs 47,865',
+      numValue: kpiData
+        ? kpiData.cash.netCashInHand.toLocaleString()
+        : '0',
       subtitle: isUrdu ? 'سیلز + پسائی + وصولی - اخراجات' : 'Sales + Pisai + Recovery - Expenses',
-      icon: <Wallet size={20} color="#16a34a" />,
-      bg: '#f0fdf4',
-      border: '#bbf7d0',
+      icon: <Wallet size={20} color="#16A34A" />,
+      bg: '#F0FDF4',
+      border: '#BBF7D0',
       textColor: '#166534',
-      valColor: '#15803d',
+      valColor: '#15803D',
       onClick: () => onNavigateTab('reports'),
     },
   ];
 
+  const auditLogs = [
+    {
+      time: isUrdu ? 'آج، 02:30 PM' : 'Today, 02:30 PM',
+      actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
+      action: 'PRINT_BILL',
+      actionColor: '#0284C7',
+      actionBg: '#F0F9FF',
+      actionBorder: '#BAE6FD',
+      detail: isUrdu ? 'بل #00481 (چکی آٹا، 40 کلو، 5,600 روپے)' : 'BILL-00481 (Chakki Atta, 40 KG, Rs 5,600)',
+    },
+    {
+      time: isUrdu ? 'آج، 02:15 PM' : 'Today, 02:15 PM',
+      actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
+      action: 'GENERATE_PISAI_TOKEN',
+      actionColor: '#059669',
+      actionBg: '#ECFDF5',
+      actionBorder: '#A7F3D0',
+      detail: isUrdu ? 'ٹوکن #0482 (صفائی و پسائی، 25 کلو، 150 روپے)' : 'Token #0482 (Cleaning & Grinding, 25 KG, Rs 150)',
+    },
+    {
+      time: isUrdu ? 'آج، 01:45 PM' : 'Today, 01:45 PM',
+      actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
+      action: 'LOG_EXPENSE',
+      actionColor: '#E11D48',
+      actionBg: '#FFF1F2',
+      actionBorder: '#FECDD3',
+      detail: isUrdu ? 'خرچہ #109 (بجلی ایڈوانس، 2,500 روپے)' : 'EXP-109 (Electricity Advance, Rs 2,500)',
+    },
+    {
+      time: isUrdu ? 'آج، 01:10 PM' : 'Today, 01:10 PM',
+      actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
+      action: 'LOG_UDHAAR_PAYMENT',
+      actionColor: '#7E22CE',
+      actionBg: '#FAF5FF',
+      actionBorder: '#E9D5FF',
+      detail: isUrdu ? 'وصولی #055 (گاہک حاجی رشید، 2,000 روپے)' : 'PAY-055 (Customer Haji Rasheed, Rs 2,000)',
+    },
+    {
+      time: isUrdu ? 'آج، 08:00 AM' : 'Today, 08:00 AM',
+      actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
+      action: 'CONFIRM_DAILY_PRICE',
+      actionColor: '#D97706',
+      actionBg: '#FFFBEB',
+      actionBorder: '#FDE68A',
+      detail: isUrdu ? 'یومیہ ریٹس کی تصدیق برائے 5 پراڈکٹس' : 'Daily rates confirmed for 5 products',
+    },
+  ];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%', maxWidth: '1280px', margin: '0 auto' }}>
       {/* 1. Shop Owner Welcome Command Banner */}
       <div
         style={{
@@ -184,56 +222,47 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           backgroundColor: '#FFFFFF',
-          border: '1.5px solid #C2C5AA',
-          borderRadius: '14px',
-          padding: '16px 20px',
+          border: '1.5px solid #CBD5E1',
+          borderRadius: '16px',
+          padding: '18px 24px',
           flexWrap: 'wrap',
-          gap: '14px',
-          boxShadow: 'none',
+          gap: '16px',
+          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
         }}
       >
         <div>
           <h1
             className={isUrdu ? 'font-nastaleeq' : ''}
-            style={{ fontSize: '18px', fontWeight: 900, color: '#414833', margin: 0, lineHeight: 1.2 }}
+            style={{ fontSize: isUrdu ? '24px' : '18px', fontWeight: 900, color: '#0F172A', margin: 0, lineHeight: 1.2 }}
           >
             {t('المدینہ فلور ملز - ایڈمن کمانڈ سنٹر', 'Al-Madina Flour Mills - Admin Command Center')}
           </h1>
-          <p
-            className={isUrdu ? 'font-nastaleeq' : ''}
-            style={{ fontSize: '12px', color: '#656D4A', marginTop: '3px', fontWeight: 700 }}
-          >
-            {t(
-              'لائیو مالیاتی صورتحال، روزانہ کے ریٹس، چکی پسائی کیو اور سٹاف اختیارات کنٹرول',
-              'Live financial status, daily rates, milling queue and staff permissions control'
-            )}
-          </p>
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           {/* RBAC Button */}
           <button
             type="button"
             onClick={() => setIsRoleModalOpen(true)}
             className="touch-active"
             style={{
-              height: '38px',
-              padding: '0 14px',
-              borderRadius: '8px',
-              backgroundColor: '#fffbeb',
-              color: '#92400e',
-              border: '1.5px solid #fde68a',
-              fontSize: '13px',
+              height: '42px',
+              padding: '0 16px',
+              borderRadius: '10px',
+              backgroundColor: '#FFFBEB',
+              color: '#92400E',
+              border: '1.5px solid #FDE68A',
+              fontSize: isUrdu ? '17px' : '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              boxShadow: 'none',
+              gap: '8px',
+              boxShadow: '0 2px 4px rgba(217, 119, 6, 0.08)',
             }}
           >
-            <ShieldCheck size={16} color="#d97706" />
+            <ShieldCheck size={18} color="#D97706" />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سٹاف رولز و اختیارات', 'Staff Roles & Permissions')}</span>
           </button>
 
@@ -243,22 +272,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onClick={onOpenPriceModal}
             className="touch-active"
             style={{
-              height: '38px',
-              padding: '0 14px',
-              borderRadius: '8px',
-              backgroundColor: '#ecfdf5',
-              color: '#065f46',
-              border: '1.5px solid #a7f3d0',
-              fontSize: '13px',
+              height: '42px',
+              padding: '0 16px',
+              borderRadius: '10px',
+              backgroundColor: '#ECFDF5',
+              color: '#065F46',
+              border: '1.5px solid #A7F3D0',
+              fontSize: isUrdu ? '17px' : '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              boxShadow: 'none',
+              gap: '8px',
+              boxShadow: '0 2px 4px rgba(5, 150, 105, 0.08)',
             }}
           >
-            <Clock size={16} color="#059669" />
+            <Clock size={18} color="#059669" />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('روزانہ کے ریٹس', 'Daily Rates')}</span>
           </button>
 
@@ -269,22 +298,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             disabled={closingTriggered}
             className="touch-active"
             style={{
-              height: '38px',
-              padding: '0 14px',
-              borderRadius: '8px',
-              backgroundColor: '#f0f9ff',
-              color: '#0369a1',
-              border: '1.5px solid #bae6fd',
-              fontSize: '13px',
+              height: '42px',
+              padding: '0 16px',
+              borderRadius: '10px',
+              backgroundColor: '#F0F9FF',
+              color: '#0369A1',
+              border: '1.5px solid #BAE6FD',
+              fontSize: isUrdu ? '17px' : '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              boxShadow: 'none',
+              gap: '8px',
+              boxShadow: '0 2px 4px rgba(2, 132, 199, 0.08)',
             }}
           >
-            <Database size={16} color="#0284c7" />
+            <Database size={18} color="#0284C7" />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {closingTriggered
                 ? t('بیک اپ ہو رہا ہے...', 'Backing up...')
@@ -298,75 +327,76 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onClick={() => onNavigateTab('billing')}
             className="touch-active"
             style={{
-              height: '38px',
-              padding: '0 14px',
-              borderRadius: '8px',
-              backgroundColor: '#faf5ff',
-              color: '#6b21a8',
-              border: '1.5px solid #e9d5ff',
-              fontSize: '13px',
+              height: '42px',
+              padding: '0 18px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #1877F2 0%, #0D5AC4 100%)',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: isUrdu ? '17px' : '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              boxShadow: 'none',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(24, 119, 242, 0.25)',
             }}
           >
-            <ShoppingCart size={16} color="#7e22ce" />
+            <ShoppingCart size={18} color="#FFFFFF" />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کاؤنٹر پی او ایس', 'Counter POS')}</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Summary KPI Cards */}
+      {/* 2. Summary KPI Cards - 5 Evenly Distributed Cards in 1 Balanced Row */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-          gap: '12px',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: '14px',
         }}
       >
         {summaryCards.map((card) => (
           <div
             key={card.id}
             onClick={card.onClick}
-            className="touch-active"
+            className="touch-active dash-card-animated"
             style={{
               backgroundColor: card.bg,
               border: `1.5px solid ${card.border}`,
-              borderRadius: '12px',
-              padding: '14px 16px',
+              borderRadius: '16px',
+              padding: '16px 18px',
               cursor: 'pointer',
-              boxShadow: 'none',
+              boxShadow: '0 2px 6px rgba(15, 23, 42, 0.03)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              transition: 'all 0.15s ease',
+              minHeight: '102px',
+              transition: 'all 0.18s ease',
             }}
           >
             <div>
+              {/* Card Header: Title + Squircle Icon */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: '14px', fontWeight: 800, color: card.textColor, lineHeight: 1.1 }}
+                  style={{ fontSize: isUrdu ? '19px' : '14px', fontWeight: 900, color: card.textColor, lineHeight: 1.2 }}
                 >
                   {card.title}
                 </span>
 
-                {/* White rounded square for icon */}
                 <div
                   style={{
                     width: '36px',
                     height: '36px',
-                    borderRadius: '8px',
-                    backgroundColor: '#ffffff',
+                    borderRadius: '10px',
+                    backgroundColor: '#FFFFFF',
                     border: `1px solid ${card.border}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: 'none',
                     flexShrink: 0,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
                   }}
                 >
                   {card.icon}
@@ -376,23 +406,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Amount */}
               <div
                 style={{
-                  fontSize: '20px',
+                  fontSize: '26px',
                   fontWeight: 900,
-                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                  fontFamily: 'var(--font-mono)',
                   color: card.valColor,
-                  margin: '8px 0 2px',
+                  margin: '10px 0 0',
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: '6px',
+                  direction: 'ltr',
                 }}
               >
-                {card.value}
+                <span>{card.numValue}</span>
+                <span
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: card.textColor }}
+                >
+                  {isUrdu ? 'روپے' : 'PKR'}
+                </span>
               </div>
-            </div>
-
-            {/* Subtitle */}
-            <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{ fontSize: '12px', color: card.textColor, opacity: 0.9, marginTop: '4px' }}
-            >
-              {card.subtitle}
             </div>
           </div>
         ))}
@@ -402,118 +434,117 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <div
         style={{
           backgroundColor: '#FFFFFF',
-          borderRadius: '12px',
-          border: '1.5px solid #C2C5AA',
-          padding: '16px 20px',
-          boxShadow: 'none',
+          borderRadius: '16px',
+          border: '1.5px solid #CBD5E1',
+          overflow: 'hidden',
+          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Table Header / Banner */}
+        <div
+          style={{
+            backgroundColor: '#0F172A',
+            padding: '16px 22px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div
               style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '6px',
-                backgroundColor: '#fffbeb',
-                border: '1px solid #fde68a',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <ShieldCheck size={16} color="#d97706" />
+              <ShieldCheck size={18} color="#FDE68A" />
             </div>
-            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 800, color: '#414833', margin: 0 }}>
+            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '16px', fontWeight: 900, color: '#FFFFFF', margin: 0 }}>
               {t('سسٹم سرگرمی اور مالیاتی لاگ', 'System Activity & Financial Audit Log')}
             </h3>
           </div>
-          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12.5px', color: '#656D4A', fontWeight: 600 }}>
+
+          <span
+            className={isUrdu ? 'font-nastaleeq' : ''}
+            style={{
+              fontSize: isUrdu ? '15px' : '12.5px',
+              color: '#34D399',
+              fontWeight: 800,
+              backgroundColor: 'rgba(52, 211, 153, 0.12)',
+              padding: '4px 12px',
+              borderRadius: '20px',
+              border: '1px solid rgba(52, 211, 153, 0.3)',
+            }}
+          >
             {t('غیر متغیر سکیورٹی و مالیاتی ٹریل', 'Immutable security and audit trail')}
           </span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {[
-            {
-              time: isUrdu ? 'آج، 02:30 PM' : 'Today, 02:30 PM',
-              actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
-              action: 'PRINT_BILL',
-              actionColor: '#0284c7',
-              actionBg: '#f0f9ff',
-              actionBorder: '#bae6fd',
-              detail: isUrdu ? 'بل #00481 (چکی آٹا، 40 کلو، 5,600 روپے)' : 'BILL-00481 (Chakki Atta, 40 KG, Rs 5,600)',
-            },
-            {
-              time: isUrdu ? 'آج، 02:15 PM' : 'Today, 02:15 PM',
-              actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
-              action: 'GENERATE_PISAI_TOKEN',
-              actionColor: '#059669',
-              actionBg: '#ecfdf5',
-              actionBorder: '#a7f3d0',
-              detail: isUrdu ? 'ٹوکن #0482 (صفائی و پسائی، 25 کلو، 150 روپے)' : 'Token #0482 (Cleaning & Grinding, 25 KG, Rs 150)',
-            },
-            {
-              time: isUrdu ? 'آج، 01:45 PM' : 'Today, 01:45 PM',
-              actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
-              action: 'LOG_EXPENSE',
-              actionColor: '#e11d48',
-              actionBg: '#fff1f2',
-              actionBorder: '#fecdd3',
-              detail: isUrdu ? 'خرچہ #109 (بجلی ایڈوانس، 2,500 روپے)' : 'EXP-109 (Electricity Advance, Rs 2,500)',
-            },
-            {
-              time: isUrdu ? 'آج، 01:10 PM' : 'Today, 01:10 PM',
-              actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
-              action: 'LOG_UDHAAR_PAYMENT',
-              actionColor: '#7e22ce',
-              actionBg: '#faf5ff',
-              actionBorder: '#e9d5ff',
-              detail: isUrdu ? 'وصولی #055 (گاہک حاجی رشید، 2,000 روپے)' : 'PAY-055 (Customer Haji Rasheed, Rs 2,000)',
-            },
-            {
-              time: isUrdu ? 'آج، 08:00 AM' : 'Today, 08:00 AM',
-              actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
-              action: 'CONFIRM_DAILY_PRICE',
-              actionColor: '#d97706',
-              actionBg: '#fffbeb',
-              actionBorder: '#fde68a',
-              detail: isUrdu ? 'یومیہ ریٹس کی تصدیق برائے 5 پراڈکٹس' : 'Daily rates confirmed for 5 products',
-            },
-          ].map((log, idx) => (
+        {/* Column Headings */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '160px 200px 220px 1fr',
+            padding: '12px 22px',
+            backgroundColor: '#F8FAFC',
+            borderBottom: '1.5px solid #E2E8F0',
+            fontSize: isUrdu ? '16px' : '13px',
+            fontWeight: 800,
+            color: '#64748B',
+          }}
+          className={isUrdu ? 'font-nastaleeq' : ''}
+        >
+          <span>{t('وقت و تاریخ', 'Time')}</span>
+          <span>{t('صارف / بلر', 'User / Actor')}</span>
+          <span>{t('کارروائی کی قسم', 'Action')}</span>
+          <span>{t('تفصیلات', 'Details')}</span>
+        </div>
+
+        {/* Log Entries */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {auditLogs.map((log, idx) => (
             <div
               key={idx}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1.2fr 1.5fr 1.6fr 3fr',
-                fontSize: '12.5px',
-                padding: '9px 14px',
-                borderRadius: '8px',
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0',
+                gridTemplateColumns: '160px 200px 220px 1fr',
+                padding: '14px 22px',
+                backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
+                borderBottom: idx === auditLogs.length - 1 ? 'none' : '1px solid #F1F5F9',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
+                transition: 'background-color 0.12s ease',
               }}
             >
-              <span style={{ color: '#64748b', fontWeight: 600, fontSize: '11.5px' }}>{log.time}</span>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#414833' }}>{log.actor}</span>
+              <span style={{ color: '#475569', fontWeight: 800, fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
+                {log.time}
+              </span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#0F172A', fontSize: isUrdu ? '17px' : '14px' }}>
+                {log.actor}
+              </span>
               <div>
                 <span
                   style={{
-                    fontSize: '10.5px',
-                    fontWeight: 800,
-                    padding: '2px 8px',
-                    borderRadius: '5px',
+                    fontSize: '12px',
+                    fontWeight: 900,
+                    padding: '4px 10px',
+                    borderRadius: '6px',
                     backgroundColor: log.actionBg,
                     color: log.actionColor,
-                    border: `1px solid ${log.actionBorder}`,
+                    border: `1.5px solid ${log.actionBorder}`,
                     fontFamily: 'var(--font-mono)',
+                    display: 'inline-block',
                   }}
                 >
                   {log.action}
                 </span>
               </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#414833', fontWeight: 600, fontSize: '12px' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#1E293B', fontWeight: 700, fontSize: isUrdu ? '17px' : '14px' }}>
                 {log.detail}
               </span>
             </div>

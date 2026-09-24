@@ -387,7 +387,7 @@ export const RateListView: React.FC = () => {
           onMouseUp={() => setPressedCard(null)}
           className="touch-active"
           style={{
-            background: '#DC3545',
+            background: '#D97706',
             borderRadius: '16px',
             padding: '16px 20px',
             display: 'flex',
@@ -419,7 +419,7 @@ export const RateListView: React.FC = () => {
               transform: hoveredCard === 'save' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
             }}
           >
-            <Check size={32} color="#DC3545" strokeWidth={2.8} />
+            <Check size={32} color="#D97706" strokeWidth={2.8} />
           </div>
 
           <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -508,12 +508,12 @@ export const RateListView: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '24px' }}>🌾</span>
-          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
             {t('آٹا و تیار اناج مصنوعات کے یومیہ ریٹس', 'Flour & Grain Products Daily Rates')}
           </h3>
           <span
             style={{
-              fontSize: '11.5px',
+              fontSize: isUrdu ? '13px' : '11.5px',
               fontWeight: 800,
               color: '#78350F',
               backgroundColor: '#FEF3C7',
@@ -539,7 +539,7 @@ export const RateListView: React.FC = () => {
             border: '2px solid #8C582B',
             borderRadius: '10px',
             padding: '6px 14px',
-            fontSize: '13px',
+            fontSize: isUrdu ? '16px' : '13px',
             fontWeight: 900,
             cursor: 'pointer',
             boxShadow: '0 2px 6px rgba(140, 88, 43, 0.12)',
@@ -610,20 +610,20 @@ export const RateListView: React.FC = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-end', gap: '3px' }}>
                   <span
                     style={{
-                      fontSize: '12.5px',
+                      fontSize: isUrdu ? '15px' : '12.5px',
                       fontWeight: 900,
                       color: '#78350F',
                       backgroundColor: '#FEF3C7',
                       padding: '4px 10px',
                       borderRadius: '8px',
                       border: '1px solid #FDE68A',
-                      fontFamily: 'var(--font-mono)',
+                      fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                       boxShadow: 'none',
                     }}
                   >
                     {isUrdu ? `1 کلو: ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)} روپے` : `1 KG: Rs ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)}`}
                   </span>
-                  <span style={{ fontSize: '11px', color: '#78716C', fontWeight: 700 }}>
+                  <span style={{ fontSize: isUrdu ? '13px' : '11px', color: '#78716C', fontWeight: 700 }}>
                     {t('کل کا من ریٹ:', 'Yesterday Maund:')} {isUrdu ? `${item.yesterdayMaund.toLocaleString()} روپے` : `Rs ${item.yesterdayMaund.toLocaleString()}`}
                   </span>
                 </div>
@@ -634,7 +634,7 @@ export const RateListView: React.FC = () => {
                 <h4
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: '18px',
+                    fontSize: isUrdu ? '24px' : '18px',
                     fontWeight: 900,
                     color: '#1F2937',
                     margin: 0,
@@ -658,7 +658,7 @@ export const RateListView: React.FC = () => {
                   gap: '8px',
                 }}
               >
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: '#8C582B' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: '#8C582B' }}>
                   {t('روپے', 'Rs')}
                 </span>
                 <input
@@ -693,7 +693,7 @@ export const RateListView: React.FC = () => {
                     boxShadow: 'none',
                   }}
                 />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12.5px', fontWeight: 800, color: '#6B7280' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: '#6B7280' }}>
                   {t('/ من', '/ Maund')}
                 </span>
               </div>
@@ -743,12 +743,12 @@ export const RateListView: React.FC = () => {
       <div style={{ marginTop: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           <span style={{ fontSize: '24px' }}>⚙️</span>
-          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
             {t('گندم چکی پسائی و صفائی کے ریٹس', 'Wheat Cleaning & Milling Rates')}
           </h3>
           <span
             style={{
-              fontSize: '11.5px',
+              fontSize: isUrdu ? '13px' : '11.5px',
               fontWeight: 800,
               color: '#065F46',
               backgroundColor: '#D1FAE5',
@@ -813,16 +813,16 @@ export const RateListView: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '20px', fontWeight: 900, color: '#1F2937', margin: 0, lineHeight: 1.2 }}>
+                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '20px', fontWeight: 900, color: '#1F2937', margin: 0, lineHeight: 1.2 }}>
                       {pisaiTitle}
                     </h4>
-                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', color: '#6B7280', fontWeight: 600, marginTop: '2px' }}>
+                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: '#6B7280', fontWeight: 600, marginTop: '2px' }}>
                       {pisaiNote}
                     </div>
                     <div
                       className={isUrdu ? 'font-nastaleeq' : ''}
                       style={{
-                        fontSize: '12.5px',
+                        fontSize: isUrdu ? '15px' : '12.5px',
                         color: '#78350F',
                         fontWeight: 900,
                         backgroundColor: '#FEF3C7',
@@ -873,7 +873,7 @@ export const RateListView: React.FC = () => {
                       boxShadow: 'none',
                     }}
                   />
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12.5px', fontWeight: 800, color: '#6B7280' }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: '#6B7280' }}>
                     {t('/ من (40 KG)', '/ Maund (40 KG)')}
                   </span>
                 </div>
@@ -938,8 +938,8 @@ export const RateListView: React.FC = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(5px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -947,169 +947,387 @@ export const RateListView: React.FC = () => {
             zIndex: 3000,
           }}
         >
+          <style dangerouslySetInnerHTML={{ __html: `
+            @media print {
+              body * {
+                visibility: hidden !important;
+              }
+              #printable-rate-sheet, #printable-rate-sheet * {
+                visibility: visible !important;
+              }
+              #printable-rate-sheet {
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 24px !important;
+                border: 1.5px solid #0F172A !important;
+                box-shadow: none !important;
+                background: #ffffff !important;
+              }
+              .no-print {
+                display: none !important;
+              }
+            }
+          `}} />
+
           <div
             style={{
               width: '100%',
-              maxWidth: '480px',
+              maxWidth: '520px',
+              maxHeight: '90vh',
               backgroundColor: '#FFFFFF',
               borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
-              border: '1.5px solid #EBE4DA',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+              border: '1.5px solid #CBD5E1',
               display: 'flex',
               flexDirection: 'column',
+              overflow: 'hidden',
+              position: 'relative',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
+            {/* Modal Header (ALWAYS PINNED AT TOP) */}
             <div
+              className="no-print"
               style={{
-                backgroundColor: '#1E293B',
+                flexShrink: 0,
+                backgroundColor: '#0F172A',
                 color: '#FFFFFF',
-                padding: '14px 20px',
+                padding: '12px 18px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                borderBottom: '1px solid #334155',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Printer size={18} color="#FDE047" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '18px', fontWeight: 900 }}>
-                  {t('روزانہ نرخ نامہ پرنٹ پریویو', 'Daily Rate List Print Preview')}
+                <Printer size={18} color="#F59E0B" />
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '15px', fontWeight: 900 }}>
+                  {t('روزانہ نرخ نامہ پرنٹ پریویو', 'Daily Rates Print Preview')}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsPrintModalOpen(false)}
-                style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', fontSize: '16px' }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#CBD5E1',
+                  cursor: 'pointer',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background 0.15s',
+                }}
+                title="Close"
               >
-                ✕
+                <X size={18} />
               </button>
             </div>
 
-            {/* Printable Content Preview */}
-            <div style={{ padding: '20px', backgroundColor: '#FAFAF9' }}>
+            {/* Printable Content Scrollable Body */}
+            <div
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '16px',
+                backgroundColor: '#F1F5F9',
+              }}
+            >
+              {/* Official Receipt Card */}
               <div
+                id="printable-rate-sheet"
                 style={{
                   backgroundColor: '#FFFFFF',
-                  border: '2px dashed #D6D3D1',
+                  border: '1.5px solid #CBD5E1',
                   borderRadius: '12px',
-                  padding: '18px',
+                  padding: '20px',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.05)',
                 }}
               >
-                <div style={{ textAlign: 'center', borderBottom: '2px solid #E7E5E4', paddingBottom: '12px' }}>
-                  <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: '#1C1917', margin: 0 }}>
-                    {t('فلور ملز و چکی روزانہ نرخ نامہ', 'Al-Madina Flour Mills Daily Rates')}
-                  </h3>
-                  <div style={{ fontSize: '12px', color: '#78716C', fontWeight: 700, marginTop: '3px' }}>
-                    {t('تاریخ:', 'Date:')} {todayDateStr}
+                {/* Official Mill Header */}
+                <div style={{ textAlign: 'center', borderBottom: '2px solid #0F172A', paddingBottom: '12px', marginBottom: '14px' }}>
+                  <div style={{ fontSize: '13px', color: '#64748B', fontWeight: 700, letterSpacing: '1px', marginBottom: '3px' }}>
+                    بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                  </div>
+                  <h2
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                    style={{
+                      fontSize: isUrdu ? '26px' : '20px',
+                      fontWeight: 900,
+                      color: '#0F172A',
+                      margin: '0 0 4px 0',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {t('فلور ملز و آٹا چکی روزانہ نرخ نامہ', 'Flour Mill & Chakki Daily Rates')}
+                  </h2>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px',
+                      fontSize: '12px',
+                      color: '#475569',
+                      fontWeight: 800,
+                      marginTop: '6px',
+                    }}
+                  >
+                    <span>{t('تاریخ:', 'Date:')} <strong style={{ color: '#0F172A' }}>{todayDateStr}</strong></span>
+                    <span>•</span>
+                    <span>{t('بوقت:', 'Time:')} <strong style={{ color: '#0F172A' }}>صبح 08:00 بجے</strong></span>
                   </div>
                 </div>
 
-                <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {rates.map((r) => (
-                    <div
-                      key={r.id}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: '4px 0',
-                        borderBottom: '1px dotted #E7E5E4',
-                        fontSize: '13.5px',
-                      }}
-                    >
-                      <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#1F2937' }}>
-                        {isUrdu ? r.nameUr : r.nameEn}
-                      </span>
-                      <span style={{ fontWeight: 900, color: '#8C582B', fontFamily: 'var(--font-mono)' }}>
-                        {isUrdu
-                          ? `${r.todayMaund.toLocaleString()} روپے / من (${(r.todayMaund / 40).toFixed(2).replace(/\.00$/, '')} روپے / کلو)`
-                          : `Rs ${r.todayMaund.toLocaleString()} / Maund (Rs ${(r.todayMaund / 40).toFixed(2).replace(/\.00$/, '')} / KG)`}
-                      </span>
-                    </div>
-                  ))}
+                {/* 3-Column Rates Table Header */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1.4fr 1.1fr 1fr',
+                    backgroundColor: '#0F172A',
+                    color: '#FFFFFF',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    fontSize: isUrdu ? '15px' : '12px',
+                    fontWeight: 900,
+                    alignItems: 'center',
+                    direction: isUrdu ? 'rtl' : 'ltr',
+                  }}
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                >
+                  <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('پروڈکٹ کا نام', 'Product')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('فی کلو ریٹ', 'Rate / KG')}</span>
+                  <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('فی من (40 کلو)', 'Rate / Maund')}</span>
                 </div>
 
-                <div style={{ marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #E7E5E4' }}>
-                  <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 900, color: '#44403C' }}>
-                    {t('پسائی چارجز:', 'Milling Charges:')}
-                  </div>
-                  {pisaiRates.map((p) => {
-                    const title = p.id === 'safai_pisai'
-                      ? t('صفائی اور پسائی', 'Cleaning & Milling')
-                      : t('صرف پسائی', 'Milling Only');
+                {/* Products Rates Rows */}
+                <div style={{ display: 'flex', flexDirection: 'column', marginTop: '4px' }}>
+                  {rates.map((r, idx) => {
+                    const perKg = (r.todayMaund / 40).toFixed(2).replace(/\.00$/, '');
                     return (
                       <div
-                        key={p.id}
+                        key={r.id}
                         style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          padding: '3px 0',
-                          fontSize: '13px',
-                          color: '#57534E',
+                          display: 'grid',
+                          gridTemplateColumns: '1.4fr 1.1fr 1fr',
+                          padding: '7px 12px',
+                          borderBottom: '1px solid #E2E8F0',
+                          backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
+                          alignItems: 'center',
+                          direction: isUrdu ? 'rtl' : 'ltr',
                         }}
                       >
-                        <span className={isUrdu ? 'font-nastaleeq' : ''}>{title}</span>
-                        <span style={{ fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
-                          {isUrdu
-                            ? `${p.ratePerMaund.toLocaleString()} روپے / من (${(p.ratePerMaund / 40).toFixed(2).replace(/\.00$/, '')} روپے / کلو)`
-                            : `Rs ${p.ratePerMaund.toLocaleString()} / Maund (Rs ${(p.ratePerMaund / 40).toFixed(2).replace(/\.00$/, '')} / KG)`}
+                        <span
+                          className={isUrdu ? 'font-nastaleeq' : ''}
+                          style={{
+                            fontWeight: 900,
+                            fontSize: isUrdu ? '18px' : '13px',
+                            color: '#0F172A',
+                            textAlign: isUrdu ? 'right' : 'left',
+                          }}
+                        >
+                          {isUrdu ? r.nameUr : r.nameEn}
+                        </span>
+                        <div style={{ textAlign: 'center' }}>
+                          <span
+                            style={{
+                              backgroundColor: '#FFFBEB',
+                              color: '#B45309',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: isUrdu ? '13px' : '11px',
+                              fontWeight: 800,
+                              fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                              border: '1px solid #FDE68A',
+                              display: 'inline-block',
+                            }}
+                          >
+                            {isUrdu ? `${perKg} روپے / کلو` : `Rs ${perKg}/KG`}
+                          </span>
+                        </div>
+                        <span
+                          dir="ltr"
+                          style={{
+                            fontWeight: 900,
+                            color: '#0F172A',
+                            fontSize: '15px',
+                            fontFamily: 'var(--font-mono)',
+                            textAlign: isUrdu ? 'left' : 'right',
+                          }}
+                        >
+                          Rs {r.todayMaund.toLocaleString()}
                         </span>
                       </div>
                     );
                   })}
                 </div>
+
+                {/* Milling Charges Section */}
+                <div style={{ marginTop: '14px' }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1.4fr 1.1fr 1fr',
+                      backgroundColor: '#1E293B',
+                      color: '#FFFFFF',
+                      borderRadius: '8px',
+                      padding: '6px 12px',
+                      fontSize: isUrdu ? '14px' : '11px',
+                      fontWeight: 900,
+                      alignItems: 'center',
+                      direction: isUrdu ? 'rtl' : 'ltr',
+                      marginBottom: '2px',
+                    }}
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                  >
+                    <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('پسائی و صفائی کے ریٹس', 'Milling Charges')}</span>
+                    <span style={{ textAlign: 'center' }}>{t('فی کلو', 'Per KG')}</span>
+                    <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('فی من', 'Per Maund')}</span>
+                  </div>
+                  {pisaiRates.map((p, idx) => {
+                    const title = p.id === 'safai_pisai'
+                      ? t('صفائی اور پسائی', 'Cleaning & Milling')
+                      : t('صرف پسائی', 'Milling Only');
+                    const perKg = (p.ratePerMaund / 40).toFixed(2).replace(/\.00$/, '');
+                    return (
+                      <div
+                        key={p.id}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1.4fr 1.1fr 1fr',
+                          padding: '7px 12px',
+                          borderBottom: '1px solid #E2E8F0',
+                          backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
+                          alignItems: 'center',
+                          direction: isUrdu ? 'rtl' : 'ltr',
+                        }}
+                      >
+                        <span
+                          className={isUrdu ? 'font-nastaleeq' : ''}
+                          style={{
+                            fontWeight: 800,
+                            fontSize: isUrdu ? '16px' : '13px',
+                            color: '#334155',
+                            textAlign: isUrdu ? 'right' : 'left',
+                          }}
+                        >
+                          {title}
+                        </span>
+                        <div style={{ textAlign: 'center' }}>
+                          <span
+                            style={{
+                              backgroundColor: '#EFF6FF',
+                              color: '#1D4ED8',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: isUrdu ? '13px' : '11px',
+                              fontWeight: 800,
+                              fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                              border: '1px solid #DBEAFE',
+                              display: 'inline-block',
+                            }}
+                          >
+                            {isUrdu ? `${perKg} روپے / کلو` : `Rs ${perKg}/KG`}
+                          </span>
+                        </div>
+                        <span
+                          dir="ltr"
+                          style={{
+                            fontWeight: 900,
+                            color: '#0F172A',
+                            fontSize: '15px',
+                            fontFamily: 'var(--font-mono)',
+                            textAlign: isUrdu ? 'left' : 'right',
+                          }}
+                        >
+                          Rs {p.ratePerMaund.toLocaleString()}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Official Receipt Footer (Signature, Stamp & Guarantee) */}
+                <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '2px solid #E2E8F0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', fontSize: '12px', color: '#475569' }}>
+                    <div>
+                      <div style={{ fontWeight: 900, color: '#0F172A', marginBottom: '18px' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+                        {t('منجانب: انتظامیہ فلور ملز و چکی', 'From: Mill Management')}
+                      </div>
+                      <div style={{ borderTop: '1px dashed #94A3B8', paddingTop: '4px', width: '130px', textAlign: 'center', fontSize: '11px', color: '#64748B' }}>
+                        {t('دستخط و مہر (Signature)', 'Authorized Stamp')}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: isUrdu ? 'left' : 'right', maxWidth: '210px' }}>
+                      <div style={{ fontWeight: 700, color: '#64748B', fontSize: '11px', lineHeight: 1.4 }} className={isUrdu ? 'font-nastaleeq' : ''}>
+                        {t('نوٹ: یہ ریٹس آج کے دن کے لیے نافذ العمل ہیں۔', 'Note: Rates valid for today only.')}
+                      </div>
+                      <div style={{ fontWeight: 800, color: '#0E8A54', fontSize: '11px', marginTop: '4px' }}>
+                        {t('خالص کوالٹی اور پورا وزن ہماری ضمانت ہے!', 'Pure Quality & Full Weight Guaranteed!')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Modal Actions */}
+            {/* Modal Actions Footer (ALWAYS PINNED AT BOTTOM - NEVER CUT OFF) */}
             <div
+              className="no-print"
               style={{
-                padding: '14px 20px',
+                flexShrink: 0,
+                padding: '12px 18px',
                 backgroundColor: '#FFFFFF',
-                borderTop: '1px solid #EBE4DA',
+                borderTop: '1.5px solid #E2E8F0',
                 display: 'flex',
-                gap: '10px',
+                gap: '12px',
+                boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.04)',
               }}
             >
               <button
                 type="button"
                 onClick={() => {
                   window.print();
-                  setIsPrintModalOpen(false);
                 }}
                 className="touch-active"
                 style={{
                   flex: 1,
-                  height: '42px',
-                  backgroundColor: '#059669',
+                  height: '46px',
+                  background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
                   color: '#FFFFFF',
                   border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '14px',
+                  borderRadius: '12px',
+                  fontSize: isUrdu ? '19px' : '14px',
                   fontWeight: 900,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px',
+                  gap: '8px',
+                  boxShadow: '0 4px 12px rgba(14, 138, 84, 0.25)',
                 }}
               >
-                <Printer size={16} />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('پرنٹ نکالیں (Print Now)', 'Print Now')}</span>
+                <Printer size={18} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('پرنٹ نکالیں (Print Now)', 'Print Rate List')}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setIsPrintModalOpen(false)}
                 className="touch-active"
                 style={{
-                  padding: '0 18px',
-                  height: '42px',
-                  backgroundColor: '#F3F4F6',
-                  color: '#374151',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '10px',
-                  fontSize: '13px',
-                  fontWeight: 700,
+                  padding: '0 20px',
+                  height: '46px',
+                  backgroundColor: '#F8FAFC',
+                  color: '#475569',
+                  border: '1.5px solid #CBD5E1',
+                  borderRadius: '12px',
+                  fontSize: isUrdu ? '16px' : '13px',
+                  fontWeight: 800,
                   cursor: 'pointer',
                 }}
               >

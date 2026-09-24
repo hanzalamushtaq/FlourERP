@@ -130,13 +130,13 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           {renderHeaderIcon(activeTab)}
         </div>
         <h1
-          className={isUrdu ? 'font-nastaleeq' : ''}
+          className={`${isUrdu ? 'font-nastaleeq dashboard-header-nastaleeq' : ''}`}
           style={{
-            fontSize: '20px',
+            fontSize: isUrdu ? '32px' : '22px',
             fontWeight: 900,
             color: '#0F172A',
             margin: 0,
-            lineHeight: 1.1,
+            lineHeight: 1.4,
             letterSpacing: '-0.02em',
           }}
         >
@@ -212,12 +212,12 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             placeholder={t('تلاش کریں...', 'Search...')}
             className={isUrdu ? 'font-nastaleeq' : ''}
             style={{
-              height: '35px',
-              padding: '0 12px 0 32px',
+              height: '38px',
+              padding: '0 12px 0 34px',
               borderRadius: '8px',
               border: 'none',
               backgroundColor: '#F8FAFC',
-              fontSize: '13px',
+              fontSize: isUrdu ? '17px' : '14px',
               width: '240px',
               outline: 'none',
               boxShadow: 'none',
@@ -226,7 +226,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             }}
           />
           <Search
-            size={15}
+            size={16}
             color="#64748B"
             style={{
               position: 'absolute',
@@ -248,7 +248,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               border: 'none',
               borderRadius: '7px',
               padding: '6px 12px',
-              fontSize: '11.5px',
+              fontSize: isUrdu ? '15px' : '13px',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',

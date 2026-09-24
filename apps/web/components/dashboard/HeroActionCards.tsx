@@ -101,10 +101,10 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: '22px',
+                  fontSize: isUrdu ? '30px' : '22px',
                   fontWeight: 900,
                   color: '#FFFFFF',
-                  lineHeight: 1.2,
+                  lineHeight: isUrdu ? 1.4 : 1.2,
                   margin: 0,
                 }}
               >

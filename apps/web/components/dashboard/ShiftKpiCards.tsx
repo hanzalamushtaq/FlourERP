@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+import { TrendingUp, BookOpen, Wheat, Wallet } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface ShiftKpiCardsProps {
@@ -17,97 +18,149 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
   creditRecovery = 25500,
   todayPisaiKg = 12340,
   cashDrawerBalance = 183730,
-  onCardClick,
 }) => {
   const { isUrdu, t } = useLanguage();
-  const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
 
   const items = [
     {
       id: 'sales' as const,
       title: t('کل نقد سیلز', 'Net Cash Sales'),
-      value: isUrdu ? `${todaySales.toLocaleString()} روپے` : `Rs ${todaySales.toLocaleString()}`,
+      amount: todaySales,
+      icon: TrendingUp,
+      accentColor: '#10B981',
+      lightBg: '#ECFDF5',
+      iconColor: '#059669',
     },
     {
       id: 'recovery' as const,
       title: t('ادھار وصولی', 'Credit Recovered'),
-      value: isUrdu ? `${creditRecovery.toLocaleString()} روپے` : `Rs ${creditRecovery.toLocaleString()}`,
+      amount: creditRecovery,
+      icon: BookOpen,
+      accentColor: '#F59E0B',
+      lightBg: '#FEF3C7',
+      iconColor: '#D97706',
     },
     {
       id: 'pisai' as const,
       title: t('گندم پسائی', 'Milling Revenue'),
-      value: isUrdu ? `${todayPisaiKg.toLocaleString()} روپے` : `Rs ${todayPisaiKg.toLocaleString()}`,
+      amount: todayPisaiKg,
+      icon: Wheat,
+      accentColor: '#EA580C',
+      lightBg: '#FFF7ED',
+      iconColor: '#C2410C',
     },
     {
       id: 'drawer' as const,
       title: t('کیش دراز', 'Cash Drawer'),
-      value: isUrdu ? `${cashDrawerBalance.toLocaleString()} روپے` : `Rs ${cashDrawerBalance.toLocaleString()}`,
+      amount: cashDrawerBalance,
+      icon: Wallet,
+      accentColor: '#2563EB',
+      lightBg: '#EFF6FF',
+      iconColor: '#1D4ED8',
     },
   ];
 
   return (
-    <div
-      style={{
-        backgroundColor: '#F8FAFC',
-        borderRadius: '16px',
-        border: 'none',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        padding: '14px 8px',
-        boxShadow: 'none',
-      }}
-    >
-      {items.map((item, idx) => {
-        const isHovered = hoveredIdx === idx;
-
+    <div className="kpi-strip-container card-animate-1">
+      {items.map((item) => {
         return (
           <div
             key={item.id}
-            className="touch-active"
-            onClick={() => onCardClick?.(item.id)}
-            onMouseEnter={() => setHoveredIdx(idx)}
-            onMouseLeave={() => setHoveredIdx(null)}
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
-              cursor: onCardClick ? 'pointer' : 'default',
-              padding: '6px 14px',
-              borderRadius: '10px',
-              backgroundColor: isHovered ? '#FFFFFF' : 'transparent',
-              border: 'none',
-              transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
-              transform: isHovered ? 'translateY(-1px)' : 'none',
+              padding: '12px 14px',
+              borderRadius: '12px',
+              backgroundColor: '#FFFFFF',
+              border: '1.5px solid #E2E8F0',
+              boxShadow: '0 2px 4px rgba(15, 23, 42, 0.04)',
+              position: 'relative',
+              overflow: 'hidden',
+              width: '100%',
+              userSelect: 'none',
             }}
           >
+            {/* Top Accent Color Bar */}
             <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '13px',
-                fontWeight: 700,
-                color: '#64748B',
-                marginBottom: '4px',
-                lineHeight: 1.2,
-                letterSpacing: '-0.01em',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '3.5px',
+                backgroundColor: item.accentColor,
+                borderTopLeftRadius: '10px',
+                borderTopRightRadius: '10px',
+              }}
+            />
+
+            {/* Top Row: Icon + Nastaleeq Title */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginBottom: '6px',
+                marginTop: '2px',
               }}
             >
-              {item.title}
+              <div
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '7px',
+                  backgroundColor: item.lightBg,
+                  color: item.iconColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <item.icon size={15} strokeWidth={2.4} />
+              </div>
+              <span
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '18px' : '14px',
+                  fontWeight: 800,
+                  color: '#334155',
+                  lineHeight: 1.4,
+                }}
+              >
+                {item.title}
+              </span>
             </div>
+
+            {/* Center: Large Amount + Currency */}
             <div
               style={{
-                fontSize: '25px',
+                fontSize: '26px',
                 fontWeight: 900,
-                fontFamily: 'var(--font-mono)',
                 color: '#0F172A',
-                letterSpacing: '-0.5px',
-                lineHeight: 1.1,
-                transition: 'transform 0.18s ease',
-                transform: isHovered ? 'scale(1.035)' : 'scale(1)',
+                lineHeight: 1.3,
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'center',
+                gap: '6px',
+                direction: isUrdu ? 'rtl' : 'ltr',
               }}
             >
-              {item.value}
+              <span style={{ fontFamily: 'var(--font-mono)', letterSpacing: '-0.5px' }}>
+                {isUrdu ? item.amount.toLocaleString() : `Rs ${item.amount.toLocaleString()}`}
+              </span>
+              {isUrdu && (
+                <span
+                  className="font-nastaleeq"
+                  style={{ fontSize: '16px', fontWeight: 800, color: '#64748B' }}
+                >
+                  روپے
+                </span>
+              )}
             </div>
           </div>
         );
