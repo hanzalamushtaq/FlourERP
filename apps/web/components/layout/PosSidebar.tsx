@@ -410,68 +410,113 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             </button>
           );
         })}
-      </nav>
 
-      {/* Bottom Section: Clean Logout Button & Online Indicator */}
-      <div style={{ flexShrink: 0, borderTop: '1.5px solid #F1F5F9', backgroundColor: '#FFFFFF' }}>
-        {/* Bottom Actions */}
+        {/* Separator before Logout */}
         {onLogout && (
-          <div style={{ padding: isCollapsed ? '8px 10px' : '8px 12px', borderTop: '1px solid #F1F5F9' }}>
-            <button
-              type="button"
-              onClick={onLogout}
-              className="touch-active"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                width: '100%',
-                height: '46px',
-                borderRadius: '12px',
-                border: '1.5px solid #FECACA',
-                backgroundColor: '#FEF2F2',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.06)',
-                outline: 'none',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#FEE2E2';
-                e.currentTarget.style.borderColor = '#FCA5A5';
-                e.currentTarget.style.boxShadow = '0 3px 8px rgba(239, 68, 68, 0.12)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#FEF2F2';
-                e.currentTarget.style.borderColor = '#FECACA';
-                e.currentTarget.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.06)';
-              }}
-            >
-              <LogOut size={19} color="#DC2626" />
-              {!isCollapsed && (
-                <span
-                  className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: isUrdu ? '20px' : '15px', fontWeight: 900, color: '#DC2626' }}
-                >
-                  {t('لاگ آؤٹ', 'Logout')}
-                </span>
-              )}
-            </button>
-          </div>
+          <div
+            style={{
+              margin: isCollapsed ? '6px 0 2px 0' : '6px 4px 2px 4px',
+              borderTop: '1.5px dashed #E2E8F0',
+              width: isCollapsed ? '36px' : 'auto',
+            }}
+          />
         )}
 
-        {/* Bottom Online Status */}
+        {/* Logout Button Attached with Page Buttons */}
+        {onLogout && (
+          <button
+            type="button"
+            onClick={onLogout}
+            title={t('لاگ آؤٹ', 'Logout')}
+            className="touch-active"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isCollapsed ? 'center' : 'space-between',
+              width: isCollapsed ? '46px' : '100%',
+              minHeight: isCollapsed ? '46px' : '52px',
+              height: isCollapsed ? '46px' : 'auto',
+              padding: isCollapsed ? '0' : '8px 12px',
+              borderRadius: '12px',
+              border: '1.5px solid #FECACA',
+              backgroundColor: '#FEF2F2',
+              cursor: 'pointer',
+              direction: 'rtl',
+              transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 1px 3px rgba(239, 68, 68, 0.08)',
+              outline: 'none',
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#FEE2E2';
+              e.currentTarget.style.borderColor = '#FCA5A5';
+              e.currentTarget.style.transform = isCollapsed ? 'none' : 'translateX(-2px)';
+              e.currentTarget.style.boxShadow = '0 3px 8px rgba(239, 68, 68, 0.14)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#FEF2F2';
+              e.currentTarget.style.borderColor = '#FECACA';
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(239, 68, 68, 0.08)';
+            }}
+          >
+            {/* Right: Bold Urdu Nastaleeq Text */}
+            {!isCollapsed && (
+              <span
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '21px' : '16px',
+                  fontWeight: 900,
+                  color: '#DC2626',
+                  lineHeight: 1.3,
+                  whiteSpace: 'nowrap',
+                  marginRight: '4px',
+                  letterSpacing: '0',
+                }}
+              >
+                {t('لاگ آؤٹ', 'Logout')}
+              </span>
+            )}
+
+            {/* Left: Dedicated Icon Squircle (or direct icon if collapsed) */}
+            {isCollapsed ? (
+              <LogOut size={20} color="#DC2626" />
+            ) : (
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '9px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #FECACA',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 1px 2px rgba(239, 68, 68, 0.06)',
+                }}
+              >
+                <LogOut size={19} color="#DC2626" />
+              </div>
+            )}
+          </button>
+        )}
+
+        {/* Bottom Online Status & Version Info - Attached inside Nav */}
         <div
           style={{
-            padding: isCollapsed ? '8px 0' : '8px 14px',
-            borderTop: 'none',
+            marginTop: 'auto',
+            paddingTop: '12px',
+            paddingBottom: '28px',
+            paddingLeft: isCollapsed ? '0' : '6px',
+            paddingRight: isCollapsed ? '0' : '6px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: isCollapsed ? 'center' : 'space-between',
             direction: 'rtl',
             fontSize: '12px',
             color: '#64748B',
-            backgroundColor: '#FFFFFF',
+            flexShrink: 0,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -499,7 +544,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             </span>
           )}
         </div>
-      </div>
+      </nav>
     </aside>
   );
 };
