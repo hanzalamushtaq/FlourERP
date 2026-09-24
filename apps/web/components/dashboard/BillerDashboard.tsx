@@ -101,15 +101,8 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
         padding: '16px 16px 24px 16px',
       }}
     >
-      {/* Top 3 Action Cards */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '16px',
-          width: '100%',
-        }}
-      >
+      {/* Top 3 Action Cards (Responsive on Mobile) */}
+      <div className="dashboard-3-action-cards">
         {/* Card 1: Create New Bill */}
         <div
           onClick={onNewBill}
@@ -342,16 +335,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
       />
 
       {/* 4. Operational Queue & Invoices Tables with Balanced Widths */}
-      <div
-        className="dashboard-tables-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.35fr',
-          gap: '16px',
-          alignItems: 'stretch',
-          width: '100%',
-        }}
-      >
+      <div className="dashboard-tables-grid">
         <ChakkiQueueCard />
         <RecentInvoicesTable
           onReprint={onReprintReceipt}

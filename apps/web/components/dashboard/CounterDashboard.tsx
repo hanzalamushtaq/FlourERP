@@ -54,16 +54,7 @@ export const CounterDashboard: React.FC<CounterDashboardProps> = ({
       />
 
       {/* 3. Operational Queue & Invoices */}
-      <div
-        className="dashboard-tables-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.35fr',
-          gap: '16px',
-          alignItems: 'stretch',
-          width: '100%',
-        }}
-      >
+      <div className="dashboard-tables-grid">
         <ChakkiQueueCard />
         <RecentInvoicesTable
           onReprint={onReprintReceipt}

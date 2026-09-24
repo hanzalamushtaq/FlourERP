@@ -384,16 +384,8 @@ export const WarehouseStockView: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. STOCK ITEMS DASHBOARD CARDS GRID */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '16px',
-          width: '100%',
-          marginTop: '4px',
-        }}
-      >
+      {/* 2. STOCK ITEMS DASHBOARD CARDS GRID (Responsive on Mobile & Tablet) */}
+      <div className="stock-items-3-grid" style={{ marginTop: '4px' }}>
         {stockItems.map((item) => {
           const totalItemValue = item.quantityBags * item.weightPerBagKg * item.ratePerKg;
 

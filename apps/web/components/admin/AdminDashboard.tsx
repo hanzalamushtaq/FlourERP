@@ -348,14 +348,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* 2. Summary KPI Cards - 5 Evenly Distributed Cards in 1 Balanced Row */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          gap: '14px',
-        }}
-      >
+      {/* 2. Summary KPI Cards - 5 Evenly Distributed Cards (Responsive Grid) */}
+      <div className="admin-summary-5-cards">
         {summaryCards.map((card) => (
           <div
             key={card.id}
@@ -485,70 +479,75 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </span>
         </div>
 
-        {/* Column Headings */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '160px 200px 220px 1fr',
-            padding: '12px 22px',
-            backgroundColor: '#F8FAFC',
-            borderBottom: '1.5px solid #E2E8F0',
-            fontSize: isUrdu ? '16px' : '13px',
-            fontWeight: 800,
-            color: '#64748B',
-          }}
-          className={isUrdu ? 'font-nastaleeq' : ''}
-        >
-          <span>{t('وقت و تاریخ', 'Time')}</span>
-          <span>{t('صارف / بلر', 'User / Actor')}</span>
-          <span>{t('کارروائی کی قسم', 'Action')}</span>
-          <span>{t('تفصیلات', 'Details')}</span>
-        </div>
-
-        {/* Log Entries */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {auditLogs.map((log, idx) => (
+        {/* Responsive Table Scroll Container for Mobile */}
+        <div className="responsive-table-scroll">
+          <div style={{ minWidth: '700px' }}>
+            {/* Column Headings */}
             <div
-              key={idx}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '160px 200px 220px 1fr',
-                padding: '14px 22px',
-                backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
-                borderBottom: idx === auditLogs.length - 1 ? 'none' : '1px solid #F1F5F9',
-                alignItems: 'center',
-                gap: '10px',
-                transition: 'background-color 0.12s ease',
+                padding: '12px 22px',
+                backgroundColor: '#F8FAFC',
+                borderBottom: '1.5px solid #E2E8F0',
+                fontSize: isUrdu ? '16px' : '13px',
+                fontWeight: 800,
+                color: '#64748B',
               }}
+              className={isUrdu ? 'font-nastaleeq' : ''}
             >
-              <span style={{ color: '#475569', fontWeight: 800, fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
-                {log.time}
-              </span>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#0F172A', fontSize: isUrdu ? '17px' : '14px' }}>
-                {log.actor}
-              </span>
-              <div>
-                <span
+              <span>{t('وقت و تاریخ', 'Time')}</span>
+              <span>{t('صارف / بلر', 'User / Actor')}</span>
+              <span>{t('کارروائی کی قسم', 'Action')}</span>
+              <span>{t('تفصیلات', 'Details')}</span>
+            </div>
+
+            {/* Log Entries */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {auditLogs.map((log, idx) => (
+                <div
+                  key={idx}
                   style={{
-                    fontSize: '12px',
-                    fontWeight: 900,
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    backgroundColor: log.actionBg,
-                    color: log.actionColor,
-                    border: `1.5px solid ${log.actionBorder}`,
-                    fontFamily: 'var(--font-mono)',
-                    display: 'inline-block',
+                    display: 'grid',
+                    gridTemplateColumns: '160px 200px 220px 1fr',
+                    padding: '14px 22px',
+                    backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
+                    borderBottom: idx === auditLogs.length - 1 ? 'none' : '1px solid #F1F5F9',
+                    alignItems: 'center',
+                    gap: '10px',
+                    transition: 'background-color 0.12s ease',
                   }}
                 >
-                  {log.action}
-                </span>
-              </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#1E293B', fontWeight: 700, fontSize: isUrdu ? '17px' : '14px' }}>
-                {log.detail}
-              </span>
+                  <span style={{ color: '#475569', fontWeight: 800, fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
+                    {log.time}
+                  </span>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#0F172A', fontSize: isUrdu ? '17px' : '14px' }}>
+                    {log.actor}
+                  </span>
+                  <div>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 900,
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        backgroundColor: log.actionBg,
+                        color: log.actionColor,
+                        border: `1.5px solid ${log.actionBorder}`,
+                        fontFamily: 'var(--font-mono)',
+                        display: 'inline-block',
+                      }}
+                    >
+                      {log.action}
+                    </span>
+                  </div>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#1E293B', fontWeight: 700, fontSize: isUrdu ? '17px' : '14px' }}>
+                    {log.detail}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
 

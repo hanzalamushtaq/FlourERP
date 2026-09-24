@@ -38,6 +38,7 @@ export default function Home() {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
   const [isZReportOpen, setIsZReportOpen] = useState<boolean>(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
   // Reprint Receipt Modal State
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
@@ -156,12 +157,24 @@ export default function Home() {
         backgroundColor: '#FFFFFF',
         width: '100%',
         overflowX: 'hidden',
+        position: 'relative',
       }}
     >
+      {/* Mobile Backdrop Overlay */}
+      {isMobileNavOpen && (
+        <div
+          className="mobile-sidebar-backdrop"
+          onClick={() => setIsMobileNavOpen(false)}
+        />
+      )}
+
       {/* 1. Left Navigation Sidebar with POS Hotkeys & Role-Gated Menu */}
       <PosSidebar
         currentTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={(tab) => {
+          setActiveTab(tab);
+          setIsMobileNavOpen(false);
+        }}
         onOpenPriceModal={() => setIsPriceModalOpen(true)}
         onLock={() => setIsLocked(true)}
         operatorName={currentUser.fullName}
@@ -171,6 +184,8 @@ export default function Home() {
         onLogout={handleLogout}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        isMobileOpen={isMobileNavOpen}
+        onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
       {/* 2. Main Workspace Layout */}
@@ -183,6 +198,7 @@ export default function Home() {
           minWidth: 0,
           height: '100vh',
           overflowY: 'auto',
+          width: '100%',
         }}
       >
         {/* Top Action Header */}
@@ -194,7 +210,13 @@ export default function Home() {
           onLogout={handleLogout}
           activeTab={activeTab}
           isSidebarCollapsed={isSidebarCollapsed}
-          onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+          onToggleSidebar={() => {
+            if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+              setIsMobileNavOpen((prev) => !prev);
+            } else {
+              setIsSidebarCollapsed((prev) => !prev);
+            }
+          }}
           title={
             activeTab === 'dashboard'
               ? t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')

@@ -303,15 +303,8 @@ export const RateListView: React.FC = () => {
         </div>
       )}
 
-      {/* 1. TOP 3 DASHBOARD ACTION CARDS */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '16px',
-          width: '100%',
-        }}
-      >
+      {/* 1. TOP 3 DASHBOARD ACTION CARDS (Responsive on Mobile) */}
+      <div className="rates-top-3-grid">
         {/* Card 1: روزانہ نرخ نامہ لسٹ */}
         <div
           onMouseEnter={() => setHoveredCard('total')}
@@ -549,15 +542,8 @@ export const RateListView: React.FC = () => {
           <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('+ نئی پروڈکٹ شامل کریں', '+ Add Product')}</span>
         </button>
       </div>
-      {/* 3. FLOUR PRODUCTS DASHBOARD CARDS GRID (3-Columns x 2-Rows) */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '16px',
-          width: '100%',
-        }}
-      >
+      {/* 3. FLOUR PRODUCTS DASHBOARD CARDS GRID (Responsive Grid) */}
+      <div className="rates-top-3-grid">
         {rates.map((item) => {
           const diff = item.todayMaund - item.yesterdayMaund;
           const perKg = item.todayMaund > 0 ? item.todayMaund / 40 : 0;
@@ -760,14 +746,7 @@ export const RateListView: React.FC = () => {
           </span>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '16px',
-            width: '100%',
-          }}
-        >
+        <div className="rates-pisai-2-grid">
           {pisaiRates.map((p) => {
             const perKg = p.ratePerMaund > 0 ? p.ratePerMaund / 40 : 0;
             const pisaiTitle = p.id === 'safai_pisai'

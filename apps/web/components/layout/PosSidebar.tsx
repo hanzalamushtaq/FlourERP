@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   LogOut,
   Menu,
+  X,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -89,6 +90,8 @@ interface PosSidebarProps {
   onLogout?: () => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const PosSidebar: React.FC<PosSidebarProps> = ({
@@ -100,11 +103,18 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
   onLogout,
   isCollapsed: isCollapsedProp,
   onToggleCollapse,
+  isMobileOpen = false,
+  onCloseMobile,
 }) => {
   const { language, isUrdu, t } = useLanguage();
   const [internalCollapsed, setInternalCollapsed] = React.useState<boolean>(false);
   const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : internalCollapsed;
   const toggleCollapse = onToggleCollapse || (() => setInternalCollapsed((prev) => !prev));
+
+  const handleItemSelect = (tab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates') => {
+    onSelectTab(tab);
+    if (onCloseMobile) onCloseMobile();
+  };
 
   const isAdminUser =
     roleName.toLowerCase().includes('admin') || permissions.includes('can_manage_users');
@@ -116,56 +126,56 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       id: 'dashboard',
       label: t('ڈیش بورڈ', 'Dashboard'),
       icon: (color: string) => <Home size={22} color={color} strokeWidth={2} />,
-      onClick: () => onSelectTab('dashboard'),
+      onClick: () => handleItemSelect('dashboard'),
       visible: true,
     },
     {
       id: 'billing',
       label: t('نیا بل', 'New Bill'),
       icon: (color: string) => <PlusCircle size={22} color={color} strokeWidth={1.8} />,
-      onClick: () => onSelectTab('billing'),
+      onClick: () => handleItemSelect('billing'),
       visible: true,
     },
     {
       id: 'pisai',
       label: t('گندم پسائی', 'Wheat Grinding'),
       icon: (color: string) => <ChakkiMachineIcon size={22} color={color} />,
-      onClick: () => onSelectTab('pisai'),
+      onClick: () => handleItemSelect('pisai'),
       visible: true,
     },
     {
       id: 'udhaar',
       label: t('ادھار کھاتے', 'Customer Ledger'),
       icon: (color: string) => <BookOpen size={22} color={color} strokeWidth={1.8} />,
-      onClick: () => onSelectTab('udhaar'),
+      onClick: () => handleItemSelect('udhaar'),
       visible: true,
     },
     {
       id: 'rates',
       label: t('ریٹ لسٹ', 'Daily Rates'),
       icon: (color: string) => <Tag size={22} color={color} strokeWidth={2} />,
-      onClick: () => onSelectTab('rates'),
+      onClick: () => handleItemSelect('rates'),
       visible: true,
     },
     {
       id: 'stock',
       label: t('گودام و اسٹاک', 'Inventory & Stock'),
       icon: (color: string) => <Boxes size={22} color={color} strokeWidth={1.8} />,
-      onClick: () => onSelectTab('stock'),
+      onClick: () => handleItemSelect('stock'),
       visible: true,
     },
     {
       id: 'reports',
       label: t('روزنامچہ و حساب', 'Reports & Accounts'),
       icon: (color: string) => <Calculator size={22} color={color} strokeWidth={1.8} />,
-      onClick: () => onSelectTab('reports'),
+      onClick: () => handleItemSelect('reports'),
       visible: canViewReports,
     },
     {
       id: 'admin',
       label: t('ایڈمن و اختیارات', 'Admin & Settings'),
       icon: (color: string) => <ShieldCheck size={22} color={color} strokeWidth={1.8} />,
-      onClick: () => onSelectTab('admin'),
+      onClick: () => handleItemSelect('admin'),
       visible: isAdminUser,
     },
   ];
@@ -177,6 +187,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
 
   return (
     <aside
+      className={`pos-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}
       style={{
         width: isCollapsed ? '68px' : '232px',
         minWidth: isCollapsed ? '68px' : '232px',
@@ -224,30 +235,60 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={toggleCollapse}
-          title={isCollapsed ? t('سائیڈ بار کھولیں', 'Expand Sidebar') : t('سائیڈ بار بند کریں', 'Collapse Sidebar')}
-          className="touch-active"
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            backgroundColor: '#F8FAFC',
-            border: '1.5px solid #E2E8F0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#0F172A',
-            boxShadow: 'none',
-            transition: 'all 0.15s ease',
-            outline: 'none',
-            flexShrink: 0,
-          }}
-        >
-          <Menu size={20} strokeWidth={2.2} />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {/* Mobile Drawer Close Button */}
+          {onCloseMobile && (
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              title={t('سائیڈ بار بند کریں', 'Close Sidebar')}
+              className="touch-active mobile-sidebar-close-btn"
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                backgroundColor: '#F1F5F9',
+                border: '1.5px solid #E2E8F0',
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#0F172A',
+                boxShadow: 'none',
+                outline: 'none',
+                flexShrink: 0,
+              }}
+            >
+              <X size={20} strokeWidth={2.5} />
+            </button>
+          )}
+
+          {/* Desktop Collapse / Expand Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleCollapse}
+            title={isCollapsed ? t('سائیڈ بار کھولیں', 'Expand Sidebar') : t('سائیڈ بار بند کریں', 'Collapse Sidebar')}
+            className="touch-active"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#0F172A',
+              boxShadow: 'none',
+              transition: 'all 0.15s ease',
+              outline: 'none',
+              flexShrink: 0,
+            }}
+          >
+            <Menu size={20} strokeWidth={2.2} />
+          </button>
+        </div>
       </div>
 
       {/* Menu Navigation Items with Tactile Button / Card Feel & Scrollbar */}

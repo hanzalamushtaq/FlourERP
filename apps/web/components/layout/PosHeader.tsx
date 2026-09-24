@@ -16,6 +16,7 @@ import {
   Calculator,
   ShieldCheck,
   Globe,
+  Menu,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -98,6 +99,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
 
   return (
     <header
+      className="pos-header-container"
       style={{
         backgroundColor: '#FFFFFF',
         borderBottom: 'none',
@@ -109,10 +111,38 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         userSelect: 'none',
         direction: 'rtl',
         boxShadow: 'none',
+        width: '100%',
       }}
     >
-      {/* Right Corner (in RTL): Icon Squircle + Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      {/* Right Corner (in RTL): Hamburger Menu Button + Icon Squircle + Title */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+        {/* Mobile / Header Hamburger Menu Button */}
+        {onToggleSidebar && (
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            title={t('مینیو کھولیں', 'Toggle Menu')}
+            className="touch-active header-menu-toggle-btn"
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#0F172A',
+              boxShadow: 'none',
+              outline: 'none',
+              flexShrink: 0,
+            }}
+          >
+            <Menu size={20} strokeWidth={2.2} />
+          </button>
+        )}
+
         <div
           style={{
             width: '38px',
@@ -130,14 +160,15 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           {renderHeaderIcon(activeTab)}
         </div>
         <h1
-          className={`${isUrdu ? 'font-nastaleeq dashboard-header-nastaleeq' : ''}`}
+          className={`${isUrdu ? 'font-nastaleeq dashboard-header-nastaleeq' : ''} header-title-responsive`}
           style={{
-            fontSize: isUrdu ? '32px' : '22px',
             fontWeight: 900,
             color: '#0F172A',
             margin: 0,
-            lineHeight: 1.4,
             letterSpacing: '-0.02em',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {title || t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')}
@@ -145,7 +176,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       </div>
 
       {/* Left Corner (in RTL): Search Bar & Action Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {/* Language Switcher Segmented Control */}
         <div
           style={{
@@ -206,7 +237,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         </div>
 
         {/* Search Bar */}
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div className="header-search-container" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <input
             type="text"
             placeholder={t('تلاش کریں...', 'Search...')}
@@ -218,7 +249,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               border: 'none',
               backgroundColor: '#F8FAFC',
               fontSize: isUrdu ? '17px' : '14px',
-              width: '240px',
+              width: '200px',
               outline: 'none',
               boxShadow: 'none',
               textAlign: 'left',
@@ -262,7 +293,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           >
             <FileSpreadsheet size={14} color="#FFFFFF" />
             <span
-              className={isUrdu ? 'font-nastaleeq' : ''}
+              className={`header-shift-btn-text ${isUrdu ? 'font-nastaleeq' : ''}`}
               style={{ fontSize: '12px', fontWeight: 800 }}
             >
               {t('شفٹ اختتام', 'End Shift (Z-Report)')}

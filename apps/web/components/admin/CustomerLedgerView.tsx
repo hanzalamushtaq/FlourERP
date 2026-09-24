@@ -398,16 +398,8 @@ export const CustomerLedgerView: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. MAIN 2-COLUMN BALANCED GRID (Equal 1fr 1fr Widths, Clean & Spacious UI) */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '16px',
-          alignItems: 'stretch',
-          width: '100%',
-        }}
-      >
+      {/* 2. MAIN 2-COLUMN BALANCED GRID (Responsive on Mobile & Tablet) */}
+      <div className="ledger-main-2-col-grid">
         {/* LEFT COLUMN: Customer Directory Card */}
         <div
           className="dash-card-animated"

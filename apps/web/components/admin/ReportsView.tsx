@@ -389,14 +389,8 @@ export const ReportsView: React.FC = () => {
             </div>
           </div>
 
-          {/* Large Summary KPI Cards (Clear, High-Contrast, Big Typography) */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '16px',
-            }}
-          >
+          {/* Large Summary KPI Cards (Responsive Grid) */}
+          <div className="reports-summary-3-cards">
             {/* Card 1: Total Inflow */}
             <div
               style={{
@@ -561,13 +555,16 @@ export const ReportsView: React.FC = () => {
               boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
             }}
           >
-            {/* Table Header */}
-            <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.4fr 1fr 1.8fr 1.1fr 1.2fr 0.8fr',
-                padding: '14px 20px',
+            {/* Responsive Table Scroll Container for Mobile */}
+            <div className="responsive-table-scroll">
+              <div style={{ minWidth: '780px' }}>
+                {/* Table Header */}
+                <div
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1.4fr 1fr 1.8fr 1.1fr 1.2fr 0.8fr',
+                    padding: '14px 20px',
                 backgroundColor: '#0F172A',
                 borderBottom: '2px solid #334155',
                 fontWeight: 900,
@@ -725,6 +722,8 @@ export const ReportsView: React.FC = () => {
                 })
               )}
             </div>
+              </div>
+            </div>
           </div>
         </>
       ) : (
@@ -773,12 +772,15 @@ export const ReportsView: React.FC = () => {
             </button>
           </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1.3fr 1.2fr 1.2fr 1fr 2fr',
-              padding: '12px 20px',
-              backgroundColor: '#F1F5F9',
+          {/* Responsive Table Scroll Container for Audit Logs */}
+          <div className="responsive-table-scroll">
+            <div style={{ minWidth: '720px' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1.3fr 1.2fr 1.2fr 1fr 2fr',
+                  padding: '12px 20px',
+                  backgroundColor: '#F1F5F9',
               fontWeight: 900,
               fontSize: isUrdu ? '17px' : '12px',
               color: '#334155',
@@ -868,6 +870,8 @@ export const ReportsView: React.FC = () => {
                 );
               })
             )}
+          </div>
+            </div>
           </div>
         </div>
       )}

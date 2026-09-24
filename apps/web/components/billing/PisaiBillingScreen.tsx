@@ -462,15 +462,8 @@ export const PisaiBillingScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. 2-COLUMN BALANCED BILLING GRID */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(320px, 1.2fr) minmax(280px, 1fr)',
-          gap: '12px',
-          alignItems: 'start',
-        }}
-      >
+      {/* 2. 2-COLUMN BALANCED BILLING GRID (Responsive on Mobile & Tablet) */}
+      <div className="pisai-billing-grid-split">
         {/* LEFT COLUMN: Entry Fields Card */}
         <div
           className="dash-card-animated"

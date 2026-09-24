@@ -1184,15 +1184,8 @@ export const ProductBillingScreen: React.FC = () => {
         })}
       </div>
 
-      {/* 2. 2-COLUMN BALANCED BILLING GRID */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(360px, 1.45fr) minmax(300px, 1fr)',
-          gap: '16px',
-          alignItems: 'start',
-        }}
-      >
+      {/* 2. 2-COLUMN BALANCED BILLING GRID (Responsive on Tablets & Mobile) */}
+      <div className="product-billing-grid-split">
         {/* LEFT COLUMN: Dynamic Multi-Item Entry Card */}
         <div
           className="dash-card-animated"
@@ -1332,12 +1325,7 @@ export const ProductBillingScreen: React.FC = () => {
 
                   {/* Two Inputs in Single Row: ITEM & QUANTITY */}
                   <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1.4fr 1fr',
-                      gap: '12px',
-                      alignItems: 'end',
-                    }}
+                    className="item-qty-input-row"
                   >
                     {/* Input 1: Item */}
                     <div style={{ position: 'relative' }}>

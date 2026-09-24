@@ -494,3 +494,254 @@ h4.font-nastaleeq {
   background: #94A3B8;
 }
 
+/* =========================================================
+   COMPREHENSIVE MOBILE RESPONSIVE SYSTEM
+   ========================================================= */
+
+/* 1. PosSidebar Mobile Drawer Styles */
+@media (min-width: 769px) {
+  .pos-sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+  }
+  .mobile-sidebar-backdrop {
+    display: none !important;
+  }
+  .mobile-sidebar-close-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .pos-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    z-index: 1050 !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 86vw !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 6px 0 28px rgba(15, 23, 42, 0.28) !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transform: translateX(-100%);
+  }
+
+  .pos-sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  .mobile-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 1040;
+    animation: mobileBackdropFade 0.2s ease;
+  }
+
+  .mobile-sidebar-close-btn {
+    display: flex !important;
+  }
+}
+
+@keyframes mobileBackdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 2. Responsive Header Elements */
+.header-title-responsive {
+  font-size: clamp(16px, 4vw, 32px);
+  line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+  .pos-header-container {
+    padding: 8px 12px !important;
+    gap: 8px !important;
+  }
+  .header-search-container {
+    display: none !important;
+  }
+  .header-shift-btn-text {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .header-menu-toggle-btn {
+    display: none !important;
+  }
+}
+
+/* 3. Universal Table Horizontal Scroll Container */
+.responsive-table-scroll {
+  width: 100%;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 4. Billing Screen Grids */
+.product-billing-grid-split {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.45fr) minmax(300px, 1fr);
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .product-billing-grid-split {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.item-qty-input-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+@media (max-width: 480px) {
+  .item-qty-input-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 5. Pisai Billing Screen Grid */
+.pisai-billing-grid-split {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 1fr);
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 920px) {
+  .pisai-billing-grid-split {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 6. Dashboard Action Cards (3 Cards) */
+.dashboard-3-action-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 820px) {
+  .dashboard-3-action-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 7. Admin Summary 5 KPI Cards */
+.admin-summary-5-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+@media (max-width: 1120px) {
+  .admin-summary-5-cards {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-summary-5-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-summary-5-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 8. Reports Summary 3 Cards */
+.reports-summary-3-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 820px) {
+  .reports-summary-3-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 9. Customer Ledger 2-Column Grid */
+.ledger-main-2-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (max-width: 920px) {
+  .ledger-main-2-col-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 10. Warehouse Stock Items 3 Grid */
+.stock-items-3-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 920px) {
+  .stock-items-3-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 540px) {
+  .stock-items-3-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 11. Rates Lists Grids */
+.rates-top-3-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 820px) {
+  .rates-top-3-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.rates-pisai-2-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .rates-pisai-2-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
