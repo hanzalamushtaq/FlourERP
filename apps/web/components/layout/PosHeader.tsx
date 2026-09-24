@@ -66,6 +66,7 @@ interface PosHeaderProps {
   activeTab?: string;
   onToggleSidebar?: () => void;
   isSidebarCollapsed?: boolean;
+  isMobileNavOpen?: boolean;
 }
 
 export const PosHeader: React.FC<PosHeaderProps> = ({
@@ -78,6 +79,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
   activeTab,
   onToggleSidebar,
   isSidebarCollapsed = false,
+  isMobileNavOpen = false,
 }) => {
   const { language, setLanguage, isUrdu, t } = useLanguage();
   const [currentTime, setCurrentTime] = useState<string>('06:45 PM');
@@ -275,8 +277,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           </button>
         )}
 
-        {/* Mobile Hamburger Menu Button (Positioned at Left Corner) */}
-        {onToggleSidebar && (
+        {/* Mobile Hamburger Menu Button (Positioned at Left Corner, hidden when drawer is open) */}
+        {onToggleSidebar && !isMobileNavOpen && (
           <button
             type="button"
             onClick={onToggleSidebar}

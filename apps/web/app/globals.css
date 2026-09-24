@@ -511,6 +511,9 @@ h4.font-nastaleeq {
   .mobile-sidebar-close-btn {
     display: none !important;
   }
+  .desktop-sidebar-collapse-btn {
+    display: flex !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -545,6 +548,10 @@ h4.font-nastaleeq {
 
   .mobile-sidebar-close-btn {
     display: flex !important;
+  }
+
+  .desktop-sidebar-collapse-btn {
+    display: none !important;
   }
 }
 

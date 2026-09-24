@@ -210,6 +210,7 @@ export default function Home() {
           onLogout={handleLogout}
           activeTab={activeTab}
           isSidebarCollapsed={isSidebarCollapsed}
+          isMobileNavOpen={isMobileNavOpen}
           onToggleSidebar={() => {
             if (typeof window !== 'undefined' && window.innerWidth <= 768) {
               setIsMobileNavOpen((prev) => !prev);

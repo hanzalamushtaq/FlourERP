@@ -263,12 +263,12 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             </button>
           )}
 
-          {/* Desktop Collapse / Expand Toggle Button */}
+          {/* Desktop Collapse / Expand Toggle Button (Hidden on Mobile) */}
           <button
             type="button"
             onClick={toggleCollapse}
             title={isCollapsed ? t('سائیڈ بار کھولیں', 'Expand Sidebar') : t('سائیڈ بار بند کریں', 'Collapse Sidebar')}
-            className="touch-active"
+            className="touch-active desktop-sidebar-collapse-btn"
             style={{
               width: '36px',
               height: '36px',
