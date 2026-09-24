@@ -10,10 +10,30 @@ import {
   Boxes,
   Calculator,
   ShieldCheck,
+  Settings,
   LogOut,
   Menu,
   X,
+  BarChart2,
+  ShieldAlert,
+  ShoppingCart,
+  Users,
+  Truck,
+  UserCheck,
+  ChevronDown,
 } from 'lucide-react';
+
+export type ReportSubTab = 'sales' | 'audit' | 'purchase' | 'customer' | 'supplier' | 'daily_log' | 'user_sales';
+
+const REPORT_SUB_ITEMS: { id: ReportSubTab; labelEn: string; labelUr: string; icon: React.ReactNode }[] = [
+  { id: 'sales',      labelEn: 'Sales Report',           labelUr: 'سیلز رپورٹ',          icon: <BarChart2 size={15} /> },
+  { id: 'audit',      labelEn: 'Audit Report',           labelUr: 'آڈٹ رپورٹ',           icon: <ShieldAlert size={15} /> },
+  { id: 'purchase',   labelEn: 'Purchase Report',        labelUr: 'خریداری رپورٹ',        icon: <ShoppingCart size={15} /> },
+  { id: 'customer',   labelEn: 'Customer Report',        labelUr: 'کسٹمر رپورٹ',         icon: <Users size={15} /> },
+  { id: 'supplier',   labelEn: 'Supplier Report',        labelUr: 'سپلائر رپورٹ',         icon: <Truck size={15} /> },
+  { id: 'daily_log',  labelEn: 'Daily Log Report',       labelUr: 'روزانہ لاگ رپورٹ',    icon: <BookOpen size={15} /> },
+  { id: 'user_sales', labelEn: 'User Wise Sales Report', labelUr: 'یوزر وائز سیلز رپورٹ', icon: <UserCheck size={15} /> },
+];
 import { useLanguage } from '../../context/LanguageContext';
 
 // Wheat-Ear Cogwheel Logo matching user's reference image
@@ -79,8 +99,8 @@ const WarehouseBoxIcon = ({ size = 22, color = '#374151' }: { size?: number; col
 );
 
 interface PosSidebarProps {
-  currentTab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates';
-  onSelectTab: (tab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates') => void;
+  currentTab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates' | 'settings';
+  onSelectTab: (tab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates' | 'settings') => void;
   onOpenPriceModal: () => void;
   onLock: () => void;
   operatorName?: string;
@@ -92,6 +112,10 @@ interface PosSidebarProps {
   onToggleCollapse?: () => void;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
+  /** Active sub-tab inside Reports section */
+  reportSubTab?: ReportSubTab;
+  /** Called when a report sub-item is clicked */
+  onSelectReportSubTab?: (sub: ReportSubTab) => void;
 }
 
 export const PosSidebar: React.FC<PosSidebarProps> = ({
@@ -105,13 +129,15 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
   onToggleCollapse,
   isMobileOpen = false,
   onCloseMobile,
+  reportSubTab = 'sales',
+  onSelectReportSubTab,
 }) => {
   const { language, isUrdu, t } = useLanguage();
   const [internalCollapsed, setInternalCollapsed] = React.useState<boolean>(false);
   const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : internalCollapsed;
   const toggleCollapse = onToggleCollapse || (() => setInternalCollapsed((prev) => !prev));
 
-  const handleItemSelect = (tab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates') => {
+  const handleItemSelect = (tab: 'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates' | 'settings') => {
     onSelectTab(tab);
     if (onCloseMobile) onCloseMobile();
   };
@@ -176,6 +202,13 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       label: t('ایڈمن و اختیارات', 'Admin & Settings'),
       icon: (color: string) => <ShieldCheck size={22} color={color} strokeWidth={1.8} />,
       onClick: () => handleItemSelect('admin'),
+      visible: isAdminUser,
+    },
+    {
+      id: 'settings',
+      label: t('عمومی معلومات', 'General Info'),
+      icon: (color: string) => <Settings size={22} color={color} strokeWidth={1.8} />,
+      onClick: () => handleItemSelect('settings'),
       visible: isAdminUser,
     },
   ];
@@ -311,8 +344,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
           const isPressed = pressedTab === item.id;
 
           return (
-            <button
-              key={item.id}
+            <React.Fragment key={item.id}>
+              <button
               type="button"
               onClick={item.onClick}
               title={item.label}
@@ -408,8 +441,72 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 )}
               </div>
             </button>
+            {/* ─── Reports Sub-Items: appears immediately after the reports button ─── */}
+            {item.id === 'reports' && currentTab === 'reports' && !isCollapsed && (
+              <div
+                style={{
+                  marginTop: '-4px',
+                  marginBottom: '2px',
+                  paddingLeft: '14px',
+                  paddingRight: '4px',
+                  borderLeft: '2px solid #BFDBFE',
+                  marginLeft: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}
+              >
+                {REPORT_SUB_ITEMS.map((sub) => {
+                  const isSubActive = reportSubTab === sub.id;
+                  return (
+                    <button
+                      key={sub.id}
+                      type="button"
+                      className="touch-active"
+                      onClick={() => {
+                        onSelectReportSubTab?.(sub.id);
+                        if (onCloseMobile) onCloseMobile();
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        width: '100%',
+                        padding: '7px 10px',
+                        borderRadius: '8px',
+                        border: isSubActive ? '1px solid #BFDBFE' : '1px solid transparent',
+                        backgroundColor: isSubActive ? '#EFF6FF' : 'transparent',
+                        cursor: 'pointer',
+                        outline: 'none',
+                        direction: 'rtl',
+                        textAlign: 'right',
+                        transition: 'all 0.12s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSubActive) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F8FAFC';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSubActive) (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0, backgroundColor: isSubActive ? '#1877F2' : '#CBD5E1', transition: 'background-color 0.12s' }} />
+                      <span
+                        className={isUrdu ? 'font-nastaleeq' : ''}
+                        style={{ flex: 1, fontSize: isUrdu ? '17px' : '13px', fontWeight: isSubActive ? 800 : 600, color: isSubActive ? '#1877F2' : '#64748B', lineHeight: 1.3, transition: 'color 0.12s' }}
+                      >
+                        {isUrdu ? sub.labelUr : sub.labelEn}
+                      </span>
+                      <span style={{ color: isSubActive ? '#1877F2' : '#94A3B8', flexShrink: 0, display: 'flex' }}>{sub.icon}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </React.Fragment>
           );
         })}
+
+
 
         {/* Separator before Logout */}
         {onLogout && (

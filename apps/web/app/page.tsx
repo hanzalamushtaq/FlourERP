@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PosSidebar } from '../components/layout/PosSidebar';
+import type { ReportSubTab } from '../components/layout/PosSidebar';
 import { PosHeader } from '../components/layout/PosHeader';
 import { CounterDashboard } from '../components/dashboard/CounterDashboard';
 import { BillerDashboard } from '../components/dashboard/BillerDashboard';
@@ -13,6 +14,7 @@ import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { RateListView } from '../components/rates/RateListView';
 import { WarehouseStockView } from '../components/stock/WarehouseStockView';
 import { DailyPriceModal } from '../components/admin/DailyPriceModal';
+import { GeneralInfoView } from '../components/admin/GeneralInfoView';
 import { PinLockOverlay } from '../components/ui/PinLockOverlay';
 import { ZReportModal } from '../components/admin/ZReportModal';
 import { ReceiptPreviewModal, ReceiptData } from '../components/ui/ReceiptPreviewModal';
@@ -32,13 +34,14 @@ export default function Home() {
   const { isUrdu, t } = useLanguage();
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates'
+    'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates' | 'settings'
   >('dashboard');
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
   const [isZReportOpen, setIsZReportOpen] = useState<boolean>(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
+  const [reportSubTab, setReportSubTab] = useState<ReportSubTab>('sales');
 
   // Reprint Receipt Modal State
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
@@ -186,6 +189,12 @@ export default function Home() {
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         isMobileOpen={isMobileNavOpen}
         onCloseMobile={() => setIsMobileNavOpen(false)}
+        reportSubTab={reportSubTab}
+        onSelectReportSubTab={(sub) => {
+          setReportSubTab(sub);
+          setActiveTab('reports');
+          setIsMobileNavOpen(false);
+        }}
       />
 
       {/* 2. Main Workspace Layout */}
@@ -235,6 +244,8 @@ export default function Home() {
               ? t('روزانہ نرخ نامہ و ریٹ لسٹ', 'Daily Rate List & Pricing')
               : activeTab === 'stock'
               ? t('گودام و اسٹاک انوینٹری', 'Warehouse & Stock Inventory')
+              : activeTab === 'settings'
+              ? t('عمومی معلومات و مل پروفائل', 'General Information & Mill Profile')
               : userIsAdmin
               ? t('ایڈمن کنٹرول پینل', 'Admin Control Panel')
               : t('کاؤنٹر بلر ورک سپیس', 'Counter Biller Workspace')
@@ -285,7 +296,7 @@ export default function Home() {
           {activeTab === 'reports' && (
             <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               {userIsAdmin || hasPermission(currentUser, 'can_view_reports') ? (
-                <ReportsView />
+                <ReportsView activeSubTab={reportSubTab} />
               ) : (
                 <div
                   style={{
@@ -392,6 +403,52 @@ export default function Home() {
           {activeTab === 'rates' && (
             <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
               <RateListView />
+            </div>
+          )}
+
+          {/* General Information Settings View */}
+          {activeTab === 'settings' && (
+            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+              {userIsAdmin ? (
+                <GeneralInfoView />
+              ) : (
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '16px',
+                    border: '1.5px solid #FCA5A5',
+                    padding: '36px',
+                    maxWidth: '600px',
+                    margin: '40px auto',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '40px', marginBottom: '10px' }}>⚙️</div>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: '#991B1B' }}>
+                    ایڈمنسٹریٹو اختیارات درکار ہیں
+                  </h2>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: '#475569', marginTop: '10px' }}>
+                    عمومی معلومات صرف ایڈمنسٹریٹر ترتیب دے سکتا ہے۔
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('dashboard')}
+                    className="touch-active"
+                    style={{
+                      marginTop: '20px',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      backgroundColor: '#7F4F24',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ڈیش بورڈ پر واپس جائیں (Esc)
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </main>
