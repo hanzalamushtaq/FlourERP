@@ -120,103 +120,103 @@ function formatAuditDateTime(dateStr: string): { date: string; time: string } {
 /* ─────────────────────────────────────────────────────────────
    Audit Action Badge Meta & Translations
 ───────────────────────────────────────────────────────────── */
-function getActionMeta(action: string, isUrdu: boolean) {
+function getActionMeta(action: string, isUrdu: boolean, isDark = false) {
   switch (action) {
     case 'USER_LOGIN':
       return {
         label: isUrdu ? 'لاگ ان' : 'Login',
-        bg: '#DCFCE7',
-        color: '#15803D',
-        border: '#86EFAC',
+        bg: isDark ? 'rgba(21, 128, 61, 0.2)' : '#DCFCE7',
+        color: isDark ? '#4ADE80' : '#15803D',
+        border: isDark ? 'rgba(34, 197, 94, 0.4)' : '#86EFAC',
         icon: <LogIn size={13} />,
       };
     case 'USER_LOGOUT':
       return {
         label: isUrdu ? 'لاگ آؤٹ' : 'Logout',
-        bg: '#F1F5F9',
-        color: '#475569',
-        border: '#CBD5E1',
+        bg: isDark ? '#1E293B' : '#F1F5F9',
+        color: isDark ? '#94A3B8' : '#475569',
+        border: isDark ? '#334155' : '#CBD5E1',
         icon: <LogOut size={13} />,
       };
     case 'PIN_UNLOCKED':
       return {
         label: isUrdu ? 'پن ان لاک' : 'PIN Unlock',
-        bg: '#EDE9FE',
-        color: '#6D28D9',
-        border: '#DDD6FE',
+        bg: isDark ? 'rgba(124, 58, 237, 0.2)' : '#EDE9FE',
+        color: isDark ? '#C084FC' : '#6D28D9',
+        border: isDark ? 'rgba(124, 58, 237, 0.4)' : '#DDD6FE',
         icon: <KeyRound size={13} />,
       };
     case 'BILL_CREATE':
       return {
         label: isUrdu ? 'نیا بل' : 'New Bill',
-        bg: '#EFF6FF',
-        color: '#1D4ED8',
-        border: '#BFDBFE',
+        bg: isDark ? 'rgba(29, 78, 216, 0.2)' : '#EFF6FF',
+        color: isDark ? '#60A5FA' : '#1D4ED8',
+        border: isDark ? 'rgba(29, 78, 216, 0.4)' : '#BFDBFE',
         icon: <FileText size={13} />,
       };
     case 'BILL_VOID':
     case 'TRANSACTION_VOID':
       return {
         label: isUrdu ? 'بل منسوخ' : 'Void Bill',
-        bg: '#FEE2E2',
-        color: '#DC2626',
-        border: '#FECACA',
+        bg: isDark ? 'rgba(220, 38, 38, 0.2)' : '#FEE2E2',
+        color: isDark ? '#F87171' : '#DC2626',
+        border: isDark ? 'rgba(220, 38, 38, 0.4)' : '#FECACA',
         icon: <Ban size={13} />,
       };
     case 'PISAI_CREATE':
       return {
         label: isUrdu ? 'پسائی ٹوکن' : 'Pisai Token',
-        bg: '#FEF3C7',
-        color: '#B45309',
-        border: '#FDE68A',
+        bg: isDark ? 'rgba(217, 119, 6, 0.2)' : '#FEF3C7',
+        color: isDark ? '#FCD34D' : '#B45309',
+        border: isDark ? 'rgba(217, 119, 6, 0.4)' : '#FDE68A',
         icon: <FileText size={13} />,
       };
     case 'PISAI_VOID':
       return {
         label: isUrdu ? 'پسائی منسوخ' : 'Void Pisai',
-        bg: '#FEE2E2',
-        color: '#DC2626',
-        border: '#FECACA',
+        bg: isDark ? 'rgba(220, 38, 38, 0.2)' : '#FEE2E2',
+        color: isDark ? '#F87171' : '#DC2626',
+        border: isDark ? 'rgba(220, 38, 38, 0.4)' : '#FECACA',
         icon: <Ban size={13} />,
       };
     case 'EXPENSE_CREATE':
       return {
         label: isUrdu ? 'خرچہ اندراج' : 'Expense Log',
-        bg: '#FFEDD5',
-        color: '#C2410C',
-        border: '#FED7AA',
+        bg: isDark ? 'rgba(194, 65, 12, 0.2)' : '#FFEDD5',
+        color: isDark ? '#FB923C' : '#C2410C',
+        border: isDark ? 'rgba(194, 65, 12, 0.4)' : '#FED7AA',
         icon: <TrendingDown size={13} />,
       };
     case 'CASH_CLOSING':
       return {
         label: isUrdu ? 'شام کلوزنگ' : 'Cash Closing',
-        bg: '#D1FAE5',
-        color: '#047857',
-        border: '#6EE7B7',
+        bg: isDark ? 'rgba(4, 120, 87, 0.2)' : '#D1FAE5',
+        color: isDark ? '#34D399' : '#047857',
+        border: isDark ? 'rgba(4, 120, 87, 0.4)' : '#6EE7B7',
         icon: <CheckCircle2 size={13} />,
       };
     case 'PRICE_UPDATE':
       return {
         label: isUrdu ? 'ریٹ تبدیلی' : 'Rate Change',
-        bg: '#F3E8FF',
-        color: '#7E22CE',
-        border: '#E9D5FF',
+        bg: isDark ? 'rgba(126, 34, 206, 0.2)' : '#F3E8FF',
+        color: isDark ? '#E879F9' : '#7E22CE',
+        border: isDark ? 'rgba(126, 34, 206, 0.4)' : '#E9D5FF',
         icon: <TrendingUp size={13} />,
       };
     case 'ROLE_UPDATE':
       return {
         label: isUrdu ? 'اختیار تبدیلی' : 'Role Update',
-        bg: '#E0E7FF',
-        color: '#3730A3',
-        border: '#C7D2FE',
+        bg: isDark ? 'rgba(55, 48, 163, 0.2)' : '#E0E7FF',
+        color: isDark ? '#A5B4FC' : '#3730A3',
+        border: isDark ? 'rgba(55, 48, 163, 0.4)' : '#C7D2FE',
         icon: <ShieldAlert size={13} />,
       };
     default:
       return {
         label: action.replace(/_/g, ' '),
-        bg: '#F1F5F9',
-        color: '#334155',
-        border: '#CBD5E1',
+        bg: isDark ? '#1E293B' : '#F1F5F9',
+        color: isDark ? '#CBD5E1' : '#334155',
+        border: isDark ? '#334155' : '#CBD5E1',
         icon: <ShieldCheck size={13} />,
       };
   }
@@ -225,39 +225,39 @@ function getActionMeta(action: string, isUrdu: boolean) {
 /* ─────────────────────────────────────────────────────────────
    Audit Entity Badge Meta & Translations
 ───────────────────────────────────────────────────────────── */
-function getEntityMeta(entityType: string, isUrdu: boolean) {
+function getEntityMeta(entityType: string, isUrdu: boolean, isDark = false) {
   switch (entityType?.toUpperCase()) {
     case 'AUTH':
-      return { label: isUrdu ? 'سیکیورٹی و لاگ ان' : 'Auth & Security', icon: '🔐', bg: '#EEF2FF', color: '#4338CA' };
+      return { label: isUrdu ? 'سیکیورٹی و لاگ ان' : 'Auth & Security', icon: '🔐', bg: isDark ? 'rgba(67, 56, 202, 0.2)' : '#EEF2FF', color: isDark ? '#A5B4FC' : '#4338CA' };
     case 'BILL':
     case 'BILLING':
-      return { label: isUrdu ? 'سیل و بلنگ' : 'Sales & Billing', icon: '🧾', bg: '#EFF6FF', color: '#1D4ED8' };
+      return { label: isUrdu ? 'سیل و بلنگ' : 'Sales & Billing', icon: '🧾', bg: isDark ? 'rgba(29, 78, 216, 0.2)' : '#EFF6FF', color: isDark ? '#60A5FA' : '#1D4ED8' };
     case 'PISAI':
-      return { label: isUrdu ? 'گندم پسائی' : 'Wheat Grinding', icon: '🌾', bg: '#FFFBEB', color: '#B45309' };
+      return { label: isUrdu ? 'گندم پسائی' : 'Wheat Grinding', icon: '🌾', bg: isDark ? 'rgba(180, 83, 9, 0.2)' : '#FFFBEB', color: isDark ? '#FCD34D' : '#B45309' };
     case 'EXPENSE':
-      return { label: isUrdu ? 'دکان اخراجات' : 'Shop Expense', icon: '💸', bg: '#FFF7ED', color: '#C2410C' };
+      return { label: isUrdu ? 'دکان اخراجات' : 'Shop Expense', icon: '💸', bg: isDark ? 'rgba(194, 65, 12, 0.2)' : '#FFF7ED', color: isDark ? '#FB923C' : '#C2410C' };
     case 'CLOSING':
-      return { label: isUrdu ? 'کاؤنٹر کلوزنگ' : 'Cash Closing', icon: '💼', bg: '#ECFDF5', color: '#047857' };
+      return { label: isUrdu ? 'کاؤنٹر کلوزنگ' : 'Cash Closing', icon: '💼', bg: isDark ? 'rgba(4, 120, 87, 0.2)' : '#ECFDF5', color: isDark ? '#34D399' : '#047857' };
     case 'PRICE':
     case 'RATE':
-      return { label: isUrdu ? 'ریٹ لسٹ' : 'Daily Rates', icon: '🏷️', bg: '#FAF5FF', color: '#7E22CE' };
+      return { label: isUrdu ? 'ریٹ لسٹ' : 'Daily Rates', icon: '🏷️', bg: isDark ? 'rgba(126, 34, 206, 0.2)' : '#FAF5FF', color: isDark ? '#E879F9' : '#7E22CE' };
     case 'CUSTOMER':
-      return { label: isUrdu ? 'ادھار کھاتہ' : 'Customer Ledger', icon: '👥', bg: '#FEF3C7', color: '#92400E' };
+      return { label: isUrdu ? 'ادھار کھاتہ' : 'Customer Ledger', icon: '👥', bg: isDark ? 'rgba(180, 83, 9, 0.2)' : '#FEF3C7', color: isDark ? '#FCD34D' : '#92400E' };
     case 'STOCK':
     case 'PRODUCT':
-      return { label: isUrdu ? 'گودام و اسٹاک' : 'Warehouse Stock', icon: '📦', bg: '#F0FDFA', color: '#0F766E' };
+      return { label: isUrdu ? 'گودام و اسٹاک' : 'Warehouse Stock', icon: '📦', bg: isDark ? 'rgba(15, 118, 110, 0.2)' : '#F0FDFA', color: isDark ? '#5EEAD4' : '#0F766E' };
     case 'USER':
     case 'ROLE':
-      return { label: isUrdu ? 'صارفین و ملازمین' : 'Staff & Roles', icon: '👤', bg: '#F8FAFC', color: '#334155' };
+      return { label: isUrdu ? 'صارفین و ملازمین' : 'Staff & Roles', icon: '👤', bg: isDark ? '#1E293B' : '#F8FAFC', color: isDark ? '#E2E8F0' : '#334155' };
     default:
-      return { label: entityType || 'سسٹم', icon: '⚡', bg: '#F1F5F9', color: '#475569' };
+      return { label: entityType || 'سسٹم', icon: '⚡', bg: isDark ? '#1E293B' : '#F1F5F9', color: isDark ? '#CBD5E1' : '#475569' };
   }
 }
 
 /* ─────────────────────────────────────────────────────────────
    Human-Readable Urdu Details Renderer (No Raw JSON!)
 ───────────────────────────────────────────────────────────── */
-function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
+function renderLogDetails(log: ActivityLogItem, isUrdu: boolean, isDark = false) {
   const details = log.details;
 
   // 1. User Login Event
@@ -271,14 +271,14 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#0F172A', fontWeight: 800, fontSize: isUrdu ? '17px' : '13px' }}>
+        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontWeight: 800, fontSize: isUrdu ? '17px' : '13px' }}>
           {isUrdu ? 'لاگ ان تصدیق:' : 'Login authenticated:'}
         </span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#1E293B', backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px', fontSize: '12px' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: isDark ? '#38BDF8' : '#1E293B', backgroundColor: isDark ? '#0F172A' : '#F1F5F9', border: isDark ? '1px solid #334155' : '1px solid #E2E8F0', padding: '2px 8px', borderRadius: '6px', fontSize: '12px' }}>
           {username}
         </span>
         {roleLabel && (
-          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '14px' : '11px', padding: '2px 8px', borderRadius: '12px', backgroundColor: '#E0E7FF', color: '#4338CA', fontWeight: 800 }}>
+          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '14px' : '11px', padding: '2px 8px', borderRadius: '12px', backgroundColor: isDark ? 'rgba(99, 102, 241, 0.2)' : '#E0E7FF', color: isDark ? '#A5B4FC' : '#4338CA', fontWeight: 800, border: isDark ? '1px solid rgba(99, 102, 241, 0.3)' : 'none' }}>
             {roleLabel}
           </span>
         )}
@@ -290,8 +290,8 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
   if (log.action === 'USER_LOGOUT') {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#94A3B8' }} />
-        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#475569', fontWeight: 700, fontSize: isUrdu ? '17px' : '13px' }}>
+        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isDark ? '#64748B' : '#94A3B8' }} />
+        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#94A3B8' : '#475569', fontWeight: 700, fontSize: isUrdu ? '17px' : '13px' }}>
           {isUrdu ? 'صارف کا سیشن باضابطہ لاگ آؤٹ ہو گیا' : 'Session ended and user logged out cleanly'}
         </span>
       </div>
@@ -302,8 +302,8 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
   if (log.action === 'PIN_UNLOCKED') {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <KeyRound size={14} color="#7C3AED" />
-        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#6D28D9', fontWeight: 700, fontSize: isUrdu ? '17px' : '13px' }}>
+        <KeyRound size={14} color={isDark ? '#A78BFA' : '#7C3AED'} />
+        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#C084FC' : '#6D28D9', fontWeight: 700, fontSize: isUrdu ? '17px' : '13px' }}>
           {isUrdu ? 'کاؤنٹر اسکرین لاک پن درج کر کے کھول دیا گیا' : 'Counter screen lock opened via Security PIN'}
         </span>
       </div>
@@ -314,9 +314,9 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
   if (log.action.includes('VOID')) {
     const reason = details?.reason || (typeof details === 'string' ? details : 'غلط اندراج');
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#FEF2F2', padding: '4px 10px', borderRadius: '8px', border: '1px solid #FECACA' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEF2F2', padding: '4px 10px', borderRadius: '8px', border: isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid #FECACA' }}>
         <Ban size={14} color="#DC2626" />
-        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#DC2626', fontWeight: 900, fontSize: isUrdu ? '17px' : '13px' }}>
+        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#F87171' : '#DC2626', fontWeight: 900, fontSize: isUrdu ? '17px' : '13px' }}>
           {isUrdu ? `منسوخی کی وجہ: ${reason}` : `Void Reason: ${reason}`}
         </span>
       </div>
@@ -329,14 +329,14 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
 
     if (details.billNumber || details.billNo) {
       pills.push(
-        <span key="bill" style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+        <span key="bill" style={{ backgroundColor: isDark ? '#0F172A' : '#EFF6FF', color: isDark ? '#60A5FA' : '#1D4ED8', border: isDark ? '1px solid #334155' : '1px solid #BFDBFE', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
           {`بل #${details.billNumber || details.billNo}`}
         </span>
       );
     }
     if (details.tokenNumber || details.tokenFormatted || details.token) {
       pills.push(
-        <span key="token" style={{ backgroundColor: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+        <span key="token" style={{ backgroundColor: isDark ? '#0F172A' : '#FEF3C7', color: isDark ? '#FCD34D' : '#B45309', border: isDark ? '1px solid #334155' : '1px solid #FDE68A', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
           {`ٹوکن #${details.tokenFormatted || details.tokenNumber || details.token}`}
         </span>
       );
@@ -344,21 +344,21 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
     if (details.amount !== undefined || details.total !== undefined) {
       const amt = Number(details.amount ?? details.total ?? 0);
       pills.push(
-        <span key="amt" style={{ backgroundColor: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+        <span key="amt" style={{ backgroundColor: isDark ? '#0F172A' : '#DCFCE7', color: isDark ? '#4ADE80' : '#15803D', border: isDark ? '1px solid #334155' : '1px solid #86EFAC', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
           {`Rs ${amt.toLocaleString()}`}
         </span>
       );
     }
     if (details.reason) {
       pills.push(
-        <span key="reason" className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#475569', fontSize: isUrdu ? '16px' : '12px', fontWeight: 700 }}>
+        <span key="reason" className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#94A3B8' : '#475569', fontSize: isUrdu ? '16px' : '12px', fontWeight: 700 }}>
           {`وجہ: ${details.reason}`}
         </span>
       );
     }
     if (details.category) {
       pills.push(
-        <span key="cat" style={{ backgroundColor: '#F1F5F9', color: '#334155', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 700 }}>
+        <span key="cat" style={{ backgroundColor: isDark ? '#1E293B' : '#F1F5F9', color: isDark ? '#E2E8F0' : '#334155', border: isDark ? '1px solid #334155' : '1px solid #E2E8F0', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 700 }}>
           {details.category}
         </span>
       );
@@ -377,8 +377,8 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
         {entries.map(([k, v]) => (
-          <span key={k} style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', color: '#334155' }}>
-            <strong>{k}:</strong> {String(v)}
+          <span key={k} style={{ backgroundColor: isDark ? '#0F172A' : '#F8FAFC', border: isDark ? '1px solid #334155' : '1px solid #E2E8F0', padding: '2px 8px', borderRadius: '6px', fontSize: '12px', color: isDark ? '#CBD5E1' : '#334155' }}>
+            <strong style={{ color: isDark ? '#F8FAFC' : '#0F172A' }}>{k}:</strong> {String(v)}
           </span>
         ))}
       </div>
@@ -388,7 +388,7 @@ function renderLogDetails(log: ActivityLogItem, isUrdu: boolean) {
   // 6. Plain String or Empty
   if (typeof details === 'string' && details.trim()) {
     return (
-      <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#334155', fontWeight: 700, fontSize: isUrdu ? '17px' : '13px' }}>
+      <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#E2E8F0' : '#334155', fontWeight: 700, fontSize: isUrdu ? '17px' : '13px' }}>
         {details}
       </span>
     );
@@ -869,8 +869,8 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
                   ) : (
                     filteredAuditLogs.map((log, idx) => {
                       const { date, time } = formatAuditDateTime(log.createdAt);
-                      const actionMeta = getActionMeta(log.action, isUrdu);
-                      const entityMeta = getEntityMeta(log.entityType, isUrdu);
+                      const actionMeta = getActionMeta(log.action, isUrdu, isDark);
+                      const entityMeta = getEntityMeta(log.entityType, isUrdu, isDark);
 
                       return (
                         <div
@@ -879,19 +879,19 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
                             display: 'grid',
                             gridTemplateColumns: '1.4fr 1.3fr 1.6fr 1.4fr 2.6fr',
                             padding: '14px 22px',
-                            borderBottom: '1px solid #E2E8F0',
-                            backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
+                            borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                            backgroundColor: idx % 2 === 0 ? (isDark ? '#1E293B' : '#FFFFFF') : (isDark ? '#162032' : '#F8FAFC'),
                             alignItems: 'center',
                             direction: isUrdu ? 'rtl' : 'ltr',
                             transition: 'background-color 0.12s ease',
                           }}
-                          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#F1F5F9'; }}
-                          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC'; }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = isDark ? '#243046' : '#F1F5F9'; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = idx % 2 === 0 ? (isDark ? '#1E293B' : '#FFFFFF') : (isDark ? '#162032' : '#F8FAFC'); }}
                         >
                           {/* Column 1: Date & Time (Strict LTR - No BiDi Mangle!) */}
                           <div dir="ltr" style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-end', fontFamily: 'var(--font-mono)' }}>
-                            <span style={{ fontWeight: 800, color: '#0F172A', fontSize: '13px' }}>{date}</span>
-                            <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>{time}</span>
+                            <span style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: '13px' }}>{date}</span>
+                            <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600 }}>{time}</span>
                           </div>
 
                           {/* Column 2: Action Badge */}
@@ -918,15 +918,15 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
 
                           {/* Column 3: User */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 800, color: '#334155', flexShrink: 0 }}>
+                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: isDark ? '#334155' : '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#334155', flexShrink: 0 }}>
                               {log.user?.fullName ? log.user.fullName.charAt(0) : <UserIcon size={16} />}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: '#0F172A', fontSize: isUrdu ? '18px' : '13.5px', lineHeight: 1.2 }}>
+                              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '18px' : '13.5px', lineHeight: 1.2 }}>
                                 {log.user?.fullName || 'System'}
                               </span>
                               {log.user?.roleName && (
-                                <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>
+                                <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600 }}>
                                   {log.user.roleName === 'SuperAdmin' ? (isUrdu ? 'سپر ایڈمن (مالک)' : 'SuperAdmin') : log.user.roleName === 'Biller' ? (isUrdu ? 'کاؤنٹر بلر' : 'Biller') : log.user.roleName}
                                 </span>
                               )}
@@ -956,7 +956,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
 
                           {/* Column 5: Details (Human readable!) */}
                           <div>
-                            {renderLogDetails(log, isUrdu)}
+                            {renderLogDetails(log, isUrdu, isDark)}
                           </div>
                         </div>
                       );
@@ -975,16 +975,16 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       {activeSubTab === 'sales' && (
         <>
           {/* Filter Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFFFFF', padding: '14px 20px', borderRadius: '16px', border: '1.5px solid #CBD5E1', boxShadow: '0 2px 6px rgba(15,23,42,0.04)', flexWrap: 'wrap', gap: '14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '14px 20px', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', boxShadow: '0 2px 6px rgba(15,23,42,0.04)', flexWrap: 'wrap', gap: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Calendar size={20} color="#0F172A" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, fontSize: isUrdu ? '19px' : '14px', color: '#0F172A' }}>{t('تاریخ:', 'Date:')}</span>
+                <Calendar size={20} color={isDark ? '#F8FAFC' : '#0F172A'} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, fontSize: isUrdu ? '19px' : '14px', color: isDark ? '#F8FAFC' : '#0F172A' }}>{t('تاریخ:', 'Date:')}</span>
               </div>
               {(['today', 'yesterday', '7days', 'month'] as const).map((period) => {
                 const isSelected = dateFilter === period;
                 return (
-                  <button key={period} type="button" onClick={() => setDateFilter(period)} className={isUrdu ? 'font-nastaleeq' : ''} style={{ height: '40px', padding: '0 18px', borderRadius: '10px', border: isSelected ? '1.5px solid #1877F2' : '1.5px solid #CBD5E1', backgroundColor: isSelected ? '#1877F2' : '#F8FAFC', color: isSelected ? '#FFFFFF' : '#334155', fontWeight: 800, fontSize: isUrdu ? '18px' : '13.5px', cursor: 'pointer', boxShadow: isSelected ? '0 4px 12px rgba(24,119,242,0.25)' : 'none', transition: 'all 0.15s ease' }}>
+                  <button key={period} type="button" onClick={() => setDateFilter(period)} className={isUrdu ? 'font-nastaleeq' : ''} style={{ height: '40px', padding: '0 18px', borderRadius: '10px', border: isSelected ? '1.5px solid #1877F2' : (isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1'), backgroundColor: isSelected ? '#1877F2' : (isDark ? '#0F172A' : '#F8FAFC'), color: isSelected ? '#FFFFFF' : (isDark ? '#CBD5E1' : '#334155'), fontWeight: 800, fontSize: isUrdu ? '18px' : '13.5px', cursor: 'pointer', boxShadow: isSelected ? '0 4px 12px rgba(24,119,242,0.25)' : 'none', transition: 'all 0.15s ease' }}>
                     {period === 'today' ? t('آج', 'Today') : period === 'yesterday' ? t('گزشتہ کل', 'Yesterday') : period === '7days' ? t('پچھلے 7 دن', 'Last 7 Days') : t('اس ماہ', 'This Month')}
                   </button>
                 );
@@ -994,34 +994,34 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
 
           {/* 3 KPI Cards */}
           <div className="reports-summary-3-cards">
-            <div style={{ backgroundColor: '#F0FDF4', padding: '16px 22px', borderRadius: '16px', border: '1.5px solid #86EFAC', boxShadow: '0 2px 8px rgba(16,185,129,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
-              <div style={{ fontSize: '30px', fontWeight: 900, color: '#15803D', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
+            <div style={{ backgroundColor: isDark ? 'rgba(21, 128, 61, 0.15)' : '#F0FDF4', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(34, 197, 94, 0.3)' : '1.5px solid #86EFAC', boxShadow: '0 2px 8px rgba(16,185,129,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#4ADE80' : '#15803D', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
                 <span>+{totalInflow.toLocaleString()}</span>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: '#166534' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#86EFAC' : '#166534' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
               </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: '#166534', textAlign: 'right' }}>{isUrdu ? 'کل آمدن (سیل و فیس)' : 'Total Revenue'}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#86EFAC' : '#166534', textAlign: 'right' }}>{isUrdu ? 'کل آمدن (سیل و فیس)' : 'Total Revenue'}</span>
             </div>
-            <div style={{ backgroundColor: '#FEF2F2', padding: '16px 22px', borderRadius: '16px', border: '1.5px solid #FECACA', boxShadow: '0 2px 8px rgba(239,68,68,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
-              <div style={{ fontSize: '30px', fontWeight: 900, color: '#DC2626', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
+            <div style={{ backgroundColor: isDark ? 'rgba(220, 38, 38, 0.15)' : '#FEF2F2', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(239, 68, 68, 0.3)' : '1.5px solid #FECACA', boxShadow: '0 2px 8px rgba(239,68,68,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#F87171' : '#DC2626', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
                 <span>-{totalOutflow.toLocaleString()}</span>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: '#991B1B' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#FCA5A5' : '#991B1B' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
               </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: '#991B1B', textAlign: 'right' }}>{isUrdu ? 'کل اخراجات و واپسی' : 'Total Expenses'}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B', textAlign: 'right' }}>{isUrdu ? 'کل اخراجات و واپسی' : 'Total Expenses'}</span>
             </div>
-            <div style={{ backgroundColor: '#FFFBEB', padding: '16px 22px', borderRadius: '16px', border: '1.5px solid #FDE68A', boxShadow: '0 2px 8px rgba(217,119,6,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
-              <div style={{ fontSize: '30px', fontWeight: 900, color: '#B45309', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
+            <div style={{ backgroundColor: isDark ? 'rgba(217, 119, 6, 0.15)' : '#FFFBEB', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(245, 158, 11, 0.3)' : '1.5px solid #FDE68A', boxShadow: '0 2px 8px rgba(217,119,6,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#FBBF24' : '#B45309', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
                 <span>{netDayCash.toLocaleString()}</span>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: '#92400E' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#FDE68A' : '#92400E' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
               </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: '#92400E', textAlign: 'right' }}>{isUrdu ? 'خالص نقد کیش' : 'Net Cash Balance'}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#FDE68A' : '#92400E', textAlign: 'right' }}>{isUrdu ? 'خالص نقد کیش' : 'Net Cash Balance'}</span>
             </div>
           </div>
 
           {/* Ledger Table */}
-          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1.5px solid #CBD5E1', overflow: 'hidden', boxShadow: '0 4px 12px rgba(15,23,42,0.04)' }}>
+          <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', overflow: 'hidden', boxShadow: '0 4px 12px rgba(15,23,42,0.04)' }}>
             <div className="responsive-table-scroll">
               <div style={{ minWidth: '780px' }}>
-                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1.8fr 1.1fr 1.2fr 0.8fr', padding: '14px 20px', backgroundColor: '#0F172A', borderBottom: '2px solid #334155', fontWeight: 900, fontSize: isUrdu ? '19px' : '13px', color: '#FFFFFF', alignItems: 'center', direction: isUrdu ? 'rtl' : 'ltr' }}>
+                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1.8fr 1.1fr 1.2fr 0.8fr', padding: '14px 20px', backgroundColor: isDark ? '#0F172A' : '#0F172A', borderBottom: '2px solid #334155', fontWeight: 900, fontSize: isUrdu ? '19px' : '13px', color: '#FFFFFF', alignItems: 'center', direction: isUrdu ? 'rtl' : 'ltr' }}>
                   <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('تاریخ و وقت', 'Date & Time')}</span>
                   <span style={{ textAlign: 'center' }}>{t('قسم / شعبہ', 'Category')}</span>
                   <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('تفصیل و کسٹمر', 'Description')}</span>
@@ -1031,36 +1031,58 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {ledger.length === 0 ? (
-                    <div style={{ padding: '36px', textAlign: 'center', color: '#64748B', fontSize: isUrdu ? '18px' : '14px' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+                    <div style={{ padding: '36px', textAlign: 'center', color: isDark ? '#94A3B8' : '#64748B', fontSize: isUrdu ? '18px' : '14px' }} className={isUrdu ? 'font-nastaleeq' : ''}>
                       {t('اس تاریخ میں کوئی ریکارڈ موجود نہیں ہے۔', 'No ledger records found for this period.')}
                     </div>
                   ) : (
                     ledger.map((item, idx) => {
                       const isVoidable = (item.category === 'SALE' || item.category === 'PISAI') && !item.description.includes('منسوخ') && !item.description.includes('VOID');
-                      let badgeBg = '#EFF6FF', badgeColor = '#1D4ED8', badgeBorder = '#BFDBFE';
+                      let badgeBg = isDark ? 'rgba(59, 130, 246, 0.2)' : '#EFF6FF';
+                      let badgeColor = isDark ? '#93C5FD' : '#1D4ED8';
+                      let badgeBorder = isDark ? 'rgba(59, 130, 246, 0.4)' : '#BFDBFE';
                       let catLabel: string = item.category;
                       if (item.category === 'SALE') catLabel = isUrdu ? 'سیل' : 'SALE';
-                      else if (item.category === 'PISAI') { badgeBg = '#FEF3C7'; badgeColor = '#D97706'; badgeBorder = '#FDE68A'; catLabel = isUrdu ? 'پسائی' : 'PISAI'; }
-                      else if (item.category === 'EXPENSE') { badgeBg = '#FEE2E2'; badgeColor = '#DC2626'; badgeBorder = '#FECACA'; catLabel = isUrdu ? 'خرچہ' : 'EXPENSE'; }
-                      else if (item.category === 'PAYMENT') { badgeBg = '#ECFDF5'; badgeColor = '#059669'; badgeBorder = '#A7F3D0'; catLabel = isUrdu ? 'وصولی' : 'PAYMENT'; }
-                      else if (item.category === 'RETURN') { badgeBg = '#FFF1F2'; badgeColor = '#BE123C'; badgeBorder = '#FECDD3'; catLabel = isUrdu ? 'واپسی' : 'RETURN'; }
+                      else if (item.category === 'PISAI') {
+                        badgeBg = isDark ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7';
+                        badgeColor = isDark ? '#FCD34D' : '#D97706';
+                        badgeBorder = isDark ? 'rgba(245, 158, 11, 0.4)' : '#FDE68A';
+                        catLabel = isUrdu ? 'پسائی' : 'PISAI';
+                      }
+                      else if (item.category === 'EXPENSE') {
+                        badgeBg = isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEE2E2';
+                        badgeColor = isDark ? '#FCA5A5' : '#DC2626';
+                        badgeBorder = isDark ? 'rgba(239, 68, 68, 0.4)' : '#FECACA';
+                        catLabel = isUrdu ? 'خرچہ' : 'EXPENSE';
+                      }
+                      else if (item.category === 'PAYMENT') {
+                        badgeBg = isDark ? 'rgba(16, 185, 129, 0.2)' : '#ECFDF5';
+                        badgeColor = isDark ? '#6EE7B7' : '#059669';
+                        badgeBorder = isDark ? 'rgba(16, 185, 129, 0.4)' : '#A7F3D0';
+                        catLabel = isUrdu ? 'وصولی' : 'PAYMENT';
+                      }
+                      else if (item.category === 'RETURN') {
+                        badgeBg = isDark ? 'rgba(244, 63, 94, 0.2)' : '#FFF1F2';
+                        badgeColor = isDark ? '#FDA4AF' : '#BE123C';
+                        badgeBorder = isDark ? 'rgba(244, 63, 94, 0.4)' : '#FECDD3';
+                        catLabel = isUrdu ? 'واپسی' : 'RETURN';
+                      }
 
                       return (
-                        <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1.8fr 1.1fr 1.2fr 0.8fr', padding: '14px 20px', borderBottom: '1px solid #E2E8F0', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC', alignItems: 'center', direction: isUrdu ? 'rtl' : 'ltr' }}>
-                          <span dir="ltr" style={{ color: '#475569', fontSize: '13.5px', fontFamily: 'var(--font-mono)', fontWeight: 700, textAlign: isUrdu ? 'right' : 'left' }}>{item.timestamp}</span>
+                        <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1.8fr 1.1fr 1.2fr 0.8fr', padding: '14px 20px', borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0', backgroundColor: idx % 2 === 0 ? (isDark ? '#1E293B' : '#FFFFFF') : (isDark ? '#162032' : '#F8FAFC'), alignItems: 'center', direction: isUrdu ? 'rtl' : 'ltr' }}>
+                          <span dir="ltr" style={{ color: isDark ? '#94A3B8' : '#475569', fontSize: '13.5px', fontFamily: 'var(--font-mono)', fontWeight: 700, textAlign: isUrdu ? 'right' : 'left' }}>{item.timestamp}</span>
                           <div style={{ textAlign: 'center' }}>
                             <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', fontWeight: 800, padding: '3px 12px', borderRadius: '20px', backgroundColor: badgeBg, color: badgeColor, border: `1px solid ${badgeBorder}`, display: 'inline-block' }}>{catLabel}</span>
                           </div>
-                          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#0F172A', fontWeight: 900, fontSize: isUrdu ? '20px' : '14.5px', textAlign: isUrdu ? 'right' : 'left' }}>{isUrdu && item.descriptionUr ? item.descriptionUr : item.description}</span>
+                          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontWeight: 900, fontSize: isUrdu ? '20px' : '14.5px', textAlign: isUrdu ? 'right' : 'left' }}>{isUrdu && item.descriptionUr ? item.descriptionUr : item.description}</span>
                           <div style={{ textAlign: 'center' }}>
-                            <span style={{ color: '#334155', fontFamily: 'var(--font-mono)', fontSize: '13.5px', fontWeight: 800, backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px' }}>{item.reference}</span>
+                            <span style={{ color: isDark ? '#38BDF8' : '#334155', fontFamily: 'var(--font-mono)', fontSize: '13.5px', fontWeight: 800, backgroundColor: isDark ? '#0F172A' : '#F1F5F9', border: isDark ? '1px solid #334155' : '1px solid #E2E8F0', padding: '3px 10px', borderRadius: '6px' }}>{item.reference}</span>
                           </div>
-                          <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: isUrdu ? '20px' : '16px', color: item.type === 'inflow' ? '#15803D' : '#DC2626' }}>
+                          <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: isUrdu ? '20px' : '16px', color: item.type === 'inflow' ? (isDark ? '#4ADE80' : '#15803D') : (isDark ? '#F87171' : '#DC2626') }}>
                             {item.type === 'inflow' ? `+ Rs ${item.amount.toLocaleString()}` : item.type === 'outflow' ? `- Rs ${item.amount.toLocaleString()}` : `Rs ${item.amount.toLocaleString()}`}
                           </span>
                           <div style={{ textAlign: 'center' }}>
                             {isVoidable ? (
-                              <button type="button" onClick={() => { const rawId = item.id.replace('bill-', '').replace('pisai-', ''); setTargetVoidItem({ id: rawId, type: item.category === 'SALE' ? 'bill' : 'pisai', ref: item.reference }); setVoidModalOpen(true); }} style={{ padding: '5px 12px', borderRadius: '8px', backgroundColor: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA', fontSize: isUrdu ? '15px' : '12px', fontWeight: 800, cursor: 'pointer' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+                              <button type="button" onClick={() => { const rawId = item.id.replace('bill-', '').replace('pisai-', ''); setTargetVoidItem({ id: rawId, type: item.category === 'SALE' ? 'bill' : 'pisai', ref: item.reference }); setVoidModalOpen(true); }} style={{ padding: '5px 12px', borderRadius: '8px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEE2E2', color: isDark ? '#F87171' : '#DC2626', border: isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid #FECACA', fontSize: isUrdu ? '15px' : '12px', fontWeight: 800, cursor: 'pointer' }} className={isUrdu ? 'font-nastaleeq' : ''}>
                                 {t('منسوخ کریں', 'Void')}
                               </button>
                             ) : (
@@ -1139,37 +1161,37 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       {activeSubTab === 'customer' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-            <div style={{ backgroundColor: '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: '1.5px solid #FDE68A', boxShadow: '0 2px 6px rgba(217,119,6,0.06)' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: '#92400E', fontWeight: 800, display: 'block' }}>
+            <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(245, 158, 11, 0.3)' : '1.5px solid #FDE68A', boxShadow: '0 2px 6px rgba(217,119,6,0.06)' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#FCD34D' : '#92400E', fontWeight: 800, display: 'block' }}>
                 {isUrdu ? 'کل واجب الادا ادھار (Receivables)' : 'Total Outstanding Balance'}
               </span>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: '#B45309', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#FBBF24' : '#B45309', fontFamily: 'var(--font-mono)' }}>
                 Rs {(customerStats?.totalReceivables || 61100).toLocaleString()}
               </span>
             </div>
-            <div style={{ backgroundColor: '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: '1.5px solid #BFDBFE', boxShadow: '0 2px 6px rgba(24,119,242,0.06)' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: '#1E40AF', fontWeight: 800, display: 'block' }}>
+            <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(59, 130, 246, 0.3)' : '1.5px solid #BFDBFE', boxShadow: '0 2px 6px rgba(24,119,242,0.06)' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#60A5FA' : '#1E40AF', fontWeight: 800, display: 'block' }}>
                 {isUrdu ? 'فعال ادھار دار گاہک' : 'Active Debtors'}
               </span>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: '#1877F2', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#60A5FA' : '#1877F2', fontFamily: 'var(--font-mono)' }}>
                 {customerStats?.activeDebtorsCount || 3} {isUrdu ? 'کسٹمرز' : 'Customers'}
               </span>
             </div>
-            <div style={{ backgroundColor: '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: '1.5px solid #CBD5E1', boxShadow: '0 2px 6px rgba(71,85,105,0.06)' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: '#475569', fontWeight: 800, display: 'block' }}>
+            <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', boxShadow: '0 2px 6px rgba(71,85,105,0.06)' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#94A3B8' : '#475569', fontWeight: 800, display: 'block' }}>
                 {isUrdu ? 'رجسٹرڈ گاہکوں کی تعداد' : 'Registered Customers'}
               </span>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: '#334155', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#334155', fontFamily: 'var(--font-mono)' }}>
                 {customerStats?.totalCustomers || 3}
               </span>
             </div>
           </div>
 
-          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1.5px solid #CBD5E1', overflow: 'hidden' }}>
-            <div style={{ padding: '14px 20px', backgroundColor: '#0F172A', color: '#FFFFFF', fontWeight: 900, fontSize: isUrdu ? '19px' : '14px' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+          <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', overflow: 'hidden' }}>
+            <div style={{ padding: '14px 20px', backgroundColor: isDark ? '#0F172A' : '#0F172A', color: '#FFFFFF', fontWeight: 900, fontSize: isUrdu ? '19px' : '14px', borderBottom: isDark ? '1px solid #334155' : 'none' }} className={isUrdu ? 'font-nastaleeq' : ''}>
               {isUrdu ? 'نمایاں ادھار کھاتے (Top Customer Receivables)' : 'Top Customer Ledger Balances'}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.2fr 1.5fr 1fr', padding: '12px 20px', backgroundColor: '#F1F5F9', fontWeight: 900, fontSize: isUrdu ? '17px' : '13px', color: '#334155' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.2fr 1.5fr 1fr', padding: '12px 20px', backgroundColor: isDark ? '#151D2F' : '#F1F5F9', fontWeight: 900, fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#E2E8F0' : '#334155' }} className={isUrdu ? 'font-nastaleeq' : ''}>
               <span>{isUrdu ? 'گاہک کا نام' : 'Customer Name'}</span>
               <span>{isUrdu ? 'فون نمبر' : 'Phone'}</span>
               <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{isUrdu ? 'موجودہ بقایا کھاتہ' : 'Current Balance'}</span>
@@ -1180,14 +1202,14 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
               { name: 'حاجی رشید', phone: '0300-8765432', balance: 14500 },
               { name: 'میاں اسلم زمیندار', phone: '0333-1122334', balance: 8400 },
             ].map((c, idx) => (
-              <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.2fr 1.5fr 1fr', padding: '14px 20px', borderBottom: '1px solid #E2E8F0', alignItems: 'center' }}>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: '#0F172A', fontSize: isUrdu ? '19px' : '14px' }}>{c.name}</span>
-                <span style={{ fontFamily: 'var(--font-mono)', color: '#475569', fontSize: '13px' }}>{c.phone}</span>
-                <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '17px', color: '#DC2626' }}>
+              <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.2fr 1.5fr 1fr', padding: '14px 20px', borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0', backgroundColor: isDark ? (idx % 2 === 1 ? '#1E293B' : '#151D2F') : '#FFFFFF', alignItems: 'center' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '19px' : '14px' }}>{c.name}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', color: isDark ? '#94A3B8' : '#475569', fontSize: '13px' }}>{c.phone}</span>
+                <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '17px', color: isDark ? '#F87171' : '#DC2626' }}>
                   Rs {c.balance.toLocaleString()}
                 </span>
                 <div style={{ textAlign: 'center' }}>
-                  <span style={{ padding: '3px 10px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 800, backgroundColor: '#FEF3C7', color: '#B45309' }}>
+                  <span style={{ padding: '3px 10px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 800, backgroundColor: isDark ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7', color: isDark ? '#FCD34D' : '#B45309', border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : 'none' }}>
                     {isUrdu ? 'ادھار واجب' : 'Unpaid'}
                   </span>
                 </div>
@@ -1201,25 +1223,25 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
           5. DAILY LOG / TIMELINE REPORT VIEW
          ═════════════════════════════════════════════════════════════ */}
       {activeSubTab === 'daily_log' && (
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1.5px solid #CBD5E1', padding: '20px', boxShadow: '0 2px 8px rgba(15,23,42,0.04)' }}>
+        <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', padding: '20px', boxShadow: '0 2px 8px rgba(15,23,42,0.04)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
             <Clock size={20} color="#DC2626" />
-            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: isUrdu ? '22px' : '16px', fontWeight: 900, color: '#0F172A' }}>
+            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: isUrdu ? '22px' : '16px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#0F172A' }}>
               {isUrdu ? 'آج کی مکمل وقتی ڈائری (Timeline Stream)' : 'Today Complete Financial Timeline'}
             </h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {ledger.map((item, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', borderRadius: '12px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 18px', borderRadius: '12px', backgroundColor: isDark ? '#151D2F' : '#F8FAFC', border: isDark ? '1px solid #334155' : '1px solid #E2E8F0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span dir="ltr" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#64748B', fontWeight: 700 }}>{item.timestamp}</span>
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: '#0F172A', fontSize: isUrdu ? '18px' : '14px' }}>
+                  <span dir="ltr" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 700 }}>{item.timestamp}</span>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '18px' : '14px' }}>
                     {isUrdu && item.descriptionUr ? item.descriptionUr : item.description}
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#475569', backgroundColor: '#E2E8F0', padding: '2px 8px', borderRadius: '6px' }}>{item.reference}</span>
-                  <span dir="ltr" style={{ fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '16px', color: item.type === 'inflow' ? '#15803D' : '#DC2626' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: isDark ? '#38BDF8' : '#475569', backgroundColor: isDark ? '#0F172A' : '#E2E8F0', border: isDark ? '1px solid #334155' : 'none', padding: '2px 8px', borderRadius: '6px' }}>{item.reference}</span>
+                  <span dir="ltr" style={{ fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '16px', color: item.type === 'inflow' ? (isDark ? '#4ADE80' : '#15803D') : (isDark ? '#F87171' : '#DC2626') }}>
                     {item.type === 'inflow' ? `+ Rs ${item.amount.toLocaleString()}` : `- Rs ${item.amount.toLocaleString()}`}
                   </span>
                 </div>
@@ -1235,30 +1257,30 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       {(activeSubTab === 'purchase' || activeSubTab === 'supplier') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-            <div style={{ backgroundColor: '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: '1.5px solid #86EFAC', boxShadow: '0 2px 6px rgba(16,185,129,0.06)' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: '#166534', fontWeight: 800, display: 'block' }}>
+            <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(34, 197, 94, 0.3)' : '1.5px solid #86EFAC', boxShadow: '0 2px 6px rgba(16,185,129,0.06)' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#4ADE80' : '#166534', fontWeight: 800, display: 'block' }}>
                 {isUrdu ? 'ماہانہ گندم آمد (خریداری)' : 'Monthly Wheat Intake'}
               </span>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: '#15803D', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#4ADE80' : '#15803D', fontFamily: 'var(--font-mono)' }}>
                 450 {isUrdu ? 'بوری (45,000 کلو)' : 'Bags (45,000 KG)'}
               </span>
             </div>
-            <div style={{ backgroundColor: '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: '1.5px solid #A5F3FC', boxShadow: '0 2px 6px rgba(8,145,178,0.06)' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: '#155E75', fontWeight: 800, display: 'block' }}>
+            <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(14, 165, 233, 0.3)' : '1.5px solid #A5F3FC', boxShadow: '0 2px 6px rgba(8,145,178,0.06)' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#38BDF8' : '#155E75', fontWeight: 800, display: 'block' }}>
                 {isUrdu ? 'سپلائر واجب الادا رقم' : 'Pending Supplier Payments'}
               </span>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: '#0891B2', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#38BDF8' : '#0891B2', fontFamily: 'var(--font-mono)' }}>
                 Rs 185,000
               </span>
             </div>
           </div>
 
-          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1.5px solid #CBD5E1', padding: '24px', textAlign: 'center' }}>
-            <ShoppingCart size={40} color="#0E8A54" style={{ margin: '0 auto 12px' }} />
-            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: '0 0 8px', fontSize: isUrdu ? '24px' : '17px', fontWeight: 900, color: '#0F172A' }}>
+          <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', padding: '24px', textAlign: 'center' }}>
+            <ShoppingCart size={40} color={isDark ? '#4ADE80' : '#0E8A54'} style={{ margin: '0 auto 12px' }} />
+            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: '0 0 8px', fontSize: isUrdu ? '24px' : '17px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#0F172A' }}>
               {isUrdu ? 'سپلائر و خریداری ماڈیول مکمل فعال ہے' : 'Supplier & Grain Purchase Ingestion Ready'}
             </h3>
-            <p className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: isUrdu ? '17px' : '13px', color: '#64748B' }}>
+            <p className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#94A3B8' : '#64748B' }}>
               {isUrdu ? 'نیا گندم چالان یا سپلائر ادائیگی ریکارڈ کرنے کے لیے نیچے دیے گئے بٹن کا استعمال فرمائیں۔' : 'Use below to record grain purchase delivery or pay supplier ledger balance.'}
             </p>
           </div>
@@ -1268,19 +1290,19 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       {/* VOID MODAL */}
       {voidModalOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 9997, backgroundColor: 'rgba(15,23,42,0.75)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-          <div style={{ width: '100%', maxWidth: '460px', backgroundColor: '#FFFFFF', borderRadius: '20px', padding: '26px', border: '1.5px solid #CBD5E1', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)' }}>
+          <div style={{ width: '100%', maxWidth: '460px', backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '20px', padding: '26px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Ban size={22} color="#DC2626" />
                 <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: '20px', fontWeight: 900, color: '#DC2626' }}>{t('بل یا ٹوکن منسوخ کریں', 'Void Transaction')} ({targetVoidItem?.ref})</h3>
               </div>
-              <button type="button" onClick={() => { setVoidModalOpen(false); setVoidReason(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}><X size={20} /></button>
+              <button type="button" onClick={() => { setVoidModalOpen(false); setVoidReason(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: isDark ? '#94A3B8' : '#64748B', padding: '4px' }}><X size={20} /></button>
             </div>
-            <p style={{ fontSize: isUrdu ? '16px' : '13px', color: '#475569', margin: '0 0 16px', lineHeight: 1.4 }} className={isUrdu ? 'font-nastaleeq' : ''}>{t('منسوخی کے بعد یہ بل باطل ہو جائے گا۔', 'Voiding marks this transaction as VOID.')}</p>
-            <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>{t('منسوخی کی وجہ (لازمی):', 'Void Reason (Required):')}</label>
-            <input type="text" value={voidReason} onChange={(e) => setVoidReason(e.target.value)} placeholder={isUrdu ? 'مثلاً: غلط اندراج' : 'e.g. Incorrect entry'} style={{ width: '100%', height: '44px', padding: '0 14px', borderRadius: '10px', border: '1.5px solid #CBD5E1', fontSize: '14px', marginBottom: '20px', outline: 'none', boxSizing: 'border-box' }} className={isUrdu ? 'font-nastaleeq' : ''} />
+            <p style={{ fontSize: isUrdu ? '16px' : '13px', color: isDark ? '#CBD5E1' : '#475569', margin: '0 0 16px', lineHeight: 1.4 }} className={isUrdu ? 'font-nastaleeq' : ''}>{t('منسوخی کے بعد یہ بل باطل ہو جائے گا۔', 'Voiding marks this transaction as VOID.')}</p>
+            <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A', marginBottom: '6px' }}>{t('منسوخی کی وجہ (لازمی):', 'Void Reason (Required):')}</label>
+            <input type="text" value={voidReason} onChange={(e) => setVoidReason(e.target.value)} placeholder={isUrdu ? 'مثلاً: غلط اندراج' : 'e.g. Incorrect entry'} style={{ width: '100%', height: '44px', padding: '0 14px', borderRadius: '10px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', backgroundColor: isDark ? '#0F172A' : '#FFFFFF', color: isDark ? '#FFFFFF' : '#0F172A', fontSize: '14px', marginBottom: '20px', outline: 'none', boxSizing: 'border-box' }} className={isUrdu ? 'font-nastaleeq' : ''} />
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button type="button" onClick={() => { setVoidModalOpen(false); setVoidReason(''); }} style={{ flex: 1, height: '46px', borderRadius: '12px', border: '1.5px solid #CBD5E1', backgroundColor: '#F8FAFC', color: '#475569', fontWeight: 800, fontSize: '14px', cursor: 'pointer' }} className={isUrdu ? 'font-nastaleeq' : ''}>{t('کینسل', 'Cancel')}</button>
+              <button type="button" onClick={() => { setVoidModalOpen(false); setVoidReason(''); }} style={{ flex: 1, height: '46px', borderRadius: '12px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', backgroundColor: isDark ? '#0F172A' : '#F8FAFC', color: isDark ? '#CBD5E1' : '#475569', fontWeight: 800, fontSize: '14px', cursor: 'pointer' }} className={isUrdu ? 'font-nastaleeq' : ''}>{t('کینسل', 'Cancel')}</button>
               <button type="button" onClick={handleExecuteVoid} disabled={isVoiding || !voidReason.trim()} style={{ flex: 1.5, height: '46px', borderRadius: '12px', border: 'none', backgroundColor: '#DC2626', color: '#FFFFFF', fontWeight: 900, fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(220,38,38,0.3)' }} className={isUrdu ? 'font-nastaleeq' : ''}>{isVoiding ? t('منسوخ ہو رہا ہے...', 'Voiding...') : t('منسوخی کی تصدیق کریں', 'Confirm Void')}</button>
             </div>
           </div>
@@ -1290,18 +1312,18 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       {/* EXPENSE MODAL */}
       {isExpenseOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 9996, backgroundColor: 'rgba(15,23,42,0.75)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-          <div style={{ width: '100%', maxWidth: '440px', backgroundColor: '#FFFFFF', borderRadius: '20px', padding: '24px', border: '1.5px solid #CBD5E1', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', borderBottom: '1px solid #E2E8F0', paddingBottom: '12px' }}>
+          <div style={{ width: '100%', maxWidth: '440px', backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '20px', padding: '24px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0', paddingBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <PlusCircle size={22} color="#0E8A54" />
-                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: '#0F172A', margin: 0 }}>{t('دکان کا نیا خرچہ درج کریں', 'Log Shop Expense')}</h3>
+                <PlusCircle size={22} color={isDark ? '#4ADE80' : '#0E8A54'} />
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '22px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#0F172A', margin: 0 }}>{t('دکان کا نیا خرچہ درج کریں', 'Log Shop Expense')}</h3>
               </div>
-              <button onClick={() => setIsExpenseOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}><X size={20} /></button>
+              <button onClick={() => setIsExpenseOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: isDark ? '#94A3B8' : '#64748B', padding: '4px' }}><X size={20} /></button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '22px' }}>
               <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>{t('خرچے کی قسم:', 'Category:')}</label>
-                <select value={expenseCategory} onChange={(e) => setExpenseCategory(e.target.value)} className={isUrdu ? 'font-nastaleeq' : ''} style={{ width: '100%', height: '44px', padding: '0 12px', borderRadius: '10px', border: '1.5px solid #CBD5E1', backgroundColor: '#F8FAFC', outline: 'none', fontWeight: 800, fontSize: isUrdu ? '17px' : '13.5px' }}>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: isDark ? '#E2E8F0' : '#334155', marginBottom: '4px' }}>{t('خرچے کی قسم:', 'Category:')}</label>
+                <select value={expenseCategory} onChange={(e) => setExpenseCategory(e.target.value)} className={isUrdu ? 'font-nastaleeq' : ''} style={{ width: '100%', height: '44px', padding: '0 12px', borderRadius: '10px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', backgroundColor: isDark ? '#0F172A' : '#F8FAFC', color: isDark ? '#FFFFFF' : '#0F172A', outline: 'none', fontWeight: 800, fontSize: isUrdu ? '17px' : '13.5px' }}>
                   <option value="Electricity">{t('بجلی کا بل', 'Electricity Bill')}</option>
                   <option value="Labor">{t('مزدوری و دیہاڑی', 'Labor Mazdoori')}</option>
                   <option value="Maintenance">{t('چکی مشین مرمت', 'Mill Maintenance')}</option>
@@ -1310,12 +1332,12 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
                 </select>
               </div>
               <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>{t('تفصیل:', 'Description:')}</label>
-                <input type="text" placeholder={t('مثلاً بیلٹ گریسنگ، جنریٹر ڈیزل...', 'e.g. Belt greasing, generator diesel...')} value={expenseDesc} onChange={(e) => setExpenseDesc(e.target.value)} style={{ width: '100%', height: '44px', padding: '0 14px', borderRadius: '10px', border: '1.5px solid #CBD5E1', backgroundColor: '#F8FAFC', outline: 'none', fontWeight: 800, fontSize: isUrdu ? '17px' : '13.5px', boxSizing: 'border-box' }} className={isUrdu ? 'font-nastaleeq' : ''} />
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: isDark ? '#E2E8F0' : '#334155', marginBottom: '4px' }}>{t('تفصیل:', 'Description:')}</label>
+                <input type="text" placeholder={t('مثلاً بیلٹ گریسنگ، جنریٹر ڈیزل...', 'e.g. Belt greasing, generator diesel...')} value={expenseDesc} onChange={(e) => setExpenseDesc(e.target.value)} style={{ width: '100%', height: '44px', padding: '0 14px', borderRadius: '10px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', backgroundColor: isDark ? '#0F172A' : '#F8FAFC', color: isDark ? '#FFFFFF' : '#0F172A', outline: 'none', fontWeight: 800, fontSize: isUrdu ? '17px' : '13.5px', boxSizing: 'border-box' }} className={isUrdu ? 'font-nastaleeq' : ''} />
               </div>
               <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>{t('رقم (PKR):', 'Amount (Rs):')}</label>
-                <input type="number" placeholder="0" value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)} style={{ width: '100%', height: '46px', padding: '0 14px', borderRadius: '10px', border: '1.5px solid #CBD5E1', fontSize: '20px', fontWeight: 900, backgroundColor: '#F8FAFC', fontFamily: 'var(--font-mono)', outline: 'none', boxSizing: 'border-box' }} />
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: isDark ? '#E2E8F0' : '#334155', marginBottom: '4px' }}>{t('رقم (PKR):', 'Amount (Rs):')}</label>
+                <input type="number" placeholder="0" value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)} style={{ width: '100%', height: '46px', padding: '0 14px', borderRadius: '10px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', fontSize: '20px', fontWeight: 900, backgroundColor: isDark ? '#0F172A' : '#F8FAFC', color: isDark ? '#FFFFFF' : '#0F172A', fontFamily: 'var(--font-mono)', outline: 'none', boxSizing: 'border-box' }} />
               </div>
             </div>
             <button type="button" onClick={handleAddExpense} className="touch-active" style={{ width: '100%', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)', color: '#FFFFFF', border: 'none', fontSize: isUrdu ? '20px' : '15px', fontWeight: 900, cursor: 'pointer', boxShadow: '0 4px 12px rgba(14,138,84,0.25)' }}>

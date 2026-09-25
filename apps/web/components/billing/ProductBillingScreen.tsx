@@ -5,6 +5,7 @@ import { Product } from '../ui/TouchCard';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
 import { Printer, Tag, Check, BookOpen, Plus, Trash2, X, AlertTriangle, Lock, RotateCcw } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { getSession, ensureValidToken, clearSession } from '../../lib/auth';
 import { sound } from '../../lib/audioFeedback';
 import { getApiBaseUrl } from '../../lib/api';
@@ -144,6 +145,19 @@ const CARD_PALETTES = [
   { bg: '#ECFEFF', bgSelected: '#A5F3FC', text: '#155E75', subText: '#0E7490', accent: '#0891B2', badgeBg: '#CFFAFE', badgeText: '#155E75', iconBg: '#FFFFFF', border: '#A5F3FC' },
 ];
 
+const DARK_CARD_PALETTES = [
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#FDE68A', subText: '#FCD34D', accent: '#F59E0B', badgeBg: '#0F172A', badgeText: '#FBBF24', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#7DD3FC', subText: '#38BDF8', accent: '#0EA5E9', badgeBg: '#0F172A', badgeText: '#38BDF8', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#F472B6', subText: '#EC4899', accent: '#DB2777', badgeBg: '#0F172A', badgeText: '#F472B6', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#FB923C', subText: '#F97316', accent: '#EA580C', badgeBg: '#0F172A', badgeText: '#FB923C', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#E2E8F0', subText: '#94A3B8', accent: '#64748B', badgeBg: '#0F172A', badgeText: '#E2E8F0', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#FDE047', subText: '#EAB308', accent: '#CA8A04', badgeBg: '#0F172A', badgeText: '#FDE047', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#4ADE80', subText: '#22C55E', accent: '#16A34A', badgeBg: '#0F172A', badgeText: '#4ADE80', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#C084FC', subText: '#A855F7', accent: '#9333EA', badgeBg: '#0F172A', badgeText: '#C084FC', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#FCD34D', subText: '#FBBF24', accent: '#D97706', badgeBg: '#0F172A', badgeText: '#FCD34D', iconBg: '#0B0F19', border: '#334155' },
+  { bg: '#1E293B', bgSelected: '#1E3A8A', text: '#22D3EE', subText: '#06B6D4', accent: '#0891B2', badgeBg: '#0F172A', badgeText: '#22D3EE', iconBg: '#0B0F19', border: '#334155' },
+];
+
 const AVAILABLE_EMOJIS = [
   '🌾', '🍚', '🥐', '🥣', '📦', '🚜', '🌱', '🏷️',
   '🌽', '🥜', '🥖', '🥯', '🍞', '🥞', '🥟', '🧈',
@@ -162,6 +176,7 @@ export interface BillItem {
 
 export const ProductBillingScreen: React.FC = () => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [productsSnapshot, setProductsSnapshot] = useState<Product[]>([]);
   const [isCustomizeMode, setIsCustomizeMode] = useState<boolean>(false);
@@ -849,13 +864,13 @@ export const ProductBillingScreen: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  backgroundColor: '#0F172A',
+                  backgroundColor: isDark ? '#2563EB' : '#0F172A',
                   color: '#FFFFFF',
                   border: 'none',
                   padding: '0 18px',
                   borderRadius: '12px',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.18)',
+                  boxShadow: isDark ? '0 2px 8px rgba(37, 99, 235, 0.35)' : '0 2px 8px rgba(15, 23, 42, 0.18)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -883,19 +898,19 @@ export const ProductBillingScreen: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#DC2626',
-                  border: '1.5px solid #FECACA',
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  color: isDark ? '#F87171' : '#DC2626',
+                  border: isDark ? '1.5px solid #EF4444' : '1.5px solid #FECACA',
                   padding: '0 18px',
                   borderRadius: '12px',
                   cursor: 'pointer',
                   boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
                   transition: 'all 0.15s ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FEF2F2')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#FEF2F2')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#FFFFFF')}
               >
-                <Trash2 size={17} strokeWidth={2.2} color="#DC2626" />
+                <Trash2 size={17} strokeWidth={2.2} color={isDark ? '#F87171' : '#DC2626'} />
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
@@ -921,13 +936,13 @@ export const ProductBillingScreen: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  backgroundColor: '#0F172A',
+                  backgroundColor: isDark ? '#16A34A' : '#0F172A',
                   color: '#FFFFFF',
                   border: 'none',
                   padding: '0 18px',
                   borderRadius: '12px',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.25)',
+                  boxShadow: isDark ? '0 2px 8px rgba(22, 163, 74, 0.35)' : '0 2px 8px rgba(15, 23, 42, 0.25)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -956,9 +971,9 @@ export const ProductBillingScreen: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '6px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#475569',
-                  border: '1.5px solid #CBD5E1',
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  color: isDark ? '#E2E8F0' : '#475569',
+                  border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
                   padding: '0 16px',
                   borderRadius: '12px',
                   cursor: 'pointer',
@@ -966,15 +981,15 @@ export const ProductBillingScreen: React.FC = () => {
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F1F5F9';
-                  e.currentTarget.style.borderColor = '#94A3B8';
+                  e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#F1F5F9';
+                  e.currentTarget.style.borderColor = isDark ? '#64748B' : '#94A3B8';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#FFFFFF';
-                  e.currentTarget.style.borderColor = '#CBD5E1';
+                  e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#FFFFFF';
+                  e.currentTarget.style.borderColor = isDark ? '#475569' : '#CBD5E1';
                 }}
               >
-                <X size={16} strokeWidth={2.4} color="#64748B" />
+                <X size={16} strokeWidth={2.4} color={isDark ? '#E2E8F0' : '#64748B'} />
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
@@ -999,23 +1014,23 @@ export const ProductBillingScreen: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '6px',
-                  backgroundColor: '#F8FAFC',
-                  color: '#64748B',
-                  border: '1.5px solid #E2E8F0',
+                  backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+                  color: isDark ? '#94A3B8' : '#64748B',
+                  border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
                   padding: '0 14px',
                   borderRadius: '12px',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#FFFFFF';
-                  e.currentTarget.style.borderColor = '#CBD5E1';
-                  e.currentTarget.style.color = '#1E293B';
+                  e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#FFFFFF';
+                  e.currentTarget.style.borderColor = isDark ? '#475569' : '#CBD5E1';
+                  e.currentTarget.style.color = isDark ? '#F8FAFC' : '#1E293B';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F8FAFC';
-                  e.currentTarget.style.borderColor = '#E2E8F0';
-                  e.currentTarget.style.color = '#64748B';
+                  e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#F8FAFC';
+                  e.currentTarget.style.borderColor = isDark ? '#334155' : '#E2E8F0';
+                  e.currentTarget.style.color = isDark ? '#94A3B8' : '#64748B';
                 }}
               >
                 <RotateCcw size={15} strokeWidth={2.2} />
@@ -1048,7 +1063,8 @@ export const ProductBillingScreen: React.FC = () => {
         {products.map((p, idx) => {
           const isSelected = billItems.some((it) => it.productId === p.id);
           const isRateSet = p.ratePerKg > 0;
-          const theme = CARD_PALETTES[idx % CARD_PALETTES.length];
+          const palettes = isDark ? DARK_CARD_PALETTES : CARD_PALETTES;
+          const theme = palettes[idx % palettes.length];
 
           // Calculate ideal columns based on products count so rows are evenly balanced
           const idealCols = products.length <= 4 
@@ -1074,8 +1090,14 @@ export const ProductBillingScreen: React.FC = () => {
                 minWidth: '180px',
                 padding: '8px 14px',
                 borderRadius: '14px',
-                backgroundColor: isSelected ? theme.bgSelected : theme.bg,
-                border: isSelected ? `2.5px solid ${theme.accent}` : `1.5px solid ${theme.border}`,
+                backgroundColor: isSelected
+                  ? (isDark ? '#1E3A8A' : theme.bgSelected)
+                  : hoveredProduct === p.id
+                  ? (isDark ? '#243046' : '#F8FAFC')
+                  : (isDark ? '#1E293B' : theme.bg),
+                border: isSelected
+                  ? (isDark ? '2.5px solid #60A5FA' : `2.5px solid ${theme.accent}`)
+                  : (isDark ? '1.5px solid #334155' : `1.5px solid ${theme.border}`),
                 boxShadow: isSelected
                   ? '0 4px 12px rgba(0, 0, 0, 0.08)'
                   : hoveredProduct === p.id
@@ -1139,12 +1161,12 @@ export const ProductBillingScreen: React.FC = () => {
                     width: '42px',
                     height: '42px',
                     borderRadius: '12px',
-                    backgroundColor: theme.iconBg,
+                    backgroundColor: isDark ? '#0B0F19' : theme.iconBg,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
-                    border: `1px solid ${theme.border}`,
+                    border: isDark ? '1px solid #334155' : `1px solid ${theme.border}`,
                     flexShrink: 0,
                     userSelect: 'none',
                   }}
@@ -1159,13 +1181,17 @@ export const ProductBillingScreen: React.FC = () => {
                     fontWeight: 900,
                     fontSize: isUrdu ? '17px' : '13px',
                     fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
-                    color: isSelected ? theme.text : theme.badgeText,
-                    backgroundColor: isSelected ? '#FFFFFF' : theme.badgeBg,
-                    padding: '1px 8px',
+                    color: isSelected
+                      ? (isDark ? '#FDE047' : '#FFFFFF')
+                      : theme.badgeText,
+                    backgroundColor: isSelected
+                      ? (isDark ? '#1E3A8A' : theme.accent)
+                      : (isDark ? '#0F172A' : theme.badgeBg),
+                    padding: '2px 8px',
                     borderRadius: '7px',
                     direction: 'ltr',
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-                    border: `1px solid ${theme.border}`,
+                    border: isDark ? '1px solid #334155' : `1px solid ${theme.border}`,
                     lineHeight: 1.2,
                     whiteSpace: 'nowrap',
                   }}
@@ -1191,7 +1217,7 @@ export const ProductBillingScreen: React.FC = () => {
                     style={{
                       fontSize: isUrdu ? '14px' : '11px',
                       fontWeight: 900,
-                      color: theme.accent,
+                      color: isDark ? '#60A5FA' : theme.accent,
                       fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
                       lineHeight: 1,
                       marginBottom: '2px',
@@ -1208,7 +1234,9 @@ export const ProductBillingScreen: React.FC = () => {
                       ? (p.nameUr && p.nameUr.length > 9 ? '30px' : '36px')
                       : (p.nameEn && p.nameEn.length > 12 ? '20px' : '23px'),
                     fontWeight: 900,
-                    color: theme.text,
+                    color: isSelected
+                      ? (isDark ? '#FFFFFF' : theme.accent)
+                      : theme.text,
                     lineHeight: 1.15,
                     textAlign: isUrdu ? 'right' : 'left',
                     letterSpacing: '0',
@@ -1229,14 +1257,14 @@ export const ProductBillingScreen: React.FC = () => {
         <div
           className="dash-card-animated"
           style={{
-            backgroundColor: '#F8FAFC',
+            backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
             borderRadius: '16px',
-            border: 'none',
+            border: isDark ? '1px solid #334155' : 'none',
             padding: '20px 22px',
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
-            boxShadow: 'none',
+            boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.2)' : 'none',
           }}
         >
           {/* Card Header */}
@@ -1255,7 +1283,7 @@ export const ProductBillingScreen: React.FC = () => {
                 style={{
                   fontSize: isUrdu ? '24px' : '18px',
                   fontWeight: 900,
-                  color: '#0F172A',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
                   margin: 0,
                   lineHeight: 1.35,
                 }}
@@ -1269,10 +1297,11 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 fontSize: isUrdu ? '16px' : '13px',
                 fontWeight: 800,
-                color: '#1877F2',
-                backgroundColor: '#EFF6FF',
+                color: isDark ? '#60A5FA' : '#1877F2',
+                backgroundColor: isDark ? '#0F172A' : '#EFF6FF',
                 padding: '4px 12px',
                 borderRadius: '8px',
+                border: isDark ? '1px solid #334155' : 'none',
               }}
             >
               {billItems.length} {t('آئٹمز', 'Items')}
@@ -1297,11 +1326,17 @@ export const ProductBillingScreen: React.FC = () => {
                 <div
                   key={item.id}
                   style={{
-                    backgroundColor: isRowActive ? '#FFFFFF' : '#F1F5F9',
+                    backgroundColor: isRowActive
+                      ? (isDark ? '#0F172A' : '#FFFFFF')
+                      : (isDark ? '#162032' : '#F1F5F9'),
                     borderRadius: '14px',
                     padding: '14px 16px',
-                    border: isRowActive ? '2px solid #1877F2' : '1.5px solid transparent',
-                    boxShadow: isRowActive ? '0 4px 12px rgba(24, 119, 242, 0.08)' : 'none',
+                    border: isRowActive
+                      ? (isDark ? '2px solid #38BDF8' : '2px solid #1877F2')
+                      : (isDark ? '1.5px solid #334155' : '1.5px solid transparent'),
+                    boxShadow: isRowActive
+                      ? (isDark ? '0 4px 12px rgba(56, 189, 248, 0.12)' : '0 4px 12px rgba(24, 119, 242, 0.08)')
+                      : 'none',
                     transition: 'all 0.15s ease',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1311,8 +1346,8 @@ export const ProductBillingScreen: React.FC = () => {
                 >
                   {/* Row Top Status Pill */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 800, color: '#475569' }}>
-                      #{idx + 1} {isRowActive && <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#1877F2', fontSize: isUrdu ? '16px' : '13px', fontWeight: 900 }}>● {t('فعال قطار', 'Active Row')}</span>}
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#94A3B8' : '#475569' }}>
+                      #{idx + 1} {isRowActive && <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#38BDF8' : '#1877F2', fontSize: isUrdu ? '16px' : '13px', fontWeight: 900 }}>● {t('فعال قطار', 'Active Row')}</span>}
                     </span>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1322,11 +1357,11 @@ export const ProductBillingScreen: React.FC = () => {
                           style={{
                             fontSize: isUrdu ? '17px' : '13px',
                             fontWeight: 900,
-                            color: '#0E8A54',
-                            backgroundColor: '#ECFDF5',
+                            color: isDark ? '#34D399' : '#0E8A54',
+                            backgroundColor: isDark ? 'rgba(5, 150, 105, 0.2)' : '#ECFDF5',
                             padding: '3px 10px',
                             borderRadius: '7px',
-                            border: '1px solid #A7F3D0',
+                            border: isDark ? '1px solid #059669' : '1px solid #A7F3D0',
                             fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                           }}
                         >
@@ -1349,7 +1384,7 @@ export const ProductBillingScreen: React.FC = () => {
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: '#DC2626',
+                            color: isDark ? '#F87171' : '#DC2626',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
@@ -1374,7 +1409,7 @@ export const ProductBillingScreen: React.FC = () => {
                           display: 'block',
                           fontSize: isUrdu ? '18px' : '14px',
                           fontWeight: 900,
-                          color: '#1E293B',
+                          color: isDark ? '#E2E8F0' : '#1E293B',
                           marginBottom: '6px',
                         }}
                       >
@@ -1402,12 +1437,12 @@ export const ProductBillingScreen: React.FC = () => {
                           width: '100%',
                           height: '52px',
                           borderRadius: '10px',
-                          border: '1.5px solid #CBD5E1',
-                          backgroundColor: '#FFFFFF',
+                          border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                          backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
                           padding: '0 14px',
                           fontSize: isUrdu ? '24px' : '17px',
                           fontWeight: 800,
-                          color: '#0F172A',
+                          color: isDark ? '#F8FAFC' : '#0F172A',
                           outline: 'none',
                           boxShadow: 'none',
                           textAlign: 'left',
@@ -1423,10 +1458,10 @@ export const ProductBillingScreen: React.FC = () => {
                             top: '100%',
                             right: 0,
                             left: 0,
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                             borderRadius: '10px',
-                            border: '1px solid #CBD5E1',
-                            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                            border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                            boxShadow: '0 10px 25px rgba(0,0,0,0.25)',
                             zIndex: 30,
                             maxHeight: '180px',
                             overflowY: 'auto',
@@ -1452,15 +1487,15 @@ export const ProductBillingScreen: React.FC = () => {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                borderBottom: '1px solid #F1F5F9',
+                                borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
                               }}
-                              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
-                              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
+                              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#F8FAFC')}
+                              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#FFFFFF')}
                             >
-                              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '19px' : '15px', fontWeight: 800 }}>
+                              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '19px' : '15px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                                 {isUrdu ? p.nameUr : p.nameEn}
                               </span>
-                              <span style={{ fontSize: '14px', fontWeight: 800, color: '#1877F2', fontFamily: 'var(--font-mono)' }}>
+                              <span style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#38BDF8' : '#1877F2', fontFamily: 'var(--font-mono)' }}>
                                 {isUrdu ? `${p.ratePerKg} روپے` : `Rs ${p.ratePerKg}`}
                               </span>
                             </div>
@@ -1477,7 +1512,7 @@ export const ProductBillingScreen: React.FC = () => {
                           display: 'block',
                           fontSize: isUrdu ? '18px' : '14px',
                           fontWeight: 900,
-                          color: '#1E293B',
+                          color: isDark ? '#E2E8F0' : '#1E293B',
                           marginBottom: '6px',
                         }}
                       >
@@ -1510,12 +1545,12 @@ export const ProductBillingScreen: React.FC = () => {
                             width: '100%',
                             height: '52px',
                             borderRadius: '10px',
-                            border: '1.5px solid #CBD5E1',
-                            backgroundColor: '#FFFFFF',
+                            border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                            backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
                             fontSize: '24px',
                             fontWeight: 900,
                             fontFamily: 'var(--font-mono)',
-                            color: '#0F172A',
+                            color: isDark ? '#F8FAFC' : '#0F172A',
                             padding: '0 56px 0 14px',
                             direction: 'ltr',
                             unicodeBidi: 'isolate',
@@ -1530,8 +1565,9 @@ export const ProductBillingScreen: React.FC = () => {
                             right: '12px',
                             fontSize: isUrdu ? '18px' : '13px',
                             fontWeight: 900,
-                            color: '#334155',
-                            backgroundColor: '#F1F5F9',
+                            color: isDark ? '#94A3B8' : '#334155',
+                            backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
+                            border: isDark ? '1px solid #334155' : 'none',
                             padding: '2px 8px',
                             borderRadius: '6px',
                           }}
@@ -1555,9 +1591,9 @@ export const ProductBillingScreen: React.FC = () => {
               height: '48px',
               padding: '12px 20px',
               borderRadius: '10px',
-              border: '1.5px dashed #94A3B8',
-              backgroundColor: '#FFFFFF',
-              color: '#1877F2',
+              border: isDark ? '1.5px dashed #475569' : '1.5px dashed #94A3B8',
+              backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+              color: isDark ? '#38BDF8' : '#1877F2',
               fontSize: isUrdu ? '19px' : '15px',
               fontWeight: 900,
               cursor: 'pointer',
@@ -1575,9 +1611,9 @@ export const ProductBillingScreen: React.FC = () => {
           </button>
 
           {/* Cash Received Row */}
-          <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '14px' }}>
+          <div style={{ borderTop: isDark ? '1px solid #334155' : '1px solid #E2E8F0', paddingTop: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 900, color: '#0F172A' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('وصول رقم:', 'Received Amount:')}
               </span>
               <button
@@ -1588,9 +1624,9 @@ export const ProductBillingScreen: React.FC = () => {
                 }}
                 className="touch-active"
                 style={{
-                  background: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
-                  color: '#0E8A54',
+                  background: isDark ? 'rgba(5, 150, 105, 0.2)' : '#ECFDF5',
+                  border: isDark ? '1px solid #059669' : '1px solid #A7F3D0',
+                  color: isDark ? '#34D399' : '#0E8A54',
                   borderRadius: '8px',
                   padding: '4px 12px',
                   fontSize: isUrdu ? '15px' : '12px',
@@ -1633,12 +1669,12 @@ export const ProductBillingScreen: React.FC = () => {
                   width: '100%',
                   height: '52px',
                   borderRadius: '10px',
-                  border: '1.5px solid #CBD5E1',
-                  backgroundColor: '#FFFFFF',
+                  border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                  backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
                   fontSize: '24px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
-                  color: '#0F172A',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
                   padding: '0 64px 0 14px',
                   direction: 'ltr',
                   unicodeBidi: 'isolate',
@@ -1653,8 +1689,9 @@ export const ProductBillingScreen: React.FC = () => {
                   right: '12px',
                   fontSize: isUrdu ? '18px' : '13px',
                   fontWeight: 900,
-                  color: '#1877F2',
-                  backgroundColor: '#EFF6FF',
+                  color: isDark ? '#60A5FA' : '#1877F2',
+                  backgroundColor: isDark ? '#0F172A' : '#EFF6FF',
+                  border: isDark ? '1px solid #334155' : 'none',
                   padding: '3px 10px',
                   borderRadius: '6px',
                 }}
@@ -1667,11 +1704,11 @@ export const ProductBillingScreen: React.FC = () => {
           {/* Customer Name */}
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 900, color: '#0F172A' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('گاہک کا نام (اختیاری):', 'Customer Name (Optional):')}
               </span>
               {balanceRemaining > 0 && (
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: '#DC2626', fontWeight: 800 }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: '#F87171', fontWeight: 800 }}>
                   {t('* ادھار کے لیے نام ضروری ہے', '* Name is required for credit')}
                 </span>
               )}
@@ -1695,15 +1732,15 @@ export const ProductBillingScreen: React.FC = () => {
                 width: '100%',
                 height: '50px',
                 borderRadius: '10px',
-                border: '1.5px solid #CBD5E1',
-                backgroundColor: '#FFFFFF',
+                border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
                 padding: '0 14px',
                 fontSize: isUrdu ? '20px' : '15px',
                 fontWeight: 700,
                 outline: 'none',
                 boxShadow: 'none',
                 textAlign: 'left',
-                color: '#0F172A',
+                color: isDark ? '#F8FAFC' : '#0F172A',
               }}
             />
 
@@ -1714,8 +1751,10 @@ export const ProductBillingScreen: React.FC = () => {
                   marginTop: '6px',
                   padding: '5px 10px',
                   borderRadius: '6px',
-                  backgroundColor: selectedCustomerCredit > 0 ? '#FEF2F2' : '#F0FDF4',
-                  border: `1px solid ${selectedCustomerCredit > 0 ? '#FCA5A5' : '#86EFAC'}`,
+                  backgroundColor: selectedCustomerCredit > 0
+                    ? (isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2')
+                    : (isDark ? 'rgba(34, 197, 94, 0.15)' : '#F0FDF4'),
+                  border: `1px solid ${selectedCustomerCredit > 0 ? (isDark ? '#EF4444' : '#FCA5A5') : (isDark ? '#22C55E' : '#86EFAC')}`,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -1723,10 +1762,10 @@ export const ProductBillingScreen: React.FC = () => {
                   fontWeight: 800,
                 }}
               >
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: selectedCustomerCredit > 0 ? '#991B1B' : '#166534' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: selectedCustomerCredit > 0 ? (isDark ? '#FCA5A5' : '#991B1B') : (isDark ? '#86EFAC' : '#166534') }}>
                   {t('سابقہ واجب الادا ادھار:', 'Previous Customer Credit:')}
                 </span>
-                <span style={{ color: selectedCustomerCredit > 0 ? '#DC2626' : '#16A34A', fontSize: '13px' }}>
+                <span style={{ color: selectedCustomerCredit > 0 ? (isDark ? '#F87171' : '#DC2626') : (isDark ? '#4ADE80' : '#16A34A'), fontSize: '13px' }}>
                   {isUrdu ? `${selectedCustomerCredit.toLocaleString()} روپے` : `Rs ${selectedCustomerCredit.toLocaleString()}`}
                 </span>
               </div>
@@ -1741,10 +1780,10 @@ export const ProductBillingScreen: React.FC = () => {
                   top: '100%',
                   right: 0,
                   left: 0,
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                   borderRadius: '8px',
-                  border: '1px solid #CBD5E1',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                  border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.25)',
                   zIndex: 20,
                   maxHeight: '160px',
                   overflowY: 'auto',
@@ -1771,15 +1810,15 @@ export const ProductBillingScreen: React.FC = () => {
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#F8FAFC')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#FFFFFF')}
                   >
                     <div>
-                      <span className="font-nastaleeq" style={{ fontWeight: 800, color: '#0F172A' }}>
+                      <span className="font-nastaleeq" style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                         {c.name}
                       </span>
                       {c.phone && (
-                        <span style={{ color: '#64748B', fontSize: '11px', marginLeft: '6px' }}>
+                        <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '11px', marginLeft: '6px' }}>
                           ({c.phone})
                         </span>
                       )}
@@ -1787,8 +1826,9 @@ export const ProductBillingScreen: React.FC = () => {
                     {c.currentBalance !== undefined && c.currentBalance > 0 && (
                       <span
                         style={{
-                          color: '#DC2626',
-                          backgroundColor: '#FEE2E2',
+                          color: isDark ? '#FCA5A5' : '#DC2626',
+                          backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEE2E2',
+                          border: isDark ? '1px solid #EF4444' : 'none',
                           padding: '1px 6px',
                           borderRadius: '4px',
                           fontSize: '11px',
@@ -1811,14 +1851,14 @@ export const ProductBillingScreen: React.FC = () => {
           <div
             className="dash-card-animated"
             style={{
-              backgroundColor: '#F8FAFC',
+              backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
               borderRadius: '16px',
-              border: 'none',
+              border: isDark ? '1px solid #334155' : 'none',
               padding: '20px 22px',
               display: 'flex',
               flexDirection: 'column',
               gap: '14px',
-              boxShadow: 'none',
+              boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.2)' : 'none',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1827,7 +1867,7 @@ export const ProductBillingScreen: React.FC = () => {
                 style={{
                   fontSize: isUrdu ? '26px' : '18px',
                   fontWeight: 900,
-                  color: '#0F172A',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
                   letterSpacing: '0',
                 }}
               >
@@ -1838,12 +1878,12 @@ export const ProductBillingScreen: React.FC = () => {
                 style={{
                   fontSize: isUrdu ? '17px' : '13px',
                   fontWeight: 900,
-                  color: '#B45309',
-                  backgroundColor: '#FFFBEB',
+                  color: isDark ? '#FDE047' : '#B45309',
+                  backgroundColor: isDark ? 'rgba(180, 83, 9, 0.2)' : '#FFFBEB',
+                  border: isDark ? '1px solid #78350F' : 'none',
                   padding: '4px 12px',
                   borderRadius: '8px',
                   fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
-                  border: 'none',
                 }}
               >
                 {isUrdu
@@ -1857,7 +1897,7 @@ export const ProductBillingScreen: React.FC = () => {
               style={{
                 fontSize: '44px',
                 fontWeight: 900,
-                color: '#0F172A',
+                color: isDark ? '#F8FAFC' : '#0F172A',
                 lineHeight: 1.2,
                 display: 'flex',
                 alignItems: 'baseline',
@@ -1869,7 +1909,7 @@ export const ProductBillingScreen: React.FC = () => {
                 {netTotal.toLocaleString()}
               </span>
               {isUrdu && (
-                <span className="font-nastaleeq" style={{ fontSize: '28px', fontWeight: 900, color: '#475569' }}>
+                <span className="font-nastaleeq" style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#94A3B8' : '#475569' }}>
                   روپے
                 </span>
               )}
@@ -1879,7 +1919,7 @@ export const ProductBillingScreen: React.FC = () => {
             {billItems.filter((it) => (parseFloat(it.quantity) || 0) > 0).length > 0 && (
               <div
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
                   borderRadius: '12px',
                   padding: '12px 14px',
                   display: 'flex',
@@ -1887,7 +1927,7 @@ export const ProductBillingScreen: React.FC = () => {
                   gap: '8px',
                   maxHeight: '160px',
                   overflowY: 'auto',
-                  border: '1px solid #E2E8F0',
+                  border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
                 }}
               >
                 {billItems
@@ -1902,16 +1942,16 @@ export const ProductBillingScreen: React.FC = () => {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          borderBottom: i < billItems.length - 1 ? '1px solid #F1F5F9' : 'none',
+                          borderBottom: i < billItems.length - 1 ? (isDark ? '1px solid #1E293B' : '1px solid #F1F5F9') : 'none',
                           paddingBottom: '6px',
                         }}
                       >
-                        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, fontSize: isUrdu ? '18px' : '14px', color: '#0F172A' }}>
+                        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, fontSize: isUrdu ? '18px' : '14px', color: isDark ? '#F8FAFC' : '#0F172A' }}>
                           {it.itemName || t('آئٹم', 'Item')}
                         </span>
-                        <span style={{ color: '#334155', fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: isUrdu ? '16px' : '13px' }}>
+                        <span style={{ color: isDark ? '#94A3B8' : '#334155', fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: isUrdu ? '16px' : '13px' }}>
                           {q} {isUrdu ? 'کلو' : 'KG'} × {it.ratePerKg} ={' '}
-                          <strong style={{ color: '#0F172A', fontSize: isUrdu ? '17px' : '14px', fontWeight: 900 }}>Rs {tot.toLocaleString()}</strong>
+                          <strong style={{ color: isDark ? '#38BDF8' : '#0F172A', fontSize: isUrdu ? '17px' : '14px', fontWeight: 900 }}>Rs {tot.toLocaleString()}</strong>
                         </span>
                       </div>
                     );
@@ -1923,8 +1963,8 @@ export const ProductBillingScreen: React.FC = () => {
             {balanceRemaining > 0 ? (
               <div
                 style={{
-                  backgroundColor: '#FEF2F2',
-                  border: '1px solid #FECACA',
+                  backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2',
+                  border: isDark ? '1px solid #EF4444' : '1px solid #FECACA',
                   borderRadius: '10px',
                   padding: '10px 14px',
                   display: 'flex',
@@ -1934,19 +1974,19 @@ export const ProductBillingScreen: React.FC = () => {
               >
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: isUrdu ? '17px' : '13px', fontWeight: 900, color: '#B91C1C' }}
+                  style={{ fontSize: isUrdu ? '17px' : '13px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#B91C1C' }}
                 >
                   {t('باقی ادھار:', 'Credit Balance:')}
                 </span>
-                <span style={{ fontSize: '18px', fontWeight: 900, color: '#B91C1C', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#F87171' : '#B91C1C', fontFamily: 'var(--font-mono)' }}>
                   {isUrdu ? `${balanceRemaining.toLocaleString()} روپے` : `Rs ${balanceRemaining.toLocaleString()}`}
                 </span>
               </div>
             ) : changeToReturn > 0 ? (
               <div
                 style={{
-                  backgroundColor: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
+                  backgroundColor: isDark ? 'rgba(34, 197, 94, 0.15)' : '#ECFDF5',
+                  border: isDark ? '1px solid #22C55E' : '1px solid #A7F3D0',
                   borderRadius: '10px',
                   padding: '10px 14px',
                   display: 'flex',
@@ -1956,11 +1996,11 @@ export const ProductBillingScreen: React.FC = () => {
               >
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: isUrdu ? '17px' : '13px', fontWeight: 900, color: '#0E8A54' }}
+                  style={{ fontSize: isUrdu ? '17px' : '13px', fontWeight: 900, color: isDark ? '#86EFAC' : '#0E8A54' }}
                 >
                   {t('گاہک کو واپسی:', 'Change Due:')}
                 </span>
-                <span style={{ fontSize: '18px', fontWeight: 900, color: '#0E8A54', fontFamily: 'var(--font-mono)' }}>
+                <span style={{ fontSize: '18px', fontWeight: 900, color: isDark ? '#4ADE80' : '#0E8A54', fontFamily: 'var(--font-mono)' }}>
                   {isUrdu ? `${changeToReturn.toLocaleString()} روپے` : `Rs ${changeToReturn.toLocaleString()}`}
                 </span>
               </div>
@@ -1980,7 +2020,7 @@ export const ProductBillingScreen: React.FC = () => {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: canDiscount ? '#475569' : '#94A3B8',
+                  color: canDiscount ? (isDark ? '#94A3B8' : '#475569') : (isDark ? '#64748B' : '#94A3B8'),
                   fontSize: isUrdu ? '16px' : '13px',
                   fontWeight: 800,
                   cursor: canDiscount ? 'pointer' : 'not-allowed',
@@ -2018,16 +2058,16 @@ export const ProductBillingScreen: React.FC = () => {
                       height: '36px',
                       padding: '0 10px',
                       borderRadius: '6px',
-                      border: '1px solid #CBD5E1',
-                      backgroundColor: '#FFFFFF',
+                      border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                      backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
                       fontSize: '13px',
                       fontWeight: 800,
                       fontFamily: 'var(--font-mono)',
-                      color: '#0F172A',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
                       outline: 'none',
                     }}
                   />
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', color: '#64748B', fontWeight: 800 }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 800 }}>
                     {t('روپے', 'Rs')}
                   </span>
                 </div>

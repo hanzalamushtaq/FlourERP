@@ -1527,19 +1527,18 @@ html.dark [style*="border-bottom: 1px solid #F1F5F9" i] {
 
 /* 9. Product & Pisai Billing Screens */
 html.dark .billing-grid-responsive > div,
-html.dark .service-grid-responsive > div,
-html.dark .product-action-tile {
+html.dark .service-grid-responsive > div {
   background-color: #1E293B !important;
   border-color: #334155 !important;
   color: #F8FAFC !important;
 }
 
-html.dark .product-action-tile span {
-  color: #F8FAFC !important;
+html.dark .product-action-tile {
+  border-color: #334155;
 }
 
 html.dark .product-action-tile:hover {
-  background-color: #243046 !important;
+  filter: brightness(1.08);
 }
 
 /* 10. Ledger, Reports, Rates & Stock Screens */
