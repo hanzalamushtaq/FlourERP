@@ -111,14 +111,14 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         justifyContent: 'space-between',
         gap: '8px',
         userSelect: 'none',
-        direction: isUrdu ? 'rtl' : 'ltr',
+        direction: 'rtl',
         boxShadow: 'none',
         width: '100%',
         boxSizing: 'border-box',
       }}
     >
       {/* Title & Icon Side */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, direction: isUrdu ? 'rtl' : 'ltr' }}>
         <div
           className="header-icon-squircle"
           style={{
@@ -153,8 +153,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         </h1>
       </div>
 
-      {/* Action Buttons Side */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+      {/* Action Buttons Side (Always on the Left) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, direction: 'ltr' }}>
         {/* Language Switcher Segmented Control */}
         <div
           className="header-lang-switcher"

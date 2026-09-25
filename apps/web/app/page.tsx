@@ -36,7 +36,16 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates' | 'settings'
-  >('dashboard');
+  >(() => {
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
+      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'stock', 'admin', 'rates', 'settings'];
+      if (savedTab && validTabs.includes(savedTab)) {
+        return savedTab;
+      }
+    }
+    return 'dashboard';
+  });
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState<boolean>(false);
   const [isZReportOpen, setIsZReportOpen] = useState<boolean>(false);
@@ -48,12 +57,23 @@ export default function Home() {
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
 
+  // Synchronize activeTab to localStorage so page refresh maintains the current tab
+  useEffect(() => {
+    if (typeof window !== 'undefined' && activeTab) {
+      localStorage.setItem('flour_erp_active_tab', activeTab);
+    }
+  }, [activeTab]);
+
   // Check saved session on mount
   useEffect(() => {
     const saved = getSession();
     if (saved) {
       setCurrentUser(saved);
-      setActiveTab('dashboard');
+      const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
+      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'stock', 'admin', 'rates', 'settings'];
+      if (savedTab && validTabs.includes(savedTab)) {
+        setActiveTab(savedTab);
+      }
       // Silently upgrade token if it was an offline mock token
       ensureValidToken(saved).then((token) => {
         if (token && token !== saved.token) {
@@ -130,6 +150,9 @@ export default function Home() {
     } catch {}
 
     clearSession();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('flour_erp_active_tab');
+    }
     setCurrentUser(null);
     setActiveTab('dashboard');
   };

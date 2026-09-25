@@ -110,10 +110,12 @@ export const PisaiBillingScreen: React.FC = () => {
   const balanceRemaining = Math.max(0, netTotal - numReceived);
   const changeToReturn = Math.max(0, numReceived - netTotal);
 
-  // Auto-focus weight input on service switch
+  // Auto-focus weight input on service switch (desktop only)
   useEffect(() => {
-    weightInputRef.current?.focus();
-    weightInputRef.current?.select();
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      weightInputRef.current?.focus();
+      weightInputRef.current?.select();
+    }
   }, [serviceType]);
 
   // Fetch next upcoming token on mount
@@ -1231,8 +1233,10 @@ export const PisaiBillingScreen: React.FC = () => {
         isOpen={isReceiptOpen}
         onClose={() => {
           setIsReceiptOpen(false);
-          weightInputRef.current?.focus();
-          weightInputRef.current?.select();
+          if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+            weightInputRef.current?.focus();
+            weightInputRef.current?.select();
+          }
         }}
         data={receiptData}
       />

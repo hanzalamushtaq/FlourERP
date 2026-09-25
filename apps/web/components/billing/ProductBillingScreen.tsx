@@ -296,11 +296,13 @@ export const ProductBillingScreen: React.FC = () => {
   const balanceRemaining = Math.max(0, netTotal - numReceived);
   const changeToReturn = Math.max(0, numReceived - netTotal);
 
-  // Focus initial item or quantity on mount
+  // Focus initial item or quantity on mount (desktop only, to keep mobile keyboard closed)
   useEffect(() => {
-    if (quantityInputRefs.current[0]) {
-      quantityInputRefs.current[0]?.focus();
-      quantityInputRefs.current[0]?.select();
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      if (quantityInputRefs.current[0]) {
+        quantityInputRefs.current[0]?.focus();
+        quantityInputRefs.current[0]?.select();
+      }
     }
   }, []);
 
@@ -325,11 +327,13 @@ export const ProductBillingScreen: React.FC = () => {
     setOpenSuggestionsRow(null);
     setIsReceivedAutoUpdated(true);
 
-    // Automatically focus the quantity input of the targeted row
-    setTimeout(() => {
-      quantityInputRefs.current[targetIdx]?.focus();
-      quantityInputRefs.current[targetIdx]?.select();
-    }, 50);
+    // Automatically focus the quantity input of the targeted row (desktop only)
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      setTimeout(() => {
+        quantityInputRefs.current[targetIdx]?.focus();
+        quantityInputRefs.current[targetIdx]?.select();
+      }, 50);
+    }
   };
 
   // When user types in the Item input
@@ -2194,10 +2198,12 @@ export const ProductBillingScreen: React.FC = () => {
         isOpen={isReceiptOpen}
         onClose={() => {
           setIsReceiptOpen(false);
-          // Reset or keep focus
-          if (quantityInputRefs.current[0]) {
-            quantityInputRefs.current[0]?.focus();
-            quantityInputRefs.current[0]?.select();
+          // Reset or keep focus on desktop only
+          if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+            if (quantityInputRefs.current[0]) {
+              quantityInputRefs.current[0]?.focus();
+              quantityInputRefs.current[0]?.select();
+            }
           }
         }}
         data={receiptData}
