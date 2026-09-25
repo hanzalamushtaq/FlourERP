@@ -340,11 +340,12 @@ export const RateListView: React.FC = () => {
               width: '56px',
               height: '56px',
               borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              boxShadow: isDark ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.22)',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
               transform: hoveredCard === 'total' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
@@ -403,17 +404,18 @@ export const RateListView: React.FC = () => {
               width: '56px',
               height: '56px',
               borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              boxShadow: isDark ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.22)',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
               transform: hoveredCard === 'save' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
             }}
           >
-            <Check size={32} color="#D97706" strokeWidth={2.8} />
+            <Check size={32} color={isDark ? '#FDE047' : '#D97706'} strokeWidth={2.8} />
           </div>
 
           <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -466,11 +468,12 @@ export const RateListView: React.FC = () => {
               width: '56px',
               height: '56px',
               borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.22)',
+              boxShadow: isDark ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.22)',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
               transform: hoveredCard === 'print' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
@@ -555,17 +558,19 @@ export const RateListView: React.FC = () => {
               onMouseLeave={() => setHoveredItem(null)}
               className="dash-card-animated"
               style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                 borderRadius: '16px',
-                border: isItemHovered ? '2px solid #C2410C' : '1.5px solid #EBE4DA',
+                border: isDark
+                  ? (isItemHovered ? '2px solid #F59E0B' : '1.5px solid #334155')
+                  : (isItemHovered ? '2px solid #C2410C' : '1.5px solid #EBE4DA'),
                 padding: '16px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '14px',
-                boxShadow: isItemHovered
-                  ? '0 10px 24px rgba(194, 65, 12, 0.12), 0 2px 6px rgba(0,0,0,0.04)'
-                  : '0 4px 14px rgba(0, 0, 0, 0.03)',
+                boxShadow: isDark
+                  ? (isItemHovered ? '0 10px 24px rgba(0, 0, 0, 0.4)' : '0 4px 14px rgba(0, 0, 0, 0.2)')
+                  : (isItemHovered ? '0 10px 24px rgba(194, 65, 12, 0.12), 0 2px 6px rgba(0,0,0,0.04)' : '0 4px 14px rgba(0, 0, 0, 0.03)'),
                 transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 transform: isItemHovered ? 'translateY(-3px)' : 'none',
               }}
@@ -577,12 +582,12 @@ export const RateListView: React.FC = () => {
                     width: '50px',
                     height: '50px',
                     borderRadius: '14px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.09)',
-                    border: '1.5px solid #EBE4DA',
+                    boxShadow: isDark ? 'none' : '0 3px 10px rgba(0, 0, 0, 0.09)',
+                    border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
                     flexShrink: 0,
                     transition: 'transform 0.22s ease',
                     transform: isItemHovered ? 'scale(1.1) rotate(-2deg)' : 'scale(1)',
@@ -597,18 +602,18 @@ export const RateListView: React.FC = () => {
                     style={{
                       fontSize: isUrdu ? '15px' : '12.5px',
                       fontWeight: 900,
-                      color: '#78350F',
-                      backgroundColor: '#FEF3C7',
+                      color: isDark ? '#FDE047' : '#78350F',
+                      backgroundColor: isDark ? 'rgba(245, 158, 11, 0.18)' : '#FEF3C7',
                       padding: '4px 10px',
                       borderRadius: '8px',
-                      border: '1px solid #FDE68A',
+                      border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid #FDE68A',
                       fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                       boxShadow: 'none',
                     }}
                   >
                     {isUrdu ? `1 کلو: ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)} روپے` : `1 KG: Rs ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)}`}
                   </span>
-                  <span style={{ fontSize: isUrdu ? '13px' : '11px', color: '#78716C', fontWeight: 700 }}>
+                  <span style={{ fontSize: isUrdu ? '13px' : '11px', color: isDark ? '#94A3B8' : '#78716C', fontWeight: 700 }}>
                     {t('کل کا من ریٹ:', 'Yesterday Maund:')} {isUrdu ? `${item.yesterdayMaund.toLocaleString()} روپے` : `Rs ${item.yesterdayMaund.toLocaleString()}`}
                   </span>
                 </div>
@@ -633,8 +638,8 @@ export const RateListView: React.FC = () => {
               {/* Card Bottom: Direct Price Input */}
               <div
                 style={{
-                  backgroundColor: '#FAF8F5',
-                  border: '1.5px solid #EBE4DA',
+                  backgroundColor: isDark ? '#0B0F19' : '#FAF8F5',
+                  border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
                   borderRadius: '12px',
                   padding: '8px 14px',
                   display: 'flex',
@@ -643,7 +648,7 @@ export const RateListView: React.FC = () => {
                   gap: '8px',
                 }}
               >
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: '#8C582B' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: isDark ? '#FBBF24' : '#8C582B' }}>
                   {t('روپے', 'Rs')}
                 </span>
                 <input
@@ -668,9 +673,9 @@ export const RateListView: React.FC = () => {
                     direction: 'ltr',
                     unicodeBidi: 'isolate',
                     borderRadius: '8px',
-                    border: '2px solid #8C582B',
-                    backgroundColor: '#FFFFFF',
-                    color: '#1F2937',
+                    border: isDark ? '1.5px solid #475569' : '2px solid #8C582B',
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                    color: isDark ? '#F8FAFC' : '#1F2937',
                     fontSize: '19px',
                     fontWeight: 900,
                     fontFamily: 'var(--font-mono)',
@@ -678,7 +683,7 @@ export const RateListView: React.FC = () => {
                     boxShadow: 'none',
                   }}
                 />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: '#6B7280' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: isDark ? '#94A3B8' : '#6B7280' }}>
                   {t('/ من', '/ Maund')}
                 </span>
               </div>
@@ -690,8 +695,9 @@ export const RateListView: React.FC = () => {
                     style={{
                       fontSize: '11px',
                       fontWeight: 800,
-                      color: '#DC2626',
-                      backgroundColor: '#FEE2E2',
+                      color: isDark ? '#F87171' : '#DC2626',
+                      backgroundColor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2',
+                      border: isDark ? '1px solid rgba(239, 68, 68, 0.3)' : 'none',
                       padding: '1px 8px',
                       borderRadius: '6px',
                       fontFamily: 'var(--font-mono)',
@@ -704,8 +710,9 @@ export const RateListView: React.FC = () => {
                     style={{
                       fontSize: '11px',
                       fontWeight: 800,
-                      color: '#16A34A',
-                      backgroundColor: '#DCFCE7',
+                      color: isDark ? '#4ADE80' : '#16A34A',
+                      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.18)' : '#DCFCE7',
+                      border: isDark ? '1px solid rgba(34, 197, 94, 0.3)' : 'none',
                       padding: '1px 8px',
                       borderRadius: '6px',
                       fontFamily: 'var(--font-mono)',
@@ -714,7 +721,7 @@ export const RateListView: React.FC = () => {
                     {isUrdu ? `${diff.toLocaleString()} روپے کمی (فی من) ▼` : `Rs ${diff.toLocaleString()} Decrease (per maund) ▼`}
                   </span>
                 ) : (
-                  <span style={{ fontSize: '11px', color: '#9CA3AF', fontWeight: 700 }}>
+                  <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : '#9CA3AF', fontWeight: 700 }}>
                     {t('قیمت مستحکم', 'Price Stable')}
                   </span>
                 )}
@@ -761,14 +768,14 @@ export const RateListView: React.FC = () => {
                 key={p.id}
                 className="dash-card-animated"
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                   borderRadius: '16px',
-                  border: '1.5px solid #EBE4DA',
+                  border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
                   padding: '18px 20px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  boxShadow: 'none',
+                  boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.2)' : 'none',
                   transition: 'all 0.22s ease',
                 }}
               >
@@ -779,12 +786,12 @@ export const RateListView: React.FC = () => {
                       width: '54px',
                       height: '54px',
                       borderRadius: '14px',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       boxShadow: 'none',
-                      border: '1.5px solid #EBE4DA',
+                      border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
                       flexShrink: 0,
                     }}
                   >
@@ -802,9 +809,10 @@ export const RateListView: React.FC = () => {
                       className={isUrdu ? 'font-nastaleeq' : ''}
                       style={{
                         fontSize: isUrdu ? '15px' : '12.5px',
-                        color: '#78350F',
+                        color: isDark ? '#FDE047' : '#78350F',
                         fontWeight: 900,
-                        backgroundColor: '#FEF3C7',
+                        backgroundColor: isDark ? 'rgba(245, 158, 11, 0.18)' : '#FEF3C7',
+                        border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : 'none',
                         padding: '2px 8px',
                         borderRadius: '6px',
                         display: 'inline-block',
@@ -819,7 +827,7 @@ export const RateListView: React.FC = () => {
 
                 {/* Direct Price Input (Rate Per Mann / 40 KG) */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#8C582B' }}>Rs</span>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#FBBF24' : '#8C582B' }}>Rs</span>
                   <input
                     type="number"
                     value={p.ratePerMaund === 0 ? '' : p.ratePerMaund}
@@ -842,9 +850,9 @@ export const RateListView: React.FC = () => {
                       direction: 'ltr',
                       unicodeBidi: 'isolate',
                       borderRadius: '8px',
-                      border: '2px solid #8C582B',
-                      backgroundColor: '#FFFFFF',
-                      color: '#1F2937',
+                      border: isDark ? '1.5px solid #475569' : '2px solid #8C582B',
+                      backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                      color: isDark ? '#F8FAFC' : '#1F2937',
                       fontSize: '18px',
                       fontWeight: 900,
                       fontFamily: 'var(--font-mono)',
@@ -852,7 +860,7 @@ export const RateListView: React.FC = () => {
                       boxShadow: 'none',
                     }}
                   />
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: '#6B7280' }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: isDark ? '#94A3B8' : '#6B7280' }}>
                     {t('/ من (40 KG)', '/ Maund (40 KG)')}
                   </span>
                 </div>
@@ -865,24 +873,24 @@ export const RateListView: React.FC = () => {
       {/* 5. BOTTOM BAR: QUICK CONTROLS & OFFICIAL POLICY */}
       <div
         style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
           borderRadius: '16px',
-          border: '1.5px solid #EBE4DA',
+          border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
           padding: '14px 20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '16px',
-          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
+          boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.2)' : '0 4px 14px rgba(0, 0, 0, 0.03)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <ShieldCheck size={24} color="#15803D" />
+          <ShieldCheck size={24} color={isDark ? '#4ADE80' : '#15803D'} />
           <div>
-            <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15.5px', fontWeight: 900, color: '#166534' }}>
+            <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15.5px', fontWeight: 900, color: isDark ? '#4ADE80' : '#166534' }}>
               {t('روزانہ نرخ نامہ تصدیق پروٹوکول فعال ہے', 'Daily Rate Confirmation Protocol Active')}
             </div>
-            <div style={{ fontSize: '11.5px', color: '#4B5563', fontWeight: 600 }}>
+            <div style={{ fontSize: '11.5px', color: isDark ? '#94A3B8' : '#4B5563', fontWeight: 600 }}>
               {t('آخری تبدیلی: آج، صبح 08:30 بجے | تصدیق کنندہ: سپروائزر و ایڈمن', 'Last modified: Today, 08:30 AM | Verified by: Supervisor & Admin')}
             </div>
           </div>
@@ -896,17 +904,17 @@ export const RateListView: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            backgroundColor: '#F8FAFC',
-            border: '1.5px solid #CBD5E1',
+            backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+            border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1',
             borderRadius: '10px',
             padding: '8px 18px',
-            color: '#334155',
+            color: isDark ? '#CBD5E1' : '#334155',
             fontSize: '13.5px',
             fontWeight: 800,
             cursor: 'pointer',
           }}
         >
-          <RotateCcw size={16} color="#64748B" />
+          <RotateCcw size={16} color={isDark ? '#94A3B8' : '#64748B'} />
           <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سابقہ (کل والے) ریٹس بحال کریں', "Restore Yesterday's Rates")}</span>
         </button>
       </div>
@@ -1336,23 +1344,24 @@ export const RateListView: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: '420px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
               borderRadius: '16px',
               overflow: 'hidden',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
-              border: '1.5px solid #EBE4DA',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.45)',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
             <div
               style={{
-                backgroundColor: '#1E293B',
+                backgroundColor: isDark ? '#0F172A' : '#1E293B',
                 color: '#FFFFFF',
                 padding: '14px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                borderBottom: isDark ? '1px solid #334155' : 'none',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1372,7 +1381,7 @@ export const RateListView: React.FC = () => {
 
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#E2E8F0' : '#374151', display: 'block', marginBottom: '6px' }}>
                   {t('پروڈکٹ کا نام:', 'Product Name:')}
                 </label>
                 <input
@@ -1385,7 +1394,9 @@ export const RateListView: React.FC = () => {
                     height: '42px',
                     padding: '0 12px',
                     borderRadius: '8px',
-                    border: '1.5px solid #D1D5DB',
+                    border: isDark ? '1.5px solid #475569' : '1.5px solid #D1D5DB',
+                    backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+                    color: isDark ? '#F8FAFC' : '#1F2937',
                     fontSize: '14px',
                     outline: 'none',
                   }}
@@ -1393,7 +1404,7 @@ export const RateListView: React.FC = () => {
               </div>
 
               <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#E2E8F0' : '#374151', display: 'block', marginBottom: '6px' }}>
                   {t('فی من ریٹ (روپے / 40 کلو):', 'Rate per Maund (Rs / 40 KG):')}
                 </label>
                 <input
@@ -1406,7 +1417,9 @@ export const RateListView: React.FC = () => {
                     height: '42px',
                     padding: '0 12px',
                     borderRadius: '8px',
-                    border: '1.5px solid #D1D5DB',
+                    border: isDark ? '1.5px solid #475569' : '1.5px solid #D1D5DB',
+                    backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+                    color: isDark ? '#F8FAFC' : '#1F2937',
                     fontSize: '16px',
                     fontFamily: 'var(--font-mono)',
                     direction: 'ltr',
@@ -1442,9 +1455,9 @@ export const RateListView: React.FC = () => {
                   style={{
                     padding: '0 18px',
                     height: '42px',
-                    backgroundColor: '#F3F4F6',
-                    color: '#374151',
-                    border: '1px solid #D1D5DB',
+                    backgroundColor: isDark ? '#334155' : '#F3F4F6',
+                    color: isDark ? '#E2E8F0' : '#374151',
+                    border: isDark ? '1px solid #475569' : '1px solid #D1D5DB',
                     borderRadius: '8px',
                     fontSize: '13px',
                     fontWeight: 700,
