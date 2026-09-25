@@ -17,6 +17,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 interface AdminDashboardProps {
   onOpenPriceModal: () => void;
@@ -28,6 +29,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onNavigateTab,
 }) => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [closingTriggered, setClosingTriggered] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [kpiData, setKpiData] = useState<{
@@ -88,11 +90,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ? `${kpiData.sales.billsCount} بلز جاری ہوئے • آٹا، میدہ، سوجی`
           : `${kpiData.sales.billsCount} bills issued • Atta, Maida, Suji`
         : isUrdu ? '0 بلز جاری ہوئے • آٹا، میدہ، سوجی' : '0 bills issued • Atta, Maida, Suji',
-      icon: <TrendingUp size={20} color="#D97706" />,
-      bg: '#FFFBEB',
-      border: '#FDE68A',
-      textColor: '#92400E',
-      valColor: '#B45309',
+      icon: <TrendingUp size={20} color={isDark ? '#FBBF24' : '#D97706'} />,
+      bg: isDark ? '#1E293B' : '#FFFBEB',
+      border: isDark ? '#78350F' : '#FDE68A',
+      textColor: isDark ? '#FDE047' : '#92400E',
+      valColor: isDark ? '#FBBF24' : '#B45309',
       onClick: () => onNavigateTab('billing'),
     },
     {
@@ -106,11 +108,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ? `${kpiData.pisai.tokensCount} ٹوکنز مکمل • ${kpiData.pisai.weightKg} کلو`
           : `${kpiData.pisai.tokensCount} tokens processed • ${kpiData.pisai.weightKg} KG`
         : isUrdu ? '0 ٹوکنز مکمل • 0 کلو' : '0 tokens processed • 0 KG',
-      icon: <Sparkles size={20} color="#0284C7" />,
-      bg: '#F0F9FF',
-      border: '#BAE6FD',
-      textColor: '#0369A1',
-      valColor: '#0284C7',
+      icon: <Sparkles size={20} color={isDark ? '#38BDF8' : '#0284C7'} />,
+      bg: isDark ? '#1E293B' : '#F0F9FF',
+      border: isDark ? '#0369A1' : '#BAE6FD',
+      textColor: isDark ? '#38BDF8' : '#0369A1',
+      valColor: isDark ? '#38BDF8' : '#0284C7',
       onClick: () => onNavigateTab('pisai'),
     },
     {
@@ -124,11 +126,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ? `${kpiData.expenses.count} اخراجات درج • بجلی، دکان خرچ`
           : `${kpiData.expenses.count} recorded • Electricity, shop`
         : isUrdu ? '0 اخراجات درج • بجلی، دکان خرچ' : '0 recorded • Electricity, shop',
-      icon: <Receipt size={20} color="#E11D48" />,
-      bg: '#FFF1F2',
-      border: '#FECDD3',
-      textColor: '#9F1239',
-      valColor: '#BE123C',
+      icon: <Receipt size={20} color={isDark ? '#FB7185' : '#E11D48'} />,
+      bg: isDark ? '#1E293B' : '#FFF1F2',
+      border: isDark ? '#881337' : '#FECDD3',
+      textColor: isDark ? '#FB7185' : '#9F1239',
+      valColor: isDark ? '#F43F5E' : '#BE123C',
       onClick: () => onNavigateTab('reports'),
     },
     {
@@ -142,11 +144,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           ? `${kpiData.udhaar.debtorsCount} فعال ادھار کھاتہ داران`
           : `${kpiData.udhaar.debtorsCount} active credit accounts`
         : isUrdu ? '7 فعال ادھار کھاتہ داران' : '7 active credit accounts',
-      icon: <Users size={20} color="#7E22CE" />,
-      bg: '#FAF5FF',
-      border: '#E9D5FF',
-      textColor: '#6B21A8',
-      valColor: '#7E22CE',
+      icon: <Users size={20} color={isDark ? '#C084FC' : '#7E22CE'} />,
+      bg: isDark ? '#1E293B' : '#FAF5FF',
+      border: isDark ? '#581C87' : '#E9D5FF',
+      textColor: isDark ? '#C084FC' : '#6B21A8',
+      valColor: isDark ? '#A855F7' : '#7E22CE',
       onClick: () => onNavigateTab('udhaar'),
     },
     {
@@ -156,11 +158,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         ? kpiData.cash.netCashInHand.toLocaleString()
         : '0',
       subtitle: isUrdu ? 'سیلز + پسائی + وصولی - اخراجات' : 'Sales + Pisai + Recovery - Expenses',
-      icon: <Wallet size={20} color="#16A34A" />,
-      bg: '#F0FDF4',
-      border: '#BBF7D0',
-      textColor: '#166534',
-      valColor: '#15803D',
+      icon: <Wallet size={20} color={isDark ? '#4ADE80' : '#166534'} />,
+      bg: isDark ? '#1E293B' : '#F0FDF4',
+      border: isDark ? '#14532D' : '#BBF7D0',
+      textColor: isDark ? '#4ADE80' : '#166534',
+      valColor: isDark ? '#22C55E' : '#15803D',
       onClick: () => onNavigateTab('reports'),
     },
   ];
@@ -170,45 +172,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       time: isUrdu ? 'آج، 02:30 PM' : 'Today, 02:30 PM',
       actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
       action: 'PRINT_BILL',
-      actionColor: '#0284C7',
-      actionBg: '#F0F9FF',
-      actionBorder: '#BAE6FD',
+      actionColor: isDark ? '#38BDF8' : '#0284C7',
+      actionBg: isDark ? 'rgba(2, 132, 199, 0.2)' : '#F0F9FF',
+      actionBorder: isDark ? 'rgba(2, 132, 199, 0.4)' : '#BAE6FD',
       detail: isUrdu ? 'بل #00481 (چکی آٹا، 40 کلو، 5,600 روپے)' : 'BILL-00481 (Chakki Atta, 40 KG, Rs 5,600)',
     },
     {
       time: isUrdu ? 'آج، 02:15 PM' : 'Today, 02:15 PM',
       actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
       action: 'GENERATE_PISAI_TOKEN',
-      actionColor: '#059669',
-      actionBg: '#ECFDF5',
-      actionBorder: '#A7F3D0',
+      actionColor: isDark ? '#34D399' : '#059669',
+      actionBg: isDark ? 'rgba(5, 150, 105, 0.2)' : '#ECFDF5',
+      actionBorder: isDark ? 'rgba(5, 150, 105, 0.4)' : '#A7F3D0',
       detail: isUrdu ? 'ٹوکن #0482 (صفائی و پسائی، 25 کلو، 150 روپے)' : 'Token #0482 (Cleaning & Grinding, 25 KG, Rs 150)',
     },
     {
       time: isUrdu ? 'آج، 01:45 PM' : 'Today, 01:45 PM',
       actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
       action: 'LOG_EXPENSE',
-      actionColor: '#E11D48',
-      actionBg: '#FFF1F2',
-      actionBorder: '#FECDD3',
+      actionColor: isDark ? '#FB7185' : '#E11D48',
+      actionBg: isDark ? 'rgba(225, 29, 72, 0.2)' : '#FFF1F2',
+      actionBorder: isDark ? 'rgba(225, 29, 72, 0.4)' : '#FECDD3',
       detail: isUrdu ? 'خرچہ #109 (بجلی ایڈوانس، 2,500 روپے)' : 'EXP-109 (Electricity Advance, Rs 2,500)',
     },
     {
       time: isUrdu ? 'آج، 01:10 PM' : 'Today, 01:10 PM',
       actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
       action: 'LOG_UDHAAR_PAYMENT',
-      actionColor: '#7E22CE',
-      actionBg: '#FAF5FF',
-      actionBorder: '#E9D5FF',
+      actionColor: isDark ? '#C084FC' : '#7E22CE',
+      actionBg: isDark ? 'rgba(126, 34, 206, 0.2)' : '#FAF5FF',
+      actionBorder: isDark ? 'rgba(126, 34, 206, 0.4)' : '#E9D5FF',
       detail: isUrdu ? 'وصولی #055 (گاہک حاجی رشید، 2,000 روپے)' : 'PAY-055 (Customer Haji Rasheed, Rs 2,000)',
     },
     {
       time: isUrdu ? 'آج، 08:00 AM' : 'Today, 08:00 AM',
       actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
       action: 'CONFIRM_DAILY_PRICE',
-      actionColor: '#D97706',
-      actionBg: '#FFFBEB',
-      actionBorder: '#FDE68A',
+      actionColor: isDark ? '#FDE047' : '#D97706',
+      actionBg: isDark ? 'rgba(217, 119, 6, 0.2)' : '#FFFBEB',
+      actionBorder: isDark ? 'rgba(217, 119, 6, 0.4)' : '#FDE68A',
       detail: isUrdu ? 'یومیہ ریٹس کی تصدیق برائے 5 پراڈکٹس' : 'Daily rates confirmed for 5 products',
     },
   ];
@@ -221,19 +223,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#FFFFFF',
-          border: '1.5px solid #CBD5E1',
+          backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+          border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1',
           borderRadius: '16px',
           padding: '18px 24px',
           flexWrap: 'wrap',
           gap: '16px',
-          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+          boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : '0 2px 8px rgba(15, 23, 42, 0.04)',
         }}
       >
         <div>
           <h1
             className={isUrdu ? 'font-nastaleeq' : ''}
-            style={{ fontSize: isUrdu ? '24px' : '18px', fontWeight: 900, color: '#0F172A', margin: 0, lineHeight: 1.2 }}
+            style={{ fontSize: isUrdu ? '24px' : '18px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', margin: 0, lineHeight: 1.2 }}
           >
             {t('المدینہ فلور ملز - ایڈمن کمانڈ سنٹر', 'Al-Madina Flour Mills - Admin Command Center')}
           </h1>
@@ -250,19 +252,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               height: '42px',
               padding: '0 16px',
               borderRadius: '10px',
-              backgroundColor: '#FFFBEB',
-              color: '#92400E',
-              border: '1.5px solid #FDE68A',
+              backgroundColor: isDark ? 'rgba(217, 119, 6, 0.15)' : '#FFFBEB',
+              color: isDark ? '#FDE047' : '#92400E',
+              border: isDark ? '1.5px solid rgba(217, 119, 6, 0.35)' : '1.5px solid #FDE68A',
               fontSize: isUrdu ? '17px' : '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 2px 4px rgba(217, 119, 6, 0.08)',
+              boxShadow: isDark ? 'none' : '0 2px 4px rgba(217, 119, 6, 0.08)',
             }}
           >
-            <ShieldCheck size={18} color="#D97706" />
+            <ShieldCheck size={18} color={isDark ? '#FDE047' : '#D97706'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سٹاف رولز و اختیارات', 'Staff Roles & Permissions')}</span>
           </button>
 
@@ -275,19 +277,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               height: '42px',
               padding: '0 16px',
               borderRadius: '10px',
-              backgroundColor: '#ECFDF5',
-              color: '#065F46',
-              border: '1.5px solid #A7F3D0',
+              backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5',
+              color: isDark ? '#34D399' : '#065F46',
+              border: isDark ? '1.5px solid rgba(16, 185, 129, 0.35)' : '1.5px solid #A7F3D0',
               fontSize: isUrdu ? '17px' : '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 2px 4px rgba(5, 150, 105, 0.08)',
+              boxShadow: isDark ? 'none' : '0 2px 4px rgba(5, 150, 105, 0.08)',
             }}
           >
-            <Clock size={18} color="#059669" />
+            <Clock size={18} color={isDark ? '#34D399' : '#059669'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('روزانہ کے ریٹس', 'Daily Rates')}</span>
           </button>
 
@@ -301,19 +303,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               height: '42px',
               padding: '0 16px',
               borderRadius: '10px',
-              backgroundColor: '#F0F9FF',
-              color: '#0369A1',
-              border: '1.5px solid #BAE6FD',
+              backgroundColor: isDark ? 'rgba(14, 165, 233, 0.15)' : '#F0F9FF',
+              color: isDark ? '#38BDF8' : '#0369A1',
+              border: isDark ? '1.5px solid rgba(14, 165, 233, 0.35)' : '1.5px solid #BAE6FD',
               fontSize: isUrdu ? '17px' : '13.5px',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 2px 4px rgba(2, 132, 199, 0.08)',
+              boxShadow: isDark ? 'none' : '0 2px 4px rgba(2, 132, 199, 0.08)',
             }}
           >
-            <Database size={18} color="#0284C7" />
+            <Database size={18} color={isDark ? '#38BDF8' : '#0284C7'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {closingTriggered
                 ? t('بیک اپ ہو رہا ہے...', 'Backing up...')
@@ -361,7 +363,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               borderRadius: '16px',
               padding: '16px 18px',
               cursor: 'pointer',
-              boxShadow: '0 2px 6px rgba(15, 23, 42, 0.03)',
+              boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : '0 2px 6px rgba(15, 23, 42, 0.03)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -384,13 +386,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     width: '36px',
                     height: '36px',
                     borderRadius: '10px',
-                    backgroundColor: '#FFFFFF',
-                    border: `1px solid ${card.border}`,
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : `1px solid ${card.border}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+                    boxShadow: isDark ? 'none' : '0 2px 4px rgba(0,0,0,0.04)',
                   }}
                 >
                   {card.icon}
@@ -427,21 +429,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* 3. Activity Audit Log */}
       <div
         style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
           borderRadius: '16px',
-          border: '1.5px solid #CBD5E1',
+          border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1',
           overflow: 'hidden',
-          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+          boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : '0 2px 8px rgba(15, 23, 42, 0.04)',
         }}
       >
         {/* Table Header / Banner */}
         <div
           style={{
-            backgroundColor: '#0F172A',
+            backgroundColor: isDark ? '#0B0F19' : '#0F172A',
             padding: '16px 22px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            borderBottom: isDark ? '1px solid #334155' : 'none',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -488,11 +491,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 display: 'grid',
                 gridTemplateColumns: '160px 200px 220px 1fr',
                 padding: '12px 22px',
-                backgroundColor: '#F8FAFC',
-                borderBottom: '1.5px solid #E2E8F0',
+                backgroundColor: isDark ? '#0B0F19' : '#F8FAFC',
+                borderBottom: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
                 fontSize: isUrdu ? '16px' : '13px',
                 fontWeight: 800,
-                color: '#64748B',
+                color: isDark ? '#94A3B8' : '#64748B',
               }}
               className={isUrdu ? 'font-nastaleeq' : ''}
             >
@@ -511,17 +514,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     display: 'grid',
                     gridTemplateColumns: '160px 200px 220px 1fr',
                     padding: '14px 22px',
-                    backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
-                    borderBottom: idx === auditLogs.length - 1 ? 'none' : '1px solid #F1F5F9',
+                    backgroundColor: isDark
+                      ? (idx % 2 === 0 ? '#1E293B' : '#111827')
+                      : (idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC'),
+                    borderBottom: isDark
+                      ? (idx === auditLogs.length - 1 ? 'none' : '1px solid #334155')
+                      : (idx === auditLogs.length - 1 ? 'none' : '1px solid #F1F5F9'),
                     alignItems: 'center',
                     gap: '10px',
                     transition: 'background-color 0.12s ease',
                   }}
                 >
-                  <span style={{ color: '#475569', fontWeight: 800, fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
+                  <span style={{ color: isDark ? '#94A3B8' : '#475569', fontWeight: 800, fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
                     {log.time}
                   </span>
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: '#0F172A', fontSize: isUrdu ? '17px' : '14px' }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '17px' : '14px' }}>
                     {log.actor}
                   </span>
                   <div>
@@ -541,7 +548,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       {log.action}
                     </span>
                   </div>
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#1E293B', fontWeight: 700, fontSize: isUrdu ? '17px' : '14px' }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#E2E8F0' : '#1E293B', fontWeight: 700, fontSize: isUrdu ? '17px' : '14px' }}>
                     {log.detail}
                   </span>
                 </div>

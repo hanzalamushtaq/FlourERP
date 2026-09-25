@@ -17,6 +17,7 @@ import {
   User,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // Handcrafted Vector SVG for Ledger Book
 const UdhaarBookSvg = () => (
@@ -84,6 +85,7 @@ const INITIAL_CUSTOMERS: Customer[] = [
 
 export const CustomerLedgerView: React.FC = () => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>(INITIAL_CUSTOMERS[0]);
@@ -279,15 +281,16 @@ export const CustomerLedgerView: React.FC = () => {
                 width: '44px',
                 height: '44px',
                 borderRadius: '12px',
-                backgroundColor: '#FFFFFF',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.12)',
                 flexShrink: 0,
               }}
             >
-              <UserPlus size={22} color="#1877F2" strokeWidth={2.4} />
+              <UserPlus size={22} color={isDark ? '#93C5FD' : '#1877F2'} strokeWidth={2.4} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
@@ -337,11 +340,12 @@ export const CustomerLedgerView: React.FC = () => {
                 width: '46px',
                 height: '46px',
                 borderRadius: '12px',
-                backgroundColor: '#FFFFFF',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.12)',
                 flexShrink: 0,
               }}
             >
@@ -399,21 +403,21 @@ export const CustomerLedgerView: React.FC = () => {
         <div
           className="dash-card-animated"
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
             borderRadius: '16px',
-            border: '1.5px solid #E2E8F0',
+            border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
             padding: '18px 20px',
             display: 'flex',
             flexDirection: 'column',
             gap: '14px',
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : '0 2px 8px rgba(15, 23, 42, 0.04)',
           }}
         >
           {/* Header with Search */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '20px' }}>👥</span>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '18px', fontWeight: 900, color: '#0F172A' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '18px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('گاہک کھاتہ جات', 'Customer Accounts')}
               </span>
             </div>
@@ -421,12 +425,12 @@ export const CustomerLedgerView: React.FC = () => {
               style={{
                 fontSize: isUrdu ? '14px' : '12px',
                 fontWeight: 800,
-                color: '#B45309',
-                backgroundColor: '#FFFBEB',
+                color: isDark ? '#FDE047' : '#B45309',
+                backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#FFFBEB',
                 padding: '3px 10px',
                 borderRadius: '8px',
                 fontFamily: 'var(--font-mono)',
-                border: '1px solid #FEF3C7',
+                border: isDark ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid #FEF3C7',
               }}
             >
               {filteredCustomers.length} {t('کسٹمرز', 'Customers')}
@@ -439,14 +443,14 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              backgroundColor: '#F8FAFC',
-              border: '1.5px solid #E2E8F0',
+              backgroundColor: isDark ? '#0B0F19' : '#F8FAFC',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
               borderRadius: '10px',
               padding: '0 14px',
               height: '44px',
             }}
           >
-            <Search size={18} color="#64748B" />
+            <Search size={18} color={isDark ? '#94A3B8' : '#64748B'} />
             <input
               type="text"
               placeholder={t('گاہک تلاش کریں...', 'Search customers...')}
@@ -460,7 +464,7 @@ export const CustomerLedgerView: React.FC = () => {
                 width: '100%',
                 fontSize: isUrdu ? '18px' : '14px',
                 fontWeight: 700,
-                color: '#0F172A',
+                color: isDark ? '#F8FAFC' : '#0F172A',
                 textAlign: isUrdu ? 'right' : 'left',
               }}
             />
@@ -479,7 +483,7 @@ export const CustomerLedgerView: React.FC = () => {
             }}
           >
             {filteredCustomers.length === 0 ? (
-              <div style={{ padding: '32px', textAlign: 'center', color: '#64748B', fontSize: isUrdu ? '18px' : '14px', fontWeight: 700 }}>
+              <div style={{ padding: '32px', textAlign: 'center', color: isDark ? '#94A3B8' : '#64748B', fontSize: isUrdu ? '18px' : '14px', fontWeight: 700 }}>
                 {t('کوئی کسٹمر نہیں ملا', 'No customers found')}
               </div>
             ) : (
@@ -496,13 +500,19 @@ export const CustomerLedgerView: React.FC = () => {
                     style={{
                       padding: '12px 16px',
                       borderRadius: '12px',
-                      backgroundColor: isSelected ? '#EFF6FF' : '#F8FAFC',
-                      border: isSelected ? '2px solid #1877F2' : '1.5px solid #E2E8F0',
+                      backgroundColor: isSelected
+                        ? (isDark ? '#0F172A' : '#EFF6FF')
+                        : (isDark ? '#1E293B' : '#F8FAFC'),
+                      border: isSelected
+                        ? (isDark ? '2px solid #3B82F6' : '2px solid #1877F2')
+                        : (isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0'),
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      boxShadow: isSelected ? '0 4px 12px rgba(24, 119, 242, 0.12)' : 'none',
+                      boxShadow: isSelected
+                        ? (isDark ? '0 4px 12px rgba(0, 0, 0, 0.4)' : '0 4px 12px rgba(24, 119, 242, 0.12)')
+                        : 'none',
                       transition: 'all 0.15s ease',
                     }}
                   >
@@ -513,15 +523,19 @@ export const CustomerLedgerView: React.FC = () => {
                           width: '42px',
                           height: '42px',
                           borderRadius: '11px',
-                          backgroundColor: isSelected ? '#DBEAFE' : '#FFFFFF',
-                          border: isSelected ? 'none' : '1px solid #E2E8F0',
+                          backgroundColor: isSelected
+                            ? (isDark ? 'rgba(59, 130, 246, 0.2)' : '#DBEAFE')
+                            : (isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF'),
+                          border: isSelected
+                            ? (isDark ? '1px solid rgba(59, 130, 246, 0.4)' : 'none')
+                            : (isDark ? '1px solid #334155' : '1px solid #E2E8F0'),
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
                         }}
                       >
-                        <User size={19} color={isSelected ? '#1877F2' : '#64748B'} />
+                        <User size={19} color={isSelected ? (isDark ? '#60A5FA' : '#1877F2') : (isDark ? '#94A3B8' : '#64748B')} />
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -530,7 +544,9 @@ export const CustomerLedgerView: React.FC = () => {
                           style={{
                             fontWeight: 900,
                             fontSize: isUrdu ? '21px' : '16px',
-                            color: isSelected ? '#1877F2' : '#0F172A',
+                            color: isSelected
+                              ? (isDark ? '#60A5FA' : '#1877F2')
+                              : (isDark ? '#F8FAFC' : '#0F172A'),
                             lineHeight: 1.2,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
@@ -543,7 +559,7 @@ export const CustomerLedgerView: React.FC = () => {
                         <span
                           style={{
                             fontSize: '13px',
-                            color: '#64748B',
+                            color: isDark ? '#94A3B8' : '#64748B',
                             fontWeight: 600,
                             direction: 'ltr',
                             textAlign: isUrdu ? 'right' : 'left',
@@ -562,7 +578,7 @@ export const CustomerLedgerView: React.FC = () => {
                         style={{
                           fontSize: '18px',
                           fontWeight: 900,
-                          color: '#DC2626',
+                          color: isDark ? '#F87171' : '#DC2626',
                           fontFamily: 'var(--font-mono)',
                         }}
                       >
@@ -576,7 +592,7 @@ export const CustomerLedgerView: React.FC = () => {
                             style={{
                               fontSize: isUrdu ? '14px' : '11px',
                               fontWeight: 900,
-                              color: '#1877F2',
+                              color: isDark ? '#60A5FA' : '#1877F2',
                             }}
                           >
                             ● {t('منتخب', 'Selected')}
@@ -585,7 +601,7 @@ export const CustomerLedgerView: React.FC = () => {
                         <span
                           style={{
                             fontSize: '12px',
-                            color: '#64748B',
+                            color: isDark ? '#94A3B8' : '#64748B',
                             fontWeight: 700,
                           }}
                         >
@@ -604,14 +620,14 @@ export const CustomerLedgerView: React.FC = () => {
         <div
           className="dash-card-animated"
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
             borderRadius: '16px',
-            border: '1.5px solid #E2E8F0',
+            border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
             padding: '20px',
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.3)' : '0 2px 8px rgba(15, 23, 42, 0.04)',
           }}
         >
           {/* Profile Header Banner */}
@@ -620,7 +636,7 @@ export const CustomerLedgerView: React.FC = () => {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottom: '1px solid #F1F5F9',
+              borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
               paddingBottom: '14px',
               flexWrap: 'wrap',
               gap: '10px',
@@ -633,25 +649,25 @@ export const CustomerLedgerView: React.FC = () => {
                   width: '48px',
                   height: '48px',
                   borderRadius: '12px',
-                  backgroundColor: '#EFF6FF',
-                  border: '1px solid #DBEAFE',
+                  backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : '#EFF6FF',
+                  border: isDark ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid #DBEAFE',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-                <BookOpen size={22} color="#1877F2" />
+                <BookOpen size={22} color={isDark ? '#60A5FA' : '#1877F2'} />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <h3
                   className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: isUrdu ? '26px' : '20px', fontWeight: 900, color: '#0F172A', margin: 0, lineHeight: 1.2 }}
+                  style={{ fontSize: isUrdu ? '26px' : '20px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', margin: 0, lineHeight: 1.2 }}
                 >
                   {selectedCustomer.name}
                 </h3>
-                <span style={{ fontSize: '14px', color: '#64748B', fontWeight: 700, marginTop: '2px' }}>
+                <span style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 700, marginTop: '2px' }}>
                   📞 {selectedCustomer.phone}
                 </span>
               </div>
@@ -659,7 +675,7 @@ export const CustomerLedgerView: React.FC = () => {
 
             {/* Current Balance Callout */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-end' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: '#64748B' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: isDark ? '#94A3B8' : '#64748B' }}>
                 {t('بقایا ادھار:', 'Credit Balance:')}
               </span>
               <span
@@ -667,7 +683,7 @@ export const CustomerLedgerView: React.FC = () => {
                 style={{
                   fontSize: '26px',
                   fontWeight: 900,
-                  color: selectedCustomer.balance > 0 ? '#DC2626' : '#0E8A54',
+                  color: selectedCustomer.balance > 0 ? (isDark ? '#F87171' : '#DC2626') : (isDark ? '#4ADE80' : '#0E8A54'),
                   fontFamily: 'var(--font-mono)',
                   lineHeight: 1.1,
                   marginTop: '2px',
@@ -714,14 +730,15 @@ export const CustomerLedgerView: React.FC = () => {
                 width: '36px',
                 height: '36px',
                 borderRadius: '9px',
-                backgroundColor: '#FFFFFF',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <DollarSign size={20} color="#0E8A54" strokeWidth={2.5} />
+              <DollarSign size={20} color={isDark ? '#4ADE80' : '#0E8A54'} strokeWidth={2.5} />
             </div>
 
             {/* Bold Text */}
@@ -742,7 +759,7 @@ export const CustomerLedgerView: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <History size={18} color="#D97706" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '16px', fontWeight: 900, color: '#0F172A' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '16px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                   {t('کھاتہ ہسٹری', 'Ledger History')}
                 </span>
               </div>
@@ -751,11 +768,11 @@ export const CustomerLedgerView: React.FC = () => {
                 style={{
                   fontSize: '12px',
                   fontWeight: 800,
-                  color: '#64748B',
-                  backgroundColor: '#F8FAFC',
+                  color: isDark ? '#94A3B8' : '#64748B',
+                  backgroundColor: isDark ? '#0B0F19' : '#F8FAFC',
                   padding: '3px 10px',
                   borderRadius: '6px',
-                  border: '1px solid #E2E8F0',
+                  border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
                 }}
               >
                 {(selectedCustomer?.transactions?.length || 0)} {t('اندراج', 'entries')}
@@ -774,7 +791,7 @@ export const CustomerLedgerView: React.FC = () => {
               }}
             >
               {(!selectedCustomer?.transactions || selectedCustomer.transactions.length === 0) ? (
-                <div style={{ padding: '24px', textAlign: 'center', color: '#64748B', fontSize: '13px', fontWeight: 700 }}>
+                <div style={{ padding: '24px', textAlign: 'center', color: isDark ? '#94A3B8' : '#64748B', fontSize: '13px', fontWeight: 700 }}>
                   {t('کوئی ٹرانزیکشن موجود نہیں ہے۔', 'No transactions found.')}
                 </div>
               ) : (
@@ -787,8 +804,8 @@ export const CustomerLedgerView: React.FC = () => {
                       justifyContent: 'space-between',
                       padding: '12px 16px',
                       borderRadius: '12px',
-                      backgroundColor: '#F8FAFC',
-                      border: '1.5px solid #E2E8F0',
+                      backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                      border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
                       transition: 'all 0.15s ease',
                     }}
                   >
@@ -799,8 +816,12 @@ export const CustomerLedgerView: React.FC = () => {
                           width: '32px',
                           height: '32px',
                           borderRadius: '9px',
-                          backgroundColor: tx.type === 'purchase' ? '#FEE2E2' : '#DCFCE7',
-                          color: tx.type === 'purchase' ? '#DC2626' : '#0E8A54',
+                          backgroundColor: tx.type === 'purchase'
+                            ? (isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2')
+                            : (isDark ? 'rgba(34, 197, 94, 0.18)' : '#DCFCE7'),
+                          color: tx.type === 'purchase'
+                            ? (isDark ? '#F87171' : '#DC2626')
+                            : (isDark ? '#4ADE80' : '#0E8A54'),
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -811,10 +832,10 @@ export const CustomerLedgerView: React.FC = () => {
                       </div>
 
                       <div>
-                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, fontSize: isUrdu ? '19px' : '14px', color: '#0F172A', lineHeight: 1.2 }}>
+                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, fontSize: isUrdu ? '19px' : '14px', color: isDark ? '#F8FAFC' : '#0F172A', lineHeight: 1.2 }}>
                           {tx.description}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '5px', marginTop: '3px' }}>
+                        <div style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B', display: 'flex', alignItems: 'center', gap: '5px', marginTop: '3px' }}>
                           <Calendar size={13} /> {tx.date}
                         </div>
                       </div>
@@ -826,14 +847,14 @@ export const CustomerLedgerView: React.FC = () => {
                         style={{
                           fontWeight: 900,
                           fontSize: '17px',
-                          color: tx.type === 'purchase' ? '#DC2626' : '#0E8A54',
+                          color: tx.type === 'purchase' ? (isDark ? '#F87171' : '#DC2626') : (isDark ? '#4ADE80' : '#0E8A54'),
                           fontFamily: 'var(--font-mono)',
                           direction: 'ltr',
                         }}
                       >
                         {tx.type === 'purchase' ? `+ Rs ${tx.amount.toLocaleString()}` : `- Rs ${tx.amount.toLocaleString()}`}
                       </div>
-                      <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '11px', color: '#64748B', fontWeight: 700, marginTop: '2px' }}>
+                      <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 700, marginTop: '2px' }}>
                         {t('بقایا:', 'Balance:')} <span style={{ fontFamily: 'var(--font-mono)' }}>Rs {tx.runningBalance.toLocaleString()}</span>
                       </div>
                     </div>
@@ -852,7 +873,7 @@ export const CustomerLedgerView: React.FC = () => {
             position: 'fixed',
             inset: 0,
             zIndex: 9996,
-            backgroundColor: 'rgba(15, 23, 42, 0.60)',
+            backgroundColor: 'rgba(15, 23, 42, 0.70)',
             backdropFilter: 'blur(6px)',
             display: 'flex',
             alignItems: 'center',
@@ -864,25 +885,25 @@ export const CustomerLedgerView: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: '380px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
               borderRadius: '16px',
               padding: '20px',
-              border: '1.5px solid #EBE4DA',
-              boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.22)',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
+              boxShadow: isDark ? '0 25px 50px -12px rgba(0, 0, 0, 0.6)' : '0 20px 40px -12px rgba(0, 0, 0, 0.22)',
             }}
           >
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontSize: '18px' }}>💵</span>
-                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '18px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '18px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#1F2937', margin: 0 }}>
                   {t('ادھار وصولی درج کریں', 'Log Cash Repayment')}
                 </h3>
               </div>
               <button
                 onClick={() => setIsRepaymentOpen(false)}
                 style={{
-                  background: '#F1F5F9',
+                  background: isDark ? '#334155' : '#F1F5F9',
                   border: 'none',
                   borderRadius: '6px',
                   width: '28px',
@@ -891,7 +912,7 @@ export const CustomerLedgerView: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: '#475569',
+                  color: isDark ? '#CBD5E1' : '#475569',
                 }}
               >
                 <X size={16} />
@@ -901,8 +922,8 @@ export const CustomerLedgerView: React.FC = () => {
             {/* Customer & Current Balance Badge */}
             <div
               style={{
-                backgroundColor: '#FAF5EE',
-                border: '1px solid #EAE0D3',
+                backgroundColor: isDark ? '#0B0F19' : '#FAF5EE',
+                border: isDark ? '1px solid #334155' : '1px solid #EAE0D3',
                 borderRadius: '8px',
                 padding: '8px 12px',
                 marginBottom: '14px',
@@ -912,26 +933,26 @@ export const CustomerLedgerView: React.FC = () => {
               }}
             >
               <div>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: '#1F2937' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#1F2937' }}>
                   {selectedCustomer.name}
                 </span>
-                <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>
+                <div style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600 }}>
                   📞 {selectedCustomer.phone}
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '13px' : '10.5px', color: '#B91C1C', fontWeight: 800 }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '13px' : '10.5px', color: isDark ? '#F87171' : '#B91C1C', fontWeight: 800 }}>
                   {t('کل بقایا', 'Total Balance')}
                 </span>
-                <div style={{ fontSize: '17px', fontWeight: 900, color: '#B91C1C', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
+                <div style={{ fontSize: '17px', fontWeight: 900, color: isDark ? '#F87171' : '#B91C1C', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
                   {isUrdu ? `${selectedCustomer.balance.toLocaleString()} روپے` : `Rs ${selectedCustomer.balance.toLocaleString()}`}
                 </div>
               </div>
             </div>
 
             {/* Input */}
-            <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '12.5px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
+            <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '12.5px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
               {t('وصول رقم:', 'Amount Received (Rs):')}
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
@@ -943,9 +964,9 @@ export const CustomerLedgerView: React.FC = () => {
                   width: '100%',
                   height: '46px',
                   borderRadius: '8px',
-                  border: '1.5px solid #D5C9B8',
-                  backgroundColor: '#FCFBF9',
-                  color: '#111827',
+                  border: isDark ? '1.5px solid #334155' : '1.5px solid #D5C9B8',
+                  backgroundColor: isDark ? '#0B0F19' : '#FCFBF9',
+                  color: isDark ? '#F8FAFC' : '#111827',
                   fontSize: '22px',
                   fontWeight: 900,
                   fontFamily: 'var(--font-mono)',
@@ -961,8 +982,9 @@ export const CustomerLedgerView: React.FC = () => {
                   left: '10px',
                   fontSize: isUrdu ? '15px' : '12px',
                   fontWeight: 900,
-                  color: '#4A2810',
-                  backgroundColor: '#FAF3E8',
+                  color: isDark ? '#CBD5E1' : '#4A2810',
+                  backgroundColor: isDark ? '#1E293B' : '#FAF3E8',
+                  border: isDark ? '1px solid #334155' : 'none',
                   padding: '2px 8px',
                   borderRadius: '5px',
                   fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
@@ -1007,7 +1029,7 @@ export const CustomerLedgerView: React.FC = () => {
             position: 'fixed',
             inset: 0,
             zIndex: 9996,
-            backgroundColor: 'rgba(15, 23, 42, 0.60)',
+            backgroundColor: 'rgba(15, 23, 42, 0.70)',
             backdropFilter: 'blur(6px)',
             display: 'flex',
             alignItems: 'center',
@@ -1019,25 +1041,25 @@ export const CustomerLedgerView: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: '380px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
               borderRadius: '16px',
               padding: '20px',
-              border: '1.5px solid #EBE4DA',
-              boxShadow: '0 20px 40px -12px rgba(0, 0, 0, 0.22)',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
+              boxShadow: isDark ? '0 25px 50px -12px rgba(0, 0, 0, 0.6)' : '0 20px 40px -12px rgba(0, 0, 0, 0.22)',
             }}
           >
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontSize: '18px' }}>👤➕</span>
-                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '18px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '18px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#1F2937', margin: 0 }}>
                   {t('نیا کھاتہ کھولیں', 'Open New Ledger')}
                 </h3>
               </div>
               <button
                 onClick={() => setIsNewCustomerOpen(false)}
                 style={{
-                  background: '#F1F5F9',
+                  background: isDark ? '#334155' : '#F1F5F9',
                   border: 'none',
                   borderRadius: '6px',
                   width: '28px',
@@ -1046,7 +1068,7 @@ export const CustomerLedgerView: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: '#475569',
+                  color: isDark ? '#CBD5E1' : '#475569',
                 }}
               >
                 <X size={16} />
@@ -1055,7 +1077,7 @@ export const CustomerLedgerView: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
               <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
                   {t('گاہک کا نام:', 'Customer Name:')}
                 </label>
                 <input
@@ -1069,9 +1091,9 @@ export const CustomerLedgerView: React.FC = () => {
                     height: '42px',
                     padding: '0 10px',
                     borderRadius: '8px',
-                    border: '1.5px solid #D5C9B8',
-                    backgroundColor: '#FCFBF9',
-                    color: '#1F2937',
+                    border: isDark ? '1.5px solid #334155' : '1.5px solid #D5C9B8',
+                    backgroundColor: isDark ? '#0B0F19' : '#FCFBF9',
+                    color: isDark ? '#F8FAFC' : '#1F2937',
                     outline: 'none',
                     fontWeight: 700,
                     fontSize: isUrdu ? '16px' : '13px',
@@ -1081,7 +1103,7 @@ export const CustomerLedgerView: React.FC = () => {
               </div>
 
               <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
+                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#1F2937', display: 'block', marginBottom: '4px', textAlign: 'left' }}>
                   {t('موبائل نمبر:', 'Mobile Phone:')}
                 </label>
                 <input
@@ -1094,9 +1116,9 @@ export const CustomerLedgerView: React.FC = () => {
                     height: '42px',
                     padding: '0 10px',
                     borderRadius: '8px',
-                    border: '1.5px solid #D5C9B8',
-                    backgroundColor: '#FCFBF9',
-                    color: '#1F2937',
+                    border: isDark ? '1.5px solid #334155' : '1.5px solid #D5C9B8',
+                    backgroundColor: isDark ? '#0B0F19' : '#FCFBF9',
+                    color: isDark ? '#F8FAFC' : '#1F2937',
                     outline: 'none',
                     fontWeight: 700,
                     fontSize: '14px',
@@ -1136,3 +1158,4 @@ export const CustomerLedgerView: React.FC = () => {
     </div>
   );
 };
+

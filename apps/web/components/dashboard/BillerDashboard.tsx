@@ -8,6 +8,7 @@ import { ChakkiQueueCard } from './ChakkiQueueCard';
 import { RecentInvoicesTable } from './RecentInvoicesTable';
 import { ReceiptData } from '../ui/ReceiptPreviewModal';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // 1. Receipt Printer SVG Illustration matching reference image
 const ReceiptPrinterIcon = () => (
@@ -86,6 +87,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   onViewAllInvoices,
 }) => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [hoveredCard, setHoveredCard] = React.useState<string | null>(null);
   const [pressedCard, setPressedCard] = React.useState<string | null>(null);
 
@@ -137,17 +139,17 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
                   : 'none',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
+          {/* Left: Squircle Icon Tile */}
           <div
             style={{
               width: '56px',
               height: '56px',
               borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: 'none',
               boxShadow: 'none',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
@@ -208,17 +210,17 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
                   : 'none',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
+          {/* Left: Squircle Icon Tile */}
           <div
             style={{
               width: '56px',
               height: '56px',
               borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: 'none',
               boxShadow: 'none',
               flexShrink: 0,
               transition: 'transform 0.25s ease',
@@ -279,17 +281,17 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
                   : 'none',
           }}
         >
-          {/* Left: White Squircle Icon Tile */}
+          {/* Left: Squircle Icon Tile */}
           <div
             style={{
               width: '56px',
               height: '56px',
               borderRadius: '13px',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: 'none',
               boxShadow: 'none',
               flexShrink: 0,
               transition: 'transform 0.25s ease',

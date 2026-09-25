@@ -1346,6 +1346,11 @@ html.dark .pos-sidebar button:hover:not([style*="1877F2"]):not([style*="24, 119,
 }
 
 /* 4. Dashboard KPI Cards (کل نقد سیلز, ادھار وصولی, گندم پسائی, کیش دراز) */
+html.dark .kpi-strip-container {
+  background-color: #0B0F19 !important;
+  border-color: #334155 !important;
+}
+
 html.dark .kpi-strip-container > div,
 html.dark .kpi-card-box {
   background-color: #1E293B !important;
