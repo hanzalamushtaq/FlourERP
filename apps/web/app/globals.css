@@ -1441,28 +1441,69 @@ html.dark [style*="background-color: #F1F5F9" i] input {
   background-color: #111827 !important;
 }
 
-/* 7. Universal Typography & Text Colors */
+/* 7. Universal Typography & Word Colors */
 html.dark [style*="color: rgb(15, 23, 42)"],
 html.dark [style*="color: rgb(15,23,42)"],
 html.dark [style*="color: rgb(30, 41, 59)"],
 html.dark [style*="color: rgb(30,41,59)"],
+html.dark [style*="color: rgb(31, 41, 55)"],
+html.dark [style*="color: rgb(31,41,55)"],
+html.dark [style*="color: rgb(17, 24, 39)"],
+html.dark [style*="color: rgb(17,24,39)"],
 html.dark [style*="color: rgb(0, 0, 0)"],
 html.dark [style*="color: rgb(0,0,0)"],
 html.dark [style*="color: #0F172A" i],
 html.dark [style*="color: #1E293B" i],
+html.dark [style*="color: #1F2937" i],
+html.dark [style*="color: #111827" i],
 html.dark [style*="color: #000000" i],
 html.dark [style*="color: #000" i],
-html.dark [style*="color: black" i] {
-  color: #F8FAFC !important;
+html.dark [style*="color: black" i],
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: #FFFFFF !important;
 }
 
+/* Secondary & Muted Labels and Words -> Crisp High-Contrast Light Slate */
+html.dark [style*="color: rgb(55, 65, 81)"],
+html.dark [style*="color: rgb(55,65,81)"],
+html.dark [style*="color: rgb(51, 65, 85)"],
+html.dark [style*="color: rgb(51,65,85)"],
+html.dark [style*="color: rgb(75, 85, 99)"],
+html.dark [style*="color: rgb(75,85,99)"],
 html.dark [style*="color: rgb(71, 85, 105)"],
 html.dark [style*="color: rgb(71,85,105)"],
 html.dark [style*="color: rgb(100, 116, 139)"],
 html.dark [style*="color: rgb(100,116,139)"],
+html.dark [style*="color: rgb(107, 114, 128)"],
+html.dark [style*="color: rgb(107,114,128)"],
+html.dark [style*="color: rgb(120, 113, 108)"],
+html.dark [style*="color: rgb(120,113,108)"],
+html.dark [style*="color: #374151" i],
+html.dark [style*="color: #334155" i],
+html.dark [style*="color: #4B5563" i],
 html.dark [style*="color: #475569" i],
-html.dark [style*="color: #64748B" i] {
-  color: #94A3B8 !important;
+html.dark [style*="color: #64748B" i],
+html.dark [style*="color: #6B7280" i],
+html.dark [style*="color: #78716C" i] {
+  color: #CBD5E1 !important;
+}
+
+html.dark label,
+html.dark p:not([class*="text-"]):not([style*="color"]) {
+  color: #E2E8F0 !important;
+}
+
+/* Gradient strips override */
+html.dark [style*="linear-gradient"][style*="255, 255, 255"],
+html.dark [style*="linear-gradient"][style*="FFFFFF" i],
+html.dark [style*="linear-gradient"][style*="F8FAFC" i] {
+  background: #151D2F !important;
+  background-image: none !important;
 }
 
 /* 8. Universal Border Inversions */
@@ -1475,8 +1516,10 @@ html.dark [style*="border: 1.5px solid #E2E8F0" i],
 html.dark [style*="border: 1px solid #E2E8F0" i],
 html.dark [style*="border: 2px solid #E2E8F0" i],
 html.dark [style*="border: 1.5px solid #CBD5E1" i],
+html.dark [style*="border: 1.5px solid #EBE4DA" i],
 html.dark [style*="border-color: #E2E8F0" i],
 html.dark [style*="border-color: #CBD5E1" i],
+html.dark [style*="border-color: #EBE4DA" i],
 html.dark [style*="border-bottom: 1px solid rgb(241, 245, 249)"],
 html.dark [style*="border-bottom: 1px solid #F1F5F9" i] {
   border-color: #334155 !important;

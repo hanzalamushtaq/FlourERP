@@ -17,6 +17,7 @@ import {
   Info,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { getSession, ensureValidToken } from '../../lib/auth';
 
 /* ─────────────────────────────────────────────────────────────
@@ -124,59 +125,62 @@ const SectionCard = ({
   titleUr: string;
   children: React.ReactNode;
   isUrdu: boolean;
-}) => (
-  <div
-    style={{
-      background: '#FFFFFF',
-      borderRadius: '16px',
-      border: '1.5px solid #E2E8F0',
-      marginBottom: '20px',
-      overflow: 'hidden',
-      boxShadow: '0 1px 4px rgba(15,23,42,0.04)',
-    }}
-  >
-    {/* Card Header */}
+}) => {
+  const { isDark } = useTheme();
+  return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        padding: '16px 20px',
-        borderBottom: '1.5px solid #F1F5F9',
-        background: 'linear-gradient(to right, #FFFFFF, #F8FAFC)',
+        background: isDark ? '#1E293B' : '#FFFFFF',
+        borderRadius: '16px',
+        border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
+        marginBottom: '20px',
+        overflow: 'hidden',
+        boxShadow: isDark ? '0 4px 14px rgba(0,0,0,0.25)' : '0 1px 4px rgba(15,23,42,0.04)',
       }}
     >
+      {/* Card Header */}
       <div
         style={{
-          width: '34px',
-          height: '34px',
-          borderRadius: '9px',
-          backgroundColor: '#EFF6FF',
-          border: '1px solid #BFDBFE',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
+          gap: '10px',
+          padding: '16px 20px',
+          borderBottom: isDark ? '1.5px solid #334155' : '1.5px solid #F1F5F9',
+          background: isDark ? '#151D2F' : 'linear-gradient(to right, #FFFFFF, #F8FAFC)',
         }}
       >
-        {icon}
+        <div
+          style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '9px',
+            backgroundColor: isDark ? '#1E3A8A' : '#EFF6FF',
+            border: isDark ? '1px solid #2563EB' : '1px solid #BFDBFE',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {icon}
+        </div>
+        <h3
+          className={isUrdu ? 'font-nastaleeq' : ''}
+          style={{
+            fontSize: isUrdu ? '20px' : '15px',
+            fontWeight: 700,
+            color: isDark ? '#FFFFFF' : '#0F172A',
+            margin: 0,
+          }}
+        >
+          {isUrdu ? titleUr : titleEn}
+        </h3>
       </div>
-      <h3
-        className={isUrdu ? 'font-nastaleeq' : ''}
-        style={{
-          fontSize: isUrdu ? '20px' : '15px',
-          fontWeight: 700,
-          color: '#0F172A',
-          margin: 0,
-        }}
-      >
-        {isUrdu ? titleUr : titleEn}
-      </h3>
+      {/* Card Body */}
+      <div style={{ padding: '20px' }}>{children}</div>
     </div>
-    {/* Card Body */}
-    <div style={{ padding: '20px' }}>{children}</div>
-  </div>
-);
+  );
+};
 
 /* ─────────────────────────────────────────────────────────────
    Form Field
@@ -193,24 +197,27 @@ const Field = ({
   isUrdu: boolean;
   children: React.ReactNode;
   fullWidth?: boolean;
-}) => (
-  <div style={{ gridColumn: fullWidth ? '1 / -1' : undefined }}>
-    <label
-      className={isUrdu ? 'font-nastaleeq' : ''}
-      style={{
-        display: 'block',
-        fontSize: isUrdu ? '17px' : '13px',
-        fontWeight: 600,
-        color: '#374151',
-        marginBottom: '6px',
-        direction: isUrdu ? 'rtl' : 'ltr',
-      }}
-    >
-      {isUrdu ? labelUr : label}
-    </label>
-    {children}
-  </div>
-);
+}) => {
+  const { isDark } = useTheme();
+  return (
+    <div style={{ gridColumn: fullWidth ? '1 / -1' : undefined }}>
+      <label
+        className={isUrdu ? 'font-nastaleeq' : ''}
+        style={{
+          display: 'block',
+          fontSize: isUrdu ? '17px' : '13px',
+          fontWeight: 700,
+          color: isDark ? '#E2E8F0' : '#374151',
+          marginBottom: '6px',
+          direction: isUrdu ? 'rtl' : 'ltr',
+        }}
+      >
+        {isUrdu ? labelUr : label}
+      </label>
+      {children}
+    </div>
+  );
+};
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -230,6 +237,7 @@ const inputStyle: React.CSSProperties = {
 ───────────────────────────────────────────────────────────── */
 export const GeneralInfoView: React.FC = () => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [info, setInfo] = useState<GeneralInfo>({ ...EMPTY_INFO });
   const [logoPreview, setLogoPreview] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
@@ -311,7 +319,7 @@ export const GeneralInfoView: React.FC = () => {
 
   const getFocusStyle = (name: string): React.CSSProperties =>
     focusedField === name
-      ? { borderColor: '#1877F2', boxShadow: '0 0 0 3px rgba(24,119,242,0.12)', backgroundColor: '#FFFFFF' }
+      ? { borderColor: '#1877F2', boxShadow: '0 0 0 3px rgba(24,119,242,0.2)', backgroundColor: isDark ? '#0F172A' : '#FFFFFF' }
       : {};
 
   const inputProps = (name: keyof GeneralInfo, type = 'text', placeholder = '') => ({
@@ -322,7 +330,20 @@ export const GeneralInfoView: React.FC = () => {
     onFocus: () => setFocusedField(name),
     onBlur: () => setFocusedField(null),
     placeholder,
-    style: { ...inputStyle, ...getFocusStyle(name), direction: isUrdu ? ('rtl' as const) : ('ltr' as const) },
+    style: {
+      width: '100%',
+      padding: '10px 12px',
+      border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
+      borderRadius: '10px',
+      fontSize: '14px',
+      color: isDark ? '#F8FAFC' : '#0F172A',
+      backgroundColor: isDark ? '#111827' : '#F8FAFC',
+      outline: 'none',
+      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+      boxSizing: 'border-box' as const,
+      ...getFocusStyle(name),
+      direction: isUrdu ? ('rtl' as const) : ('ltr' as const),
+    },
   });
 
   /* ── grid helper ── */
@@ -345,7 +366,7 @@ export const GeneralInfoView: React.FC = () => {
         style={{
           marginBottom: '28px',
           paddingBottom: '16px',
-          borderBottom: '1.5px solid #E2E8F0',
+          borderBottom: isDark ? '1.5px solid #1E293B' : '1.5px solid #E2E8F0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -356,13 +377,13 @@ export const GeneralInfoView: React.FC = () => {
         <div>
           <h2
             className={isUrdu ? 'font-nastaleeq' : ''}
-            style={{ fontSize: isUrdu ? '30px' : '22px', fontWeight: 900, color: '#0F172A', margin: 0 }}
+            style={{ fontSize: isUrdu ? '30px' : '22px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#0F172A', margin: 0 }}
           >
             {t('عمومی معلومات', 'General Information')}
           </h2>
           <p
             className={isUrdu ? 'font-nastaleeq' : ''}
-            style={{ fontSize: isUrdu ? '18px' : '13px', color: '#64748B', margin: '4px 0 0' }}
+            style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#CBD5E1' : '#64748B', margin: '4px 0 0' }}
           >
             {t('مل کی بنیادی معلومات اور پبلک پروفائل ترتیب دیں۔', "Manage your flour mill's primary details and public profile.")}
           </p>
@@ -377,8 +398,10 @@ export const GeneralInfoView: React.FC = () => {
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               padding: '9px 16px', borderRadius: '10px',
-              border: '1.5px solid #E2E8F0', backgroundColor: '#F8FAFC',
-              fontSize: '13px', fontWeight: 600, color: '#374151',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
+              backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+              fontSize: '13px', fontWeight: 600,
+              color: isDark ? '#E2E8F0' : '#374151',
               cursor: 'pointer', outline: 'none',
             }}
           >
@@ -428,10 +451,10 @@ export const GeneralInfoView: React.FC = () => {
             <div
               style={{
                 width: '110px', height: '110px',
-                border: '2px dashed #CBD5E1',
+                border: isDark ? '2px dashed #475569' : '2px dashed #CBD5E1',
                 borderRadius: '14px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: '#F8FAFC', overflow: 'hidden', flexShrink: 0,
+                background: isDark ? '#111827' : '#F8FAFC', overflow: 'hidden', flexShrink: 0,
               }}
             >
               {isUploading ? (
@@ -443,13 +466,13 @@ export const GeneralInfoView: React.FC = () => {
               ) : logoPreview ? (
                 <img src={logoPreview} alt="Mill Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               ) : (
-                <Building2 size={40} color="#CBD5E1" />
+                <Building2 size={40} color={isDark ? '#475569' : '#CBD5E1'} />
               )}
             </div>
 
             {/* Upload Controls */}
             <div>
-              <p style={{ fontSize: '13px', color: '#64748B', marginBottom: '10px', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '13px', color: isDark ? '#CBD5E1' : '#64748B', marginBottom: '10px', lineHeight: 1.6 }}>
                 {t(
                   'PNG، JPG، WEBP یا SVG — زیادہ سے زیادہ 20 MB۔ یہ لوگو رسیدوں اور رپورٹوں پر ظاہر ہو گا۔',
                   'Upload PNG, JPG, WEBP or SVG. Max 20 MB. This logo will appear on receipts and reports.'
@@ -471,8 +494,10 @@ export const GeneralInfoView: React.FC = () => {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '6px',
                     padding: '9px 18px', borderRadius: '10px',
-                    border: '1.5px solid #CBD5E1', backgroundColor: '#FFFFFF',
-                    fontSize: '13px', fontWeight: 600, color: '#374151',
+                    border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1',
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                    fontSize: '13px', fontWeight: 600,
+                    color: isDark ? '#F8FAFC' : '#374151',
                     cursor: isUploading ? 'not-allowed' : 'pointer', outline: 'none',
                     opacity: isUploading ? 0.7 : 1,
                   }}

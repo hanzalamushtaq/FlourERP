@@ -14,6 +14,7 @@ import {
   Scale,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // --- 1. Custom Handcrafted Vector SVGs matching Dashboard & Billing aesthetic ---
 
@@ -185,6 +186,7 @@ const renderProductSvg = (id: string) => {
 
 export const RateListView: React.FC = () => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [rates, setRates] = useState<RateItem[]>(INITIAL_RATES);
   const [pisaiRates, setPisaiRates] = useState<PisaiRateItem[]>(INITIAL_PISAI_RATES);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
@@ -498,18 +500,18 @@ export const RateListView: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '24px' }}>🌾</span>
-          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0 }}>
             {t('آٹا و تیار اناج مصنوعات کے یومیہ ریٹس', 'Flour & Grain Products Daily Rates')}
           </h3>
           <span
             style={{
               fontSize: isUrdu ? '13px' : '11.5px',
               fontWeight: 800,
-              color: '#78350F',
-              backgroundColor: '#FEF3C7',
+              color: isDark ? '#FBBF24' : '#78350F',
+              backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7',
               padding: '2px 8px',
               borderRadius: '6px',
-              border: '1px solid #FDE68A',
+              border: isDark ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid #FDE68A',
             }}
           >
             {t('فی من ریٹ (روپے / 40 کلو)', 'Rate per Maund (Rs / 40 KG)')}
@@ -524,15 +526,15 @@ export const RateListView: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            backgroundColor: '#FFFFFF',
-            color: '#8C582B',
-            border: '2px solid #8C582B',
+            backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+            color: isDark ? '#FBBF24' : '#8C582B',
+            border: isDark ? '1.5px solid #D97706' : '2px solid #8C582B',
             borderRadius: '10px',
             padding: '6px 14px',
             fontSize: isUrdu ? '16px' : '13px',
             fontWeight: 900,
             cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(140, 88, 43, 0.12)',
+            boxShadow: isDark ? '0 2px 6px rgba(0, 0, 0, 0.3)' : '0 2px 6px rgba(140, 88, 43, 0.12)',
           }}
         >
           <Plus size={16} strokeWidth={2.5} />
@@ -619,7 +621,7 @@ export const RateListView: React.FC = () => {
                   style={{
                     fontSize: isUrdu ? '24px' : '18px',
                     fontWeight: 900,
-                    color: '#1F2937',
+                    color: isDark ? '#FFFFFF' : '#1F2937',
                     margin: 0,
                     lineHeight: 1.2,
                   }}
@@ -726,17 +728,18 @@ export const RateListView: React.FC = () => {
       <div style={{ marginTop: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           <span style={{ fontSize: '24px' }}>⚙️</span>
-          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: '#1F2937', margin: 0 }}>
+          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0 }}>
             {t('گندم چکی پسائی و صفائی کے ریٹس', 'Wheat Cleaning & Milling Rates')}
           </h3>
           <span
             style={{
               fontSize: isUrdu ? '13px' : '11.5px',
               fontWeight: 800,
-              color: '#065F46',
-              backgroundColor: '#D1FAE5',
+              color: isDark ? '#34D399' : '#065F46',
+              backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#D1FAE5',
               padding: '2px 8px',
               borderRadius: '6px',
+              border: isDark ? '1px solid rgba(16, 185, 129, 0.3)' : 'none',
             }}
           >
             {t('فی من نرخ (روپے / 40 کلو)', 'Rate per Maund (Rs / 40 KG)')}
@@ -789,10 +792,10 @@ export const RateListView: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '20px', fontWeight: 900, color: '#1F2937', margin: 0, lineHeight: 1.2 }}>
+                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '20px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0, lineHeight: 1.2 }}>
                       {pisaiTitle}
                     </h4>
-                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: '#6B7280', fontWeight: 600, marginTop: '2px' }}>
+                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: isDark ? '#CBD5E1' : '#6B7280', fontWeight: 600, marginTop: '2px' }}>
                       {pisaiNote}
                     </div>
                     <div
