@@ -4,6 +4,8 @@
 **/build/
 **/dist/
 *.log
-.env*
+.env
+.env*.local
+!.env.example
 .DS_Store
 *.tsbuildinfo
