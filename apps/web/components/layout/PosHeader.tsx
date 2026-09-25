@@ -17,8 +17,11 @@ import {
   ShieldCheck,
   Globe,
   Menu,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { NotificationDropdown } from './NotificationDropdown';
 
 // Chakki Grinder Outline Icon matching sidebar
@@ -85,6 +88,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
   onOpenPriceModal,
 }) => {
   const { language, setLanguage, isUrdu, t } = useLanguage();
+  const { theme, resolvedTheme, setTheme, toggleTheme, isDark } = useTheme();
   const [currentTime, setCurrentTime] = useState<string>('06:45 PM');
 
   const isAdmin =
@@ -254,6 +258,41 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             EN
           </button>
         </div>
+
+        {/* Theme Mode Toggle (System Auto / Light / Dark) */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={
+            theme === 'system'
+              ? t(`سسٹم تھیم (آٹو) - اب ${isDark ? 'ڈارک' : 'لائٹ'} ہے`, `System Theme (Auto) - Currently ${isDark ? 'Dark' : 'Light'}`)
+              : isDark
+              ? t('ڈارک موڈ آن ہے - لائٹ پر سوئچ کریں', 'Dark Mode - Switch to Light')
+              : t('لائٹ موڈ آن ہے - ڈارک پر سوئچ کریں', 'Light Mode - Switch to Dark')
+          }
+          className="touch-active header-theme-btn"
+          style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '10px',
+            backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+            border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: 'none',
+            outline: 'none',
+            flexShrink: 0,
+            transition: 'all 0.15s ease',
+          }}
+        >
+          {isDark ? (
+            <Moon size={18} strokeWidth={2.2} color="#FBBF24" />
+          ) : (
+            <Sun size={18} strokeWidth={2.2} color="#D97706" />
+          )}
+        </button>
 
         {/* Search Bar (Hidden on Mobile) */}
         <div className="header-search-container" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>

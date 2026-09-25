@@ -1237,4 +1237,219 @@ h4.font-nastaleeq {
   }
 }
 
+/* ==============================================================================
+   DARK THEME SYSTEM (AUTOMATIC SYSTEM PREFERENCE & MANUAL TOGGLE)
+   ============================================================================== */
+
+:root[data-theme="dark"],
+html.dark {
+  --bg-main: #0B0F19;
+  --bg-surface: #1E293B;
+  --bg-subtle: #111827;
+  --bg-card: #1E293B;
+  --bg-input: #111827;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #E2E8F0;
+  --text-muted: #94A3B8;
+  --text-inverse: #0B0F19;
+
+  --c5: #1E293B;
+  --c7: #94A3B8;
+  --c8: #F8FAFC;
+
+  --border-subtle: #334155;
+  --border-medium: #475569;
+}
+
+/* Smooth theme transition */
+body, header, aside, main, div, button, input, select {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+}
+
+/* 1. Main Backgrounds & Workspaces */
+html.dark body,
+html.dark main,
+html.dark .app-main-workspace {
+  background-color: #0B0F19 !important;
+  color: #F8FAFC !important;
+}
+
+/* 2. Top Header & Navigation Bars */
+html.dark header,
+html.dark .pos-header-container {
+  background-color: #0F172A !important;
+  border-bottom: 1px solid #1E293B !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark .header-icon-squircle {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+html.dark .header-title-responsive {
+  color: #F8FAFC !important;
+}
+
+html.dark .header-menu-toggle-btn {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+html.dark .header-lang-switcher {
+  background-color: #1E293B !important;
+  border: 1px solid #334155 !important;
+}
+
+html.dark .header-lang-btn {
+  color: #94A3B8 !important;
+}
+
+html.dark .header-search-container input {
+  background-color: #111827 !important;
+  color: #F8FAFC !important;
+  border: 1px solid #334155 !important;
+}
+
+/* 3. Left/Right Collapsible Sidebar */
+html.dark aside,
+html.dark .pos-sidebar {
+  background-color: #0F172A !important;
+  border-color: #1E293B !important;
+}
+
+html.dark .sidebar-item-btn:hover {
+  background-color: #1E293B !important;
+}
+
+/* 4. Universal Surface, Card & Container Inversions */
+html.dark [style*="background-color: #FFFFFF"],
+html.dark [style*="background-color: #ffffff"],
+html.dark [style*="background: #FFFFFF"],
+html.dark [style*="background: #ffffff"],
+html.dark .bg-white {
+  background-color: #1E293B !important;
+}
+
+html.dark [style*="background-color: #F8FAFC"],
+html.dark [style*="background-color: #f8fafc"],
+html.dark [style*="background-color: #F1F5F9"],
+html.dark [style*="background-color: #f1f5f9"],
+html.dark [style*="background: #F8FAFC"],
+html.dark [style*="background: #f8fafc"],
+html.dark [style*="background: #F1F5F9"],
+html.dark [style*="background: #f1f5f9"] {
+  background-color: #111827 !important;
+}
+
+/* 5. Typography & Text Colors */
+html.dark [style*="color: #0F172A"],
+html.dark [style*="color: #0f172a"],
+html.dark [style*="color: #1E293B"],
+html.dark [style*="color: #1e293b"],
+html.dark [style*="color: #334155"],
+html.dark [style*="color: #111827"] {
+  color: #F8FAFC !important;
+}
+
+html.dark [style*="color: #475569"],
+html.dark [style*="color: #64748B"],
+html.dark [style*="color: #64748b"] {
+  color: #94A3B8 !important;
+}
+
+/* 6. Border Inversions */
+html.dark [style*="border: 1px solid #E2E8F0"],
+html.dark [style*="border: 1.5px solid #E2E8F0"],
+html.dark [style*="border: 2px solid #E2E8F0"],
+html.dark [style*="border: 1px solid #e2e8f0"],
+html.dark [style*="border: 1.5px solid #e2e8f0"],
+html.dark [style*="border-color: #E2E8F0"],
+html.dark [style*="border-color: #e2e8f0"],
+html.dark [style*="border-color: #F1F5F9"],
+html.dark [style*="border-color: #f1f5f9"],
+html.dark [style*="border-bottom: 1px solid #F1F5F9"],
+html.dark [style*="border-bottom: 1px solid #f1f5f9"],
+html.dark [style*="borderBottom: '1px solid #F1F5F9'"],
+html.dark [style*="borderBottom: '1px solid #E2E8F0'"] {
+  border-color: #334155 !important;
+}
+
+/* 7. Inputs, Selects & Forms */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #111827 !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748B !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #3B82F6 !important;
+  background-color: #0F172A !important;
+}
+
+/* 8. Tables & Data Grids */
+html.dark table {
+  background-color: #1E293B !important;
+}
+
+html.dark table th {
+  background-color: #111827 !important;
+  color: #94A3B8 !important;
+  border-color: #334155 !important;
+}
+
+html.dark table td {
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+html.dark table tr:hover td {
+  background-color: #243046 !important;
+}
+
+/* 9. Dropdowns & Floating Panels */
+html.dark .notification-panel-dropdown {
+  background-color: #1E293B !important;
+  border: 1px solid #334155 !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 16px 40px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark .notification-panel-dropdown div[style*="background-color: #F8FAFC"],
+html.dark .notification-panel-dropdown div[style*="background-color: #f8fafc"] {
+  background-color: #111827 !important;
+  border-color: #334155 !important;
+}
+
+/* 10. Modals & Dialog Overlays */
+html.dark .modal-content,
+html.dark [role="dialog"] {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+/* 11. Scrollbars in Dark Mode */
+html.dark ::-webkit-scrollbar-track {
+  background: #0B0F19;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+
 
