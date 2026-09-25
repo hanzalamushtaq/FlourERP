@@ -188,13 +188,15 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
         style={{
           width: '100%',
           borderRadius: '8px',
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
         <table
           style={{
             width: '100%',
             borderCollapse: 'collapse',
-            tableLayout: 'fixed',
+            minWidth: '520px',
           }}
         >
           <thead>

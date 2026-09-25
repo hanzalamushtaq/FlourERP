@@ -162,12 +162,11 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '32px' : '22px',
+                fontSize: isUrdu ? '28px' : '20px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
                 lineHeight: 1.4,
-                whiteSpace: 'nowrap',
               }}
             >
               {t('نیا بل بنائیں', 'Create New Bill')}
@@ -234,12 +233,11 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '32px' : '22px',
+                fontSize: isUrdu ? '28px' : '20px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
                 lineHeight: 1.4,
-                whiteSpace: 'nowrap',
               }}
             >
               {t('گندم پسائی ٹوکن', 'Milling Token')}
@@ -306,12 +304,11 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '32px' : '22px',
+                fontSize: isUrdu ? '28px' : '20px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
                 lineHeight: 1.4,
-                whiteSpace: 'nowrap',
               }}
             >
               {t('ادھار کھاتے و وصولی', 'Customer Ledger')}

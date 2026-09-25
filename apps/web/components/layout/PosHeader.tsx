@@ -105,21 +105,22 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       style={{
         backgroundColor: '#FFFFFF',
         borderBottom: 'none',
-        padding: '9px 20px',
+        padding: '9px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '12px',
+        gap: '8px',
         userSelect: 'none',
-        direction: 'rtl',
+        direction: isUrdu ? 'rtl' : 'ltr',
         boxShadow: 'none',
         width: '100%',
+        boxSizing: 'border-box',
       }}
     >
-      {/* Right Corner (in RTL): Icon Squircle + Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-
+      {/* Title & Icon Side */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
         <div
+          className="header-icon-squircle"
           style={{
             width: '38px',
             height: '38px',
@@ -145,16 +146,18 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            minWidth: 0,
           }}
         >
           {title || t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')}
         </h1>
       </div>
 
-      {/* Left Corner (in RTL): Search Bar & Action Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+      {/* Action Buttons Side */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
         {/* Language Switcher Segmented Control */}
         <div
+          className="header-lang-switcher"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -170,12 +173,12 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           <button
             type="button"
             onClick={() => setLanguage('ur')}
-            className={`touch-active ${language === 'ur' ? 'font-nastaleeq' : ''}`}
+            className={`touch-active header-lang-btn ${language === 'ur' ? 'font-nastaleeq' : ''}`}
             style={{
               border: 'none',
               borderRadius: '6px',
-              padding: '4px 10px',
-              fontSize: '13px',
+              padding: '4px 9px',
+              fontSize: '12.5px',
               fontWeight: language === 'ur' ? 900 : 600,
               backgroundColor: language === 'ur' ? '#1877F2' : 'transparent',
               color: language === 'ur' ? '#FFFFFF' : '#64748B',
@@ -191,11 +194,11 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           <button
             type="button"
             onClick={() => setLanguage('en')}
-            className="touch-active"
+            className="touch-active header-lang-btn"
             style={{
               border: 'none',
               borderRadius: '6px',
-              padding: '4px 9px',
+              padding: '4px 8px',
               fontSize: '11.5px',
               fontWeight: language === 'en' ? 800 : 600,
               fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -212,7 +215,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           </button>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Bar (Hidden on Mobile) */}
         <div className="header-search-container" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <input
             type="text"
@@ -225,10 +228,10 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               border: 'none',
               backgroundColor: '#F8FAFC',
               fontSize: isUrdu ? '17px' : '14px',
-              width: '200px',
+              width: '180px',
               outline: 'none',
               boxShadow: 'none',
-              textAlign: 'left',
+              textAlign: isUrdu ? 'right' : 'left',
               color: '#0F172A',
             }}
           />
@@ -248,13 +251,13 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           <button
             type="button"
             onClick={onOpenZReport}
-            className="touch-active"
+            className="touch-active header-shift-btn"
             style={{
               backgroundColor: '#1877F2',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '7px',
-              padding: '6px 12px',
+              padding: '6px 10px',
               fontSize: isUrdu ? '15px' : '13px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -267,17 +270,17 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               outline: 'none',
             }}
           >
-            <FileSpreadsheet size={14} color="#FFFFFF" />
+            <FileSpreadsheet size={15} color="#FFFFFF" />
             <span
               className={`header-shift-btn-text ${isUrdu ? 'font-nastaleeq' : ''}`}
               style={{ fontSize: '12px', fontWeight: 800 }}
             >
-              {t('شفٹ اختتام', 'End Shift (Z-Report)')}
+              {t('شفٹ اختتام', 'End Shift')}
             </span>
           </button>
         )}
 
-        {/* Mobile Hamburger Menu Button (Positioned at Left Corner, hidden when drawer is open) */}
+        {/* Mobile Hamburger Menu Button */}
         {onToggleSidebar && !isMobileNavOpen && (
           <button
             type="button"

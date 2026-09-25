@@ -1028,7 +1028,7 @@ export const ProductBillingScreen: React.FC = () => {
               onClick={() => handleCardClick(p)}
               onMouseEnter={() => setHoveredProduct(p.id)}
               onMouseLeave={() => setHoveredProduct(null)}
-              className="touch-active"
+              className="touch-active product-action-tile"
               title={t('اس پروڈکٹ کو بل میں شامل کرنے کے لیے کلک کریں', 'Click to add this product to bill')}
               style={{
                 flex: `1 1 calc(${Math.floor(100 / idealCols)}% - 12px)`,

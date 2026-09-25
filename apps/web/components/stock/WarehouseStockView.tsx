@@ -234,15 +234,8 @@ export const WarehouseStockView: React.FC = () => {
         </div>
       )}
 
-      {/* 1. TOP DASHBOARD ACTION CARDS (Centered Dual Cards - Exact Match to Picture 2) */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '14px',
-          width: '100%',
-        }}
-      >
+      {/* 1. TOP DASHBOARD ACTION CARDS (Responsive on Mobile & Desktop) */}
+      <div className="dual-top-action-cards">
         {/* Card 1: نیا اسٹاک آمد - Cobalt Blue Action Card */}
         <div
           onClick={() => setModalMode('inward')}
@@ -253,9 +246,10 @@ export const WarehouseStockView: React.FC = () => {
           }}
           onMouseDown={() => setPressedCard('inward')}
           onMouseUp={() => setPressedCard(null)}
-          className="touch-active"
+          className="dual-action-card touch-active"
           style={{
-            width: '360px',
+            width: '100%',
+            maxWidth: '360px',
             background: 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)',
             borderRadius: '14px',
             border: '2px solid #1E40AF',
@@ -298,12 +292,11 @@ export const WarehouseStockView: React.FC = () => {
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '26px' : '19px',
+                  fontSize: isUrdu ? '21px' : '16px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   margin: 0,
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
+                  lineHeight: 1.3,
                   letterSpacing: '0',
                 }}
               >
@@ -323,9 +316,10 @@ export const WarehouseStockView: React.FC = () => {
           }}
           onMouseDown={() => setPressedCard('outward')}
           onMouseUp={() => setPressedCard(null)}
-          className="touch-active"
+          className="dual-action-card touch-active"
           style={{
-            width: '360px',
+            width: '100%',
+            maxWidth: '360px',
             background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
             borderRadius: '14px',
             border: '2px solid #065F46',
@@ -368,12 +362,11 @@ export const WarehouseStockView: React.FC = () => {
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '26px' : '19px',
+                  fontSize: isUrdu ? '21px' : '16px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   margin: 0,
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
+                  lineHeight: 1.3,
                   letterSpacing: '0',
                 }}
               >

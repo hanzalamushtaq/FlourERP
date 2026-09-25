@@ -355,12 +355,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '24px',
+                fontSize: isUrdu ? '20px' : '17px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
+                lineHeight: 1.3,
               }}
             >
               {t('روزانہ نرخ نامہ لسٹ', 'Daily Rate List')}
@@ -419,12 +418,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '24px',
+                fontSize: isUrdu ? '20px' : '17px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
+                lineHeight: 1.3,
               }}
             >
               {t('تمام ریٹس لاگو کریں', 'Apply All Rates')}
@@ -483,12 +481,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: '24px',
+                fontSize: isUrdu ? '20px' : '17px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
+                lineHeight: 1.3,
               }}
             >
               {t('ریٹ لسٹ پرنٹ کریں', 'Print Rate List')}

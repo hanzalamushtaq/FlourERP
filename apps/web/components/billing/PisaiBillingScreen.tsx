@@ -304,23 +304,17 @@ export const PisaiBillingScreen: React.FC = () => {
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      {/* 1. TOP: Premium Dual Service Selection Switcher */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '14px',
-          width: '100%',
-        }}
-      >
+      {/* 1. TOP: Premium Dual Service Selection Switcher (Responsive) */}
+      <div className="dual-top-action-cards">
         {/* Card 1: Safai + Pisai */}
         <div
           onClick={() => handleSelectService('safai_pisai')}
           onMouseEnter={() => setHoveredService('safai_pisai')}
           onMouseLeave={() => setHoveredService(null)}
-          className="touch-active"
+          className="dual-action-card touch-active"
           style={{
-            width: '360px',
+            width: '100%',
+            maxWidth: '360px',
             background:
               serviceType === 'safai_pisai'
                 ? 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
@@ -336,22 +330,23 @@ export const PisaiBillingScreen: React.FC = () => {
               serviceType === 'safai_pisai'
                 ? '0 6px 16px rgba(217, 119, 6, 0.26)'
                 : '0 2px 6px rgba(15, 23, 42, 0.04)',
-            padding: '10px 20px',
+            padding: '10px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            direction: 'rtl',
+            direction: isUrdu ? 'rtl' : 'ltr',
             cursor: 'pointer',
             minHeight: '62px',
             transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box',
           }}
         >
           {/* Icon + Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '46px',
-                height: '46px',
+                width: '44px',
+                height: '44px',
                 borderRadius: '12px',
                 backgroundColor: serviceType === 'safai_pisai' ? '#FFFFFF' : '#FFFBEB',
                 display: 'flex',
@@ -368,16 +363,15 @@ export const PisaiBillingScreen: React.FC = () => {
               <SafaiPisaiSvg />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '27px' : '20px',
+                  fontSize: isUrdu ? '21px' : '16px',
                   fontWeight: 900,
                   color: serviceType === 'safai_pisai' ? '#FFFFFF' : '#0F172A',
                   margin: 0,
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
+                  lineHeight: 1.3,
                   letterSpacing: '0',
                 }}
               >
@@ -392,9 +386,10 @@ export const PisaiBillingScreen: React.FC = () => {
           onClick={() => handleSelectService('pisai')}
           onMouseEnter={() => setHoveredService('pisai')}
           onMouseLeave={() => setHoveredService(null)}
-          className="touch-active"
+          className="dual-action-card touch-active"
           style={{
-            width: '360px',
+            width: '100%',
+            maxWidth: '360px',
             background:
               serviceType === 'pisai'
                 ? 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)'
@@ -410,22 +405,23 @@ export const PisaiBillingScreen: React.FC = () => {
               serviceType === 'pisai'
                 ? '0 6px 16px rgba(24, 119, 242, 0.26)'
                 : '0 2px 6px rgba(15, 23, 42, 0.04)',
-            padding: '10px 20px',
+            padding: '10px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            direction: 'rtl',
+            direction: isUrdu ? 'rtl' : 'ltr',
             cursor: 'pointer',
             minHeight: '62px',
             transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box',
           }}
         >
           {/* Icon + Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '46px',
-                height: '46px',
+                width: '44px',
+                height: '44px',
                 borderRadius: '12px',
                 backgroundColor: serviceType === 'pisai' ? '#FFFFFF' : '#EFF6FF',
                 display: 'flex',
@@ -446,12 +442,11 @@ export const PisaiBillingScreen: React.FC = () => {
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '26px' : '19px',
+                  fontSize: isUrdu ? '22px' : '17px',
                   fontWeight: 900,
                   color: serviceType === 'pisai' ? '#FFFFFF' : '#0F172A',
                   margin: 0,
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
+                  lineHeight: 1.3,
                   letterSpacing: '0',
                 }}
               >

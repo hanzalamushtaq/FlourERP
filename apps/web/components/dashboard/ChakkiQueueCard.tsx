@@ -99,12 +99,12 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
       </h3>
 
       {/* Table Container */}
-      <div style={{ width: '100%', borderRadius: '8px' }}>
+      <div style={{ width: '100%', borderRadius: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <table
           style={{
             width: '100%',
             borderCollapse: 'collapse',
-            tableLayout: 'fixed',
+            minWidth: '360px',
           }}
         >
           <thead>

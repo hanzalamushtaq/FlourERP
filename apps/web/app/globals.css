@@ -71,11 +71,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: var(--font-sans);
   min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   user-select: none;
 }
@@ -561,22 +568,59 @@ h4.font-nastaleeq {
   to { opacity: 1; }
 }
 
-/* 2. Responsive Header Elements */
+/* 2. Main Page View Container */
+.main-content-view-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .main-content-view-container {
+    padding: 10px 8px !important;
+  }
+}
+
+/* 3. Responsive Header Elements */
+.pos-header-container {
+  box-sizing: border-box;
+  width: 100%;
+}
+
 .header-title-responsive {
-  font-size: clamp(16px, 4vw, 32px);
-  line-height: 1.35;
+  font-size: clamp(14px, 3.8vw, 22px);
+  line-height: 1.3;
 }
 
 @media (max-width: 768px) {
   .pos-header-container {
-    padding: 8px 12px !important;
-    gap: 8px !important;
+    padding: 8px 10px !important;
+    gap: 6px !important;
   }
   .header-search-container {
     display: none !important;
   }
   .header-shift-btn-text {
     display: none !important;
+  }
+  .header-icon-squircle {
+    display: none !important;
+  }
+}
+
+@media (max-width: 540px) {
+  .header-shift-btn {
+    display: none !important;
+  }
+  .header-lang-switcher {
+    padding: 2px !important;
+    gap: 1px !important;
+  }
+  .header-lang-btn {
+    padding: 3px 6px !important;
+    font-size: 11px !important;
   }
 }
 
@@ -586,7 +630,55 @@ h4.font-nastaleeq {
   }
 }
 
-/* 3. Universal Table Horizontal Scroll Container */
+/* 4. Dual Top Action Cards Grid (Pisai, Udhaar, Warehouse Stock) */
+.dual-top-action-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 360px));
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dual-action-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 680px) {
+  .dual-top-action-cards {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+/* 5. Responsive Form Grids (Settings, Forms) */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.responsive-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .responsive-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 6. Universal Table Horizontal Scroll Container */
 .responsive-table-scroll {
   width: 100%;
   overflow-x: auto !important;
@@ -749,6 +841,371 @@ h4.font-nastaleeq {
 @media (max-width: 680px) {
   .rates-pisai-2-grid {
     grid-template-columns: 1fr !important;
+  }
+}
+
+/* =========================================================
+   COMPREHENSIVE MOBILE RESPONSIVE OVERRIDES
+   Every component, every mini point - fully mobile ready
+   ========================================================= */
+
+/* === HEADER MOBILE FIXES === */
+@media (max-width: 480px) {
+  .pos-header-container {
+    padding: 6px 8px !important;
+    gap: 4px !important;
+  }
+  .header-title-responsive {
+    font-size: clamp(11px, 3.2vw, 16px) !important;
+    max-width: calc(100vw - 160px);
+  }
+  .header-lang-switcher {
+    padding: 1px !important;
+    gap: 0px !important;
+  }
+  .header-lang-btn {
+    padding: 2px 5px !important;
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .pos-header-container {
+    padding: 5px 6px !important;
+    gap: 3px !important;
+  }
+  .header-title-responsive {
+    font-size: 11px !important;
+    max-width: calc(100vw - 130px);
+  }
+}
+
+/* === TOP ACTION CARDS (Dual Cards) - NO TEXT CUTOFF === */
+@media (max-width: 480px) {
+  .dual-top-action-cards {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 0 !important;
+  }
+  .dual-action-card {
+    max-width: 100% !important;
+    padding: 8px 10px !important;
+    min-height: 54px !important;
+    border-radius: 12px !important;
+  }
+  /* Fix text that overflows on cards */
+  .dual-action-card h2 {
+    font-size: 16px !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    line-height: 1.3 !important;
+  }
+  .dual-action-card span {
+    font-size: 13px !important;
+  }
+}
+
+/* === DASHBOARD 3 ACTION CARDS - Stack on small screens === */
+@media (max-width: 640px) {
+  .dashboard-3-action-cards {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .dashboard-3-action-cards > div {
+    padding: 12px 14px !important;
+    min-height: 72px !important;
+  }
+  .dashboard-3-action-cards > div h2 {
+    font-size: 18px !important;
+    white-space: normal !important;
+  }
+}
+
+/* === KPI STRIP - 2 columns on small, 1 on tiny === */
+@media (max-width: 640px) {
+  .kpi-strip-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+  .kpi-strip-container > div span[style*="font-size: 26px"],
+  .kpi-strip-container > div span {
+    font-size: 18px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .kpi-strip-container {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+}
+
+/* === TABLES - Horizontal Scroll wrapper for all tables === */
+@media (max-width: 768px) {
+  .dashboard-tables-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  /* Make all dashboard table cards horizontally scrollable */
+  .dash-interactive-card {
+    padding: 12px 10px !important;
+  }
+  
+  .dash-interactive-card table {
+    table-layout: auto !important;
+    min-width: 480px !important;
+  }
+  
+  /* Wrap the table in a scrollable container */
+  .dash-interactive-card > div:last-child {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-interactive-card {
+    padding: 10px 6px !important;
+    border-radius: 12px !important;
+  }
+  
+  .dash-interactive-card h3 {
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .dash-interactive-card table {
+    min-width: 420px !important;
+    font-size: 12px !important;
+  }
+  
+  .dash-interactive-card table th {
+    padding: 0 4px !important;
+    font-size: 12px !important;
+    height: 38px !important;
+  }
+  
+  .dash-interactive-card table td {
+    padding: 0 4px !important;
+    font-size: 12px !important;
+    height: 44px !important;
+  }
+  
+  .token-badge-animated {
+    padding: 3px 6px !important;
+    font-size: 11px !important;
+  }
+  
+  .payment-badge-animated {
+    padding: 2px 6px !important;
+    font-size: 11px !important;
+  }
+  
+  .print-btn-animated {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+
+/* === LEDGER 2-COLUMN GRID - Stack on mobile === */
+@media (max-width: 768px) {
+  .ledger-main-2-col-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ledger-main-2-col-grid > div {
+    padding: 12px 10px !important;
+    border-radius: 12px !important;
+  }
+}
+
+/* === PISAI BILLING GRID - Stack on mobile === */
+@media (max-width: 640px) {
+  .pisai-billing-grid-split {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+/* === PRODUCT BILLING GRID - Stack on mobile === */
+@media (max-width: 640px) {
+  .product-billing-grid-split {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+/* === NAV TABS - Better touch scroll on mobile === */
+@media (max-width: 640px) {
+  .nav-tabs-grid {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 4px !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none;
+  }
+  .nav-tabs-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .nav-tab-btn {
+    flex: 0 0 auto !important;
+    min-width: 110px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* === MAIN CONTENT CONTAINER === */
+@media (max-width: 480px) {
+  .main-content-view-container {
+    padding: 8px 4px !important;
+  }
+}
+
+/* === ADMIN SUMMARY CARDS === */
+@media (max-width: 380px) {
+  .admin-summary-5-cards {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* === REPORTS SUMMARY CARDS === */
+@media (max-width: 640px) {
+  .reports-summary-3-cards {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* === RATES GRID === */
+@media (max-width: 480px) {
+  .rates-top-3-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .rates-pisai-2-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* === STOCK ITEMS GRID === */
+@media (max-width: 380px) {
+  .stock-items-3-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* === RESPONSIVE GRID UTILITIES === */
+@media (max-width: 480px) {
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .responsive-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+/* === MODAL RESPONSIVENESS === */
+@media (max-width: 480px) {
+  /* Modals should have smaller padding on mobile */
+  div[style*="position: fixed"][style*="inset: 0"] > div {
+    padding: 14px !important;
+    border-radius: 12px !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+/* === SIDEBAR MOBILE REFINEMENTS === */
+@media (max-width: 480px) {
+  .pos-sidebar {
+    width: 260px !important;
+    min-width: 260px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .pos-sidebar {
+    width: 240px !important;
+    min-width: 240px !important;
+  }
+}
+
+/* === UNIVERSAL MOBILE TEXT OVERFLOW PREVENTION === */
+@media (max-width: 640px) {
+  h1, h2, h3 {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}
+
+/* === FORM INPUTS MOBILE === */
+@media (max-width: 480px) {
+  input[type='text'],
+  input[type='number'],
+  input[type='tel'],
+  input[inputmode='decimal'],
+  input[inputmode='numeric'] {
+    font-size: 16px !important; /* Prevents iOS zoom on input focus */
+  }
+}
+
+/* === RECEIPT MODAL MOBILE === */
+@media (max-width: 480px) {
+  .receipt-preview-modal {
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 32px) !important;
+  }
+}
+
+/* === TOUCH TARGET MINIMUM SIZE === */
+@media (max-width: 768px) {
+  button, 
+  [role="button"],
+  a[href] {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* === Z-REPORT MODAL === */
+@media (max-width: 640px) {
+  .z-report-content {
+    padding: 12px !important;
+  }
+}
+
+/* === PIN LOCK OVERLAY === */
+@media (max-width: 480px) {
+  .pin-lock-container {
+    padding: 16px !important;
+  }
+}
+
+/* === PRODUCT ACTION TILES MOBILE === */
+@media (max-width: 480px) {
+  .product-action-tile {
+    min-width: 135px !important;
+    padding: 6px 10px !important;
+    min-height: 68px !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .product-action-tile {
+    min-width: 100% !important;
   }
 }
 

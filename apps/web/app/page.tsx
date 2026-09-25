@@ -273,28 +273,28 @@ export default function Home() {
 
           {/* Billing Screen (F8) */}
           {activeTab === 'billing' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               <ProductBillingScreen />
             </div>
           )}
 
           {/* Pisai Screen (F2) */}
           {activeTab === 'pisai' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               <PisaiBillingScreen />
             </div>
           )}
 
           {/* Udhaar Ledger (Alt+K) */}
           {activeTab === 'udhaar' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               <CustomerLedgerView />
             </div>
           )}
 
           {/* Reports View: Accessible to Admin or permitted staff */}
           {activeTab === 'reports' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               {userIsAdmin || hasPermission(currentUser, 'can_view_reports') ? (
                 <ReportsView activeSubTab={reportSubTab} />
               ) : (
@@ -340,7 +340,7 @@ export default function Home() {
 
           {/* Admin Dashboard: Accessible to SuperAdmin or users with can_manage_users */}
           {activeTab === 'admin' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               {userIsAdmin ? (
                 <AdminDashboard
                   onOpenPriceModal={() => setActiveTab('rates')}
@@ -394,21 +394,21 @@ export default function Home() {
 
           {/* Stock Warehouse View */}
           {activeTab === 'stock' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               <WarehouseStockView />
             </div>
           )}
 
           {/* Daily Rates View (F3) */}
           {activeTab === 'rates' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               <RateListView />
             </div>
           )}
 
           {/* General Information Settings View */}
           {activeTab === 'settings' && (
-            <div className="dashboard-nastaleeq-scope" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+            <div className="dashboard-nastaleeq-scope main-content-view-container">
               {userIsAdmin ? (
                 <GeneralInfoView />
               ) : (

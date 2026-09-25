@@ -246,43 +246,38 @@ export const CustomerLedgerView: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
-      {/* 1. TOP DASHBOARD ACTION CARDS (Centered Dual Cards - Exact Match to Pisai Billing Screen) */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '14px',
-          width: '100%',
-        }}
-      >
+      {/* 1. TOP DASHBOARD ACTION CARDS (Responsive on Mobile & Desktop) */}
+      <div className="dual-top-action-cards">
         {/* Card 1: نیا کھاتہ کھولیں - Cobalt Blue Action Card */}
         <div
           onClick={() => setIsNewCustomerOpen(true)}
           onMouseEnter={() => setHoveredTopCard('new')}
           onMouseLeave={() => setHoveredTopCard(null)}
-          className="touch-active"
+          className="dual-action-card touch-active"
           style={{
-            width: '360px',
+            width: '100%',
+            maxWidth: '360px',
             background: 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)',
             borderRadius: '14px',
             border: '2px solid #1E40AF',
             boxShadow: '0 6px 16px rgba(24, 119, 242, 0.26)',
-            padding: '10px 20px',
+            padding: '10px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            direction: 'rtl',
+            direction: isUrdu ? 'rtl' : 'ltr',
             cursor: 'pointer',
             minHeight: '62px',
             transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box',
           }}
         >
           {/* Icon + Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '46px',
-                height: '46px',
+                width: '44px',
+                height: '44px',
                 borderRadius: '12px',
                 backgroundColor: '#FFFFFF',
                 display: 'flex',
@@ -295,16 +290,15 @@ export const CustomerLedgerView: React.FC = () => {
               <UserPlus size={22} color="#1877F2" strokeWidth={2.4} />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '26px' : '19px',
+                  fontSize: isUrdu ? '20px' : '16px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   margin: 0,
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
+                  lineHeight: 1.3,
                   letterSpacing: '0',
                 }}
               >
@@ -318,24 +312,26 @@ export const CustomerLedgerView: React.FC = () => {
         <div
           onMouseEnter={() => setHoveredTopCard('total')}
           onMouseLeave={() => setHoveredTopCard(null)}
-          className="dash-card-animated"
+          className="dual-action-card dash-card-animated"
           style={{
-            width: '360px',
+            width: '100%',
+            maxWidth: '360px',
             background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
             borderRadius: '14px',
             border: '2px solid #065F46',
             boxShadow: '0 6px 16px rgba(14, 138, 84, 0.26)',
-            padding: '10px 20px',
+            padding: '10px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            direction: 'rtl',
+            direction: isUrdu ? 'rtl' : 'ltr',
             minHeight: '62px',
             transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box',
           }}
         >
           {/* Icon + Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
                 width: '46px',
@@ -357,12 +353,11 @@ export const CustomerLedgerView: React.FC = () => {
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: isUrdu ? '20px' : '15px',
+                    fontSize: isUrdu ? '17px' : '13px',
                     fontWeight: 900,
                     color: '#FFFFFF',
                     margin: 0,
-                    lineHeight: 1.1,
-                    whiteSpace: 'nowrap',
+                    lineHeight: 1.2,
                   }}
                 >
                   {t('مجموعی ادھار کھاتہ', 'Total Ledger')}
@@ -383,7 +378,7 @@ export const CustomerLedgerView: React.FC = () => {
               <span
                 dir="ltr"
                 style={{
-                  fontSize: '22px',
+                  fontSize: 'clamp(18px, 5vw, 22px)',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   fontFamily: 'var(--font-mono)',
@@ -626,6 +621,8 @@ export const CustomerLedgerView: React.FC = () => {
               alignItems: 'center',
               borderBottom: '1px solid #F1F5F9',
               paddingBottom: '14px',
+              flexWrap: 'wrap',
+              gap: '10px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
