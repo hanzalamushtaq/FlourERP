@@ -157,7 +157,34 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       </div>
 
       {/* Action Buttons Side (Always on the Left) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, direction: 'ltr' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, direction: 'ltr' }}>
+        {/* Mobile Hamburger Menu Button (Full Left Corner) */}
+        {onToggleSidebar && !isMobileNavOpen && (
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            title={t('مینیو کھولیں', 'Toggle Menu')}
+            className="touch-active header-menu-toggle-btn"
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              backgroundColor: '#F8FAFC',
+              border: '1.5px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#0F172A',
+              boxShadow: 'none',
+              outline: 'none',
+              flexShrink: 0,
+            }}
+          >
+            <Menu size={20} strokeWidth={2.2} />
+          </button>
+        )}
+
         {/* Language Switcher Segmented Control */}
         <div
           className="header-lang-switcher"
@@ -280,33 +307,6 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             >
               {t('شفٹ اختتام', 'End Shift')}
             </span>
-          </button>
-        )}
-
-        {/* Mobile Hamburger Menu Button */}
-        {onToggleSidebar && !isMobileNavOpen && (
-          <button
-            type="button"
-            onClick={onToggleSidebar}
-            title={t('مینیو کھولیں', 'Toggle Menu')}
-            className="touch-active header-menu-toggle-btn"
-            style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
-              backgroundColor: '#F8FAFC',
-              border: '1.5px solid #E2E8F0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#0F172A',
-              boxShadow: 'none',
-              outline: 'none',
-              flexShrink: 0,
-            }}
-          >
-            <Menu size={20} strokeWidth={2.2} />
           </button>
         )}
       </div>
