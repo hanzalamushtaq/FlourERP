@@ -468,6 +468,7 @@ export const CustomerLedgerView: React.FC = () => {
 
           {/* Customer Cards List */}
           <div
+            className="ledger-customer-list-scroll"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -762,6 +763,7 @@ export const CustomerLedgerView: React.FC = () => {
             </div>
 
             <div
+              className="ledger-tx-list-scroll"
               style={{
                 display: 'flex',
                 flexDirection: 'column',

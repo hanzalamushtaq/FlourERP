@@ -1209,4 +1209,32 @@ h4.font-nastaleeq {
   }
 }
 
+/* === MOBILE SMOOTH FULL-PAGE SCROLLING & BOTTOM SAFE PADDING === */
+@media (max-width: 920px) {
+  /* Remove nested scroll locks so the mobile page scrolls continuously in one smooth gesture */
+  .ledger-customer-list-scroll,
+  .ledger-tx-list-scroll {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-main-workspace {
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+  }
+
+  /* Provide ample bottom spacing so bottom list items are never cut off by mobile browser address bars */
+  .main-content-view-container {
+    padding-bottom: calc(110px + env(safe-area-inset-bottom, 24px)) !important;
+  }
+  
+  .app-main-content {
+    padding-bottom: calc(110px + env(safe-area-inset-bottom, 24px)) !important;
+  }
+}
+
 

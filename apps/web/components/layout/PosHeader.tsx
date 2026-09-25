@@ -104,7 +104,10 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       className="pos-header-container"
       style={{
         backgroundColor: '#FFFFFF',
-        borderBottom: 'none',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        borderBottom: '1px solid #F1F5F9',
         padding: '9px 16px',
         display: 'flex',
         alignItems: 'center',
@@ -112,7 +115,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         gap: '8px',
         userSelect: 'none',
         direction: 'rtl',
-        boxShadow: 'none',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
         width: '100%',
         boxSizing: 'border-box',
       }}

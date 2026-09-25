@@ -223,14 +223,17 @@ export default function Home() {
 
       {/* 2. Main Workspace Layout */}
       <div
-        className={isUrdu ? 'dashboard-nastaleeq-scope' : ''}
+        className={`app-main-workspace ${isUrdu ? 'dashboard-nastaleeq-scope' : ''}`}
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           minWidth: 0,
-          height: '100vh',
+          height: '100dvh',
+          minHeight: '100vh',
           overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehaviorY: 'contain',
           width: '100%',
         }}
       >
@@ -277,7 +280,7 @@ export default function Home() {
         />
 
         {/* View Router based on active tab and logged-in role */}
-        <main style={{ flex: 1, paddingBottom: '24px' }}>
+        <main className="app-main-content" style={{ flex: 1, paddingBottom: '32px' }}>
           {/* Dashboard Tab: Unified Approved Dashboard for both Operator and Admin */}
           {activeTab === 'dashboard' && (
             <div className="dashboard-nastaleeq-scope">
