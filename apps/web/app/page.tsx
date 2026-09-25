@@ -30,9 +30,11 @@ import {
 } from '../lib/auth';
 import { getApiBaseUrl } from '../lib/api';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Home() {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates' | 'settings'
@@ -181,10 +183,12 @@ export default function Home() {
       style={{
         display: 'flex',
         minHeight: '100vh',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+        color: isDark ? '#F8FAFC' : '#0F172A',
         width: '100%',
         overflowX: 'hidden',
         position: 'relative',
+        transition: 'background-color 0.2s ease',
       }}
     >
       {/* Mobile Backdrop Overlay */}
@@ -328,9 +332,9 @@ export default function Home() {
               ) : (
                 <div
                   style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                     borderRadius: '16px',
-                    border: '1.5px solid #FCA5A5',
+                    border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FCA5A5',
                     padding: '36px',
                     maxWidth: '600px',
                     margin: '40px auto',
@@ -338,10 +342,10 @@ export default function Home() {
                   }}
                 >
                   <div style={{ fontSize: '40px', marginBottom: '10px' }}>🔒</div>
-                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: '#991B1B' }}>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B' }}>
                     اختیار موجود نہیں (Access Restricted)
                   </h2>
-                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: '#475569', marginTop: '10px' }}>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#475569', marginTop: '10px' }}>
                     روزنامچہ اور منافع دیکھنے کے اختیارات صرف ایڈمن یا منظور شدہ سپروائزر کے پاس ہیں۔
                   </p>
                   <button
@@ -382,9 +386,9 @@ export default function Home() {
               ) : (
                 <div
                   style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                     borderRadius: '16px',
-                    border: '1.5px solid #FCA5A5',
+                    border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FCA5A5',
                     padding: '36px',
                     maxWidth: '600px',
                     margin: '40px auto',
@@ -392,10 +396,10 @@ export default function Home() {
                   }}
                 >
                   <div style={{ fontSize: '40px', marginBottom: '10px' }}>🛡️</div>
-                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: '#991B1B' }}>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B' }}>
                     ایڈمنسٹریٹو اختیارات درکار ہیں
                   </h2>
-                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: '#475569', marginTop: '10px' }}>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#475569', marginTop: '10px' }}>
                     سٹاف رولز، پرمیشنز اور سسٹم ایڈمنسٹریشن صرف ایڈمنسٹریٹر کے پاس ہے۔
                   </p>
                   <button
@@ -442,9 +446,9 @@ export default function Home() {
               ) : (
                 <div
                   style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                     borderRadius: '16px',
-                    border: '1.5px solid #FCA5A5',
+                    border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FCA5A5',
                     padding: '36px',
                     maxWidth: '600px',
                     margin: '40px auto',
@@ -452,10 +456,10 @@ export default function Home() {
                   }}
                 >
                   <div style={{ fontSize: '40px', marginBottom: '10px' }}>⚙️</div>
-                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: '#991B1B' }}>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B' }}>
                     ایڈمنسٹریٹو اختیارات درکار ہیں
                   </h2>
-                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: '#475569', marginTop: '10px' }}>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#475569', marginTop: '10px' }}>
                     عمومی معلومات صرف ایڈمنسٹریٹر ترتیب دے سکتا ہے۔
                   </p>
                   <button

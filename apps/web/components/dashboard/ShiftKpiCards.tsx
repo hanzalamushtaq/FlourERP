@@ -4,6 +4,7 @@
 import React from 'react';
 import { TrendingUp, BookOpen, Wheat, Wallet } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 interface ShiftKpiCardsProps {
   todaySales?: number;
@@ -20,6 +21,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
   cashDrawerBalance = 183730,
 }) => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
 
   const items = [
     {
@@ -66,6 +68,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
         return (
           <div
             key={item.id}
+            className="kpi-card-box"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -74,13 +77,14 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               textAlign: 'center',
               padding: '12px 14px',
               borderRadius: '12px',
-              backgroundColor: '#FFFFFF',
-              border: '1.5px solid #E2E8F0',
-              boxShadow: '0 2px 4px rgba(15, 23, 42, 0.04)',
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
+              boxShadow: isDark ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 2px 4px rgba(15, 23, 42, 0.04)',
               position: 'relative',
               overflow: 'hidden',
               width: '100%',
               userSelect: 'none',
+              transition: 'background-color 0.2s ease, border-color 0.2s ease',
             }}
           >
             {/* Top Accent Color Bar */}
@@ -113,7 +117,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
                   width: '26px',
                   height: '26px',
                   borderRadius: '7px',
-                  backgroundColor: item.lightBg,
+                  backgroundColor: isDark ? '#111827' : item.lightBg,
                   color: item.iconColor,
                   display: 'flex',
                   alignItems: 'center',
@@ -128,7 +132,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
                 style={{
                   fontSize: isUrdu ? '18px' : '14px',
                   fontWeight: 800,
-                  color: '#334155',
+                  color: isDark ? '#94A3B8' : '#334155',
                   lineHeight: 1.4,
                 }}
               >
@@ -141,7 +145,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               style={{
                 fontSize: '26px',
                 fontWeight: 900,
-                color: '#0F172A',
+                color: isDark ? '#F8FAFC' : '#0F172A',
                 lineHeight: 1.3,
                 display: 'flex',
                 alignItems: 'baseline',
@@ -156,7 +160,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               {isUrdu && (
                 <span
                   className="font-nastaleeq"
-                  style={{ fontSize: '16px', fontWeight: 800, color: '#64748B' }}
+                  style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#94A3B8' : '#64748B' }}
                 >
                   روپے
                 </span>

@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export interface ChakkiQueueItem {
   id: string;
@@ -56,6 +57,7 @@ interface ChakkiQueueCardProps {
 
 export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDelivered }) => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [queue, setQueue] = useState<ChakkiQueueItem[]>(SAMPLE_QUEUE);
 
   const handleDeliver = (tokenNumber: number | string) => {
@@ -67,15 +69,16 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
     <div
       className="dash-interactive-card card-animate-1"
       style={{
-        backgroundColor: '#F8FAFC',
+        backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
         borderRadius: '16px',
-        border: 'none',
+        border: isDark ? '1.5px solid #334155' : 'none',
         outline: 'none',
         padding: '16px 20px',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: 'none',
+        boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : 'none',
         width: '100%',
+        transition: 'background-color 0.2s ease, border-color 0.2s ease',
       }}
     >
       {/* Centered Title */}
@@ -85,7 +88,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
           fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
           fontSize: isUrdu ? '24px' : '18px',
           fontWeight: 900,
-          color: '#0F172A',
+          color: isDark ? '#F8FAFC' : '#0F172A',
           textAlign: 'center',
           margin: '0 0 12px 0',
           height: '38px',
@@ -179,8 +182,10 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
                   key={item.id}
                   className="dash-table-row"
                   style={{
-                    borderBottom: '1px solid #F1F5F9',
-                    backgroundColor: idx % 2 === 1 ? '#FFFFFF' : '#F8FAFC',
+                    borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
+                    backgroundColor: isDark
+                      ? (idx % 2 === 1 ? '#1E293B' : '#151D2F')
+                      : (idx % 2 === 1 ? '#FFFFFF' : '#F8FAFC'),
                     height: '52px',
                   }}
                 >
@@ -192,7 +197,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
                       padding: '0 8px',
                       fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                       fontWeight: 800,
-                      color: '#0F172A',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
                       fontSize: isUrdu ? '18px' : '14px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
@@ -209,7 +214,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
                       padding: '0 8px',
                       fontFamily: 'var(--font-urdu)',
                       fontWeight: 800,
-                      color: '#0F172A',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
                       fontSize: isUrdu ? '19px' : '15px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
@@ -231,9 +236,9 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
                     <span
                       className="token-badge-animated"
                       style={{
-                        backgroundColor: '#EFF6FF',
-                        color: '#1D4ED8',
-                        border: '1px solid #BFDBFE',
+                        backgroundColor: isDark ? '#1E3A8A' : '#EFF6FF',
+                        color: isDark ? '#93C5FD' : '#1D4ED8',
+                        border: isDark ? '1px solid #2563EB' : '1px solid #BFDBFE',
                         padding: '4px 10px',
                         borderRadius: '6px',
                         fontFamily: 'var(--font-mono)',

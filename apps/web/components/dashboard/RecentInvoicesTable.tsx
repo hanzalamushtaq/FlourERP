@@ -5,6 +5,7 @@ import React from 'react';
 import { Printer } from 'lucide-react';
 import { ReceiptData } from '../ui/ReceiptPreviewModal';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export interface ShiftInvoiceItem {
   invoiceNumber: string;
@@ -148,19 +149,21 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
   onReprint,
 }) => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
 
   return (
     <div
       className="dash-interactive-card card-animate-1"
       style={{
-        backgroundColor: '#F8FAFC',
+        backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
         borderRadius: '16px',
-        border: 'none',
+        border: isDark ? '1.5px solid #334155' : 'none',
         padding: '16px 20px',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: 'none',
+        boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : 'none',
         width: '100%',
+        transition: 'background-color 0.2s ease, border-color 0.2s ease',
       }}
     >
       {/* Centered Title */}
@@ -170,7 +173,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
           fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
           fontSize: isUrdu ? '24px' : '18px',
           fontWeight: 900,
-          color: '#0F172A',
+          color: isDark ? '#F8FAFC' : '#0F172A',
           textAlign: 'center',
           margin: '0 0 12px 0',
           height: '38px',
@@ -324,15 +327,25 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   ? t('چیک', 'Cheque')
                   : t('ادھار', 'Credit');
 
-              const chipBg =
-                inv.paymentMethod === 'cash'
+              const chipBg = isDark
+                ? inv.paymentMethod === 'cash'
+                  ? 'rgba(16, 185, 129, 0.2)'
+                  : inv.paymentMethod === 'cheque'
+                  ? 'rgba(59, 130, 246, 0.2)'
+                  : 'rgba(245, 158, 11, 0.2)'
+                : inv.paymentMethod === 'cash'
                   ? '#ECFDF5'
                   : inv.paymentMethod === 'cheque'
                   ? '#EFF6FF'
                   : '#FFFBEB';
 
-              const chipText =
-                inv.paymentMethod === 'cash'
+              const chipText = isDark
+                ? inv.paymentMethod === 'cash'
+                  ? '#34D399'
+                  : inv.paymentMethod === 'cheque'
+                  ? '#60A5FA'
+                  : '#FBBF24'
+                : inv.paymentMethod === 'cash'
                   ? '#0E8A54'
                   : inv.paymentMethod === 'cheque'
                   ? '#1D4ED8'
@@ -343,8 +356,10 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   key={inv.invoiceNumber}
                   className="dash-table-row"
                   style={{
-                    borderBottom: '1px solid #F1F5F9',
-                    backgroundColor: idx % 2 === 1 ? '#FFFFFF' : '#F8FAFC',
+                    borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
+                    backgroundColor: isDark
+                      ? (idx % 2 === 1 ? '#1E293B' : '#151D2F')
+                      : (idx % 2 === 1 ? '#FFFFFF' : '#F8FAFC'),
                     height: '52px',
                   }}
                 >
@@ -361,9 +376,9 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     <span
                       className="token-badge-animated"
                       style={{
-                        backgroundColor: '#EFF6FF',
-                        color: '#1D4ED8',
-                        border: '1px solid #BFDBFE',
+                        backgroundColor: isDark ? '#1E3A8A' : '#EFF6FF',
+                        color: isDark ? '#93C5FD' : '#1D4ED8',
+                        border: isDark ? '1px solid #2563EB' : '1px solid #BFDBFE',
                         padding: '4px 10px',
                         borderRadius: '6px',
                         fontFamily: 'var(--font-mono)',
@@ -384,7 +399,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       padding: '0 6px',
                       fontFamily: 'var(--font-urdu)',
                       fontWeight: 800,
-                      color: '#0F172A',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
                       fontSize: isUrdu ? '19px' : '15px',
                       textAlign: 'center',
                       whiteSpace: 'nowrap',
@@ -400,7 +415,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       verticalAlign: 'middle',
                       padding: '0 6px',
                       fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-                      color: '#64748B',
+                      color: isDark ? '#94A3B8' : '#64748B',
                       fontSize: isUrdu ? '17px' : '13.5px',
                       fontWeight: 700,
                       textAlign: 'center',
@@ -424,7 +439,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       style={{
                         fontWeight: 900,
                         fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
-                        color: '#0F172A',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
                         fontSize: isUrdu ? '17px' : '14px',
                         display: 'inline-block',
                       }}
@@ -482,8 +497,8 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                         height: '28px',
                         borderRadius: '7px',
                         border: 'none',
-                        backgroundColor: '#EFF6FF',
-                        color: '#1877F2',
+                        backgroundColor: isDark ? '#1E3A8A' : '#EFF6FF',
+                        color: isDark ? '#93C5FD' : '#1877F2',
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -492,10 +507,10 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                         outline: 'none',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#DBEAFE';
+                        e.currentTarget.style.backgroundColor = isDark ? '#2563EB' : '#DBEAFE';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#EFF6FF';
+                        e.currentTarget.style.backgroundColor = isDark ? '#1E3A8A' : '#EFF6FF';
                       }}
                     >
                       <Printer size={15} strokeWidth={2} />

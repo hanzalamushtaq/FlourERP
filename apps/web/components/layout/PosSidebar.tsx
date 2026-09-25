@@ -35,6 +35,7 @@ const REPORT_SUB_ITEMS: { id: ReportSubTab; labelEn: string; labelUr: string; ic
   { id: 'user_sales', labelEn: 'User Wise Sales Report', labelUr: 'یوزر وائز سیلز رپورٹ', icon: <UserCheck size={15} /> },
 ];
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // Wheat-Ear Cogwheel Logo matching user's reference image
 const WheatGearLogo = ({ size = 32 }: { size?: number }) => (
@@ -133,6 +134,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
   onSelectReportSubTab,
 }) => {
   const { language, isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [internalCollapsed, setInternalCollapsed] = React.useState<boolean>(false);
   const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : internalCollapsed;
   const toggleCollapse = onToggleCollapse || (() => setInternalCollapsed((prev) => !prev));
@@ -225,8 +227,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         width: isCollapsed ? '68px' : '232px',
         minWidth: isCollapsed ? '68px' : '232px',
         maxWidth: isCollapsed ? '68px' : '232px',
-        backgroundColor: '#FFFFFF',
-        color: '#0F172A',
+        backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+        color: isDark ? '#F8FAFC' : '#0F172A',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -235,9 +237,9 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        borderRight: '1.5px solid #E2E8F0',
+        borderRight: isDark ? '1.5px solid #1E293B' : '1.5px solid #E2E8F0',
         boxShadow: 'none',
-        transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease',
         overflow: 'hidden',
       }}
     >
@@ -249,7 +251,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
           justifyContent: isCollapsed ? 'center' : 'space-between',
           padding: isCollapsed ? '14px 0 10px 0' : '14px 14px 12px 14px',
           flexShrink: 0,
-          borderBottom: '1px solid #F1F5F9',
+          borderBottom: isDark ? '1px solid #1E293B' : '1px solid #F1F5F9',
         }}
       >
         {!isCollapsed && (
@@ -259,7 +261,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               style={{
                 fontSize: '15px',
                 fontWeight: 800,
-                color: '#0F172A',
+                color: isDark ? '#F8FAFC' : '#0F172A',
                 letterSpacing: '-0.2px',
               }}
             >
@@ -280,13 +282,13 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                backgroundColor: '#F1F5F9',
-                border: '1.5px solid #E2E8F0',
+                backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
+                border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
                 display: 'none',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                color: '#0F172A',
+                color: isDark ? '#F8FAFC' : '#0F172A',
                 boxShadow: 'none',
                 outline: 'none',
                 flexShrink: 0,
@@ -306,13 +308,13 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              backgroundColor: '#F8FAFC',
-              border: '1.5px solid #E2E8F0',
+              backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: '#0F172A',
+              color: isDark ? '#F8FAFC' : '#0F172A',
               boxShadow: 'none',
               transition: 'all 0.15s ease',
               outline: 'none',
@@ -370,22 +372,24 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 borderRadius: '12px',
                 border: isActive
                   ? '1.5px solid #1877F2'
-                  : isHovered
-                    ? '1.5px solid #CBD5E1'
-                    : '1.5px solid #E2E8F0',
+                  : isDark
+                    ? isHovered ? '1.5px solid #475569' : '1.5px solid #1E293B'
+                    : isHovered ? '1.5px solid #CBD5E1' : '1.5px solid #E2E8F0',
                 backgroundColor: isActive
                   ? '#1877F2'
-                  : isHovered
-                    ? '#F1F5F9'
-                    : '#F8FAFC',
+                  : isDark
+                    ? isHovered ? '#243046' : '#141D2E'
+                    : isHovered ? '#F1F5F9' : '#F8FAFC',
                 cursor: 'pointer',
                 direction: 'rtl',
                 transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
                 boxShadow: isActive
                   ? '0 4px 12px rgba(24, 119, 242, 0.28)'
-                  : isHovered
-                    ? '0 2px 6px rgba(15, 23, 42, 0.06)'
-                    : '0 1px 3px rgba(15, 23, 42, 0.03)',
+                  : isDark
+                    ? '0 2px 6px rgba(0, 0, 0, 0.2)'
+                    : isHovered
+                      ? '0 2px 6px rgba(15, 23, 42, 0.06)'
+                      : '0 1px 3px rgba(15, 23, 42, 0.03)',
                 transform: isPressed ? 'scale(0.97)' : isHovered ? 'translateX(-2px)' : 'none',
                 outline: 'none',
               }}
@@ -397,7 +401,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   style={{
                     fontSize: isUrdu ? '21px' : '16px',
                     fontWeight: isActive ? 900 : 800,
-                    color: isActive ? '#FFFFFF' : isHovered ? '#1877F2' : '#0F172A',
+                    color: isActive ? '#FFFFFF' : isHovered ? '#38BDF8' : (isDark ? '#F1F5F9' : '#0F172A'),
                     lineHeight: 1.3,
                     whiteSpace: 'nowrap',
                     marginRight: '4px',
@@ -416,12 +420,12 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   borderRadius: '9px',
                   backgroundColor: isActive
                     ? 'rgba(255, 255, 255, 0.22)'
-                    : '#FFFFFF',
+                    : (isDark ? '#0B0F19' : '#FFFFFF'),
                   border: isActive
                     ? '1px solid rgba(255, 255, 255, 0.35)'
-                    : isHovered
-                      ? '1px solid #CBD5E1'
-                      : '1px solid #E2E8F0',
+                    : isDark
+                      ? (isHovered ? '1px solid #475569' : '1px solid #1E293B')
+                      : (isHovered ? '1px solid #CBD5E1' : '1px solid #E2E8F0'),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -436,8 +440,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   isActive
                     ? '#FFFFFF'
                     : isHovered
-                      ? '#1877F2'
-                      : '#475569'
+                      ? '#38BDF8'
+                      : (isDark ? '#94A3B8' : '#475569')
                 )}
               </div>
             </button>
@@ -449,7 +453,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   marginBottom: '2px',
                   paddingLeft: '14px',
                   paddingRight: '4px',
-                  borderLeft: '2px solid #BFDBFE',
+                  borderLeft: isDark ? '2px solid #2563EB' : '2px solid #BFDBFE',
                   marginLeft: '20px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -474,8 +478,12 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                         width: '100%',
                         padding: '7px 10px',
                         borderRadius: '8px',
-                        border: isSubActive ? '1px solid #BFDBFE' : '1px solid transparent',
-                        backgroundColor: isSubActive ? '#EFF6FF' : 'transparent',
+                        border: isSubActive
+                          ? (isDark ? '1px solid #2563EB' : '1px solid #BFDBFE')
+                          : '1px solid transparent',
+                        backgroundColor: isSubActive
+                          ? (isDark ? 'rgba(37, 99, 235, 0.25)' : '#EFF6FF')
+                          : 'transparent',
                         cursor: 'pointer',
                         outline: 'none',
                         direction: 'rtl',
@@ -483,20 +491,20 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                         transition: 'all 0.12s ease',
                       }}
                       onMouseEnter={(e) => {
-                        if (!isSubActive) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#F8FAFC';
+                        if (!isSubActive) (e.currentTarget as HTMLButtonElement).style.backgroundColor = isDark ? '#1E293B' : '#F8FAFC';
                       }}
                       onMouseLeave={(e) => {
                         if (!isSubActive) (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
                       }}
                     >
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0, backgroundColor: isSubActive ? '#1877F2' : '#CBD5E1', transition: 'background-color 0.12s' }} />
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0, backgroundColor: isSubActive ? '#38BDF8' : (isDark ? '#475569' : '#CBD5E1'), transition: 'background-color 0.12s' }} />
                       <span
                         className={isUrdu ? 'font-nastaleeq' : ''}
-                        style={{ flex: 1, fontSize: isUrdu ? '17px' : '13px', fontWeight: isSubActive ? 800 : 600, color: isSubActive ? '#1877F2' : '#64748B', lineHeight: 1.3, transition: 'color 0.12s' }}
+                        style={{ flex: 1, fontSize: isUrdu ? '17px' : '13px', fontWeight: isSubActive ? 800 : 600, color: isSubActive ? '#38BDF8' : (isDark ? '#CBD5E1' : '#64748B'), lineHeight: 1.3, transition: 'color 0.12s' }}
                       >
                         {isUrdu ? sub.labelUr : sub.labelEn}
                       </span>
-                      <span style={{ color: isSubActive ? '#1877F2' : '#94A3B8', flexShrink: 0, display: 'flex' }}>{sub.icon}</span>
+                      <span style={{ color: isSubActive ? '#38BDF8' : (isDark ? '#94A3B8' : '#94A3B8'), flexShrink: 0, display: 'flex' }}>{sub.icon}</span>
                     </button>
                   );
                 })}
@@ -513,7 +521,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
           <div
             style={{
               margin: isCollapsed ? '6px 0 2px 0' : '6px 4px 2px 4px',
-              borderTop: '1.5px dashed #E2E8F0',
+              borderTop: isDark ? '1.5px dashed #334155' : '1.5px dashed #E2E8F0',
               width: isCollapsed ? '36px' : 'auto',
             }}
           />
@@ -535,8 +543,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               height: isCollapsed ? '46px' : 'auto',
               padding: isCollapsed ? '0' : '8px 12px',
               borderRadius: '12px',
-              border: '1.5px solid #FECACA',
-              backgroundColor: '#FEF2F2',
+              border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FECACA',
+              backgroundColor: isDark ? '#1F1315' : '#FEF2F2',
               cursor: 'pointer',
               direction: 'rtl',
               transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -545,14 +553,14 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#FEE2E2';
-              e.currentTarget.style.borderColor = '#FCA5A5';
+              e.currentTarget.style.backgroundColor = isDark ? '#2D1618' : '#FEE2E2';
+              e.currentTarget.style.borderColor = isDark ? '#991B1B' : '#FCA5A5';
               e.currentTarget.style.transform = isCollapsed ? 'none' : 'translateX(-2px)';
               e.currentTarget.style.boxShadow = '0 3px 8px rgba(239, 68, 68, 0.14)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FEF2F2';
-              e.currentTarget.style.borderColor = '#FECACA';
+              e.currentTarget.style.backgroundColor = isDark ? '#1F1315' : '#FEF2F2';
+              e.currentTarget.style.borderColor = isDark ? '#7F1D1D' : '#FECACA';
               e.currentTarget.style.transform = 'none';
               e.currentTarget.style.boxShadow = '0 1px 3px rgba(239, 68, 68, 0.08)';
             }}
@@ -564,7 +572,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                 style={{
                   fontSize: isUrdu ? '21px' : '16px',
                   fontWeight: 900,
-                  color: '#DC2626',
+                  color: '#EF4444',
                   lineHeight: 1.3,
                   whiteSpace: 'nowrap',
                   marginRight: '4px',
@@ -577,15 +585,15 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
 
             {/* Left: Dedicated Icon Squircle (or direct icon if collapsed) */}
             {isCollapsed ? (
-              <LogOut size={20} color="#DC2626" />
+              <LogOut size={20} color="#EF4444" />
             ) : (
               <div
                 style={{
                   width: '36px',
                   height: '36px',
                   borderRadius: '9px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #FECACA',
+                  backgroundColor: isDark ? '#2D1618' : '#FFFFFF',
+                  border: isDark ? '1px solid #7F1D1D' : '1px solid #FECACA',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -593,7 +601,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                   boxShadow: '0 1px 2px rgba(239, 68, 68, 0.06)',
                 }}
               >
-                <LogOut size={19} color="#DC2626" />
+                <LogOut size={19} color="#EF4444" />
               </div>
             )}
           </button>
