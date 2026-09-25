@@ -19,6 +19,7 @@ import {
   Menu,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { NotificationDropdown } from './NotificationDropdown';
 
 // Chakki Grinder Outline Icon matching sidebar
 const ChakkiMachineIcon = ({ size = 21, color = '#6B4A28' }: { size?: number; color?: string }) => (
@@ -67,6 +68,7 @@ interface PosHeaderProps {
   onToggleSidebar?: () => void;
   isSidebarCollapsed?: boolean;
   isMobileNavOpen?: boolean;
+  onOpenPriceModal?: () => void;
 }
 
 export const PosHeader: React.FC<PosHeaderProps> = ({
@@ -80,6 +82,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
   onToggleSidebar,
   isSidebarCollapsed = false,
   isMobileNavOpen = false,
+  onOpenPriceModal,
 }) => {
   const { language, setLanguage, isUrdu, t } = useLanguage();
   const [currentTime, setCurrentTime] = useState<string>('06:45 PM');
@@ -120,8 +123,15 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         boxSizing: 'border-box',
       }}
     >
-      {/* Title & Icon Side */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, direction: isUrdu ? 'rtl' : 'ltr' }}>
+      {/* Title & Icon & Bell Side (Always on the Right) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1, direction: 'rtl' }}>
+        {/* Top Right Bell Icon with Notifications & Daily Rate Alert */}
+        <NotificationDropdown
+          isAdmin={isAdmin}
+          onOpenPriceModal={onOpenPriceModal}
+          onOpenZReport={onOpenZReport}
+        />
+
         <div
           className="header-icon-squircle"
           style={{

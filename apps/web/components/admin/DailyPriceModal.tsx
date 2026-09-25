@@ -6,6 +6,7 @@ import { Clock, Check, AlertCircle, ShieldCheck, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 import { getSession } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 
 interface DailyPriceModalProps {
   isOpen: boolean;
@@ -46,7 +47,8 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   React.useEffect(() => {
     if (!isOpen) return;
     const session = getSession();
-    fetch('http://localhost:5000/api/prices/daily-status', {
+    const baseUrl = getApiBaseUrl();
+    fetch(`${baseUrl}/api/prices/daily-status`, {
       headers: session?.token ? { Authorization: `Bearer ${session.token}` } : {},
     })
       .then((res) => res.json())
@@ -76,13 +78,14 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   const handleConfirmAll = async () => {
     setIsSubmitting(true);
     const session = getSession();
+    const baseUrl = getApiBaseUrl();
     try {
       const updates = prices.map((p) => ({
         productId: p.id,
         rate: p.todayRate,
       }));
 
-      await fetch('http://localhost:5000/api/prices/daily-confirm', {
+      await fetch(`${baseUrl}/api/prices/daily-confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,9 +111,10 @@ export const DailyPriceModal: React.FC<DailyPriceModalProps> = ({
   const handleBillerRequestUpdate = async () => {
     setBillerHoldState(true);
     const session = getSession();
+    const baseUrl = getApiBaseUrl();
     try {
       if (prices.length > 0) {
-        await fetch('http://localhost:5000/api/prices/request-change', {
+        await fetch(`${baseUrl}/api/prices/request-change`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

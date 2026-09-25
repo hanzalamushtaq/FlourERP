@@ -240,6 +240,7 @@ export default function Home() {
         {/* Top Action Header */}
         <PosHeader
           onOpenZReport={() => setIsZReportOpen(true)}
+          onOpenPriceModal={() => setIsPriceModalOpen(true)}
           operatorName={currentUser.fullName}
           roleName={currentUser.role}
           canCloseDay={canCloseDay}
