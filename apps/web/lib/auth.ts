@@ -78,6 +78,8 @@ export function clearSession(): void {
   }
 }
 
+import { getApiBaseUrl } from './api';
+
 export async function ensureValidToken(user?: UserSession | null): Promise<string | null> {
   const current = user || getSession();
   if (!current) return null;
@@ -92,7 +94,7 @@ export async function ensureValidToken(user?: UserSession | null): Promise<strin
   const preset = PRESET_USERS[uname];
   if (preset) {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`${getApiBaseUrl()}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

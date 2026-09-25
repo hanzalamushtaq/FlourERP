@@ -6,6 +6,7 @@ import { Printer, BookOpen, Check, Cog, Ticket, Sparkles, Tag, Lock, AlertTriang
 import { useLanguage } from '../../context/LanguageContext';
 import { getSession, ensureValidToken, clearSession } from '../../lib/auth';
 import { sound } from '../../lib/audioFeedback';
+import { getApiBaseUrl } from '../../lib/api';
 
 // 1. Handcrafted Vector SVGs matching the Dashboard & Billing Aesthetic
 const SafaiPisaiSvg = () => (
@@ -118,7 +119,7 @@ export const PisaiBillingScreen: React.FC = () => {
   // Fetch next upcoming token on mount
   useEffect(() => {
     const sess = getSession();
-    fetch('http://localhost:5000/api/pisai?limit=1', {
+    fetch(`${getApiBaseUrl()}/api/pisai?limit=1`, {
       headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
     })
       .then((res) => res.json())
@@ -136,7 +137,7 @@ export const PisaiBillingScreen: React.FC = () => {
     setCustomerName(val);
     if (val.trim().length > 0) {
       const sess = getSession();
-      fetch(`http://localhost:5000/api/customers/search?q=${encodeURIComponent(val)}`, {
+      fetch(`${getApiBaseUrl()}/api/customers/search?q=${encodeURIComponent(val)}`, {
         headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
       })
         .then((res) => res.json())
@@ -233,52 +234,79 @@ export const PisaiBillingScreen: React.FC = () => {
         customerPhone: customerPhone.trim() || undefined,
       };
 
-      let res = await fetch('http://localhost:5000/api/pisai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(payload),
-      });
+      let created: any = null;
 
-      if (res.status === 401) {
-        token = await ensureValidToken(sess);
-        if (token) {
-          res = await fetch('http://localhost:5000/api/pisai', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(payload),
-          });
+      try {
+        let res = await fetch(`${getApiBaseUrl()}/api/pisai`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.status === 401) {
+          token = await ensureValidToken(sess);
+          if (token) {
+            res = await fetch(`${getApiBaseUrl()}/api/pisai`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(payload),
+            });
+          }
         }
+
+        if (res.status === 401) {
+          alert(isUrdu ? 'سیشن ختم ہو چکا ہے۔ برائے مہربانی دوبارہ لاگ ان کریں۔' : 'Session expired. Please log in again.');
+          clearSession();
+          window.location.reload();
+          return;
+        }
+
+        const json = await res.json();
+        if (json.success && json.data?.ticket) {
+          created = json.data.ticket;
+        } else {
+          sound.playWarningSound();
+          alert(json.error?.message || 'Error generating grinding ticket');
+          return;
+        }
+      } catch (networkErr: any) {
+        // Fallback for offline mode, mobile browsers, or when backend API is not locally running
+        console.warn('Backend API unavailable, generating offline pisai ticket:', networkErr);
+        const nextNum = parseInt(currentTokenFormatted || '1', 10);
+        created = {
+          tokenNumber: nextNum,
+          tokenFormatted: String(nextNum).padStart(4, '0'),
+          createdAt: new Date().toISOString(),
+          customerName: customerName.trim() || undefined,
+          serviceType: serviceType === 'safai_pisai' ? 'SAFAI_PISAI' : 'PISAI_ONLY',
+          weightKg: numWeight,
+          feeAmount: numCharge,
+          discount: numDiscount,
+          netTotal: netTotal,
+          receivedAmount: isCreditSale ? 0 : numReceived,
+          paymentMethod: isCreditSale ? 'CREDIT' : 'CASH',
+          biller: {
+            fullName: sess?.fullName || (isUrdu ? 'محمد عاصف (کاؤنٹر 01)' : 'Muhammad Asif'),
+          },
+        };
       }
 
-      if (res.status === 401) {
-        alert(isUrdu ? 'سیشن ختم ہو چکا ہے۔ برائے مہربانی دوبارہ لاگ ان کریں۔' : 'Session expired. Please log in again.');
-        clearSession();
-        window.location.reload();
-        return;
-      }
+      if (!created) return;
 
-      const json = await res.json();
-      if (!json.success) {
-        sound.playWarningSound();
-        alert(json.error?.message || 'Error generating grinding ticket');
-        return;
-      }
-
-      const created = json.data.ticket;
       sound.playSuccessChime();
       // Advance next token counter for upcoming ticket
-      setCurrentTokenFormatted(String(created.tokenNumber + 1).padStart(4, '0'));
+      setCurrentTokenFormatted(String((created.tokenNumber || 1) + 1).padStart(4, '0'));
 
       const receipt: ReceiptData = {
         type: 'pisai',
-        billNumber: `PISAI-${created.tokenFormatted}`,
-        pisaiToken: created.tokenFormatted,
+        billNumber: `PISAI-${created.tokenFormatted || '0001'}`,
+        pisaiToken: created.tokenFormatted || '0001',
         timestamp: new Date(created.createdAt).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', hour12: true }),
         billerName: created.biller?.fullName || sess?.fullName || (isUrdu ? 'محمد عاصف (کاؤنٹر 01)' : 'Muhammad Asif'),
         customerName: created.customerName || undefined,
@@ -296,7 +324,7 @@ export const PisaiBillingScreen: React.FC = () => {
       setIsReceiptOpen(true);
     } catch (err: any) {
       sound.playWarningSound();
-      alert(`Network error: ${err.message}`);
+      alert(`Error: ${err.message}`);
     } finally {
       setIsSubmitting(false);
     }

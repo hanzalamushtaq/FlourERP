@@ -18,6 +18,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { UserSession, saveSession, PRESET_USERS } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 
 interface LoginScreenProps {
   onLoginSuccess: (user: UserSession) => void;
@@ -46,7 +47,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     setErrorMessage(null);
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`${getApiBaseUrl()}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

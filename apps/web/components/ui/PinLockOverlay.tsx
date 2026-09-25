@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Lock, Unlock, ShieldAlert } from 'lucide-react';
 import { sound } from '../../lib/audioFeedback';
 import { getToken, getSession, ensureValidToken } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 
 interface PinLockOverlayProps {
   isLocked: boolean;
@@ -37,17 +38,21 @@ export const PinLockOverlay: React.FC<PinLockOverlayProps> = ({
 
         let isSuccess = false;
         if (token) {
-          const res = await fetch('http://localhost:5000/api/auth/verify-pin', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ pin: nextPin }),
-          });
-          const json = await res.json();
-          if (json.success && json.data?.unlocked) {
-            isSuccess = true;
+          try {
+            const res = await fetch(`${getApiBaseUrl()}/api/auth/verify-pin`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ pin: nextPin }),
+            });
+            const json = await res.json();
+            if (json.success && json.data?.unlocked) {
+              isSuccess = true;
+            }
+          } catch {
+            // API unreachable, fall back to offline verification
           }
         }
 

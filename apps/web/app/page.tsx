@@ -28,6 +28,7 @@ import {
   isBiller,
   hasPermission,
 } from '../lib/auth';
+import { getApiBaseUrl } from '../lib/api';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Home() {
@@ -120,7 +121,7 @@ export default function Home() {
 
     // Call backend logout asynchronously
     try {
-      fetch('http://localhost:5000/api/auth/logout', {
+      fetch(`${getApiBaseUrl()}/api/auth/logout`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${currentUser?.token}`,
