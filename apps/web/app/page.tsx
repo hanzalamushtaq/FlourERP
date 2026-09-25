@@ -39,7 +39,7 @@ export default function Home() {
   >(() => {
     if (typeof window !== 'undefined') {
       const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
-      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'stock', 'admin', 'rates', 'settings'];
+      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
       if (savedTab && validTabs.includes(savedTab)) {
         return savedTab;
       }
@@ -70,7 +70,7 @@ export default function Home() {
     if (saved) {
       setCurrentUser(saved);
       const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
-      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'stock', 'admin', 'rates', 'settings'];
+      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
       if (savedTab && validTabs.includes(savedTab)) {
         setActiveTab(savedTab);
       }

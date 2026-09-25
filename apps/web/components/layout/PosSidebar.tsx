@@ -188,7 +188,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       label: t('گودام و اسٹاک', 'Inventory & Stock'),
       icon: (color: string) => <Boxes size={22} color={color} strokeWidth={1.8} />,
       onClick: () => handleItemSelect('stock'),
-      visible: true,
+      visible: false,
     },
     {
       id: 'reports',
