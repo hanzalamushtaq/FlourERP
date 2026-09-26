@@ -55,13 +55,16 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     });
   }
 
-  const isPasswordValid = await comparePassword(password, user.passwordHash);
+  let isPasswordValid = await comparePassword(password, user.passwordHash);
+  if (!isPasswordValid && user.pinHash && (password.length === 4 || !isNaN(Number(password)))) {
+    isPasswordValid = await comparePin(password, user.pinHash);
+  }
   if (!isPasswordValid) {
     return res.status(401).json({
       success: false,
       error: {
         code: 'INVALID_CREDENTIALS',
-        message: 'Invalid username or password.',
+        message: 'Invalid username or password/PIN.',
       },
     });
   }

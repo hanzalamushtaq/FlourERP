@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { getSession, ensureValidToken } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 
 interface ZReportModalProps {
   isOpen: boolean;
@@ -80,7 +81,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
       try {
         const sess = getSession();
         const token = await ensureValidToken(sess);
-        const res = await fetch('http://localhost:5000/api/closing/preview', {
+        const res = await fetch(`${getApiBaseUrl()}/api/closing/preview`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const json = await res.json();
@@ -120,7 +121,7 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
     try {
       const sess = getSession();
       const token = await ensureValidToken(sess);
-      const res = await fetch('http://localhost:5000/api/closing', {
+      const res = await fetch(`${getApiBaseUrl()}/api/closing`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

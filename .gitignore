@@ -10,3 +10,4 @@
 .DS_Store
 *.tsbuildinfo
 apps/api/backups/
+.planning

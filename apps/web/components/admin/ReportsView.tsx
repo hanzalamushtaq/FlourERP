@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { getSession, ensureValidToken } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 import {
   BarChart2,
   ShieldAlert,
@@ -432,7 +433,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
     try {
       const sess = getSession();
       const token = await ensureValidToken(sess);
-      const res = await fetch(`http://localhost:5000/api/reports/ledger-stream?range=${range}`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/reports/ledger-stream?range=${range}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json();
@@ -445,7 +446,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
     try {
       const sess = getSession();
       const token = await ensureValidToken(sess);
-      const res = await fetch('http://localhost:5000/api/audit-logs?limit=100', {
+      const res = await fetch(`${getApiBaseUrl()}/api/audit-logs?limit=100`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json();
@@ -460,8 +461,8 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       const sess = getSession();
       const token = await ensureValidToken(sess);
       const [sumRes, custRes] = await Promise.all([
-        fetch('http://localhost:5000/api/customers/ledger/summary', { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
-        fetch('http://localhost:5000/api/customers', { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
+        fetch(`${getApiBaseUrl()}/api/customers/ledger/summary`, { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
+        fetch(`${getApiBaseUrl()}/api/customers`, { headers: token ? { Authorization: `Bearer ${token}` } : {} }),
       ]);
       const sumJson = await sumRes.json();
       const custJson = await custRes.json();
@@ -489,8 +490,8 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       const sess = getSession();
       const token = await ensureValidToken(sess);
       const endpoint = targetVoidItem.type === 'bill'
-        ? `http://localhost:5000/api/bills/${targetVoidItem.id}/void`
-        : `http://localhost:5000/api/pisai/${targetVoidItem.id}/void`;
+        ? `${getApiBaseUrl()}/api/bills/${targetVoidItem.id}/void`
+        : `${getApiBaseUrl()}/api/pisai/${targetVoidItem.id}/void`;
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
@@ -519,7 +520,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
     try {
       const sess = getSession();
       const token = await ensureValidToken(sess);
-      const res = await fetch('http://localhost:5000/api/expenses', {
+      const res = await fetch(`${getApiBaseUrl()}/api/expenses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ category: catMap[expenseCategory] || 'MISC', description: expenseDesc.trim(), amount: amt }),
@@ -539,7 +540,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
     try {
       const sess = getSession();
       const token = await ensureValidToken(sess);
-      const res = await fetch(`http://localhost:5000/api/reports/export-csv?range=${dateFilter}`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/reports/export-csv?range=${dateFilter}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const blob = await res.blob();

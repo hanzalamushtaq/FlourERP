@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getSession, ensureValidToken } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 import {
   Search,
   UserPlus,
@@ -107,8 +108,8 @@ export const CustomerLedgerView: React.FC = () => {
       const sess = getSession();
       const token = await ensureValidToken(sess);
       const url = q && q.trim().length > 0
-        ? `http://localhost:5000/api/customers?q=${encodeURIComponent(q.trim())}`
-        : 'http://localhost:5000/api/customers';
+        ? `${getApiBaseUrl()}/api/customers?q=${encodeURIComponent(q.trim())}`
+        : `${getApiBaseUrl()}/api/customers`;
       const res = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -144,7 +145,7 @@ export const CustomerLedgerView: React.FC = () => {
     if (!selectedCustomer?.id || selectedCustomer.id === 'c1' || selectedCustomer.id === 'c2') return;
     const sess = getSession();
     ensureValidToken(sess).then((token) => {
-      fetch(`http://localhost:5000/api/customers/${selectedCustomer.id}`, {
+      fetch(`${getApiBaseUrl()}/api/customers/${selectedCustomer.id}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
         .then((res) => res.json())
@@ -173,7 +174,7 @@ export const CustomerLedgerView: React.FC = () => {
     try {
       const sess = getSession();
       const token = await ensureValidToken(sess);
-      const res = await fetch(`http://localhost:5000/api/customers/${selectedCustomer.id}/repayments`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/customers/${selectedCustomer.id}/repayments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -197,7 +198,7 @@ export const CustomerLedgerView: React.FC = () => {
       // Refresh customer profile & list
       await loadCustomers(searchQuery);
       if (selectedCustomer?.id) {
-        const detailRes = await fetch(`http://localhost:5000/api/customers/${selectedCustomer.id}`, {
+        const detailRes = await fetch(`${getApiBaseUrl()}/api/customers/${selectedCustomer.id}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const detailJson = await detailRes.json();
@@ -216,7 +217,7 @@ export const CustomerLedgerView: React.FC = () => {
     try {
       const sess = getSession();
       const token = await ensureValidToken(sess);
-      const res = await fetch('http://localhost:5000/api/customers', {
+      const res = await fetch(`${getApiBaseUrl()}/api/customers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

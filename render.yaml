@@ -1,0 +1,28 @@
+# ==============================================================================
+# Render Infrastructure as Code Blueprint (render.yaml)
+# Connect your GitHub repo to Render and choose "Blueprint" to auto-deploy
+# ==============================================================================
+services:
+  - type: web
+    name: flour-erp-api
+    runtime: node
+    plan: free
+    region: singapore # Closest free region to South Asia / Tokyo DB
+    rootDir: apps/api
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false

@@ -2,18 +2,23 @@ import 'dotenv/config';
 import { createApp } from './app.js';
 import { prisma } from './config/db.js';
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
 const startServer = async () => {
   try {
-    // Verify DB connection on startup
-    await prisma.$connect();
-    console.log('✓ Database connection established');
-
     const app = createApp();
-    const server = app.listen(PORT, () => {
-      console.log(`✓ FlourERP API running on http://localhost:${PORT}`);
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`✓ FlourERP API running on http://0.0.0.0:${PORT}`);
     });
+
+    // Connect to database resiliently
+    prisma.$connect()
+      .then(() => {
+        console.log('✓ Database connection established');
+      })
+      .catch((err) => {
+        console.warn('⚠️ Initial database connect warning (Prisma will auto-reconnect on query):', err.message);
+      });
 
     // Graceful Shutdown
     const shutdown = async () => {

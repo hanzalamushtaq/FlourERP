@@ -46,15 +46,23 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
     setErrorMessage(null);
 
+    const cleanUname = uname.trim().toLowerCase();
+    const cleanPass = pass.trim();
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: uname.trim().toLowerCase(),
-          password: pass.trim(),
+          username: cleanUname,
+          password: cleanPass,
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (res.ok) {
         const json = await res.json();
@@ -75,16 +83,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       }
 
       if (res.status === 401) {
-        setErrorMessage('غلط صارف نام یا پاس ورڈ! برائے مہربانی درست معلومات درج کریں۔');
+        setErrorMessage('غلط صارف نام یا پاس ورڈ/پن! (Invalid username or password/PIN)');
         setIsLoading(false);
         return;
       }
-    } catch {
-      // Offline fallback
+
+      // If server returned 500 or other unexpected error, attempt preset fallback
       const presetKey = Object.keys(PRESET_USERS).find(
         (k) =>
-          PRESET_USERS[k].username.toLowerCase() === uname.trim().toLowerCase() &&
-          (PRESET_USERS[k].pass === pass || PRESET_USERS[k].pin === pass)
+          PRESET_USERS[k].username.toLowerCase() === cleanUname &&
+          (PRESET_USERS[k].pass === cleanPass || PRESET_USERS[k].pin === cleanPass)
       );
 
       if (presetKey) {
@@ -103,13 +111,37 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         return;
       }
 
-      setErrorMessage('لاگ ان کی معلومات درست نہیں ہیں یا سرور آف لائن ہے۔');
+      const errJson = await res.json().catch(() => null);
+      setErrorMessage(errJson?.error?.message || 'سرور سے رابطہ ممکن نہیں ہو سکا۔ دوبارہ کوشش کریں۔');
       setIsLoading(false);
-      return;
-    }
+    } catch {
+      clearTimeout(timeoutId);
+      // Offline fallback
+      const presetKey = Object.keys(PRESET_USERS).find(
+        (k) =>
+          PRESET_USERS[k].username.toLowerCase() === cleanUname &&
+          (PRESET_USERS[k].pass === cleanPass || PRESET_USERS[k].pin === cleanPass)
+      );
 
-    setErrorMessage('لاگ ان کی تفصیلات درست نہیں ہیں۔');
-    setIsLoading(false);
+      if (presetKey) {
+        const matched = PRESET_USERS[presetKey];
+        const localSession: UserSession = {
+          id: `local-${matched.username}`,
+          username: matched.username,
+          fullName: matched.name,
+          role: matched.role,
+          permissions: matched.permissions,
+          token: `local-token-${Date.now()}`,
+          hasPin: true,
+        };
+        saveSession(localSession);
+        onLoginSuccess(localSession);
+        return;
+      }
+
+      setErrorMessage('سرور آف لائن ہے یا لاگ ان کی معلومات درست نہیں ہیں۔');
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -428,7 +460,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
 
           {/* Primary Submit Button */}
           <button
-            type="submit"
+            type="button"
+            onClick={() => {
+              if (!username.trim() || !password.trim()) {
+                setErrorMessage('صارف کا نام اور پاس ورڈ درج کریں۔');
+                return;
+              }
+              executeLogin(username, password);
+            }}
             disabled={isLoading}
             className="touch-active"
             style={{
@@ -439,18 +478,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               border: 'none',
               fontWeight: 900,
               fontSize: '15px',
-              cursor: 'pointer',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
               boxShadow: '0 6px 16px rgba(14, 138, 84, 0.28)',
               marginTop: '4px',
+              opacity: isLoading ? 0.75 : 1,
             }}
           >
             <LogIn size={18} />
             <span className="font-nastaleeq" style={{ fontSize: '17px' }}>
-              {isLoading ? 'لاگ ان ہو رہا ہے...' : 'ٹرمینل میں لاگ ان کریں'}
+              {isLoading ? 'تصدیق ہو رہی ہے، براہ کرم انتظار کریں...' : 'ٹرمینل میں لاگ ان کریں'}
             </span>
           </button>
         </form>

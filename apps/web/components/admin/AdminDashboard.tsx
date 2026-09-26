@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getSession, ensureValidToken } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 import { RoleManagementModal } from './RoleManagementModal';
 import {
   TrendingUp,
@@ -15,6 +16,7 @@ import {
   Database,
   ShoppingCart,
   CheckCircle,
+  UserPlus,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -32,6 +34,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const { isDark } = useTheme();
   const [closingTriggered, setClosingTriggered] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [roleModalTab, setRoleModalTab] = useState<'roles' | 'staff' | 'create' | 'add_user'>('roles');
   const [kpiData, setKpiData] = useState<{
     sales: { totalAmount: number; billsCount: number; cashCollected: number };
     pisai: { totalRevenue: number; tokensCount: number; weightKg: number; cashCollected: number };
@@ -45,7 +48,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       try {
         const sess = getSession();
         const token = await ensureValidToken(sess);
-        const res = await fetch('http://localhost:5000/api/reports/dashboard-kpis?range=today', {
+        const res = await fetch(`${getApiBaseUrl()}/api/reports/dashboard-kpis?range=today`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const json = await res.json();
@@ -243,10 +246,41 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Action Buttons */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Add User & Key Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setRoleModalTab('add_user');
+              setIsRoleModalOpen(true);
+            }}
+            className="touch-active"
+            style={{
+              height: '42px',
+              padding: '0 16px',
+              borderRadius: '10px',
+              backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5',
+              color: isDark ? '#34D399' : '#065F46',
+              border: isDark ? '1.5px solid rgba(16, 185, 129, 0.35)' : '1.5px solid #A7F3D0',
+              fontSize: isUrdu ? '17px' : '13.5px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: isDark ? 'none' : '0 2px 4px rgba(5, 150, 105, 0.08)',
+            }}
+          >
+            <UserPlus size={18} color={isDark ? '#34D399' : '#059669'} />
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('+ نیا صارف / لاگ ان کی', '+ Add User & Key')}</span>
+          </button>
+
           {/* RBAC Button */}
           <button
             type="button"
-            onClick={() => setIsRoleModalOpen(true)}
+            onClick={() => {
+              setRoleModalTab('roles');
+              setIsRoleModalOpen(true);
+            }}
             className="touch-active"
             style={{
               height: '42px',
@@ -562,6 +596,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <RoleManagementModal
         isOpen={isRoleModalOpen}
         onClose={() => setIsRoleModalOpen(false)}
+        initialTab={roleModalTab}
       />
     </div>
   );

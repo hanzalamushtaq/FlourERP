@@ -15,8 +15,13 @@ import {
   Trash2,
   Save,
   AlertCircle,
+  Eye,
+  EyeOff,
+  UserPlus,
+  Key,
 } from 'lucide-react';
 import { getToken } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 import { useLanguage } from '../../context/LanguageContext';
 
 export interface PermissionItem {
@@ -40,6 +45,9 @@ export interface StaffUser {
   username: string;
   fullName: string;
   roleName: string;
+  roleId?: string;
+  isActive?: boolean;
+  hasPin?: boolean;
 }
 
 export const ALL_PERMISSIONS: PermissionItem[] = [
@@ -90,15 +98,17 @@ interface RoleManagementModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRolesUpdated?: (roles: RoleItem[]) => void;
+  initialTab?: 'roles' | 'staff' | 'create' | 'add_user';
 }
 
 export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
   isOpen,
   onClose,
   onRolesUpdated,
+  initialTab = 'roles',
 }) => {
   const { isUrdu, t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'roles' | 'staff' | 'create'>('roles');
+  const [activeTab, setActiveTab] = useState<'roles' | 'staff' | 'create' | 'add_user'>(initialTab);
   const [roles, setRoles] = useState<RoleItem[]>(INITIAL_ROLES);
   const [staff, setStaff] = useState<StaffUser[]>(INITIAL_STAFF);
 
@@ -112,13 +122,33 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
   const [selectedPerms, setSelectedPerms] = useState<string[]>(['can_bill']);
   const [noticeMessage, setNoticeMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
+  // New User Form State
+  const [newUsername, setNewUsername] = useState('');
+  const [newFullName, setNewFullName] = useState('');
+  const [newUserRole, setNewUserRole] = useState('Biller');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPin, setNewPin] = useState('');
+  const [showNewUserPassword, setShowNewUserPassword] = useState(false);
+  const [isSubmittingUser, setIsSubmittingUser] = useState(false);
+
+  // Key Reset Modal State
+  const [keyResetTarget, setKeyResetTarget] = useState<StaffUser | null>(null);
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetPin, setResetPin] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [isSubmittingResetKey, setIsSubmittingResetKey] = useState(false);
+
+  useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+  }, [initialTab]);
+
   // Fetch roles & staff from backend with auth token
   const refreshRolesFromBackend = async () => {
     const token = getToken();
     const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
     try {
-      const res = await fetch('http://localhost:5000/api/roles', { headers });
+      const res = await fetch(`${getApiBaseUrl()}/api/roles`, { headers });
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
@@ -131,7 +161,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
     }
 
     try {
-      const staffRes = await fetch('http://localhost:5000/api/roles/staff', { headers });
+      const staffRes = await fetch(`${getApiBaseUrl()}/api/roles/staff`, { headers });
       if (staffRes.ok) {
         const staffJson = await staffRes.json();
         if (staffJson.success && staffJson.data) {
@@ -189,7 +219,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
     };
 
     try {
-      const res = await fetch('http://localhost:5000/api/roles', {
+      const res = await fetch(`${getApiBaseUrl()}/api/roles`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -230,7 +260,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
     };
 
     try {
-      await fetch(`http://localhost:5000/api/roles/${editingRole.id}`, {
+      await fetch(`${getApiBaseUrl()}/api/roles/${editingRole.id}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify({
@@ -265,7 +295,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
     const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
     try {
-      await fetch(`http://localhost:5000/api/roles/${role.id}`, {
+      await fetch(`${getApiBaseUrl()}/api/roles/${role.id}`, {
         method: 'DELETE',
         headers,
       });
@@ -288,7 +318,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
     };
 
     try {
-      await fetch(`http://localhost:5000/api/roles/staff/${userId}`, {
+      await fetch(`${getApiBaseUrl()}/api/roles/staff/${userId}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify({ roleName: newRoleName }),
@@ -301,6 +331,157 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
       prev.map((s) => (s.id === userId ? { ...s, roleName: newRoleName } : s))
     );
     showNotice('سٹاف ممبر کا رول کامیابی سے تبدیل ہو گیا۔');
+  };
+
+  // 5. CREATE NEW STAFF USER (ADMIN)
+  const handleCreateStaffUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanUname = newUsername.trim().toLowerCase();
+    const cleanFull = newFullName.trim();
+    const cleanPass = newPassword.trim();
+    const cleanPin = newPin.trim();
+
+    if (!cleanUname || !cleanFull || !cleanPass) {
+      showNotice('برائے مہربانی یوزر آئی ڈی، مکمل نام اور پاس ورڈ لازمی درج کریں۔', 'error');
+      return;
+    }
+
+    if (cleanPin && cleanPin.length !== 4) {
+      showNotice('سکیورٹی پن لازمی 4 ہندسوں پر مشتمل ہونا چاہیے۔', 'error');
+      return;
+    }
+
+    setIsSubmittingUser(true);
+    const token = getToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/roles/staff`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          username: cleanUname,
+          fullName: cleanFull,
+          roleName: newUserRole,
+          password: cleanPass,
+          pin: cleanPin || undefined,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        showNotice(
+          isUrdu
+            ? `نیا صارف "${json.data.fullName}" (@${json.data.username}) کامیابی سے شامل ہو گیا اور لاگ ان کی تفویض ہو گئی!`
+            : `User "${json.data.fullName}" created with login key successfully!`,
+          'success'
+        );
+        setNewUsername('');
+        setNewFullName('');
+        setNewPassword('');
+        setNewPin('');
+        await refreshRolesFromBackend();
+        setActiveTab('staff');
+      } else {
+        showNotice(json.error?.message || 'صارف بنانے میں ناکامی ہوئی۔', 'error');
+      }
+    } catch {
+      showNotice('سرور سے رابطہ ممکن نہیں ہو سکا۔', 'error');
+    } finally {
+      setIsSubmittingUser(false);
+    }
+  };
+
+  // 6. RESET STAFF LOGIN KEY / PIN (ADMIN)
+  const handleResetStaffKey = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!keyResetTarget) return;
+
+    if (!resetPassword.trim() && !resetPin.trim()) {
+      showNotice('نیا پاس ورڈ یا پن درج کریں۔', 'error');
+      return;
+    }
+
+    if (resetPin.trim() && resetPin.trim().length !== 4) {
+      showNotice('پن لازمی 4 ہندسوں پر مشتمل ہونا چاہیے۔', 'error');
+      return;
+    }
+
+    setIsSubmittingResetKey(true);
+    const token = getToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/roles/staff/${keyResetTarget.id}/key`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          password: resetPassword.trim() || undefined,
+          pin: resetPin.trim() || undefined,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        showNotice(
+          isUrdu
+            ? `@${keyResetTarget.username} کی لاگ ان کی / پاس ورڈ کامیابی سے تبدیل ہو گئی۔`
+            : `Login key for @${keyResetTarget.username} updated successfully!`,
+          'success'
+        );
+        setKeyResetTarget(null);
+        setResetPassword('');
+        setResetPin('');
+        await refreshRolesFromBackend();
+      } else {
+        showNotice(json.error?.message || 'کی تبدیل کرنے میں ناکامی ہوئی۔', 'error');
+      }
+    } catch {
+      showNotice('سرور سے رابطہ ممکن نہیں ہو سکا۔', 'error');
+    } finally {
+      setIsSubmittingResetKey(false);
+    }
+  };
+
+  // 7. DELETE / DEACTIVATE STAFF USER (ADMIN)
+  const handleDeleteStaffUser = async (member: StaffUser) => {
+    if (member.username.toLowerCase() === 'hanzala') {
+      showNotice('مرکزی ایڈمن کو ڈیلیٹ نہیں کیا جا سکتا۔', 'error');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      isUrdu
+        ? `کیا آپ واقعی صارف "${member.fullName}" (@${member.username}) کو حذف یا غیر فعال کرنا چاہتے ہیں؟`
+        : `Are you sure you want to remove user "${member.fullName}" (@${member.username})?`
+    );
+    if (!confirmed) return;
+
+    const token = getToken();
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/roles/staff/${member.id}`, {
+        method: 'DELETE',
+        headers,
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        showNotice(json.message || 'صارف کامیابی سے حذف کر دیا گیا', 'success');
+        await refreshRolesFromBackend();
+      } else {
+        showNotice(json.error?.message || 'صارف حذف کرنے میں خرابی۔', 'error');
+      }
+    } catch {
+      showNotice('سرور سے رابطہ ممکن نہیں ہو سکا۔', 'error');
+    }
   };
 
   return (
@@ -446,7 +627,33 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
           >
             <Users size={17} color={activeTab === 'staff' ? '#2563EB' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
-              {isUrdu ? `سٹاف کو رول تفویض (${staff.length})` : `Staff Roles (${staff.length})`}
+              {isUrdu ? `سٹاف اکاؤنٹس (${staff.length})` : `Staff Accounts (${staff.length})`}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('add_user');
+              setEditingRole(null);
+            }}
+            style={{
+              padding: '12px 18px',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              borderBottom: activeTab === 'add_user' ? '3px solid #10B981' : '3px solid transparent',
+              color: activeTab === 'add_user' ? '#0F172A' : '#64748B',
+              fontWeight: activeTab === 'add_user' ? 900 : 700,
+              fontSize: isUrdu ? '17px' : '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <UserPlus size={17} color={activeTab === 'add_user' ? '#10B981' : '#64748B'} />
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {isUrdu ? '+ نیا صارف و لاگ ان کی' : '+ Add User & Key'}
             </span>
           </button>
 
@@ -739,10 +946,41 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             })}
             </div>
           ) : activeTab === 'staff' ? (
-            /* TAB 2: ASSIGN ROLES TO USERS */
+            /* TAB 2: STAFF LIST & USER MANAGEMENT */
             <div>
-              <div style={{ fontSize: '13px', color: '#64748B', marginBottom: '12px', fontWeight: 600 }}>
-                {t('مندرجہ ذیل سٹاف ممبرز کے لیے رول منتخب کریں:', 'Select role for following staff members:')}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '17px' : '14px', fontWeight: 900, color: '#0F172A' }}>
+                    {t(`سٹاف اور لاگ ان اکاؤنٹس (${staff.length})`, `Staff & Login Accounts (${staff.length})`)}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748B' }}>
+                    {t('سٹاف کے لیے رول منتخب کریں یا لاگ ان کی / پاس ورڈ تبدیل کریں', 'Assign roles, change login keys or manage staff members')}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('add_user')}
+                  className="touch-active"
+                  style={{
+                    height: '36px',
+                    padding: '0 14px',
+                    borderRadius: '8px',
+                    backgroundColor: '#10B981',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontSize: '12.5px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 6px rgba(16, 185, 129, 0.25)',
+                  }}
+                >
+                  <UserPlus size={16} />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('+ نیا صارف شامل کریں', '+ Add Staff User')}</span>
+                </button>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -752,55 +990,84 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     style={{
                       backgroundColor: '#FFFFFF',
                       border: '1.5px solid #E2E8F0',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
                       padding: '12px 16px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '10px',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div
                         style={{
-                          width: '36px',
-                          height: '36px',
-                          borderRadius: '8px',
-                          backgroundColor: '#F0F9FF',
-                          border: '1px solid #BAE6FD',
-                          color: '#0284C7',
+                          width: '38px',
+                          height: '38px',
+                          borderRadius: '10px',
+                          backgroundColor: member.roleName === 'SuperAdmin' ? '#FFFBEB' : '#F0FDF4',
+                          border: member.roleName === 'SuperAdmin' ? '1px solid #FDE68A' : '1px solid #BBF7D0',
+                          color: member.roleName === 'SuperAdmin' ? '#D97706' : '#16A34A',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontWeight: 800,
+                          fontWeight: 900,
                         }}
                       >
                         <UserCheck size={18} />
                       </div>
                       <div>
-                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>
-                          {member.fullName}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>
+                            {member.fullName}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontFamily: 'var(--font-mono)',
+                              color: '#0369A1',
+                              backgroundColor: '#E0F2FE',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              fontWeight: 700,
+                            }}
+                          >
+                            @{member.username}
+                          </span>
+                          {member.hasPin && (
+                            <span
+                              style={{
+                                fontSize: '10.5px',
+                                color: '#16A34A',
+                                backgroundColor: '#DCFCE7',
+                                padding: '1px 5px',
+                                borderRadius: '4px',
+                                fontWeight: 700,
+                              }}
+                            >
+                              PIN ✓
+                            </span>
+                          )}
                         </div>
-                        <div style={{ fontSize: '11px', color: '#64748B', fontFamily: 'var(--font-mono)' }}>
-                          @{member.username}
+                        <div style={{ fontSize: '11px', color: '#64748B', marginTop: '2px' }}>
+                          {member.isActive !== false ? 'فعال صارف (Active)' : 'غیر فعال (Inactive)'}
                         </div>
                       </div>
                     </div>
 
-                    {/* Role Selector Dropdown */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 700 }}>
-                        {t('موجودہ رول:', 'Current Role:')}
-                      </span>
+                    {/* Actions on Right */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      {/* Role Selector Dropdown */}
                       <select
                         value={member.roleName}
                         onChange={(e) => handleAssignRole(member.id, e.target.value)}
                         style={{
-                          height: '36px',
-                          padding: '0 12px',
+                          height: '34px',
+                          padding: '0 10px',
                           borderRadius: '6px',
                           border: '1.5px solid #CBD5E1',
                           backgroundColor: '#F8FAFC',
-                          fontSize: '12.5px',
+                          fontSize: '12px',
                           fontWeight: 700,
                           color: '#0F172A',
                           cursor: 'pointer',
@@ -813,13 +1080,301 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                           </option>
                         ))}
                       </select>
+
+                      {/* Reset Password / Key Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setKeyResetTarget(member);
+                          setResetPassword('');
+                          setResetPin('');
+                        }}
+                        className="touch-active"
+                        title={t('کی / پاس ورڈ تبدیل کریں', 'Change Login Key')}
+                        style={{
+                          height: '34px',
+                          padding: '0 10px',
+                          borderRadius: '6px',
+                          border: '1.5px solid #FDE68A',
+                          backgroundColor: '#FFFBEB',
+                          color: '#B45309',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                        }}
+                      >
+                        <Key size={14} color="#D97706" />
+                        <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کی تبدیل کریں', 'Reset Key')}</span>
+                      </button>
+
+                      {/* Delete / Deactivate Button (Hidden for primary SuperAdmin) */}
+                      {member.username.toLowerCase() !== 'hanzala' && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteStaffUser(member)}
+                          className="touch-active"
+                          title={t('صارف حذف کریں', 'Delete Staff')}
+                          style={{
+                            height: '34px',
+                            width: '34px',
+                            borderRadius: '6px',
+                            border: '1.5px solid #FECACA',
+                            backgroundColor: '#FEF2F2',
+                            color: '#DC2626',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+          ) : activeTab === 'add_user' ? (
+            /* TAB 3: CREATE NEW USER & ASSIGN KEY */
+            <form onSubmit={handleCreateStaffUser} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div
+                style={{
+                  backgroundColor: '#F0FDF4',
+                  border: '1.5px solid #BBF7D0',
+                  borderRadius: '10px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
+                <UserPlus size={20} color="#16A34A" />
+                <div>
+                  <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 900, color: '#166534' }}>
+                    {t('نیا سٹاف صارف اور لاگ ان کی تفویض', 'Add New Staff User & Assign Login Key')}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#15803D' }}>
+                    {t('ایڈمنسٹریٹر یہاں سے نیا آپریٹر شامل کر سکتا ہے اور اس کی لاگ ان آئی ڈی اور پاس ورڈ/پن سیٹ کر سکتا ہے۔', 'Admin can register a new operator with login ID and password/PIN key.')}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                {/* 1. Username / Login ID */}
+                <div>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                    {t('صارف آئی ڈی / لاگ ان نام (Login Username / ID):', 'Login Username / User ID:')} *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      placeholder="e.g. khalid یا cashier1"
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
+                      required
+                      style={{
+                        width: '100%',
+                        height: '40px',
+                        padding: '0 12px 0 28px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #CBD5E1',
+                        fontSize: '13.5px',
+                        fontFamily: 'var(--font-mono)',
+                        outline: 'none',
+                        direction: 'ltr',
+                      }}
+                    />
+                    <span style={{ position: 'absolute', left: '10px', top: '10px', color: '#94A3B8', fontWeight: 800 }}>@</span>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>
+                    {t('لاگ ان سکرین پر یہ آئی ڈی درج کی جائے گی (صرف انگریزی حروف و اعداد)', 'Used on login screen (letters & numbers only)')}
+                  </span>
+                </div>
+
+                {/* 2. Full Name */}
+                <div>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                    {t('مکمل نام (Staff Full Name):', 'Staff Full Name:')} *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. خالد محمود (سیلز کاؤنٹر)"
+                    value={newFullName}
+                    onChange={(e) => setNewFullName(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      height: '40px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '13.5px',
+                      outline: 'none',
+                    }}
+                  />
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>
+                    {t('بلز، رپورٹس اور ٹرمینل پر ظاہر ہونے والا نام', 'Display name on bills and receipts')}
+                  </span>
+                </div>
+
+                {/* 3. Assign Role */}
+                <div>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                    {t('رول منتخب کریں (Assign Role):', 'Assign Role:')} *
+                  </label>
+                  <select
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value)}
+                    style={{
+                      width: '100%',
+                      height: '40px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #CBD5E1',
+                      backgroundColor: '#FFFFFF',
+                      fontSize: '13.5px',
+                      fontWeight: 700,
+                      outline: 'none',
+                    }}
+                  >
+                    {roles.map((r) => (
+                      <option key={r.id} value={r.name}>
+                        {r.name} ({r.description || 'اختیارات'})
+                      </option>
+                    ))}
+                  </select>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>
+                    {t('اس صارف کے مجاز اختیارات (بلنگ، ڈسکاؤنٹ، رپورٹس وغیرہ)', 'Permission level for this operator')}
+                  </span>
+                </div>
+
+                {/* 4. Login Password / Key */}
+                <div>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                    {t('لاگ ان کی / پاس ورڈ (Login Key / Password):', 'Login Key / Password:')} *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showNewUserPassword ? 'text' : 'password'}
+                      placeholder="کم از کم 4 ہندسے یا حروف (e.g. khalid123)"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        height: '40px',
+                        padding: '0 36px 0 12px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #CBD5E1',
+                        fontSize: '13.5px',
+                        fontFamily: 'var(--font-mono)',
+                        outline: 'none',
+                        direction: 'ltr',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewUserPassword(!showNewUserPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '8px',
+                        top: '10px',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#94A3B8',
+                      }}
+                    >
+                      {showNewUserPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>
+                    {t('یہ کی صارف لاگ ان کے وقت پاس ورڈ کے خانے میں درج کرے گا', 'Key used by operator to log into terminal')}
+                  </span>
+                </div>
+
+                {/* 5. Optional PIN */}
+                <div>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                    {t('سکیورٹی پن (Optional 4-Digit Quick PIN):', 'Quick PIN (Optional 4-Digits):')}
+                  </label>
+                  <input
+                    type="password"
+                    maxLength={4}
+                    placeholder="4 ہندسوں کا پن (e.g. 1234)"
+                    value={newPin}
+                    onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
+                    style={{
+                      width: '100%',
+                      height: '40px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '14px',
+                      fontFamily: 'var(--font-mono)',
+                      outline: 'none',
+                      direction: 'ltr',
+                    }}
+                  />
+                  <span style={{ fontSize: '11px', color: '#64748B' }}>
+                    {t('ٹرمینل کے ٹچ کی پیڈ پر فوری انٹری کے لیے (اختیاری)', 'For touch keypad quick enter (optional)')}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+                <button
+                  type="submit"
+                  disabled={isSubmittingUser}
+                  className="touch-active"
+                  style={{
+                    height: '42px',
+                    padding: '0 24px',
+                    borderRadius: '10px',
+                    backgroundColor: '#10B981',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: 900,
+                    cursor: isSubmittingUser ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                    opacity: isSubmittingUser ? 0.7 : 1,
+                  }}
+                >
+                  <UserPlus size={18} />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {isSubmittingUser ? 'صارف بنایا جا رہا ہے...' : t('صارف بنائیں اور لاگ ان کی تفویض کریں', 'Create User & Assign Key')}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('staff')}
+                  style={{
+                    height: '42px',
+                    padding: '0 16px',
+                    borderRadius: '10px',
+                    backgroundColor: '#F1F5F9',
+                    color: '#475569',
+                    border: '1px solid #CBD5E1',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t('منسوخ کریں', 'Cancel')}
+                </button>
+              </div>
+            </form>
           ) : (
-            /* TAB 3: CREATE NEW ROLE */
+            /* TAB 4: CREATE NEW ROLE */
             <form onSubmit={handleCreateRole} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
@@ -982,6 +1537,172 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             {t('بند کریں', 'Close')}
           </button>
         </div>
+        {/* Key Reset Modal Dialog */}
+        {keyResetTarget && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.75)',
+              zIndex: 110,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px',
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '14px',
+                width: '100%',
+                maxWidth: '420px',
+                padding: '22px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+                border: '1.5px solid #CBD5E1',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div
+                    style={{
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '8px',
+                      backgroundColor: '#FFFBEB',
+                      border: '1px solid #FDE68A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#D97706',
+                    }}
+                  >
+                    <Key size={18} />
+                  </div>
+                  <div>
+                    <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: '16px', fontWeight: 900, color: '#0F172A' }}>
+                      {t('لاگ ان کی / پاس ورڈ تبدیل کریں', 'Change Login Key / Password')}
+                    </h3>
+                    <div style={{ fontSize: '11px', color: '#64748B', fontFamily: 'var(--font-mono)' }}>
+                      @{keyResetTarget.username} ({keyResetTarget.fullName})
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setKeyResetTarget(null)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleResetStaffKey} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                    {t('نیا پاس ورڈ / لاگ ان کی:', 'New Password / Login Key:')}
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showResetPassword ? 'text' : 'password'}
+                      placeholder="کم از کم 4 حروف یا ہندسے"
+                      value={resetPassword}
+                      onChange={(e) => setResetPassword(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        padding: '0 34px 0 10px',
+                        borderRadius: '6px',
+                        border: '1.5px solid #CBD5E1',
+                        fontSize: '13px',
+                        fontFamily: 'var(--font-mono)',
+                        outline: 'none',
+                        direction: 'ltr',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowResetPassword(!showResetPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '8px',
+                        top: '9px',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#94A3B8',
+                      }}
+                    >
+                      {showResetPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
+                    {t('نیا 4-ہندسوں کا پن (اختیاری):', 'New 4-Digit PIN (Optional):')}
+                  </label>
+                  <input
+                    type="password"
+                    maxLength={4}
+                    placeholder="مثلاً: 1234"
+                    value={resetPin}
+                    onChange={(e) => setResetPin(e.target.value.replace(/\D/g, ''))}
+                    style={{
+                      width: '100%',
+                      height: '38px',
+                      padding: '0 10px',
+                      borderRadius: '6px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '14px',
+                      fontFamily: 'var(--font-mono)',
+                      outline: 'none',
+                      direction: 'ltr',
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingResetKey}
+                    className="touch-active"
+                    style={{
+                      flex: 1,
+                      height: '38px',
+                      borderRadius: '8px',
+                      backgroundColor: '#D97706',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      cursor: isSubmittingResetKey ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {isSubmittingResetKey ? 'محفوظ ہو رہا ہے...' : t('محفوظ کریں', 'Save Key')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setKeyResetTarget(null)}
+                    style={{
+                      padding: '0 14px',
+                      height: '38px',
+                      borderRadius: '8px',
+                      backgroundColor: '#F1F5F9',
+                      color: '#475569',
+                      border: '1px solid #CBD5E1',
+                      fontSize: '12.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {t('منسوخ', 'Cancel')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

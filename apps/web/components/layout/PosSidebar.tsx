@@ -224,9 +224,9 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
     <aside
       className={`pos-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}
       style={{
-        width: isCollapsed ? '68px' : '232px',
-        minWidth: isCollapsed ? '68px' : '232px',
-        maxWidth: isCollapsed ? '68px' : '232px',
+        width: isCollapsed ? '68px' : '240px',
+        minWidth: isCollapsed ? '68px' : '240px',
+        maxWidth: isCollapsed ? '68px' : '240px',
         backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
         color: isDark ? '#F8FAFC' : '#0F172A',
         display: 'flex',
@@ -335,8 +335,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
           overflowX: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
-          padding: isCollapsed ? '8px 8px' : '8px 10px',
+          gap: '4px',
+          padding: isCollapsed ? '6px 6px' : '6px 8px',
           alignItems: isCollapsed ? 'center' : 'stretch',
         }}
       >
@@ -364,12 +364,13 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: isCollapsed ? 'center' : 'space-between',
+                justifyContent: isCollapsed ? 'center' : (isUrdu ? 'space-between' : 'flex-start'),
+                gap: isCollapsed ? '0' : '10px',
                 width: isCollapsed ? '46px' : '100%',
-                minHeight: isCollapsed ? '46px' : '52px',
-                height: isCollapsed ? '46px' : 'auto',
-                padding: isCollapsed ? '0' : '8px 12px',
-                borderRadius: '12px',
+                minHeight: isCollapsed ? '40px' : '40px',
+                height: isCollapsed ? '40px' : 'auto',
+                padding: isCollapsed ? '0' : '4px 8px',
+                borderRadius: '10px',
                 border: isActive
                   ? '1.5px solid #1877F2'
                   : isDark
@@ -381,7 +382,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                     ? isHovered ? '#243046' : '#141D2E'
                     : isHovered ? '#F1F5F9' : '#F8FAFC',
                 cursor: 'pointer',
-                direction: 'rtl',
+                direction: isUrdu ? 'rtl' : 'ltr',
                 transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
                 boxShadow: isActive
                   ? '0 4px 12px rgba(24, 119, 242, 0.28)'
@@ -390,60 +391,113 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
                     : isHovered
                       ? '0 2px 6px rgba(15, 23, 42, 0.06)'
                       : '0 1px 3px rgba(15, 23, 42, 0.03)',
-                transform: isPressed ? 'scale(0.97)' : isHovered ? 'translateX(-2px)' : 'none',
+                transform: isPressed ? 'scale(0.97)' : isHovered ? (isUrdu ? 'translateX(-2px)' : 'translateX(2px)') : 'none',
                 outline: 'none',
+                overflow: 'hidden',
               }}
             >
-              {/* Right: Bold Urdu Nastaleeq Text or Clean English */}
-              {!isCollapsed && (
-                <span
-                  className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{
-                    fontSize: isUrdu ? '21px' : '16px',
-                    fontWeight: isActive ? 900 : 800,
-                    color: isActive ? '#FFFFFF' : isHovered ? '#38BDF8' : (isDark ? '#F1F5F9' : '#0F172A'),
-                    lineHeight: 1.3,
-                    whiteSpace: 'nowrap',
-                    marginRight: '4px',
-                    letterSpacing: '0',
-                  }}
-                >
-                  {item.label}
-                </span>
+              {isUrdu ? (
+                <>
+                  {!isCollapsed && (
+                    <span
+                      className="font-nastaleeq"
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: isActive ? 900 : 800,
+                        color: isActive ? '#FFFFFF' : isHovered ? '#38BDF8' : (isDark ? '#F1F5F9' : '#0F172A'),
+                        lineHeight: 1.3,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        flex: 1,
+                        textAlign: 'right',
+                        marginRight: '2px',
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  )}
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: isActive
+                        ? 'rgba(255, 255, 255, 0.22)'
+                        : (isDark ? '#0B0F19' : '#FFFFFF'),
+                      border: isActive
+                        ? '1px solid rgba(255, 255, 255, 0.35)'
+                        : isDark
+                          ? (isHovered ? '1px solid #475569' : '1px solid #1E293B')
+                          : (isHovered ? '1px solid #CBD5E1' : '1px solid #E2E8F0'),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: isActive ? 'none' : '0 1px 2px rgba(0,0,0,0.04)',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {item.icon(
+                      isActive
+                        ? '#FFFFFF'
+                        : isHovered
+                          ? '#38BDF8'
+                          : (isDark ? '#94A3B8' : '#475569')
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: isActive
+                        ? 'rgba(255, 255, 255, 0.22)'
+                        : (isDark ? '#0B0F19' : '#FFFFFF'),
+                      border: isActive
+                        ? '1px solid rgba(255, 255, 255, 0.35)'
+                        : isDark
+                          ? (isHovered ? '1px solid #475569' : '1px solid #1E293B')
+                          : (isHovered ? '1px solid #CBD5E1' : '1px solid #E2E8F0'),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: isActive ? 'none' : '0 1px 2px rgba(0,0,0,0.04)',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {item.icon(
+                      isActive
+                        ? '#FFFFFF'
+                        : isHovered
+                          ? '#38BDF8'
+                          : (isDark ? '#94A3B8' : '#475569')
+                    )}
+                  </div>
+                  {!isCollapsed && (
+                    <span
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: isActive ? 800 : 700,
+                        color: isActive ? '#FFFFFF' : isHovered ? '#38BDF8' : (isDark ? '#F1F5F9' : '#0F172A'),
+                        lineHeight: 1.2,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        flex: 1,
+                        textAlign: 'left',
+                        letterSpacing: '-0.15px',
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  )}
+                </>
               )}
-
-              {/* Left: Dedicated Icon Squircle */}
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '9px',
-                  backgroundColor: isActive
-                    ? 'rgba(255, 255, 255, 0.22)'
-                    : (isDark ? '#0B0F19' : '#FFFFFF'),
-                  border: isActive
-                    ? '1px solid rgba(255, 255, 255, 0.35)'
-                    : isDark
-                      ? (isHovered ? '1px solid #475569' : '1px solid #1E293B')
-                      : (isHovered ? '1px solid #CBD5E1' : '1px solid #E2E8F0'),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: isActive
-                    ? 'none'
-                    : '0 1px 2px rgba(0,0,0,0.04)',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {item.icon(
-                  isActive
-                    ? '#FFFFFF'
-                    : isHovered
-                      ? '#38BDF8'
-                      : (isDark ? '#94A3B8' : '#475569')
-                )}
-              </div>
             </button>
             {/* ─── Reports Sub-Items: appears immediately after the reports button ─── */}
             {item.id === 'reports' && currentTab === 'reports' && !isCollapsed && (
@@ -537,25 +591,27 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: isCollapsed ? 'center' : 'space-between',
+              justifyContent: isCollapsed ? 'center' : (isUrdu ? 'space-between' : 'flex-start'),
+              gap: isCollapsed ? '0' : '10px',
               width: isCollapsed ? '46px' : '100%',
-              minHeight: isCollapsed ? '46px' : '52px',
-              height: isCollapsed ? '46px' : 'auto',
-              padding: isCollapsed ? '0' : '8px 12px',
-              borderRadius: '12px',
+              minHeight: isCollapsed ? '40px' : '40px',
+              height: isCollapsed ? '40px' : 'auto',
+              padding: isCollapsed ? '0' : '4px 8px',
+              borderRadius: '10px',
               border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FECACA',
               backgroundColor: isDark ? '#1F1315' : '#FEF2F2',
               cursor: 'pointer',
-              direction: 'rtl',
+              direction: isUrdu ? 'rtl' : 'ltr',
               transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
               boxShadow: '0 1px 3px rgba(239, 68, 68, 0.08)',
               outline: 'none',
               flexShrink: 0,
+              overflow: 'hidden',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = isDark ? '#2D1618' : '#FEE2E2';
               e.currentTarget.style.borderColor = isDark ? '#991B1B' : '#FCA5A5';
-              e.currentTarget.style.transform = isCollapsed ? 'none' : 'translateX(-2px)';
+              e.currentTarget.style.transform = isCollapsed ? 'none' : (isUrdu ? 'translateX(-2px)' : 'translateX(2px)');
               e.currentTarget.style.boxShadow = '0 3px 8px rgba(239, 68, 68, 0.14)';
             }}
             onMouseLeave={(e) => {
@@ -565,44 +621,89 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               e.currentTarget.style.boxShadow = '0 1px 3px rgba(239, 68, 68, 0.08)';
             }}
           >
-            {/* Right: Bold Urdu Nastaleeq Text */}
-            {!isCollapsed && (
-              <span
-                className={isUrdu ? 'font-nastaleeq' : ''}
-                style={{
-                  fontSize: isUrdu ? '21px' : '16px',
-                  fontWeight: 900,
-                  color: '#EF4444',
-                  lineHeight: 1.3,
-                  whiteSpace: 'nowrap',
-                  marginRight: '4px',
-                  letterSpacing: '0',
-                }}
-              >
-                {t('لاگ آؤٹ', 'Logout')}
-              </span>
-            )}
-
-            {/* Left: Dedicated Icon Squircle (or direct icon if collapsed) */}
-            {isCollapsed ? (
-              <LogOut size={20} color="#EF4444" />
+            {isUrdu ? (
+              <>
+                {!isCollapsed && (
+                  <span
+                    className="font-nastaleeq"
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 900,
+                      color: '#EF4444',
+                      lineHeight: 1.3,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      flex: 1,
+                      textAlign: 'right',
+                      marginRight: '2px',
+                    }}
+                  >
+                    {t('لاگ آؤٹ', 'Logout')}
+                  </span>
+                )}
+                {isCollapsed ? (
+                  <LogOut size={18} color="#EF4444" />
+                ) : (
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: isDark ? '#2D1618' : '#FFFFFF',
+                      border: isDark ? '1px solid #7F1D1D' : '1px solid #FECACA',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: '0 1px 2px rgba(239, 68, 68, 0.06)',
+                    }}
+                  >
+                    <LogOut size={17} color="#EF4444" />
+                  </div>
+                )}
+              </>
             ) : (
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '9px',
-                  backgroundColor: isDark ? '#2D1618' : '#FFFFFF',
-                  border: isDark ? '1px solid #7F1D1D' : '1px solid #FECACA',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 1px 2px rgba(239, 68, 68, 0.06)',
-                }}
-              >
-                <LogOut size={19} color="#EF4444" />
-              </div>
+              <>
+                {isCollapsed ? (
+                  <LogOut size={18} color="#EF4444" />
+                ) : (
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: isDark ? '#2D1618' : '#FFFFFF',
+                      border: isDark ? '1px solid #7F1D1D' : '1px solid #FECACA',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      boxShadow: '0 1px 2px rgba(239, 68, 68, 0.06)',
+                    }}
+                  >
+                    <LogOut size={17} color="#EF4444" />
+                  </div>
+                )}
+                {!isCollapsed && (
+                  <span
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      color: '#EF4444',
+                      lineHeight: 1.2,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      flex: 1,
+                      textAlign: 'left',
+                      letterSpacing: '-0.1px',
+                    }}
+                  >
+                    {t('لاگ آؤٹ', 'Logout')}
+                  </span>
+                )}
+              </>
             )}
           </button>
         )}
@@ -611,14 +712,14 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         <div
           style={{
             marginTop: 'auto',
-            paddingTop: '12px',
-            paddingBottom: '28px',
+            paddingTop: '6px',
+            paddingBottom: '12px',
             paddingLeft: isCollapsed ? '0' : '6px',
             paddingRight: isCollapsed ? '0' : '6px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: isCollapsed ? 'center' : 'space-between',
-            direction: 'rtl',
+            direction: isUrdu ? 'rtl' : 'ltr',
             fontSize: '12px',
             color: '#64748B',
             flexShrink: 0,
