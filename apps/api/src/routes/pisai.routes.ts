@@ -374,6 +374,231 @@ pisaiRouter.get('/', requireAuth, async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/pisai/queue
+ * Returns milling tokens for queue dashboard with filter option (ALL, IN_QUEUE, DELIVERED)
+ */
+pisaiRouter.get('/queue', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { status, limit = '50' } = req.query;
+    const limitNum = parseInt(limit as string, 10) || 50;
+
+    const where: any = {
+      status: { not: 'VOIDED' },
+    };
+
+    if (status && status !== 'ALL') {
+      where.deliveryStatus = status;
+    }
+
+    const records = await prisma.pisaiRecord.findMany({
+      where,
+      include: {
+        biller: { select: { id: true, fullName: true, username: true } },
+        customer: true,
+      },
+      take: limitNum,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        records,
+        count: records.length,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
+ * GET /api/pisai/token/:token
+ * Lookup single grinding ticket by token number (e.g. 1001, "T-1001", "0101") or ID
+ */
+pisaiRouter.get('/token/:token', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const rawToken = req.params.token.trim();
+    const digitsOnly = rawToken.replace(/\D/g, '');
+    const numToken = digitsOnly ? parseInt(digitsOnly, 10) : NaN;
+
+    const ticket = await prisma.pisaiRecord.findFirst({
+      where: {
+        OR: [
+          ...(!isNaN(numToken) ? [{ tokenNumber: numToken }] : []),
+          { tokenFormatted: rawToken },
+          { tokenFormatted: digitsOnly },
+          { id: rawToken },
+        ],
+      },
+      include: {
+        biller: { select: { id: true, fullName: true, username: true } },
+        customer: true,
+      },
+    });
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Token #${rawToken} not found` },
+      });
+    }
+
+    let printPayload = null;
+    if (ticket.printPayload) {
+      try {
+        printPayload = JSON.parse(ticket.printPayload);
+      } catch {
+        printPayload = { formattedText: ticket.printPayload };
+      }
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        ...ticket,
+        printPayloadParsed: printPayload,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
+ * PATCH /api/pisai/:id/delivery-status
+ * Toggle/set delivery status between IN_QUEUE and DELIVERED
+ */
+pisaiRouter.patch('/:id/delivery-status', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { deliveryStatus } = req.body;
+
+    if (!['IN_QUEUE', 'DELIVERED'].includes(deliveryStatus)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'deliveryStatus must be IN_QUEUE or DELIVERED' },
+      });
+    }
+
+    const isNum = !isNaN(Number(id));
+    const ticket = await prisma.pisaiRecord.findFirst({
+      where: isNum ? { tokenNumber: Number(id) } : { id },
+    });
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Grinding ticket not found' },
+      });
+    }
+
+    const deliveredAt = deliveryStatus === 'DELIVERED' ? new Date() : null;
+
+    const updated = await prisma.pisaiRecord.update({
+      where: { id: ticket.id },
+      data: {
+        deliveryStatus,
+        deliveredAt,
+      },
+      include: {
+        biller: { select: { id: true, fullName: true, username: true } },
+        customer: true,
+      },
+    });
+
+    await recordActivityLog({
+      userId: req.user!.id,
+      action: 'UPDATE_PISAI_DELIVERY_STATUS',
+      entityType: 'PisaiRecord',
+      entityId: ticket.id,
+      details: {
+        tokenNumber: ticket.tokenNumber,
+        deliveryStatus,
+      },
+      ipAddress: req.ip,
+    });
+
+    return res.json({
+      success: true,
+      data: updated,
+      message: `Token #${ticket.tokenFormatted} status updated to ${deliveryStatus === 'DELIVERED' ? 'Delivered' : 'In Queue'}`,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
+ * PATCH /api/pisai/:id
+ * Edit grinding ticket customer details or weight
+ */
+pisaiRouter.patch('/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { customerName, customerPhone, weightKg } = req.body;
+
+    const isNum = !isNaN(Number(id));
+    const ticket = await prisma.pisaiRecord.findFirst({
+      where: isNum ? { tokenNumber: Number(id) } : { id },
+    });
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Grinding ticket not found' },
+      });
+    }
+
+    const updated = await prisma.pisaiRecord.update({
+      where: { id: ticket.id },
+      data: {
+        ...(customerName !== undefined ? { customerName: customerName.trim() } : {}),
+        ...(customerPhone !== undefined ? { customerPhone: customerPhone.trim() } : {}),
+        ...(weightKg !== undefined && Number(weightKg) > 0 ? { weightKg: Number(weightKg) } : {}),
+      },
+      include: {
+        biller: { select: { id: true, fullName: true, username: true } },
+        customer: true,
+      },
+    });
+
+    await recordActivityLog({
+      userId: req.user!.id,
+      action: 'UPDATE_PISAI_TICKET',
+      entityType: 'PisaiRecord',
+      entityId: ticket.id,
+      details: {
+        tokenNumber: ticket.tokenNumber,
+        customerName,
+        customerPhone,
+      },
+      ipAddress: req.ip,
+    });
+
+    return res.json({
+      success: true,
+      data: updated,
+      message: 'Grinding ticket updated successfully',
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
  * GET /api/pisai/:id/reprint
  * Thermal reprint: returns identical large-format print payload without altering token sequence (PRINT-02)
  */

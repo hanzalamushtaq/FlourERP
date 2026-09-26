@@ -239,6 +239,8 @@ model PisaiRecord {
   changeReturned Float     @default(0)
   paymentMethod  String    @default("CASH") // CASH, CREDIT
   status         String    @default("PAID") // PAID, CREDIT, VOIDED, COMPLETED
+  deliveryStatus String    @default("IN_QUEUE") // IN_QUEUE, DELIVERED
+  deliveredAt    DateTime?
   printPayload   String?   // Large-format thermal ticket JSON/text
   voidReason     String?
   voidedById     String?

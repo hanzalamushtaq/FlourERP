@@ -2,7 +2,25 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
-import { Printer, BookOpen, Check, Cog, Ticket, Sparkles, Tag, Lock, AlertTriangle } from 'lucide-react';
+import {
+  Printer,
+  BookOpen,
+  Check,
+  Cog,
+  Ticket,
+  Sparkles,
+  Tag,
+  Lock,
+  AlertTriangle,
+  Search,
+  CheckCircle2,
+  Clock,
+  RotateCcw,
+  Edit3,
+  Save,
+  X,
+  RefreshCw,
+} from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getSession, ensureValidToken, clearSession } from '../../lib/auth';
@@ -84,6 +102,17 @@ export const PisaiBillingScreen: React.FC = () => {
   const [pressedBtn, setPressedBtn] = useState<'print' | 'credit' | null>(null);
 
   const [currentTokenFormatted, setCurrentTokenFormatted] = useState<string>('0101');
+
+  // Token Status & Action Lookup State
+  const [searchTokenInput, setSearchTokenInput] = useState<string>('');
+  const [isSearchingToken, setIsSearchingToken] = useState<boolean>(false);
+  const [searchedTokenData, setSearchedTokenData] = useState<any | null>(null);
+  const [searchTokenError, setSearchTokenError] = useState<string | null>(null);
+  const [isUpdatingTokenStatus, setIsUpdatingTokenStatus] = useState<boolean>(false);
+  const [isEditingTokenCustomer, setIsEditingTokenCustomer] = useState<boolean>(false);
+  const [editTokenCustName, setEditTokenCustName] = useState<string>('');
+  const [editTokenCustPhone, setEditTokenCustPhone] = useState<string>('');
+  const [isSavingTokenEdit, setIsSavingTokenEdit] = useState<boolean>(false);
 
   // Receipt Modal State
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
@@ -334,8 +363,613 @@ export const PisaiBillingScreen: React.FC = () => {
     }
   };
 
+  // Handle Token Lookup
+  const handleSearchToken = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const tokenQuery = searchTokenInput.trim();
+    if (!tokenQuery) return;
+
+    sound.beep();
+    setIsSearchingToken(true);
+    setSearchTokenError(null);
+    setSearchedTokenData(null);
+    setIsEditingTokenCustomer(false);
+
+    try {
+      const sess = getSession();
+      const res = await fetch(`${getApiBaseUrl()}/api/pisai/token/${encodeURIComponent(tokenQuery)}`, {
+        headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
+      });
+      const json = await res.json();
+      if (res.ok && json.success && json.data) {
+        sound.success();
+        setSearchedTokenData(json.data);
+        setEditTokenCustName(json.data.customerName || json.data.customer?.name || '');
+        setEditTokenCustPhone(json.data.customerPhone || json.data.customer?.phone || '');
+      } else {
+        sound.playWarningSound();
+        setSearchTokenError(json.error?.message || (isUrdu ? 'ٹوکن نمبر نہیں ملا' : 'Token not found'));
+      }
+    } catch {
+      sound.playWarningSound();
+      setSearchTokenError(isUrdu ? 'ٹوکن تلاش کرنے میں خرابی ہوئی' : 'Error looking up token');
+    } finally {
+      setIsSearchingToken(false);
+    }
+  };
+
+  // Toggle delivery status for looked up token
+  const handleToggleSearchedTokenStatus = async () => {
+    if (!searchedTokenData) return;
+    const nextStatus = searchedTokenData.deliveryStatus === 'IN_QUEUE' ? 'DELIVERED' : 'IN_QUEUE';
+    setIsUpdatingTokenStatus(true);
+    sound.success();
+
+    const updated = {
+      ...searchedTokenData,
+      deliveryStatus: nextStatus,
+      deliveredAt: nextStatus === 'DELIVERED' ? new Date().toISOString() : null,
+    };
+    setSearchedTokenData(updated);
+
+    try {
+      const sess = getSession();
+      await fetch(`${getApiBaseUrl()}/api/pisai/${searchedTokenData.id}/delivery-status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(sess?.token ? { Authorization: `Bearer ${sess.token}` } : {}),
+        },
+        body: JSON.stringify({ deliveryStatus: nextStatus }),
+      });
+    } catch {
+      // ignore
+    } finally {
+      setIsUpdatingTokenStatus(false);
+    }
+  };
+
+  // Save edited customer for looked up token
+  const handleSaveSearchedTokenEdit = async () => {
+    if (!searchedTokenData) return;
+    setIsSavingTokenEdit(true);
+    sound.beep();
+
+    const updated = {
+      ...searchedTokenData,
+      customerName: editTokenCustName.trim(),
+      customerPhone: editTokenCustPhone.trim(),
+    };
+    setSearchedTokenData(updated);
+
+    try {
+      const sess = getSession();
+      await fetch(`${getApiBaseUrl()}/api/pisai/${searchedTokenData.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(sess?.token ? { Authorization: `Bearer ${sess.token}` } : {}),
+        },
+        body: JSON.stringify({
+          customerName: editTokenCustName.trim(),
+          customerPhone: editTokenCustPhone.trim(),
+        }),
+      });
+      setIsEditingTokenCustomer(false);
+      sound.success();
+    } catch {
+      // ignore
+    } finally {
+      setIsSavingTokenEdit(false);
+    }
+  };
+
+  // Print searched token ticket
+  const handlePrintSearchedToken = () => {
+    if (!searchedTokenData) return;
+    sound.beep();
+    const tokenDisplay = searchedTokenData.tokenFormatted || `T-${searchedTokenData.tokenNumber}`;
+    const dateFormatted = searchedTokenData.createdAt
+      ? new Date(searchedTokenData.createdAt).toLocaleString('en-PK', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : new Date().toLocaleString();
+
+    const receipt: ReceiptData = {
+      type: 'pisai',
+      billNumber: tokenDisplay,
+      customerName: searchedTokenData.customerName || searchedTokenData.customer?.name,
+      serviceType: searchedTokenData.serviceType || 'SAFAI_PISAI',
+      pisaiWeightKg: searchedTokenData.weightKg,
+      pisaiToken: tokenDisplay,
+      subtotal: searchedTokenData.feeAmount || searchedTokenData.netTotal || 0,
+      discount: searchedTokenData.discount || 0,
+      netTotal: searchedTokenData.netTotal || searchedTokenData.feeAmount || 0,
+      cashReceived: searchedTokenData.receivedAmount || searchedTokenData.netTotal || 0,
+      remainingBalance: searchedTokenData.paymentMethod === 'CREDIT' ? searchedTokenData.netTotal : 0,
+      isCredit: searchedTokenData.paymentMethod === 'CREDIT',
+      timestamp: dateFormatted,
+      billerName: searchedTokenData.biller?.fullName || 'محمد عاصف',
+    };
+
+    setReceiptData(receipt);
+    setIsReceiptOpen(true);
+  };
+
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* 0. TOP: Token Status & Action Lookup Card */}
+      <div
+        style={{
+          backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+          borderRadius: '16px',
+          border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
+          padding: '14px 18px',
+          boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : '0 2px 8px rgba(0, 0, 0, 0.04)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                backgroundColor: isDark ? '#334155' : '#EFF6FF',
+                color: isDark ? '#93C5FD' : '#1877F2',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Search size={17} />
+            </div>
+            <div>
+              <h3
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  margin: 0,
+                  fontSize: isUrdu ? '20px' : '15px',
+                  fontWeight: 900,
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                }}
+              >
+                {t('ٹوکن نمبر اسٹیٹس اور فوری کارروائی', 'Token Status & Action Lookup')}
+              </h3>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: isUrdu ? '14px' : '12px',
+                  color: isDark ? '#94A3B8' : '#64748B',
+                }}
+              >
+                {t('ٹوکن نمبر درج کریں اور اسٹیٹس (قطار / فراہم شدہ) چیک کریں', 'Insert token number to check status, mark delivered, edit or print')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Bar Form */}
+        <form onSubmit={handleSearchToken} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <input
+              type="text"
+              value={searchTokenInput}
+              onChange={(e) => {
+                setSearchTokenInput(e.target.value);
+                if (searchTokenError) setSearchTokenError(null);
+              }}
+              placeholder={t('ٹوکن نمبر درج کریں (مثال: 1001 یا 101)', 'Enter Token # (e.g. 1001 or 101)...')}
+              style={{
+                width: '100%',
+                height: '42px',
+                padding: '0 14px',
+                borderRadius: '10px',
+                border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                color: isDark ? '#F8FAFC' : '#0F172A',
+                fontSize: '15px',
+                fontWeight: 700,
+                outline: 'none',
+                fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
+              }}
+            />
+            {searchTokenInput && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTokenInput('');
+                  setSearchedTokenData(null);
+                  setSearchTokenError(null);
+                }}
+                style={{
+                  position: 'absolute',
+                  right: isUrdu ? 'auto' : '10px',
+                  left: isUrdu ? '10px' : 'auto',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+              >
+                <X size={15} />
+              </button>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={!searchTokenInput.trim() || isSearchingToken}
+            style={{
+              height: '42px',
+              padding: '0 18px',
+              borderRadius: '10px',
+              border: 'none',
+              backgroundColor: '#1877F2',
+              color: '#FFFFFF',
+              fontWeight: 800,
+              fontSize: isUrdu ? '16px' : '14px',
+              cursor: searchTokenInput.trim() && !isSearchingToken ? 'pointer' : 'not-allowed',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 2px 6px rgba(24, 119, 242, 0.25)',
+              opacity: searchTokenInput.trim() && !isSearchingToken ? 1 : 0.65,
+            }}
+          >
+            {isSearchingToken ? (
+              <RefreshCw size={16} className="animate-spin" />
+            ) : (
+              <Search size={16} />
+            )}
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {t('چیک کریں', 'Check')}
+            </span>
+          </button>
+        </form>
+
+        {/* Error message */}
+        {searchTokenError && (
+          <div
+            style={{
+              backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2',
+              border: '1px solid #EF4444',
+              borderRadius: '8px',
+              padding: '8px 12px',
+              color: '#EF4444',
+              fontSize: '13px',
+              fontWeight: 700,
+            }}
+          >
+            {searchTokenError}
+          </div>
+        )}
+
+        {/* Result & Action Card */}
+        {searchedTokenData && (
+          <div
+            style={{
+              backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
+              borderRadius: '12px',
+              border: isDark ? '1px solid #334155' : '1px solid #CBD5E1',
+              padding: '14px 16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}
+          >
+            {/* Header: Token # + Status Badge */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span
+                  style={{
+                    backgroundColor: '#D97706',
+                    color: '#FFFFFF',
+                    padding: '4px 12px',
+                    borderRadius: '8px',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 900,
+                    fontSize: '16px',
+                  }}
+                >
+                  {searchedTokenData.tokenFormatted || `T-${searchedTokenData.tokenNumber}`}
+                </span>
+                <span
+                  style={{
+                    fontWeight: 800,
+                    fontSize: isUrdu ? '18px' : '15px',
+                    color: isDark ? '#F8FAFC' : '#0F172A',
+                    fontFamily: 'var(--font-urdu)',
+                  }}
+                >
+                  {searchedTokenData.customerName || searchedTokenData.customer?.name || (isUrdu ? 'عام گاہک' : 'Walk-in Customer')}
+                </span>
+              </div>
+
+              {/* Status Badge */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 12px',
+                  borderRadius: '8px',
+                  fontWeight: 900,
+                  fontSize: isUrdu ? '15px' : '13px',
+                  backgroundColor:
+                    searchedTokenData.deliveryStatus === 'DELIVERED'
+                      ? (isDark ? 'rgba(16, 185, 129, 0.2)' : '#ECFDF5')
+                      : (isDark ? 'rgba(217, 119, 6, 0.2)' : '#FFFBEB'),
+                  color:
+                    searchedTokenData.deliveryStatus === 'DELIVERED'
+                      ? '#0E8A54'
+                      : '#B45309',
+                  border:
+                    searchedTokenData.deliveryStatus === 'DELIVERED'
+                      ? '1px solid #10B981'
+                      : '1px solid #D97706',
+                }}
+              >
+                {searchedTokenData.deliveryStatus === 'DELIVERED' ? (
+                  <>
+                    <CheckCircle2 size={16} />
+                    <span>{t('فراہم کر دیا گیا (Delivered)', 'Delivered')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Clock size={16} />
+                    <span>{t('قطار میں ہے (In Queue)', 'In Queue')}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Specs */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                gap: '8px',
+                fontSize: '13px',
+              }}
+            >
+              <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '8px 10px', borderRadius: '8px' }}>
+                <span style={{ color: isDark ? '#94A3B8' : '#64748B', display: 'block', fontSize: '11px', fontWeight: 700 }}>
+                  {t('گندم کا وزن', 'Wheat Weight')}
+                </span>
+                <span style={{ fontWeight: 900, fontSize: '15px', color: isDark ? '#F8FAFC' : '#0F172A' }}>
+                  {searchedTokenData.weightKg} KG
+                </span>
+              </div>
+
+              <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '8px 10px', borderRadius: '8px' }}>
+                <span style={{ color: isDark ? '#94A3B8' : '#64748B', display: 'block', fontSize: '11px', fontWeight: 700 }}>
+                  {t('سروس', 'Service')}
+                </span>
+                <span style={{ fontWeight: 900, fontSize: '14px', color: '#D97706' }}>
+                  {searchedTokenData.serviceType === 'PISAI_ONLY' ? t('صرف پسائی', 'Pisai Only') : t('صفائی و پسائی', 'Safai & Pisai')}
+                </span>
+              </div>
+
+              <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '8px 10px', borderRadius: '8px' }}>
+                <span style={{ color: isDark ? '#94A3B8' : '#64748B', display: 'block', fontSize: '11px', fontWeight: 700 }}>
+                  {t('پسائی اجرت', 'Grinding Fee')}
+                </span>
+                <span style={{ fontWeight: 900, fontSize: '15px', color: isDark ? '#F8FAFC' : '#0F172A' }}>
+                  Rs {searchedTokenData.netTotal || searchedTokenData.feeAmount}
+                </span>
+              </div>
+
+              <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '8px 10px', borderRadius: '8px' }}>
+                <span style={{ color: isDark ? '#94A3B8' : '#64748B', display: 'block', fontSize: '11px', fontWeight: 700 }}>
+                  {t('ادائیگی', 'Payment')}
+                </span>
+                <span style={{ fontWeight: 800, fontSize: '13px', color: searchedTokenData.paymentMethod === 'CREDIT' ? '#B45309' : '#0E8A54' }}>
+                  {searchedTokenData.paymentMethod === 'CREDIT' ? t('ادھار', 'Credit') : t('نقد', 'Cash')}
+                </span>
+              </div>
+            </div>
+
+            {/* Inline Customer Edit Form (if toggled) */}
+            {isEditingTokenCustomer && (
+              <div
+                style={{
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  borderRadius: '8px',
+                  padding: '10px 12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                }}
+              >
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                      {t('گاہک کا نام', 'Customer Name')}
+                    </label>
+                    <input
+                      type="text"
+                      value={editTokenCustName}
+                      onChange={(e) => setEditTokenCustName(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '13px',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                      {t('فون نمبر', 'Phone Number')}
+                    </label>
+                    <input
+                      type="text"
+                      value={editTokenCustPhone}
+                      onChange={(e) => setEditTokenCustPhone(e.target.value)}
+                      placeholder="0300-1234567"
+                      style={{
+                        width: '100%',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '13px',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingTokenCustomer(false)}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: 'transparent',
+                      color: isDark ? '#94A3B8' : '#64748B',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {t('منسوخ', 'Cancel')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveSearchedTokenEdit}
+                    disabled={isSavingTokenEdit}
+                    style={{
+                      padding: '4px 12px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      backgroundColor: '#1877F2',
+                      color: '#FFFFFF',
+                      fontSize: '12px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <Save size={13} />
+                    <span>{t('محفوظ کریں', 'Save')}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons Row */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* Action 1: Status Toggle Button */}
+              <button
+                type="button"
+                onClick={handleToggleSearchedTokenStatus}
+                disabled={isUpdatingTokenStatus}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  fontWeight: 900,
+                  fontSize: isUrdu ? '15px' : '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor:
+                    searchedTokenData.deliveryStatus === 'IN_QUEUE' ? '#0E8A54' : '#D97706',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                }}
+              >
+                {searchedTokenData.deliveryStatus === 'IN_QUEUE' ? (
+                  <>
+                    <Check size={16} />
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {t('گاہک کو فراہم کر دیا گیا (Mark Delivered)', 'Mark as Delivered')}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw size={16} />
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {t('واپس قطار میں ڈالیں (Move to Queue)', 'Move back to Queue')}
+                    </span>
+                  </>
+                )}
+              </button>
+
+              {/* Action 2: Print Ticket */}
+              <button
+                type="button"
+                onClick={handlePrintSearchedToken}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#D97706',
+                  color: '#FFFFFF',
+                  fontWeight: 900,
+                  fontSize: isUrdu ? '15px' : '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Printer size={16} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('پرچی پرنٹ کریں', 'Print Ticket')}
+                </span>
+              </button>
+
+              {/* Action 3: Edit Details */}
+              <button
+                type="button"
+                onClick={() => setIsEditingTokenCustomer((prev) => !prev)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  fontWeight: 800,
+                  fontSize: isUrdu ? '14px' : '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Edit3 size={15} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('معلومات درست کریں', 'Edit Details')}
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* 1. TOP: Premium Dual Service Selection Switcher (Responsive) */}
       <div className="dual-top-action-cards">
         {/* Card 1: Safai + Pisai */}

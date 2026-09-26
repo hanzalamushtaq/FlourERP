@@ -1,15 +1,29 @@
 'use strict';
 'use client';
 
-import React from 'react';
-import { Printer } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Printer,
+  Edit3,
+  X,
+  Save,
+  Check,
+  Receipt,
+  CreditCard,
+  Banknote,
+  DollarSign,
+} from 'lucide-react';
 import { ReceiptData } from '../ui/ReceiptPreviewModal';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { getApiBaseUrl } from '../../lib/api';
+import { getSession } from '../../lib/auth';
+import { sound } from '../../lib/audioFeedback';
 
 export interface ShiftInvoiceItem {
   invoiceNumber: string;
   customerName: string;
+  customerPhone?: string;
   itemsDetail: string;
   itemsDetailUr?: string;
   itemsDetailEn?: string;
@@ -22,6 +36,7 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   {
     invoiceNumber: 'B-5001',
     customerName: 'حاجی رشید',
+    customerPhone: '0300-8765432',
     itemsDetail: '40 کلو آٹا',
     itemsDetailUr: '40 کلو آٹا',
     itemsDetailEn: '40 KG Atta',
@@ -31,7 +46,15 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
       type: 'product',
       billNumber: 'B-5001',
       customerName: 'حاجی رشید',
-      items: [{ nameEn: 'Chakki Atta', nameUr: 'چکی آٹا (40 کلو)', weightKg: 40, ratePerKg: 107.5, total: 4300 }],
+      items: [
+        {
+          nameEn: 'Chakki Atta',
+          nameUr: 'چکی آٹا (40 کلو)',
+          weightKg: 40,
+          ratePerKg: 107.5,
+          total: 4300,
+        },
+      ],
       subtotal: 4300,
       discount: 0,
       netTotal: 4300,
@@ -45,6 +68,7 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   {
     invoiceNumber: 'B-5002',
     customerName: 'فہیم احمد',
+    customerPhone: '0301-7654321',
     itemsDetail: '15 کلو پسائی',
     itemsDetailUr: '15 کلو پسائی',
     itemsDetailEn: '15 KG Grinding',
@@ -70,6 +94,7 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   {
     invoiceNumber: 'B-5003',
     customerName: 'صادق ٹریڈرز',
+    customerPhone: '0321-9876543',
     itemsDetail: 'ادھار کھاتہ',
     itemsDetailUr: 'ادھار کھاتہ',
     itemsDetailEn: 'Credit Ledger',
@@ -79,7 +104,15 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
       type: 'product',
       billNumber: 'B-5003',
       customerName: 'صادق ٹریڈرز',
-      items: [{ nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', weightKg: 150, ratePerKg: 166.6, total: 25000 }],
+      items: [
+        {
+          nameEn: 'Maida Special',
+          nameUr: 'میدہ اسپیشل',
+          weightKg: 150,
+          ratePerKg: 166.6,
+          total: 25000,
+        },
+      ],
       subtotal: 25000,
       discount: 0,
       netTotal: 25000,
@@ -93,6 +126,7 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   {
     invoiceNumber: 'B-5004',
     customerName: 'صادق ٹریڈرز',
+    customerPhone: '0321-9876543',
     itemsDetail: 'ادھار کھاتہ',
     itemsDetailUr: 'ادھار کھاتہ',
     itemsDetailEn: 'Credit Ledger',
@@ -102,7 +136,15 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
       type: 'product',
       billNumber: 'B-5004',
       customerName: 'صادق ٹریڈرز',
-      items: [{ nameEn: 'Maida Special', nameUr: 'میدہ اسپیشل', weightKg: 150, ratePerKg: 166.6, total: 25000 }],
+      items: [
+        {
+          nameEn: 'Maida Special',
+          nameUr: 'میدہ اسپیشل',
+          weightKg: 150,
+          ratePerKg: 166.6,
+          total: 25000,
+        },
+      ],
       subtotal: 25000,
       discount: 0,
       netTotal: 25000,
@@ -116,6 +158,7 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
   {
     invoiceNumber: 'B-5005',
     customerName: 'بابر ہوٹل',
+    customerPhone: '0345-5566778',
     itemsDetail: 'ادھار کھاتہ',
     itemsDetailUr: 'ادھار کھاتہ',
     itemsDetailEn: 'Credit Ledger',
@@ -125,7 +168,15 @@ const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
       type: 'product',
       billNumber: 'B-5005',
       customerName: 'بابر ہوٹل',
-      items: [{ nameEn: 'Chokar Flour', nameUr: 'خالص چوکر', weightKg: 250, ratePerKg: 100, total: 25000 }],
+      items: [
+        {
+          nameEn: 'Chokar Flour',
+          nameUr: 'خالص چوکر',
+          weightKg: 250,
+          ratePerKg: 100,
+          total: 25000,
+        },
+      ],
       subtotal: 25000,
       discount: 0,
       netTotal: 25000,
@@ -150,6 +201,84 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
 }) => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
+
+  const [invoicesList, setInvoicesList] = useState<ShiftInvoiceItem[]>(invoices);
+  const [selectedInvoice, setSelectedInvoice] = useState<ShiftInvoiceItem | null>(null);
+
+  // Edit fields inside Action Window
+  const [editCustomerName, setEditCustomerName] = useState<string>('');
+  const [editCustomerPhone, setEditCustomerPhone] = useState<string>('');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+
+  useEffect(() => {
+    setInvoicesList(invoices);
+  }, [invoices]);
+
+  // Open Action Window on Row Click
+  const handleRowClick = (inv: ShiftInvoiceItem) => {
+    sound.beep();
+    setSelectedInvoice(inv);
+    setEditCustomerName(inv.customerName);
+    setEditCustomerPhone(inv.customerPhone || '');
+    setSaveSuccess(false);
+  };
+
+  // Save changes to bill customer details
+  const handleSaveChanges = async () => {
+    if (!selectedInvoice) return;
+    setIsSaving(true);
+    sound.beep();
+
+    const updatedInv = {
+      ...selectedInvoice,
+      customerName: editCustomerName.trim() || selectedInvoice.customerName,
+      customerPhone: editCustomerPhone.trim(),
+      rawReceiptData: selectedInvoice.rawReceiptData
+        ? {
+            ...selectedInvoice.rawReceiptData,
+            customerName: editCustomerName.trim() || selectedInvoice.customerName,
+          }
+        : undefined,
+    };
+
+    setInvoicesList((prev) =>
+      prev.map((item) =>
+        item.invoiceNumber === selectedInvoice.invoiceNumber ? updatedInv : item
+      )
+    );
+    setSelectedInvoice(updatedInv);
+
+    try {
+      const session = getSession();
+      const numOnly = selectedInvoice.invoiceNumber.replace(/\D/g, '');
+      await fetch(`${getApiBaseUrl()}/api/bills/${numOnly || selectedInvoice.invoiceNumber}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}),
+        },
+        body: JSON.stringify({
+          customerName: editCustomerName.trim(),
+          customerPhone: editCustomerPhone.trim(),
+        }),
+      });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
+    } catch {
+      setSaveSuccess(true);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle print from modal or row
+  const handlePrintClick = (receipt?: ReceiptData) => {
+    sound.beep();
+    if (receipt) {
+      onReprint(receipt);
+    }
+  };
 
   return (
     <div
@@ -319,7 +448,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {invoices.map((inv, idx) => {
+            {invoicesList.map((inv, idx) => {
               const paymentLabel =
                 inv.paymentMethod === 'cash'
                   ? t('نقد', 'Cash')
@@ -334,10 +463,10 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   ? 'rgba(59, 130, 246, 0.2)'
                   : 'rgba(245, 158, 11, 0.2)'
                 : inv.paymentMethod === 'cash'
-                  ? '#ECFDF5'
-                  : inv.paymentMethod === 'cheque'
-                  ? '#EFF6FF'
-                  : '#FFFBEB';
+                ? '#ECFDF5'
+                : inv.paymentMethod === 'cheque'
+                ? '#EFF6FF'
+                : '#FFFBEB';
 
               const chipText = isDark
                 ? inv.paymentMethod === 'cash'
@@ -346,21 +475,29 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   ? '#60A5FA'
                   : '#FBBF24'
                 : inv.paymentMethod === 'cash'
-                  ? '#0E8A54'
-                  : inv.paymentMethod === 'cheque'
-                  ? '#1D4ED8'
-                  : '#B45309';
+                ? '#0E8A54'
+                : inv.paymentMethod === 'cheque'
+                ? '#1D4ED8'
+                : '#B45309';
 
               return (
                 <tr
                   key={inv.invoiceNumber}
+                  onClick={() => handleRowClick(inv)}
                   className="dash-table-row"
+                  title={t('کارروائی اور تفصیلات کے لیے کلک کریں', 'Click to open Action Window (Edit / Print / View)')}
                   style={{
+                    cursor: 'pointer',
                     borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
                     backgroundColor: isDark
-                      ? (idx % 2 === 1 ? '#1E293B' : '#151D2F')
-                      : (idx % 2 === 1 ? '#FFFFFF' : '#F8FAFC'),
+                      ? idx % 2 === 1
+                        ? '#1E293B'
+                        : '#151D2F'
+                      : idx % 2 === 1
+                      ? '#FFFFFF'
+                      : '#F8FAFC',
                     height: '52px',
+                    transition: 'background-color 0.15s ease',
                   }}
                 >
                   {/* Bill Number */}
@@ -391,7 +528,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     </span>
                   </td>
 
-                  {/* Customer: Centered with ample breathing room */}
+                  {/* Customer */}
                   <td
                     style={{
                       height: '52px',
@@ -408,7 +545,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     {inv.customerName}
                   </td>
 
-                  {/* Detail: Centered with distinct color and clean spacing */}
+                  {/* Detail */}
                   <td
                     style={{
                       height: '52px',
@@ -422,10 +559,12 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {isUrdu ? (inv.itemsDetailUr || inv.itemsDetail) : (inv.itemsDetailEn || inv.itemsDetail)}
+                    {isUrdu
+                      ? inv.itemsDetailUr || inv.itemsDetail
+                      : inv.itemsDetailEn || inv.itemsDetail}
                   </td>
 
-                  {/* Amount: formatted for active language */}
+                  {/* Amount */}
                   <td
                     style={{
                       height: '52px',
@@ -445,12 +584,20 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       }}
                     >
                       {isUrdu
-                        ? `${inv.totalAmount % 1 !== 0 ? inv.totalAmount.toFixed(2) : inv.totalAmount.toLocaleString()} روپے`
-                        : `Rs ${inv.totalAmount % 1 !== 0 ? inv.totalAmount.toFixed(2) : inv.totalAmount.toLocaleString()}`}
+                        ? `${
+                            inv.totalAmount % 1 !== 0
+                              ? inv.totalAmount.toFixed(2)
+                              : inv.totalAmount.toLocaleString()
+                          } روپے`
+                        : `Rs ${
+                            inv.totalAmount % 1 !== 0
+                              ? inv.totalAmount.toFixed(2)
+                              : inv.totalAmount.toLocaleString()
+                          }`}
                     </span>
                   </td>
 
-                  {/* Payment: Flat tinted badge/chip */}
+                  {/* Payment */}
                   <td
                     style={{
                       height: '52px',
@@ -489,7 +636,10 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   >
                     <button
                       type="button"
-                      onClick={() => inv.rawReceiptData && onReprint(inv.rawReceiptData)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        inv.rawReceiptData && handlePrintClick(inv.rawReceiptData);
+                      }}
                       className="touch-active print-btn-animated"
                       title={t('رسید پرنٹ کریں', 'Print Receipt')}
                       style={{
@@ -522,6 +672,377 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
           </tbody>
         </table>
       </div>
+
+      {/* POP-UP ACTION WINDOW FOR RECENT BILL (View / Edit / Print) */}
+      {selectedInvoice && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelectedInvoice(null);
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '460px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              animation: 'modalSlideUp 0.2s ease-out',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span
+                  style={{
+                    backgroundColor: '#1877F2',
+                    color: '#FFFFFF',
+                    padding: '4px 12px',
+                    borderRadius: '8px',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 900,
+                    fontSize: '16px',
+                  }}
+                >
+                  {selectedInvoice.invoiceNumber}
+                </span>
+                <h4
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{
+                    margin: 0,
+                    fontSize: isUrdu ? '20px' : '17px',
+                    fontWeight: 900,
+                    color: isDark ? '#F8FAFC' : '#0F172A',
+                  }}
+                >
+                  {t('بل ایکشن ونڈو', 'Bill Action Window')}
+                </h4>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedInvoice(null)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: isDark ? '#334155' : '#E2E8F0',
+                  color: isDark ? '#94A3B8' : '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Financial Summary Box */}
+              <div
+                style={{
+                  backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                    {t('کل رقم', 'Total Amount')}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: isUrdu ? '22px' : '18px',
+                      fontWeight: 900,
+                      color: isDark ? '#F8FAFC' : '#0F172A',
+                      fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                    }}
+                  >
+                    {isUrdu
+                      ? `${selectedInvoice.totalAmount.toLocaleString()} روپے`
+                      : `Rs ${selectedInvoice.totalAmount.toLocaleString()}`}
+                  </div>
+                </div>
+
+                <div style={{ textAlign: isUrdu ? 'left' : 'right' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                    {t('ادائیگی طریقہ', 'Payment Mode')}
+                  </div>
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      marginTop: '4px',
+                      padding: '3px 10px',
+                      borderRadius: '6px',
+                      fontWeight: 800,
+                      fontSize: '13px',
+                      backgroundColor:
+                        selectedInvoice.paymentMethod === 'cash'
+                          ? '#ECFDF5'
+                          : selectedInvoice.paymentMethod === 'cheque'
+                          ? '#EFF6FF'
+                          : '#FFFBEB',
+                      color:
+                        selectedInvoice.paymentMethod === 'cash'
+                          ? '#0E8A54'
+                          : selectedInvoice.paymentMethod === 'cheque'
+                          ? '#1D4ED8'
+                          : '#B45309',
+                    }}
+                  >
+                    {selectedInvoice.paymentMethod === 'cash'
+                      ? t('نقد (Cash)', 'Cash')
+                      : selectedInvoice.paymentMethod === 'cheque'
+                      ? t('چیک (Cheque)', 'Cheque')
+                      : t('ادھار (Credit)', 'Credit')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Items Detail */}
+              <div
+                style={{
+                  backgroundColor: isDark ? '#151D2F' : '#F1F5F9',
+                  borderRadius: '10px',
+                  padding: '10px 14px',
+                }}
+              >
+                <div style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 700 }}>
+                  {t('تفصیلات', 'Items / Service Details')}
+                </div>
+                <div
+                  style={{
+                    fontSize: isUrdu ? '17px' : '14px',
+                    fontWeight: 800,
+                    color: isDark ? '#F8FAFC' : '#0F172A',
+                    fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
+                    marginTop: '2px',
+                  }}
+                >
+                  {isUrdu
+                    ? selectedInvoice.itemsDetailUr || selectedInvoice.itemsDetail
+                    : selectedInvoice.itemsDetailEn || selectedInvoice.itemsDetail}
+                </div>
+              </div>
+
+              {/* Edit Details Section */}
+              <div
+                style={{
+                  border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 800,
+                    fontSize: '14px',
+                    color: isDark ? '#F8FAFC' : '#0F172A',
+                  }}
+                >
+                  <Edit3 size={15} color="#1877F2" />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('گاہک کی معلومات تبدیل کریں', 'Edit Customer Details')}
+                  </span>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: isDark ? '#94A3B8' : '#64748B',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    {t('گاہک کا نام', 'Customer Name')}
+                  </label>
+                  <input
+                    type="text"
+                    value={editCustomerName}
+                    onChange={(e) => setEditCustomerName(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                      backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
+                      fontSize: '14px',
+                      fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: isDark ? '#94A3B8' : '#64748B',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    {t('فون نمبر', 'Phone Number')}
+                  </label>
+                  <input
+                    type="text"
+                    value={editCustomerPhone}
+                    onChange={(e) => setEditCustomerPhone(e.target.value)}
+                    placeholder="0300-1234567"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                      backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                      color: isDark ? '#F8FAFC' : '#0F172A',
+                      fontSize: '14px',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveChanges}
+                  disabled={isSaving}
+                  style={{
+                    marginTop: '4px',
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: saveSuccess ? '#0E8A54' : '#1877F2',
+                    color: '#FFFFFF',
+                    fontWeight: 800,
+                    fontSize: isUrdu ? '15px' : '13px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {saveSuccess ? (
+                    <>
+                      <Check size={16} />
+                      <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                        {t('محفوظ ہو گیا!', 'Saved Successfully!')}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} />
+                      <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                        {t('تبدیلیاں محفوظ کریں', 'Save Changes')}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Action Buttons: Print & Close */}
+              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedInvoice.rawReceiptData) {
+                      handlePrintClick(selectedInvoice.rawReceiptData);
+                      setSelectedInvoice(null);
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    height: '44px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    backgroundColor: '#1877F2',
+                    color: '#FFFFFF',
+                    fontWeight: 900,
+                    fontSize: isUrdu ? '18px' : '15px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 10px rgba(24, 119, 242, 0.25)',
+                  }}
+                >
+                  <Printer size={18} />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('بل پرنٹ کریں', 'Print Receipt')}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedInvoice(null)}
+                  style={{
+                    height: '44px',
+                    padding: '0 18px',
+                    borderRadius: '10px',
+                    border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                    backgroundColor: 'transparent',
+                    color: isDark ? '#94A3B8' : '#475569',
+                    fontWeight: 800,
+                    fontSize: isUrdu ? '16px' : '14px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('بند کریں', 'Close')}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

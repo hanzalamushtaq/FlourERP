@@ -115,6 +115,14 @@ class SoundSynthesizer {
       // Audio autoplay policy catch
     }
   }
+
+  public beep() {
+    this.playKeyClick();
+  }
+
+  public success() {
+    this.playSuccessChime();
+  }
 }
 
 export const sound = new SoundSynthesizer();

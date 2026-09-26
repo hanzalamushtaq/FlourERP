@@ -577,6 +577,101 @@ billingRouter.get('/:id/reprint', requireAuth, async (req: Request, res: Respons
 });
 
 /**
+ * GET /api/bills/:id
+ * Retrieve single bill by UUID or billNumber
+ */
+billingRouter.get('/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const isNum = !isNaN(Number(id));
+    const bill = await prisma.bill.findFirst({
+      where: isNum ? { billNumber: Number(id) } : { id },
+      include: {
+        items: true,
+        biller: { select: { id: true, fullName: true, username: true } },
+        customer: true,
+      },
+    });
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Bill not found' },
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: bill,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
+ * PATCH /api/bills/:id
+ * Update bill customer details
+ */
+billingRouter.patch('/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { customerName, customerPhone } = req.body;
+
+    const isNum = !isNaN(Number(id));
+    const bill = await prisma.bill.findFirst({
+      where: isNum ? { billNumber: Number(id) } : { id },
+    });
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Bill not found' },
+      });
+    }
+
+    const updated = await prisma.bill.update({
+      where: { id: bill.id },
+      data: {
+        ...(customerName !== undefined ? { customerName: customerName.trim() } : {}),
+        ...(customerPhone !== undefined ? { customerPhone: customerPhone.trim() } : {}),
+      },
+      include: {
+        items: true,
+        biller: { select: { id: true, fullName: true, username: true } },
+      },
+    });
+
+    await recordActivityLog({
+      userId: req.user!.id,
+      action: 'UPDATE_BILL',
+      entityType: 'Bill',
+      entityId: bill.id,
+      details: {
+        billNumber: bill.billNumber,
+        customerName,
+        customerPhone,
+      },
+      ipAddress: req.ip,
+    });
+
+    return res.json({
+      success: true,
+      data: updated,
+      message: 'Bill updated successfully',
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
  * POST /api/bills/:id/void
  * Admin void endpoint for standard bills (VOID-01)
  */
