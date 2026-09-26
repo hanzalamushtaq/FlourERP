@@ -542,14 +542,32 @@ pisaiRouter.patch('/:id/delivery-status', requireAuth, async (req: Request, res:
  * PATCH /api/pisai/:id
  * Edit grinding ticket customer details or weight
  */
+/**
+ * PATCH /api/pisai/:id
+ * Edit grinding ticket: customer details, weight, fee/money settlement, credit/ledger, delivery status
+ */
 pisaiRouter.patch('/:id', requireAuth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { customerName, customerPhone, weightKg } = req.body;
+    const {
+      customerName,
+      customerPhone,
+      weightKg,
+      feeAmount,
+      discount,
+      receivedAmount,
+      paymentMethod,
+      deliveryStatus,
+      saveToLedger,
+    } = req.body;
 
     const isNum = !isNaN(Number(id));
     const ticket = await prisma.pisaiRecord.findFirst({
       where: isNum ? { tokenNumber: Number(id) } : { id },
+      include: {
+        customer: true,
+        ledgerEntries: true,
+      },
     });
 
     if (!ticket) {
@@ -559,12 +577,129 @@ pisaiRouter.patch('/:id', requireAuth, async (req: Request, res: Response) => {
       });
     }
 
+    const newWeight = weightKg !== undefined && Number(weightKg) > 0 ? Number(weightKg) : ticket.weightKg;
+    const newFee = feeAmount !== undefined && Number(feeAmount) >= 0 ? Number(feeAmount) : ticket.feeAmount;
+    const newDiscount = discount !== undefined && Number(discount) >= 0 ? Number(discount) : ticket.discount;
+    const newNetTotal = Math.max(0, newFee - newDiscount);
+
+    const enteredReceived = receivedAmount !== undefined
+      ? (Number(receivedAmount) >= 0 ? Number(receivedAmount) : 0)
+      : ticket.receivedAmount;
+    const actualReceived = Math.min(newNetTotal, enteredReceived);
+    const debtAmount = Math.max(0, newNetTotal - actualReceived);
+    const changeReturned = Math.max(0, enteredReceived - newNetTotal);
+
+    const isCredit = paymentMethod === 'CREDIT' || saveToLedger === true || (receivedAmount !== undefined && debtAmount > 0);
+    const newPaymentMethod = isCredit ? 'CREDIT' : (paymentMethod || (debtAmount > 0 ? 'CREDIT' : 'CASH'));
+    const newStatus = debtAmount > 0 ? 'CREDIT' : 'PAID';
+
+    const newDeliveryStatus = deliveryStatus !== undefined ? deliveryStatus : ticket.deliveryStatus;
+    const deliveredAt = newDeliveryStatus === 'DELIVERED' ? (ticket.deliveredAt || new Date()) : null;
+
+    const finalCustName = customerName !== undefined ? customerName.trim() : (ticket.customerName || '');
+    const finalCustPhone = customerPhone !== undefined ? customerPhone.trim() : (ticket.customerPhone || '');
+
+    let customerId: string | null = ticket.customerId;
+
+    // Resolve or link customer if name provided
+    if (finalCustName) {
+      let cust = await prisma.customer.findFirst({
+        where: { name: finalCustName },
+      });
+      if (!cust) {
+        cust = await prisma.customer.create({
+          data: {
+            name: finalCustName,
+            phone: finalCustPhone || null,
+            currentBalance: 0,
+          },
+        });
+      } else if (finalCustPhone && !cust.phone) {
+        await prisma.customer.update({
+          where: { id: cust.id },
+          data: { phone: finalCustPhone },
+        });
+      }
+      customerId = cust.id;
+    }
+
+    // Ledger adjustment if debt/credit is being modified
+    if (customerId) {
+      const existingDebit = ticket.ledgerEntries?.find((e: any) => e.type === 'DEBIT_PURCHASE');
+      const prevDebt = existingDebit ? existingDebit.amount : 0;
+      const targetDebt = isCredit ? debtAmount : 0;
+      const debtDiff = targetDebt - prevDebt;
+
+      if (debtDiff !== 0) {
+        const custRecord = await prisma.customer.findUnique({ where: { id: customerId } });
+        const prevBal = custRecord?.currentBalance || 0;
+        const newBal = Math.max(0, prevBal + debtDiff);
+
+        await prisma.customer.update({
+          where: { id: customerId },
+          data: { currentBalance: newBal },
+        });
+
+        const sName = ticket.serviceType === 'SAFAI_PISAI' ? 'صفائی و پسائی' : 'صرف پسائی';
+
+        if (existingDebit) {
+          if (targetDebt === 0) {
+            // Customer settled previous debt
+            await prisma.ledgerEntry.create({
+              data: {
+                customerId,
+                pisaiId: ticket.id,
+                type: 'CREDIT_PAYMENT',
+                amount: prevDebt,
+                description: `ادائیگی / کلیرنس پسائی ٹوکن #${ticket.tokenFormatted}`,
+                balanceAfter: newBal,
+                recordedById: req.user!.id,
+              },
+            });
+          } else {
+            // Update existing debit entry
+            await prisma.ledgerEntry.update({
+              where: { id: existingDebit.id },
+              data: {
+                amount: targetDebt,
+                balanceAfter: newBal,
+                description: `پسائی ٹوکن #${ticket.tokenFormatted} - ${newWeight} KG ${sName}`,
+              },
+            });
+          }
+        } else if (targetDebt > 0) {
+          // New debit entry
+          await prisma.ledgerEntry.create({
+            data: {
+              customerId,
+              pisaiId: ticket.id,
+              type: 'DEBIT_PURCHASE',
+              amount: targetDebt,
+              description: `پسائی ٹوکن #${ticket.tokenFormatted} - ${newWeight} KG ${sName}`,
+              balanceAfter: newBal,
+              recordedById: req.user!.id,
+            },
+          });
+        }
+      }
+    }
+
     const updated = await prisma.pisaiRecord.update({
       where: { id: ticket.id },
       data: {
-        ...(customerName !== undefined ? { customerName: customerName.trim() } : {}),
-        ...(customerPhone !== undefined ? { customerPhone: customerPhone.trim() } : {}),
-        ...(weightKg !== undefined && Number(weightKg) > 0 ? { weightKg: Number(weightKg) } : {}),
+        ...(customerName !== undefined ? { customerName: finalCustName || null } : {}),
+        ...(customerPhone !== undefined ? { customerPhone: finalCustPhone || null } : {}),
+        customerId,
+        weightKg: newWeight,
+        feeAmount: newFee,
+        discount: newDiscount,
+        netTotal: newNetTotal,
+        receivedAmount: actualReceived,
+        changeReturned,
+        paymentMethod: newPaymentMethod,
+        status: newStatus,
+        deliveryStatus: newDeliveryStatus,
+        deliveredAt,
       },
       include: {
         biller: { select: { id: true, fullName: true, username: true } },
@@ -579,8 +714,11 @@ pisaiRouter.patch('/:id', requireAuth, async (req: Request, res: Response) => {
       entityId: ticket.id,
       details: {
         tokenNumber: ticket.tokenNumber,
-        customerName,
-        customerPhone,
+        customerName: finalCustName,
+        feeAmount: newFee,
+        receivedAmount: actualReceived,
+        paymentMethod: newPaymentMethod,
+        deliveryStatus: newDeliveryStatus,
       },
       ipAddress: req.ip,
     });

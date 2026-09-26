@@ -32,6 +32,7 @@ export interface ChakkiQueueItem {
   feeAmount?: number;
   discount?: number;
   netTotal?: number;
+  receivedAmount?: number;
   paymentMethod?: string;
   createdAt?: string;
   deliveredAt?: string;
@@ -129,6 +130,9 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
   // Edit fields for selected token
   const [editCustomerName, setEditCustomerName] = useState<string>('');
   const [editCustomerPhone, setEditCustomerPhone] = useState<string>('');
+  const [editFeeAmount, setEditFeeAmount] = useState<string>('0');
+  const [editReceivedAmount, setEditReceivedAmount] = useState<string>('0');
+  const [editSaveToLedger, setEditSaveToLedger] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
@@ -158,6 +162,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
             feeAmount: r.feeAmount,
             discount: r.discount,
             netTotal: r.netTotal,
+            receivedAmount: r.receivedAmount,
             paymentMethod: r.paymentMethod,
             createdAt: r.createdAt,
             deliveredAt: r.deliveredAt,
@@ -191,6 +196,11 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
     setSelectedToken(item);
     setEditCustomerName(item.customerName);
     setEditCustomerPhone(item.customerPhone || '');
+    const total = item.netTotal || item.feeAmount || 0;
+    const rec = item.receivedAmount !== undefined ? item.receivedAmount : (item.paymentMethod === 'CREDIT' ? 0 : total);
+    setEditFeeAmount(String(total));
+    setEditReceivedAmount(String(rec));
+    setEditSaveToLedger(item.paymentMethod === 'CREDIT' || (total - rec) > 0);
     setSaveSuccess(false);
   };
 
@@ -232,16 +242,28 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
     }
   };
 
-  // Save edited customer details
-  const handleSaveChanges = async () => {
+  // Save edited customer, money, and credit ledger details
+  const handleSaveChanges = async (markDelivered?: boolean) => {
     if (!selectedToken) return;
     setIsSaving(true);
     sound.beep();
 
-    const updatedItem = {
+    const numFee = parseFloat(editFeeAmount) || 0;
+    const numRec = parseFloat(editReceivedAmount) || 0;
+    const debt = Math.max(0, numFee - numRec);
+    const isCredit = editSaveToLedger || debt > 0;
+    const nextDeliveryStatus: 'IN_QUEUE' | 'DELIVERED' = markDelivered ? 'DELIVERED' : selectedToken.deliveryStatus;
+
+    const updatedItem: ChakkiQueueItem = {
       ...selectedToken,
       customerName: editCustomerName.trim() || selectedToken.customerName,
       customerPhone: editCustomerPhone.trim(),
+      feeAmount: numFee,
+      netTotal: numFee,
+      receivedAmount: numRec,
+      paymentMethod: isCredit ? 'CREDIT' : 'CASH',
+      deliveryStatus: nextDeliveryStatus,
+      deliveredAt: nextDeliveryStatus === 'DELIVERED' ? new Date().toISOString() : selectedToken.deliveredAt,
     };
 
     setQueue((prev) =>
@@ -250,6 +272,10 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
       )
     );
     setSelectedToken(updatedItem);
+
+    if (nextDeliveryStatus === 'DELIVERED' && selectedToken.deliveryStatus !== 'DELIVERED') {
+      onTokenDelivered?.(selectedToken.tokenNumber);
+    }
 
     try {
       const session = getSession();
@@ -260,14 +286,27 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
           ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}),
         },
         body: JSON.stringify({
-          customerName: editCustomerName.trim(),
+          customerName: editCustomerName.trim() || selectedToken.customerName,
           customerPhone: editCustomerPhone.trim(),
+          feeAmount: numFee,
+          receivedAmount: numRec,
+          paymentMethod: isCredit ? 'CREDIT' : 'CASH',
+          saveToLedger: isCredit,
+          deliveryStatus: nextDeliveryStatus,
         }),
       });
       setSaveSuccess(true);
+      sound.success();
       setTimeout(() => setSaveSuccess(false), 2000);
+      if (markDelivered) {
+        setTimeout(() => setSelectedToken(null), 800);
+      }
     } catch {
       setSaveSuccess(true);
+      sound.success();
+      if (markDelivered) {
+        setTimeout(() => setSelectedToken(null), 800);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -992,121 +1031,316 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
                 </div>
               </div>
 
-              {/* Edit Details Section */}
+              {/* Edit Details & Money Settlement Section */}
               <div
                 style={{
-                  border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                  border: isDark ? '1px solid #334155' : '1px solid #CBD5E1',
                   borderRadius: '12px',
                   padding: '14px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '10px',
+                  gap: '12px',
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, fontSize: '14px', color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                  <Edit3 size={15} color="#D97706" />
-                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                    {t('گاہک کی معلومات تبدیل کریں', 'Edit Customer Details')}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, fontSize: '14px', color: isDark ? '#F8FAFC' : '#0F172A' }}>
+                    <Edit3 size={15} color="#D97706" />
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {t('رقم و کھاتہ سیٹلمنٹ / معلومات', 'Payment Settlement & Details')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      backgroundColor: selectedToken.deliveryStatus === 'DELIVERED' ? '#ECFDF5' : '#FFFBEB',
+                      color: selectedToken.deliveryStatus === 'DELIVERED' ? '#0E8A54' : '#B45309',
+                    }}
+                  >
+                    {selectedToken.deliveryStatus === 'DELIVERED' ? t('فراہم شدہ', 'Delivered') : t('قطار میں', 'In Queue')}
                   </span>
                 </div>
 
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      color: isDark ? '#94A3B8' : '#64748B',
-                      marginBottom: '4px',
-                    }}
-                  >
-                    {t('گاہک کا نام', 'Customer Name')}
-                  </label>
-                  <input
-                    type="text"
-                    value={editCustomerName}
-                    onChange={(e) => setEditCustomerName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
-                      backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
-                      color: isDark ? '#F8FAFC' : '#0F172A',
-                      fontSize: '14px',
-                      fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-                      outline: 'none',
-                    }}
-                  />
+                {/* Customer Details */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: isDark ? '#94A3B8' : '#64748B',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {t('گاہک کا نام', 'Customer Name')}
+                    </label>
+                    <input
+                      type="text"
+                      value={editCustomerName}
+                      onChange={(e) => setEditCustomerName(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '13.5px',
+                        fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: isDark ? '#94A3B8' : '#64748B',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {t('فون نمبر', 'Phone Number')}
+                    </label>
+                    <input
+                      type="text"
+                      value={editCustomerPhone}
+                      onChange={(e) => setEditCustomerPhone(e.target.value)}
+                      placeholder="0300-1234567"
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '13px',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      color: isDark ? '#94A3B8' : '#64748B',
-                      marginBottom: '4px',
-                    }}
-                  >
-                    {t('فون نمبر', 'Phone Number')}
-                  </label>
-                  <input
-                    type="text"
-                    value={editCustomerPhone}
-                    onChange={(e) => setEditCustomerPhone(e.target.value)}
-                    placeholder="0300-1234567"
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
-                      backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
-                      color: isDark ? '#F8FAFC' : '#0F172A',
-                      fontSize: '14px',
-                      outline: 'none',
-                    }}
-                  />
+                {/* Money Settlement Controls */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: isDark ? '#94A3B8' : '#64748B',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {t('کل پسائی اجرت (روپے)', 'Total Grinding Fee (Rs)')}
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={editFeeAmount}
+                      onChange={(e) => setEditFeeAmount(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '15px',
+                        fontWeight: 800,
+                        fontFamily: 'var(--font-mono)',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <label
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: isDark ? '#94A3B8' : '#64748B',
+                        }}
+                      >
+                        {t('نقد وصولی (روپے)', 'Cash Received (Rs)')}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditReceivedAmount(editFeeAmount);
+                          setEditSaveToLedger(false);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#0E8A54',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          padding: 0,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {t('مکمل ادا', 'Paid in Full')}
+                      </button>
+                    </div>
+                    <input
+                      type="number"
+                      step="any"
+                      value={editReceivedAmount}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditReceivedAmount(val);
+                        const numF = parseFloat(editFeeAmount) || 0;
+                        const numR = parseFloat(val) || 0;
+                        setEditSaveToLedger(numF - numR > 0);
+                      }}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '15px',
+                        fontWeight: 800,
+                        fontFamily: 'var(--font-mono)',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleSaveChanges}
-                  disabled={isSaving}
-                  style={{
-                    marginTop: '4px',
-                    padding: '8px 14px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    backgroundColor: saveSuccess ? '#0E8A54' : '#1877F2',
-                    color: '#FFFFFF',
-                    fontWeight: 800,
-                    fontSize: isUrdu ? '15px' : '13px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  {saveSuccess ? (
-                    <>
-                      <Check size={16} />
-                      <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                        {t('محفوظ ہو گیا!', 'Saved Successfully!')}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Save size={16} />
-                      <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                        {t('تبدیلیاں محفوظ کریں', 'Save Changes')}
-                      </span>
-                    </>
-                  )}
-                </button>
+                {/* Remaining Credit & Ledger Notification */}
+                {(() => {
+                  const numF = parseFloat(editFeeAmount) || 0;
+                  const numR = parseFloat(editReceivedAmount) || 0;
+                  const debt = Math.max(0, numF - numR);
+
+                  return (
+                    <div
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        backgroundColor: debt > 0
+                          ? (isDark ? 'rgba(217, 119, 6, 0.15)' : '#FFFBEB')
+                          : (isDark ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5'),
+                        border: debt > 0 ? '1px solid #F59E0B' : '1px solid #10B981',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 800, color: debt > 0 ? '#B45309' : '#0E8A54' }}>
+                          {debt > 0
+                            ? (isUrdu ? `بقایا ادھار: Rs ${debt}` : `Remaining Credit: Rs ${debt}`)
+                            : (isUrdu ? 'مکمل نقد ادائیگی (No Credit Debt)' : 'Full Payment Settled')}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                          {debt > 0 ? t('ادھار کھاتہ', 'Credit Account') : t('نقد ادا', 'Cash Settled')}
+                        </span>
+                      </div>
+
+                      {debt > 0 && (
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 700, color: isDark ? '#F8FAFC' : '#0F172A' }}>
+                          <input
+                            type="checkbox"
+                            checked={editSaveToLedger}
+                            onChange={(e) => setEditSaveToLedger(e.target.checked)}
+                            style={{ cursor: 'pointer' }}
+                          />
+                          <span>
+                            {t('گاہک کے کھاتے میں ادھار درج کریں (Save in Customer Ledger)', 'Save remaining credit in customer ledger')}
+                          </span>
+                        </label>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Actions: Save & Mark Delivered vs Save Changes */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleSaveChanges(true)}
+                    disabled={isSaving}
+                    style={{
+                      height: '40px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: '#0E8A54',
+                      color: '#FFFFFF',
+                      fontWeight: 900,
+                      fontSize: isUrdu ? '15px' : '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      boxShadow: '0 2px 6px rgba(14, 138, 84, 0.25)',
+                    }}
+                  >
+                    <Check size={16} />
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {t('محفوظ اور فراہم کریں', 'Save & Mark Delivered')}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSaveChanges(false)}
+                    disabled={isSaving}
+                    style={{
+                      height: '40px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: saveSuccess ? '#0E8A54' : '#1877F2',
+                      color: '#FFFFFF',
+                      fontWeight: 800,
+                      fontSize: isUrdu ? '15px' : '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    {saveSuccess ? (
+                      <>
+                        <Check size={16} />
+                        <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                          {t('محفوظ ہو گیا!', 'Saved!')}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Save size={16} />
+                        <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                          {t('تبدیلیاں محفوظ کریں', 'Save Changes')}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Action Buttons: Print & Close */}

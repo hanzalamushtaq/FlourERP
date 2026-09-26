@@ -113,6 +113,9 @@ export const PisaiBillingScreen: React.FC = () => {
   const [isEditingTokenCustomer, setIsEditingTokenCustomer] = useState<boolean>(false);
   const [editTokenCustName, setEditTokenCustName] = useState<string>('');
   const [editTokenCustPhone, setEditTokenCustPhone] = useState<string>('');
+  const [editTokenFee, setEditTokenFee] = useState<string>('0');
+  const [editTokenReceived, setEditTokenReceived] = useState<string>('0');
+  const [editTokenSaveLedger, setEditTokenSaveLedger] = useState<boolean>(false);
   const [isSavingTokenEdit, setIsSavingTokenEdit] = useState<boolean>(false);
 
   // Receipt Modal State
@@ -392,6 +395,11 @@ export const PisaiBillingScreen: React.FC = () => {
         setSearchedTokenData(json.data);
         setEditTokenCustName(json.data.customerName || json.data.customer?.name || '');
         setEditTokenCustPhone(json.data.customerPhone || json.data.customer?.phone || '');
+        const fee = json.data.netTotal || json.data.feeAmount || 0;
+        const rec = json.data.receivedAmount !== undefined ? json.data.receivedAmount : (json.data.paymentMethod === 'CREDIT' ? 0 : fee);
+        setEditTokenFee(String(fee));
+        setEditTokenReceived(String(rec));
+        setEditTokenSaveLedger(json.data.paymentMethod === 'CREDIT' || (fee - rec) > 0);
       } else {
         sound.playWarningSound();
         setSearchTokenError(json.error?.message || (isUrdu ? 'ٹوکن نمبر نہیں ملا' : 'Token not found'));
@@ -407,6 +415,15 @@ export const PisaiBillingScreen: React.FC = () => {
   // Toggle delivery status for looked up token
   const handleToggleSearchedTokenStatus = async () => {
     if (!searchedTokenData) return;
+
+    // If moving to delivered and has unpaid balance, expand settlement to allow entering cash or credit
+    const fee = searchedTokenData.netTotal || searchedTokenData.feeAmount || 0;
+    const rec = searchedTokenData.receivedAmount || 0;
+    if (searchedTokenData.deliveryStatus === 'IN_QUEUE' && (fee - rec) > 0 && !isEditingTokenCustomer) {
+      setIsEditingTokenCustomer(true);
+      return;
+    }
+
     const nextStatus = searchedTokenData.deliveryStatus === 'IN_QUEUE' ? 'DELIVERED' : 'IN_QUEUE';
     setIsUpdatingTokenStatus(true);
     sound.success();
@@ -435,36 +452,58 @@ export const PisaiBillingScreen: React.FC = () => {
     }
   };
 
-  // Save edited customer for looked up token
-  const handleSaveSearchedTokenEdit = async () => {
+  // Save edited customer, money, and credit ledger for looked up token
+  const handleSaveSearchedTokenEdit = async (markDelivered?: boolean) => {
     if (!searchedTokenData) return;
     setIsSavingTokenEdit(true);
     sound.beep();
 
+    const numFee = parseFloat(editTokenFee) || 0;
+    const numRec = parseFloat(editTokenReceived) || 0;
+    const debt = Math.max(0, numFee - numRec);
+    const isCredit = editTokenSaveLedger || debt > 0;
+    const nextDeliveryStatus = markDelivered ? 'DELIVERED' : searchedTokenData.deliveryStatus;
+
     const updated = {
       ...searchedTokenData,
-      customerName: editTokenCustName.trim(),
+      customerName: editTokenCustName.trim() || searchedTokenData.customerName,
       customerPhone: editTokenCustPhone.trim(),
+      feeAmount: numFee,
+      netTotal: numFee,
+      receivedAmount: numRec,
+      paymentMethod: isCredit ? 'CREDIT' : 'CASH',
+      deliveryStatus: nextDeliveryStatus,
+      deliveredAt: nextDeliveryStatus === 'DELIVERED' ? new Date().toISOString() : searchedTokenData.deliveredAt,
     };
     setSearchedTokenData(updated);
 
     try {
       const sess = getSession();
-      await fetch(`${getApiBaseUrl()}/api/pisai/${searchedTokenData.id}`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/pisai/${searchedTokenData.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           ...(sess?.token ? { Authorization: `Bearer ${sess.token}` } : {}),
         },
         body: JSON.stringify({
-          customerName: editTokenCustName.trim(),
+          customerName: editTokenCustName.trim() || searchedTokenData.customerName,
           customerPhone: editTokenCustPhone.trim(),
+          feeAmount: numFee,
+          receivedAmount: numRec,
+          paymentMethod: isCredit ? 'CREDIT' : 'CASH',
+          saveToLedger: isCredit,
+          deliveryStatus: nextDeliveryStatus,
         }),
       });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setSearchedTokenData(json.data);
+      }
       setIsEditingTokenCustomer(false);
       sound.success();
     } catch {
-      // ignore
+      setIsEditingTokenCustomer(false);
+      sound.success();
     } finally {
       setIsSavingTokenEdit(false);
     }
@@ -786,22 +825,44 @@ export const PisaiBillingScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* Inline Customer Edit Form (if toggled) */}
+            {/* Inline Money & Customer Settlement Form (if toggled) */}
             {isEditingTokenCustomer && (
               <div
                 style={{
                   backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderRadius: '8px',
-                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  padding: '14px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '8px',
-                  border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                  gap: '12px',
+                  border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
                 }}
               >
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, fontSize: '14px', color: isDark ? '#F8FAFC' : '#0F172A' }}>
+                    <Edit3 size={15} color="#D97706" />
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {t('رقم و کھاتہ سیٹلمنٹ / معلومات', 'Payment Settlement & Details')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      backgroundColor: searchedTokenData.deliveryStatus === 'DELIVERED' ? '#ECFDF5' : '#FFFBEB',
+                      color: searchedTokenData.deliveryStatus === 'DELIVERED' ? '#0E8A54' : '#B45309',
+                    }}
+                  >
+                    {searchedTokenData.deliveryStatus === 'DELIVERED' ? t('فراہم شدہ', 'Delivered') : t('قطار میں', 'In Queue')}
+                  </span>
+                </div>
+
+                {/* Customer Details */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B', marginBottom: '4px' }}>
                       {t('گاہک کا نام', 'Customer Name')}
                     </label>
                     <input
@@ -810,18 +871,21 @@ export const PisaiBillingScreen: React.FC = () => {
                       onChange={(e) => setEditTokenCustName(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '6px 10px',
-                        borderRadius: '6px',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
                         border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
                         backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
                         color: isDark ? '#F8FAFC' : '#0F172A',
-                        fontSize: '13px',
+                        fontSize: '13.5px',
+                        fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B', marginBottom: '4px' }}>
                       {t('فون نمبر', 'Phone Number')}
                     </label>
                     <input
@@ -831,54 +895,220 @@ export const PisaiBillingScreen: React.FC = () => {
                       placeholder="0300-1234567"
                       style={{
                         width: '100%',
-                        padding: '6px 10px',
-                        borderRadius: '6px',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
                         border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
                         backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
                         color: isDark ? '#F8FAFC' : '#0F172A',
                         fontSize: '13px',
                         outline: 'none',
+                        boxSizing: 'border-box',
                       }}
                     />
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                {/* Money Settlement Controls */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B', marginBottom: '4px' }}>
+                      {t('کل پسائی اجرت (روپے)', 'Total Grinding Fee (Rs)')}
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={editTokenFee}
+                      onChange={(e) => setEditTokenFee(e.target.value)}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '15px',
+                        fontWeight: 800,
+                        fontFamily: 'var(--font-mono)',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                        {t('نقد وصولی (روپے)', 'Cash Received (Rs)')}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditTokenReceived(editTokenFee);
+                          setEditTokenSaveLedger(false);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#0E8A54',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          padding: 0,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {t('مکمل ادا', 'Paid in Full')}
+                      </button>
+                    </div>
+                    <input
+                      type="number"
+                      step="any"
+                      value={editTokenReceived}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditTokenReceived(val);
+                        const numF = parseFloat(editTokenFee) || 0;
+                        const numR = parseFloat(val) || 0;
+                        setEditTokenSaveLedger(numF - numR > 0);
+                      }}
+                      style={{
+                        width: '100%',
+                        height: '38px',
+                        padding: '0 10px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '15px',
+                        fontWeight: 800,
+                        fontFamily: 'var(--font-mono)',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Remaining Credit & Ledger Notification */}
+                {(() => {
+                  const numF = parseFloat(editTokenFee) || 0;
+                  const numR = parseFloat(editTokenReceived) || 0;
+                  const debt = Math.max(0, numF - numR);
+
+                  return (
+                    <div
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        backgroundColor: debt > 0
+                          ? (isDark ? 'rgba(217, 119, 6, 0.15)' : '#FFFBEB')
+                          : (isDark ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5'),
+                        border: debt > 0 ? '1px solid #F59E0B' : '1px solid #10B981',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 800, color: debt > 0 ? '#B45309' : '#0E8A54' }}>
+                          {debt > 0
+                            ? (isUrdu ? `بقایا ادھار: Rs ${debt}` : `Remaining Credit: Rs ${debt}`)
+                            : (isUrdu ? 'مکمل نقد ادائیگی (No Credit Debt)' : 'Full Payment Settled')}
+                        </span>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#94A3B8' : '#64748B' }}>
+                          {debt > 0 ? t('ادھار کھاتہ', 'Credit Account') : t('نقد ادا', 'Cash Settled')}
+                        </span>
+                      </div>
+
+                      {debt > 0 && (
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 700, color: isDark ? '#F8FAFC' : '#0F172A' }}>
+                          <input
+                            type="checkbox"
+                            checked={editTokenSaveLedger}
+                            onChange={(e) => setEditTokenSaveLedger(e.target.checked)}
+                            style={{ cursor: 'pointer' }}
+                          />
+                          <span>
+                            {t('گاہک کے کھاتے میں ادھار درج کریں (Save in Customer Ledger)', 'Save remaining credit in customer ledger')}
+                          </span>
+                        </label>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Actions: Save & Mark Delivered, Save Changes, Cancel */}
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr', gap: '8px', marginTop: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleSaveSearchedTokenEdit(true)}
+                    disabled={isSavingTokenEdit}
+                    style={{
+                      height: '40px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: '#0E8A54',
+                      color: '#FFFFFF',
+                      fontWeight: 900,
+                      fontSize: isUrdu ? '15px' : '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      boxShadow: '0 2px 6px rgba(14, 138, 84, 0.25)',
+                    }}
+                  >
+                    <Check size={16} />
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {t('محفوظ اور فراہم کریں', 'Save & Mark Delivered')}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSaveSearchedTokenEdit(false)}
+                    disabled={isSavingTokenEdit}
+                    style={{
+                      height: '40px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: '#1877F2',
+                      color: '#FFFFFF',
+                      fontWeight: 800,
+                      fontSize: isUrdu ? '15px' : '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <Save size={16} />
+                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                      {t('تبدیلیاں محفوظ کریں', 'Save Changes')}
+                    </span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setIsEditingTokenCustomer(false)}
                     style={{
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      border: 'none',
+                      height: '40px',
+                      borderRadius: '8px',
+                      border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
                       background: 'transparent',
                       color: isDark ? '#94A3B8' : '#64748B',
                       fontSize: '12px',
+                      fontWeight: 800,
                       cursor: 'pointer',
                     }}
                   >
                     {t('منسوخ', 'Cancel')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveSearchedTokenEdit}
-                    disabled={isSavingTokenEdit}
-                    style={{
-                      padding: '4px 12px',
-                      borderRadius: '6px',
-                      border: 'none',
-                      backgroundColor: '#1877F2',
-                      color: '#FFFFFF',
-                      fontSize: '12px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <Save size={13} />
-                    <span>{t('محفوظ کریں', 'Save')}</span>
                   </button>
                 </div>
               </div>
