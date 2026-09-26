@@ -166,7 +166,13 @@ export interface BillItem {
   ratePerKg: number;
 }
 
-export const ProductBillingScreen: React.FC = () => {
+export interface ProductBillingScreenProps {
+  initialProductId?: string;
+}
+
+export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
+  initialProductId,
+}) => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -242,6 +248,26 @@ export const ProductBillingScreen: React.FC = () => {
     },
   ]);
   const [activeRowIndex, setActiveRowIndex] = useState<number>(0);
+
+  useEffect(() => {
+    if (initialProductId && products.length > 0) {
+      const match = products.find((p) => p.id === initialProductId);
+      if (match) {
+        setBillItems((prev) => {
+          const updated = [...prev];
+          if (updated.length > 0) {
+            updated[0] = {
+              ...updated[0],
+              productId: match.id,
+              itemName: isUrdu ? match.nameUr : match.nameEn,
+              ratePerKg: match.ratePerKg,
+            };
+          }
+          return updated;
+        });
+      }
+    }
+  }, [initialProductId, products, isUrdu]);
   const [openSuggestionsRow, setOpenSuggestionsRow] = useState<number | null>(null);
 
   const [discountValue, setDiscountValue] = useState<string>('0');

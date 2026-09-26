@@ -49,12 +49,26 @@ interface Customer {
 
 const INITIAL_CUSTOMERS: Customer[] = [];
 
-export const CustomerLedgerView: React.FC = () => {
+export interface CustomerLedgerViewProps {
+  initialSearch?: string;
+  targetCustomerId?: string;
+}
+
+export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
+  initialSearch = '',
+  targetCustomerId,
+}) => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+
+  useEffect(() => {
+    if (initialSearch !== undefined) {
+      setSearchQuery(initialSearch);
+    }
+  }, [initialSearch]);
   const [isRepaymentOpen, setIsRepaymentOpen] = useState(false);
   const [repaymentAmount, setRepaymentAmount] = useState('2000');
   const [isNewCustomerOpen, setIsNewCustomerOpen] = useState(false);
@@ -87,6 +101,10 @@ export const CustomerLedgerView: React.FC = () => {
         setCustomers(enriched);
         setSelectedCustomer((curr) => {
           if (enriched.length === 0) return null;
+          if (targetCustomerId) {
+            const target = enriched.find((c: Customer) => c.id === targetCustomerId);
+            if (target) return target;
+          }
           const match = enriched.find((c: Customer) => c.id === curr?.id);
           return match || enriched[0];
         });

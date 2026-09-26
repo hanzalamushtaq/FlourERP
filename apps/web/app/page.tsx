@@ -55,6 +55,11 @@ export default function Home() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
   const [reportSubTab, setReportSubTab] = useState<ReportSubTab>('sales');
 
+  // Selected entities from Global Search
+  const [selectedCustomerIdForLedger, setSelectedCustomerIdForLedger] = useState<string | null>(null);
+  const [customerSearchForLedger, setCustomerSearchForLedger] = useState<string>('');
+  const [selectedProductIdForBilling, setSelectedProductIdForBilling] = useState<string | undefined>(undefined);
+
   // Reprint Receipt Modal State
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
@@ -259,6 +264,19 @@ export default function Home() {
               setIsSidebarCollapsed((prev) => !prev);
             }
           }}
+          onNavigateTab={(tab, extra) => {
+            if (extra?.subTab) {
+              setReportSubTab(extra.subTab as ReportSubTab);
+            }
+            if (extra?.customerId || extra?.customerName) {
+              setSelectedCustomerIdForLedger(extra.customerId || null);
+              setCustomerSearchForLedger(extra.customerName || '');
+            }
+            if (extra?.productId) {
+              setSelectedProductIdForBilling(extra.productId);
+            }
+            setActiveTab(tab as any);
+          }}
           title={
             activeTab === 'dashboard'
               ? t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')
@@ -314,7 +332,7 @@ export default function Home() {
           {/* Billing Screen (F8) */}
           {activeTab === 'billing' && (
             <div className="dashboard-nastaleeq-scope main-content-view-container">
-              <ProductBillingScreen />
+              <ProductBillingScreen initialProductId={selectedProductIdForBilling} />
             </div>
           )}
 
@@ -328,7 +346,10 @@ export default function Home() {
           {/* Udhaar Ledger (Alt+K) */}
           {activeTab === 'udhaar' && (
             <div className="dashboard-nastaleeq-scope main-content-view-container">
-              <CustomerLedgerView />
+              <CustomerLedgerView
+                initialSearch={customerSearchForLedger}
+                targetCustomerId={selectedCustomerIdForLedger || undefined}
+              />
             </div>
           )}
 
