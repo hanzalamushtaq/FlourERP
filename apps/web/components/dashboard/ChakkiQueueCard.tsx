@@ -39,80 +39,7 @@ export interface ChakkiQueueItem {
   rawReceiptData?: ReceiptData;
 }
 
-const SAMPLE_QUEUE: ChakkiQueueItem[] = [
-  {
-    id: '1',
-    tokenNumber: '1001',
-    tokenFormatted: 'T-1001',
-    customerName: 'احمد خان',
-    customerPhone: '0300-1234567',
-    weightKg: 50,
-    deliveryStatus: 'IN_QUEUE',
-    serviceType: 'SAFAI_PISAI',
-    feeAmount: 300,
-    netTotal: 300,
-    paymentMethod: 'CASH',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    tokenNumber: '1002',
-    tokenFormatted: 'T-1002',
-    customerName: 'بلال شیخ',
-    customerPhone: '0321-9876543',
-    weightKg: 30,
-    deliveryStatus: 'IN_QUEUE',
-    serviceType: 'PISAI_ONLY',
-    feeAmount: 150,
-    netTotal: 150,
-    paymentMethod: 'CASH',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    tokenNumber: '1003',
-    tokenFormatted: 'T-1003',
-    customerName: 'عمران علی',
-    customerPhone: '0333-1122334',
-    weightKg: 80,
-    deliveryStatus: 'IN_QUEUE',
-    serviceType: 'SAFAI_PISAI',
-    feeAmount: 480,
-    netTotal: 480,
-    paymentMethod: 'CASH',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    tokenNumber: '1004',
-    tokenFormatted: 'T-1004',
-    customerName: 'عمران علی',
-    customerPhone: '0333-1122334',
-    weightKg: 40,
-    deliveryStatus: 'DELIVERED',
-    serviceType: 'SAFAI_PISAI',
-    feeAmount: 240,
-    netTotal: 240,
-    paymentMethod: 'CASH',
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-    deliveredAt: new Date().toISOString(),
-  },
-  {
-    id: '5',
-    tokenNumber: '1005',
-    tokenFormatted: 'T-1005',
-    customerName: 'عمران علی',
-    customerPhone: '0333-1122334',
-    weightKg: 30,
-    deliveryStatus: 'DELIVERED',
-    serviceType: 'PISAI_ONLY',
-    feeAmount: 150,
-    netTotal: 150,
-    paymentMethod: 'CASH',
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-    deliveredAt: new Date(Date.now() - 1800000).toISOString(),
-  },
-];
+const SAMPLE_QUEUE: ChakkiQueueItem[] = [];
 
 interface ChakkiQueueCardProps {
   onTokenDelivered?: (tokenNumber: number | string) => void;
@@ -124,7 +51,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
 
   // Status Filter: 'IN_QUEUE' | 'DELIVERED' | 'ALL'
   const [activeFilter, setActiveFilter] = useState<'IN_QUEUE' | 'DELIVERED' | 'ALL'>('IN_QUEUE');
-  const [queue, setQueue] = useState<ChakkiQueueItem[]>(SAMPLE_QUEUE);
+  const [queue, setQueue] = useState<ChakkiQueueItem[]>([]);
   const [selectedToken, setSelectedToken] = useState<ChakkiQueueItem | null>(null);
 
   // Edit fields for selected token

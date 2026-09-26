@@ -32,162 +32,7 @@ export interface ShiftInvoiceItem {
   rawReceiptData?: ReceiptData;
 }
 
-const SAMPLE_INVOICES: ShiftInvoiceItem[] = [
-  {
-    invoiceNumber: 'B-5001',
-    customerName: 'حاجی رشید',
-    customerPhone: '0300-8765432',
-    itemsDetail: '40 کلو آٹا',
-    itemsDetailUr: '40 کلو آٹا',
-    itemsDetailEn: '40 KG Atta',
-    totalAmount: 4300,
-    paymentMethod: 'cash',
-    rawReceiptData: {
-      type: 'product',
-      billNumber: 'B-5001',
-      customerName: 'حاجی رشید',
-      items: [
-        {
-          nameEn: 'Chakki Atta',
-          nameUr: 'چکی آٹا (40 کلو)',
-          weightKg: 40,
-          ratePerKg: 107.5,
-          total: 4300,
-        },
-      ],
-      subtotal: 4300,
-      discount: 0,
-      netTotal: 4300,
-      cashReceived: 4300,
-      remainingBalance: 0,
-      isCredit: false,
-      timestamp: '19/09/2026, 06:19 PM',
-      billerName: 'محمد عاصف',
-    },
-  },
-  {
-    invoiceNumber: 'B-5002',
-    customerName: 'فہیم احمد',
-    customerPhone: '0301-7654321',
-    itemsDetail: '15 کلو پسائی',
-    itemsDetailUr: '15 کلو پسائی',
-    itemsDetailEn: '15 KG Grinding',
-    totalAmount: 127.5,
-    paymentMethod: 'cash',
-    rawReceiptData: {
-      type: 'pisai',
-      billNumber: 'B-5002',
-      customerName: 'فہیم احمد',
-      serviceType: 'safai_pisai',
-      pisaiWeightKg: 15,
-      pisaiToken: 'T-1002',
-      subtotal: 127.5,
-      discount: 0,
-      netTotal: 127.5,
-      cashReceived: 127.5,
-      remainingBalance: 0,
-      isCredit: false,
-      timestamp: '19/09/2026, 06:15 PM',
-      billerName: 'محمد عاصف',
-    },
-  },
-  {
-    invoiceNumber: 'B-5003',
-    customerName: 'صادق ٹریڈرز',
-    customerPhone: '0321-9876543',
-    itemsDetail: 'ادھار کھاتہ',
-    itemsDetailUr: 'ادھار کھاتہ',
-    itemsDetailEn: 'Credit Ledger',
-    totalAmount: 25000,
-    paymentMethod: 'cheque',
-    rawReceiptData: {
-      type: 'product',
-      billNumber: 'B-5003',
-      customerName: 'صادق ٹریڈرز',
-      items: [
-        {
-          nameEn: 'Maida Special',
-          nameUr: 'میدہ اسپیشل',
-          weightKg: 150,
-          ratePerKg: 166.6,
-          total: 25000,
-        },
-      ],
-      subtotal: 25000,
-      discount: 0,
-      netTotal: 25000,
-      cashReceived: 0,
-      remainingBalance: 25000,
-      isCredit: true,
-      timestamp: '19/09/2026, 06:05 PM',
-      billerName: 'محمد عاصف',
-    },
-  },
-  {
-    invoiceNumber: 'B-5004',
-    customerName: 'صادق ٹریڈرز',
-    customerPhone: '0321-9876543',
-    itemsDetail: 'ادھار کھاتہ',
-    itemsDetailUr: 'ادھار کھاتہ',
-    itemsDetailEn: 'Credit Ledger',
-    totalAmount: 25000,
-    paymentMethod: 'cheque',
-    rawReceiptData: {
-      type: 'product',
-      billNumber: 'B-5004',
-      customerName: 'صادق ٹریڈرز',
-      items: [
-        {
-          nameEn: 'Maida Special',
-          nameUr: 'میدہ اسپیشل',
-          weightKg: 150,
-          ratePerKg: 166.6,
-          total: 25000,
-        },
-      ],
-      subtotal: 25000,
-      discount: 0,
-      netTotal: 25000,
-      cashReceived: 0,
-      remainingBalance: 25000,
-      isCredit: true,
-      timestamp: '19/09/2026, 05:45 PM',
-      billerName: 'محمد عاصف',
-    },
-  },
-  {
-    invoiceNumber: 'B-5005',
-    customerName: 'بابر ہوٹل',
-    customerPhone: '0345-5566778',
-    itemsDetail: 'ادھار کھاتہ',
-    itemsDetailUr: 'ادھار کھاتہ',
-    itemsDetailEn: 'Credit Ledger',
-    totalAmount: 25000,
-    paymentMethod: 'cheque',
-    rawReceiptData: {
-      type: 'product',
-      billNumber: 'B-5005',
-      customerName: 'بابر ہوٹل',
-      items: [
-        {
-          nameEn: 'Chokar Flour',
-          nameUr: 'خالص چوکر',
-          weightKg: 250,
-          ratePerKg: 100,
-          total: 25000,
-        },
-      ],
-      subtotal: 25000,
-      discount: 0,
-      netTotal: 25000,
-      cashReceived: 0,
-      remainingBalance: 25000,
-      isCredit: true,
-      timestamp: '19/09/2026, 05:30 PM',
-      billerName: 'محمد عاصف',
-    },
-  },
-];
+const SAMPLE_INVOICES: ShiftInvoiceItem[] = [];
 
 interface RecentInvoicesTableProps {
   invoices?: ShiftInvoiceItem[];
@@ -196,13 +41,13 @@ interface RecentInvoicesTableProps {
 }
 
 export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
-  invoices = SAMPLE_INVOICES,
+  invoices = [],
   onReprint,
 }) => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
 
-  const [invoicesList, setInvoicesList] = useState<ShiftInvoiceItem[]>(invoices);
+  const [invoicesList, setInvoicesList] = useState<ShiftInvoiceItem[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<ShiftInvoiceItem | null>(null);
 
   // Edit fields inside Action Window
@@ -448,7 +293,25 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {invoicesList.map((inv, idx) => {
+            {invoicesList.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  style={{
+                    textAlign: 'center',
+                    padding: '36px 12px',
+                    color: isDark ? '#94A3B8' : '#64748B',
+                    fontSize: isUrdu ? '17px' : '14px',
+                    fontWeight: 700,
+                  }}
+                >
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('اس شفٹ کی ابھی کوئی رسید نہیں بنی ہے', 'No invoices generated for this shift yet')}
+                  </span>
+                </td>
+              </tr>
+            ) : (
+              invoicesList.map((inv, idx) => {
               const paymentLabel =
                 inv.paymentMethod === 'cash'
                   ? t('نقد', 'Cash')
@@ -668,7 +531,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   </td>
                 </tr>
               );
-            })}
+            }))}
           </tbody>
         </table>
       </div>

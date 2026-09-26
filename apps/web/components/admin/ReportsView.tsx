@@ -70,15 +70,7 @@ interface ReportsViewProps {
   activeSubTab: ReportSubTab;
 }
 
-const INITIAL_LEDGER: LedgerItem[] = [
-  { id: '1', timestamp: 'Today, 2:30 PM', category: 'SALE', description: '40 KG Chakki Atta', descriptionUr: '40 کلو چکی آٹا', reference: 'BILL-00481', amount: 5600, type: 'inflow' },
-  { id: '2', timestamp: 'Today, 2:15 PM', category: 'PISAI', description: '25 KG Safai + Pisai (Token #0482)', descriptionUr: '25 کلو صفائی + پسائی (ٹوکن #0482)', reference: 'PISAI-0482', amount: 150, type: 'inflow' },
-  { id: '3', timestamp: 'Today, 1:45 PM', category: 'EXPENSE', description: 'Mill Electricity Advance Bill', descriptionUr: 'مل بجلی کا پیشگی بل', reference: 'EXP-109', amount: 2500, type: 'outflow' },
-  { id: '4', timestamp: 'Today, 1:10 PM', category: 'PAYMENT', description: 'Haji Rasheed Cash Repayment', descriptionUr: 'حاجی رشید نقد وصولی کھاتہ', reference: 'PAY-055', amount: 2000, type: 'inflow' },
-  { id: '5', timestamp: 'Today, 12:30 PM', category: 'SALE', description: '10 KG Fine Atta', descriptionUr: '10 کلو فائن آٹا', reference: 'BILL-00480', amount: 1480, type: 'inflow' },
-  { id: '6', timestamp: 'Today, 11:15 AM', category: 'RETURN', description: 'Return 5 KG Maida (Damaged Bag)', descriptionUr: 'واپسی 5 کلو میدہ (خراب تھیلا)', reference: 'RET-012', amount: 775, type: 'outflow' },
-  { id: '7', timestamp: 'Today, 10:00 AM', category: 'EXPENSE', description: 'Worker Daily Lunch / Tea', descriptionUr: 'ملازمین کا کھانا و چائے', reference: 'EXP-108', amount: 350, type: 'outflow' },
-];
+const INITIAL_LEDGER: LedgerItem[] = [];
 
 /* ─────────────────────────────────────────────────────────────
    Report Metadata
@@ -1198,24 +1190,31 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
               <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{isUrdu ? 'موجودہ بقایا کھاتہ' : 'Current Balance'}</span>
               <span style={{ textAlign: 'center' }}>{isUrdu ? 'کیفیت' : 'Status'}</span>
             </div>
-            {[
-              { name: 'طارق نان بائی', phone: '0321-9876543', balance: 38200 },
-              { name: 'حاجی رشید', phone: '0300-8765432', balance: 14500 },
-              { name: 'میاں اسلم زمیندار', phone: '0333-1122334', balance: 8400 },
-            ].map((c, idx) => (
-              <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.2fr 1.5fr 1fr', padding: '14px 20px', borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0', backgroundColor: isDark ? (idx % 2 === 1 ? '#1E293B' : '#151D2F') : '#FFFFFF', alignItems: 'center' }}>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '19px' : '14px' }}>{c.name}</span>
-                <span style={{ fontFamily: 'var(--font-mono)', color: isDark ? '#94A3B8' : '#475569', fontSize: '13px' }}>{c.phone}</span>
-                <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '17px', color: isDark ? '#F87171' : '#DC2626' }}>
-                  Rs {c.balance.toLocaleString()}
+            {customerList.length === 0 ? (
+              <div style={{ padding: '36px 20px', textAlign: 'center', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 700 }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {isUrdu ? 'کوئی ادھار کھاتہ موجود نہیں ہے' : 'No customer ledger balances found'}
                 </span>
-                <div style={{ textAlign: 'center' }}>
-                  <span style={{ padding: '3px 10px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 800, backgroundColor: isDark ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7', color: isDark ? '#FCD34D' : '#B45309', border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : 'none' }}>
-                    {isUrdu ? 'ادھار واجب' : 'Unpaid'}
-                  </span>
-                </div>
               </div>
-            ))}
+            ) : (
+              customerList.slice(0, 10).map((c: any, idx: number) => {
+                const bal = Number(c.currentBalance ?? c.balance ?? 0);
+                return (
+                  <div key={c.id || idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.2fr 1.5fr 1fr', padding: '14px 20px', borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0', backgroundColor: isDark ? (idx % 2 === 1 ? '#1E293B' : '#151D2F') : '#FFFFFF', alignItems: 'center' }}>
+                    <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '19px' : '14px' }}>{c.name}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: isDark ? '#94A3B8' : '#475569', fontSize: '13px' }}>{c.phone || '-'}</span>
+                    <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '17px', color: bal > 0 ? (isDark ? '#F87171' : '#DC2626') : (isDark ? '#4ADE80' : '#166534') }}>
+                      Rs {bal.toLocaleString()}
+                    </span>
+                    <div style={{ textAlign: 'center' }}>
+                      <span style={{ padding: '3px 10px', borderRadius: '12px', fontSize: '11.5px', fontWeight: 800, backgroundColor: bal > 0 ? (isDark ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7') : (isDark ? 'rgba(34, 197, 94, 0.2)' : '#DCFCE7'), color: bal > 0 ? (isDark ? '#FCD34D' : '#B45309') : (isDark ? '#4ADE80' : '#15803D'), border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : 'none' }}>
+                        {bal > 0 ? (isUrdu ? 'ادھار واجب' : 'Unpaid') : (isUrdu ? 'کلیئر' : 'Clear')}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       )}

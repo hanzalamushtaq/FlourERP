@@ -47,49 +47,14 @@ interface Customer {
   }>;
 }
 
-const INITIAL_CUSTOMERS: Customer[] = [
-  {
-    id: 'c1',
-    name: 'حاجی رشید',
-    phone: '0300-8765432',
-    balance: 14500,
-    lastActivity: 'آج 2:15 PM',
-    transactions: [
-      { id: 't1', date: '18 Sep 2026', type: 'purchase', description: 'چکی آٹا 40 کلو (بوری)', amount: 5600, runningBalance: 14500 },
-      { id: 't2', date: '14 Sep 2026', type: 'payment', description: 'کاؤنٹر نقد وصولی', amount: 3000, runningBalance: 8900 },
-      { id: 't3', date: '10 Sep 2026', type: 'purchase', description: 'گندم پسائی 50 کلو + میدہ 20 کلو', amount: 4800, runningBalance: 11900 },
-    ],
-  },
-  {
-    id: 'c2',
-    name: 'طارق نان بائی',
-    phone: '0321-9876543',
-    balance: 38200,
-    lastActivity: 'کل',
-    transactions: [
-      { id: 't4', date: '17 Sep 2026', type: 'purchase', description: 'فائن آٹا 4 بوری (160 کلو)', amount: 23680, runningBalance: 38200 },
-      { id: 't5', date: '12 Sep 2026', type: 'payment', description: 'بینک وصولی ٹرانسفر', amount: 15000, runningBalance: 14520 },
-    ],
-  },
-  {
-    id: 'c3',
-    name: 'میاں اسلم زمیندار',
-    phone: '0333-1122334',
-    balance: 8400,
-    lastActivity: '15 Sep',
-    transactions: [
-      { id: 't6', date: '15 Sep 2026', type: 'purchase', description: 'گندم صفائی و پسائی (120 کلو)', amount: 1800, runningBalance: 8400 },
-      { id: 't7', date: '01 Sep 2026', type: 'purchase', description: 'چوکر 2 بوری', amount: 6600, runningBalance: 6600 },
-    ],
-  },
-];
+const INITIAL_CUSTOMERS: Customer[] = [];
 
 export const CustomerLedgerView: React.FC = () => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
-  const [customers, setCustomers] = useState<Customer[]>(INITIAL_CUSTOMERS);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer>(INITIAL_CUSTOMERS[0]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isRepaymentOpen, setIsRepaymentOpen] = useState(false);
   const [repaymentAmount, setRepaymentAmount] = useState('2000');
   const [isNewCustomerOpen, setIsNewCustomerOpen] = useState(false);
@@ -114,22 +79,20 @@ export const CustomerLedgerView: React.FC = () => {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json();
-      if (json.success && json.data.customers && json.data.customers.length > 0) {
+      if (json.success && Array.isArray(json.data.customers)) {
         const enriched: Customer[] = json.data.customers.map((c: any) => ({
           ...c,
           transactions: Array.isArray(c.transactions) ? c.transactions : [],
         }));
         setCustomers(enriched);
         setSelectedCustomer((curr) => {
+          if (enriched.length === 0) return null;
           const match = enriched.find((c: Customer) => c.id === curr?.id);
-          if (match) {
-            return {
-              ...match,
-              transactions: (curr?.transactions && curr.transactions.length > 0) ? curr.transactions : match.transactions,
-            };
-          }
-          return enriched[0];
+          return match || enriched[0];
         });
+      } else {
+        setCustomers([]);
+        setSelectedCustomer(null);
       }
     } catch (err) {
       console.error('Failed to load customers from API:', err);
@@ -654,18 +617,66 @@ export const CustomerLedgerView: React.FC = () => {
             boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.3)' : '0 2px 8px rgba(15, 23, 42, 0.04)',
           }}
         >
-          {/* Profile Header Banner */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
-              paddingBottom: '14px',
-              flexWrap: 'wrap',
-              gap: '10px',
-            }}
-          >
+          {!selectedCustomer ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '14px',
+                  backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : '#EFF6FF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <BookOpen size={28} color="#1877F2" />
+              </div>
+              <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '18px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', margin: 0 }}>
+                {t('کوئی کسٹمر کھاتہ منتخب نہیں ہے', 'No Customer Account Selected')}
+              </h3>
+              <p className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#94A3B8' : '#64748B', margin: 0, maxWidth: '320px' }}>
+                {t('بائیں جانب فہرست سے کسٹمر منتخب کریں یا نیا کسٹمر شامل کریں۔', 'Select a customer from the left list or create a new account to view their ledger.')}
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsNewCustomerOpen(true)}
+                style={{
+                  marginTop: '8px',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  backgroundColor: '#1877F2',
+                  color: '#FFFFFF',
+                  fontWeight: 900,
+                  fontSize: isUrdu ? '16px' : '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 12px rgba(24, 119, 242, 0.25)',
+                }}
+              >
+                <UserPlus size={16} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('+ نیا کسٹمر کھاتہ بنائیں', '+ Create Customer Account')}
+                </span>
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Profile Header Banner */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
+                  paddingBottom: '14px',
+                  flexWrap: 'wrap',
+                  gap: '10px',
+                }}
+              >
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               {/* Squircle Avatar Tile */}
               <div
@@ -887,11 +898,13 @@ export const CustomerLedgerView: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </>
+      )}
       </div>
+    </div>
 
       {/* 3. MODAL: Log Cash Repayment */}
-      {isRepaymentOpen && (
+      {isRepaymentOpen && selectedCustomer && (
         <div
           style={{
             position: 'fixed',
@@ -958,10 +971,10 @@ export const CustomerLedgerView: React.FC = () => {
             >
               <div>
                 <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#1F2937' }}>
-                  {selectedCustomer.name}
+                  {selectedCustomer?.name}
                 </span>
                 <div style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600 }}>
-                  📞 {selectedCustomer.phone}
+                  📞 {selectedCustomer?.phone}
                 </div>
               </div>
 
@@ -970,7 +983,7 @@ export const CustomerLedgerView: React.FC = () => {
                   {t('کل بقایا', 'Total Balance')}
                 </span>
                 <div style={{ fontSize: '17px', fontWeight: 900, color: isDark ? '#F87171' : '#B91C1C', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                  {isUrdu ? `${selectedCustomer.balance.toLocaleString()} روپے` : `Rs ${selectedCustomer.balance.toLocaleString()}`}
+                  {isUrdu ? `${(selectedCustomer?.balance ?? 0).toLocaleString()} روپے` : `Rs ${(selectedCustomer?.balance ?? 0).toLocaleString()}`}
                 </div>
               </div>
             </div>

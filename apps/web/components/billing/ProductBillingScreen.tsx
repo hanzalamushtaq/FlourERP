@@ -122,15 +122,7 @@ const INITIAL_PRODUCTS: Product[] = [
   { id: '8', nameEn: 'Unpriced Special Atta', nameUr: 'بغیر ریٹ آٹا', ratePerKg: 0, unit: 'KG', isActive: true, emoji: '🏷️' },
 ];
 
-const MOCK_CUSTOMERS = [
-  { id: '1', name: 'حاجی رشید', phone: '0300-8765432' },
-  { id: '2', name: 'حاجی الطاف', phone: '0301-7654321' },
-  { id: '3', name: 'Haji Mushtaq', phone: '0302-3344556' },
-  { id: '4', name: 'طارق نان بائی', phone: '0321-9876543' },
-  { id: '5', name: 'میاں اسلم', phone: '0333-1122334' },
-  { id: '6', name: 'Babar Hotel', phone: '0345-5566778' },
-  { id: '7', name: 'حاجی آصف', phone: '0300-9988776' },
-];
+const MOCK_CUSTOMERS: Array<{ id: string; name: string; phone: string }> = [];
 
 const CARD_PALETTES = [
   { bg: '#FFFBEB', bgSelected: '#FEF08A', text: '#78350F', subText: '#92400E', accent: '#B45309', badgeBg: '#FEF3C7', badgeText: '#78350F', iconBg: '#FFFFFF', border: '#FDE68A' },

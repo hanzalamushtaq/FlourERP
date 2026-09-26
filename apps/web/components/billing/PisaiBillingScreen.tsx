@@ -60,14 +60,7 @@ const PisaiOnlySvg = () => (
   </svg>
 );
 
-const MOCK_CUSTOMERS = [
-  { id: '1', name: 'حاجی رشید', phone: '0300-8765432' },
-  { id: '2', name: 'حاجی الطاف', phone: '0301-7654321' },
-  { id: '3', name: 'Haji Mushtaq', phone: '0302-3344556' },
-  { id: '4', name: 'طارق نان بائی', phone: '0321-9876543' },
-  { id: '5', name: 'Mian Aslam', phone: '0333-1122334' },
-  { id: '6', name: 'بابر ہوٹل', phone: '0345-5566778' },
-];
+const MOCK_CUSTOMERS: Array<{ id: string; name: string; phone: string }> = [];
 
 const PISAI_RATES = {
   safai_pisai: 6, // Rs 6 / KG

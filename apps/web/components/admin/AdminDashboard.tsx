@@ -57,6 +57,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         if (json.success && json.data) {
           setKpiData(json.data);
         }
+
+        const auditRes = await fetch(`${getApiBaseUrl()}/api/audit-logs?limit=5`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const auditJson = await auditRes.json();
+        if (auditJson.success && auditJson.data?.logs) {
+          setAuditLogs(auditJson.data.logs.map((l: any) => {
+            const d = new Date(l.createdAt);
+            const time = !isNaN(d.getTime()) ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+            return {
+              time,
+              actor: l.user?.fullName || l.user?.username || (isUrdu ? 'ایڈمن' : 'Admin'),
+              action: l.action,
+              actionColor: isDark ? '#38BDF8' : '#0284C7',
+              actionBg: isDark ? 'rgba(2, 132, 199, 0.2)' : '#F0F9FF',
+              actionBorder: isDark ? 'rgba(2, 132, 199, 0.4)' : '#BAE6FD',
+              detail: typeof l.details === 'string' ? l.details : JSON.stringify(l.details || {}),
+            };
+          }));
+        }
       } catch (err) {
         console.error('Failed to load dashboard KPIs:', err);
       }
@@ -172,53 +192,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     },
   ];
 
-  const auditLogs = [
-    {
-      time: isUrdu ? 'آج، 02:30 PM' : 'Today, 02:30 PM',
-      actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
-      action: 'PRINT_BILL',
-      actionColor: isDark ? '#38BDF8' : '#0284C7',
-      actionBg: isDark ? 'rgba(2, 132, 199, 0.2)' : '#F0F9FF',
-      actionBorder: isDark ? 'rgba(2, 132, 199, 0.4)' : '#BAE6FD',
-      detail: isUrdu ? 'بل #00481 (چکی آٹا، 40 کلو، 5,600 روپے)' : 'BILL-00481 (Chakki Atta, 40 KG, Rs 5,600)',
-    },
-    {
-      time: isUrdu ? 'آج، 02:15 PM' : 'Today, 02:15 PM',
-      actor: isUrdu ? 'بلر (محمد عاصف)' : 'Biller (Muhammad Asif)',
-      action: 'GENERATE_PISAI_TOKEN',
-      actionColor: isDark ? '#34D399' : '#059669',
-      actionBg: isDark ? 'rgba(5, 150, 105, 0.2)' : '#ECFDF5',
-      actionBorder: isDark ? 'rgba(5, 150, 105, 0.4)' : '#A7F3D0',
-      detail: isUrdu ? 'ٹوکن #0482 (صفائی و پسائی، 25 کلو، 150 روپے)' : 'Token #0482 (Cleaning & Grinding, 25 KG, Rs 150)',
-    },
-    {
-      time: isUrdu ? 'آج، 01:45 PM' : 'Today, 01:45 PM',
-      actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
-      action: 'LOG_EXPENSE',
-      actionColor: isDark ? '#FB7185' : '#E11D48',
-      actionBg: isDark ? 'rgba(225, 29, 72, 0.2)' : '#FFF1F2',
-      actionBorder: isDark ? 'rgba(225, 29, 72, 0.4)' : '#FECDD3',
-      detail: isUrdu ? 'خرچہ #109 (بجلی ایڈوانس، 2,500 روپے)' : 'EXP-109 (Electricity Advance, Rs 2,500)',
-    },
-    {
-      time: isUrdu ? 'آج، 01:10 PM' : 'Today, 01:10 PM',
-      actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
-      action: 'LOG_UDHAAR_PAYMENT',
-      actionColor: isDark ? '#C084FC' : '#7E22CE',
-      actionBg: isDark ? 'rgba(126, 34, 206, 0.2)' : '#FAF5FF',
-      actionBorder: isDark ? 'rgba(126, 34, 206, 0.4)' : '#E9D5FF',
-      detail: isUrdu ? 'وصولی #055 (گاہک حاجی رشید، 2,000 روپے)' : 'PAY-055 (Customer Haji Rasheed, Rs 2,000)',
-    },
-    {
-      time: isUrdu ? 'آج، 08:00 AM' : 'Today, 08:00 AM',
-      actor: isUrdu ? 'ایڈمن (حنظلہ)' : 'Admin (Hanzala)',
-      action: 'CONFIRM_DAILY_PRICE',
-      actionColor: isDark ? '#FDE047' : '#D97706',
-      actionBg: isDark ? 'rgba(217, 119, 6, 0.2)' : '#FFFBEB',
-      actionBorder: isDark ? 'rgba(217, 119, 6, 0.4)' : '#FDE68A',
-      detail: isUrdu ? 'یومیہ ریٹس کی تصدیق برائے 5 پراڈکٹس' : 'Daily rates confirmed for 5 products',
-    },
-  ];
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', width: '100%', maxWidth: '1280px', margin: '0 auto' }}>
@@ -545,52 +519,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {/* Log Entries */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {auditLogs.map((log, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '160px 200px 220px 1fr',
-                    padding: '14px 22px',
-                    backgroundColor: isDark
-                      ? (idx % 2 === 0 ? '#1E293B' : '#111827')
-                      : (idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC'),
-                    borderBottom: isDark
-                      ? (idx === auditLogs.length - 1 ? 'none' : '1px solid #334155')
-                      : (idx === auditLogs.length - 1 ? 'none' : '1px solid #F1F5F9'),
-                    alignItems: 'center',
-                    gap: '10px',
-                    transition: 'background-color 0.12s ease',
-                  }}
-                >
-                  <span style={{ color: isDark ? '#94A3B8' : '#475569', fontWeight: 800, fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
-                    {log.time}
-                  </span>
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '17px' : '14px' }}>
-                    {log.actor}
-                  </span>
-                  <div>
-                    <span
-                      style={{
-                        fontSize: '12px',
-                        fontWeight: 900,
-                        padding: '4px 10px',
-                        borderRadius: '6px',
-                        backgroundColor: log.actionBg,
-                        color: log.actionColor,
-                        border: `1.5px solid ${log.actionBorder}`,
-                        fontFamily: 'var(--font-mono)',
-                        display: 'inline-block',
-                      }}
-                    >
-                      {log.action}
-                    </span>
-                  </div>
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#E2E8F0' : '#1E293B', fontWeight: 700, fontSize: isUrdu ? '17px' : '14px' }}>
-                    {log.detail}
+              {auditLogs.length === 0 ? (
+                <div style={{ padding: '36px 20px', textAlign: 'center', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 700 }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('کوئی سرگرمی ریکارڈ موجود نہیں ہے', 'No activity records found')}
                   </span>
                 </div>
-              ))}
+              ) : (
+                auditLogs.map((log, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '160px 200px 220px 1fr',
+                      padding: '14px 22px',
+                      backgroundColor: isDark
+                        ? (idx % 2 === 0 ? '#1E293B' : '#111827')
+                        : (idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC'),
+                      borderBottom: isDark
+                        ? (idx === auditLogs.length - 1 ? 'none' : '1px solid #334155')
+                        : (idx === auditLogs.length - 1 ? 'none' : '1px solid #F1F5F9'),
+                      alignItems: 'center',
+                      gap: '10px',
+                      transition: 'background-color 0.12s ease',
+                    }}
+                  >
+                    <span style={{ color: isDark ? '#94A3B8' : '#475569', fontWeight: 800, fontSize: '14px', fontFamily: 'var(--font-mono)' }}>
+                      {log.time}
+                    </span>
+                    <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '17px' : '14px' }}>
+                      {log.actor}
+                    </span>
+                    <div>
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 900,
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          backgroundColor: log.actionBg,
+                          color: log.actionColor,
+                          border: `1.5px solid ${log.actionBorder}`,
+                          fontFamily: 'var(--font-mono)',
+                          display: 'inline-block',
+                        }}
+                      >
+                        {log.action}
+                      </span>
+                    </div>
+                    <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#E2E8F0' : '#1E293B', fontWeight: 700, fontSize: isUrdu ? '17px' : '14px' }}>
+                      {log.detail}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
