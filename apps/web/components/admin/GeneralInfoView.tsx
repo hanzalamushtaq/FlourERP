@@ -20,64 +20,12 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getSession, ensureValidToken } from '../../lib/auth';
 
-/* ─────────────────────────────────────────────────────────────
-   Types
-───────────────────────────────────────────────────────────── */
-interface GeneralInfo {
-  mill_name: string;
-  tagline: string;
-  owner_name: string;
-  ntn_number: string;
-  address: string;
-  city: string;
-  phone_primary: string;
-  phone_secondary: string;
-  email: string;
-  website: string;
-  facebook_link: string;
-  twitter_link: string;
-  instagram_link: string;
-  logo_url: string;
-  established_year: string;
-  license_number: string;
-}
-
-const EMPTY_INFO: GeneralInfo = {
-  mill_name: '',
-  tagline: '',
-  owner_name: '',
-  ntn_number: '',
-  address: '',
-  city: '',
-  phone_primary: '',
-  phone_secondary: '',
-  email: '',
-  website: '',
-  facebook_link: '',
-  twitter_link: '',
-  instagram_link: '',
-  logo_url: '',
-  established_year: '',
-  license_number: '',
-};
-
-/* ─────────────────────────────────────────────────────────────
-   Local-storage helpers (localStorage-based, no backend required)
-   Key: 'flour_erp_general_info'
-───────────────────────────────────────────────────────────── */
-const LS_KEY = 'flour_erp_general_info';
-
-function loadFromStorage(): GeneralInfo {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) return { ...EMPTY_INFO, ...JSON.parse(raw) };
-  } catch {}
-  return { ...EMPTY_INFO };
-}
-
-function saveToStorage(data: GeneralInfo) {
-  localStorage.setItem(LS_KEY, JSON.stringify(data));
-}
+import {
+  GeneralInfo,
+  EMPTY_GENERAL_INFO as EMPTY_INFO,
+  getGeneralInfo as loadFromStorage,
+  saveGeneralInfo as saveToStorage,
+} from '../../lib/generalInfo';
 
 /* ─────────────────────────────────────────────────────────────
    Helper: compress image on canvas (max 800×800)

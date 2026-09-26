@@ -3,6 +3,7 @@
 import React from 'react';
 import { Printer, RefreshCw, X, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useGeneralInfo } from '../../lib/generalInfo';
 
 export interface ReceiptData {
   type: 'product' | 'pisai';
@@ -44,6 +45,7 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
   data,
 }) => {
   const { isUrdu, t } = useLanguage();
+  const generalInfo = useGeneralInfo();
   const [printed, setPrinted] = React.useState(false);
 
   if (!isOpen || !data) return null;
@@ -132,14 +134,36 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
               </div>
             )}
+            {generalInfo.logo_url && (
+              <img
+                src={generalInfo.logo_url}
+                alt="Mill Logo"
+                style={{
+                  maxHeight: '40px',
+                  maxWidth: '120px',
+                  objectFit: 'contain',
+                  margin: '0 auto 6px auto',
+                  display: 'block',
+                }}
+              />
+            )}
             <div
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{ fontSize: '16px', fontWeight: 900, marginTop: '2px', color: '#0f172a', letterSpacing: isUrdu ? 'normal' : '0.5px' }}
             >
-              {t('المدینہ چکی و فلور ملز', 'AL-MADINA FLOUR MILLS')}
+              {generalInfo.mill_name || t('المدینہ چکی و فلور ملز', 'AL-MADINA FLOUR MILLS')}
             </div>
+            {generalInfo.tagline && (
+              <div style={{ fontSize: '9px', fontStyle: 'italic', color: '#475569', marginTop: '1px' }}>
+                {generalInfo.tagline}
+              </div>
+            )}
             <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
-              {t('مین بازار، نزد گھنٹہ گھر • فون: 0300-1234567', 'Main Bazaar, Near Clock Tower • Ph: 0300-1234567')}
+              {[
+                generalInfo.address,
+                generalInfo.city,
+                generalInfo.phone_primary ? `${t('فون:', 'Ph:')} ${generalInfo.phone_primary}` : null,
+              ].filter(Boolean).join(' • ') || t('مین بازار، نزد گھنٹہ گھر • فون: 0300-1234567', 'Main Bazaar, Near Clock Tower • Ph: 0300-1234567')}
             </div>
             <div style={{ borderBottom: '1px dashed #cbd5e1', margin: '10px 0' }} />
           </div>

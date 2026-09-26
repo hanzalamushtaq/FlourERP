@@ -19,12 +19,14 @@ import {
 } from 'lucide-react';
 import { UserSession, saveSession, PRESET_USERS } from '../../lib/auth';
 import { getApiBaseUrl } from '../../lib/api';
+import { useGeneralInfo } from '../../lib/generalInfo';
 
 interface LoginScreenProps {
   onLoginSuccess: (user: UserSession) => void;
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
+  const generalInfo = useGeneralInfo();
   const [username, setUsername] = useState<string>('asif');
   const [password, setPassword] = useState<string>('biller123');
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -197,22 +199,28 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
               width: '52px',
               height: '52px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
+              background: generalInfo.logo_url ? '#FFFFFF' : 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
+              border: generalInfo.logo_url ? '1.5px solid #E2E8F0' : 'none',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(14, 138, 84, 0.25)',
+              boxShadow: '0 8px 16px rgba(14, 138, 84, 0.15)',
               marginBottom: '12px',
+              overflow: 'hidden',
             }}
           >
-            <Wheat size={28} color="#FFFFFF" strokeWidth={2.4} />
+            {generalInfo.logo_url ? (
+              <img src={generalInfo.logo_url} alt="Logo" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
+            ) : (
+              <Wheat size={28} color="#FFFFFF" strokeWidth={2.4} />
+            )}
           </div>
 
           <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#0F172A', margin: '0 0 4px 0', letterSpacing: '-0.3px' }}>
-            FlourERP POS
+            {generalInfo.mill_name || 'FlourERP POS'}
           </h1>
           <p className="font-nastaleeq" style={{ fontSize: '15px', fontWeight: 800, color: '#64748B', margin: 0 }}>
-            المدینہ فلور ملز و گندم چکی - کاؤنٹر ٹرمینل
+            {generalInfo.tagline || (generalInfo.mill_name ? `${generalInfo.mill_name} - کاؤنٹر ٹرمینل` : 'المدینہ فلور ملز و گندم چکی - کاؤنٹر ٹرمینل')}
           </p>
 
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', padding: '4px 12px', borderRadius: '20px', marginTop: '10px' }}>

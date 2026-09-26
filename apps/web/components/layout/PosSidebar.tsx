@@ -36,6 +36,7 @@ const REPORT_SUB_ITEMS: { id: ReportSubTab; labelEn: string; labelUr: string; ic
 ];
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useGeneralInfo } from '../../lib/generalInfo';
 
 // Wheat-Ear Cogwheel Logo matching user's reference image
 const WheatGearLogo = ({ size = 32 }: { size?: number }) => (
@@ -135,6 +136,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
 }) => {
   const { language, isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
+  const generalInfo = useGeneralInfo();
   const [internalCollapsed, setInternalCollapsed] = React.useState<boolean>(false);
   const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : internalCollapsed;
   const toggleCollapse = onToggleCollapse || (() => setInternalCollapsed((prev) => !prev));
@@ -255,17 +257,29 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
         }}
       >
         {!isCollapsed && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <WheatGearLogo size={32} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+            {generalInfo.logo_url ? (
+              <img
+                src={generalInfo.logo_url}
+                alt="Mill Logo"
+                style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'contain', flexShrink: 0 }}
+              />
+            ) : (
+              <WheatGearLogo size={32} />
+            )}
             <span
               style={{
                 fontSize: '15px',
                 fontWeight: 800,
                 color: isDark ? '#F8FAFC' : '#0F172A',
                 letterSpacing: '-0.2px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
+              title={generalInfo.mill_name || 'Flour ERP'}
             >
-              Flour ERP
+              {generalInfo.mill_name || 'Flour ERP'}
             </span>
           </div>
         )}

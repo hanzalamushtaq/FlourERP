@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useGeneralInfo } from '../../lib/generalInfo';
 
 interface AdminDashboardProps {
   onOpenPriceModal: () => void;
@@ -32,6 +33,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
+  const generalInfo = useGeneralInfo();
   const [closingTriggered, setClosingTriggered] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [roleModalTab, setRoleModalTab] = useState<'roles' | 'staff' | 'create' | 'add_user'>('roles');
@@ -240,7 +242,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             className={isUrdu ? 'font-nastaleeq' : ''}
             style={{ fontSize: isUrdu ? '24px' : '18px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', margin: 0, lineHeight: 1.2 }}
           >
-            {t('المدینہ فلور ملز - ایڈمن کمانڈ سنٹر', 'Al-Madina Flour Mills - Admin Command Center')}
+            {generalInfo.mill_name
+              ? `${generalInfo.mill_name} - ${t('ایڈمن کمانڈ سنٹر', 'Admin Command Center')}`
+              : t('المدینہ فلور ملز - ایڈمن کمانڈ سنٹر', 'Al-Madina Flour Mills - Admin Command Center')}
           </h1>
         </div>
 
