@@ -305,13 +305,20 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
 
           {/* Calculations */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سب ٹوٹل:', 'Subtotal:')}</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کل بل:', 'Total Bill:')}</span>
             <span>{isUrdu ? `${data.subtotal} روپے` : `Rs ${data.subtotal}`}</span>
           </div>
+
           {(() => {
             const calculatedDiscount = Math.max(0, (data.subtotal || 0) - (data.netTotal || 0));
             const displayDiscount = calculatedDiscount > 0 ? calculatedDiscount : ((data.discount || 0) + (data.shortDiscount || 0));
-            if (displayDiscount <= 0) return null;
+            const creditPortion = data.isCredit && (data.creditAdded !== undefined ? data.creditAdded : (data.remainingBalance || 0)) > 0
+              ? (data.creditAdded !== undefined ? data.creditAdded : (data.remainingBalance || 0))
+              : 0;
+
+            const deduction = displayDiscount > 0 ? displayDiscount : creditPortion;
+            if (deduction <= 0) return null;
+
             return (
               <div
                 style={{
@@ -323,12 +330,14 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
                 }}
               >
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                  {t('رعایت / کٹوتی (Less):', 'Discount / Less:')}
+                  {t('رعایت / ادھار:', 'Discount / Credit:')}
                 </span>
-                <span>{isUrdu ? `- ${displayDiscount} روپے` : `- Rs ${displayDiscount}`}</span>
+                <span>{isUrdu ? `- ${deduction} روپے` : `- Rs ${deduction}`}</span>
               </div>
             );
           })()}
+
+          {/* Cash Received (Primary Total) */}
           <div
             style={{
               display: 'flex',
@@ -340,14 +349,15 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
               borderTop: '2px solid #414833',
             }}
           >
-            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کل بل:', 'TOTAL BILL:')}</span>
-            <span>{isUrdu ? `${data.netTotal} روپے` : `Rs ${data.netTotal}`}</span>
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('وصول شدہ نقد:', 'Cash Received:')}</span>
+            <span>{isUrdu ? `${data.cashReceived !== undefined ? data.cashReceived : data.netTotal} روپے` : `Rs ${data.cashReceived !== undefined ? data.cashReceived : data.netTotal}`}</span>
           </div>
 
-          {data.cashReceived !== undefined && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '13px', fontWeight: 700 }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('وصول رقم (نقد):', 'CASH RECEIVED:')}</span>
-              <span>{isUrdu ? `${data.cashReceived} روپے` : `Rs ${data.cashReceived}`}</span>
+          {/* Change Returned if paid more than net total */}
+          {data.cashReceived !== undefined && data.cashReceived > data.netTotal && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '13px', fontWeight: 700, color: '#047857' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('بقایا واپسی:', 'Change Returned:')}</span>
+              <span>{isUrdu ? `${data.cashReceived - data.netTotal} روپے` : `Rs ${data.cashReceived - data.netTotal}`}</span>
             </div>
           )}
 

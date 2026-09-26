@@ -94,16 +94,14 @@ function generateEscPosPayload(params: {
 
   const totals = [
     line,
-    `Subtotal:                         Rs. ${Math.round(params.subtotal)}`,
-    totalDiscount > 0
-      ? `Discount / Less (رعایت / کٹوتی): -Rs. ${Math.round(totalDiscount)}`
+    `Total Bill (کل رقم):              Rs. ${Math.round(params.subtotal)}`,
+    (totalDiscount > 0 || (params.paymentMethod === 'CREDIT' && (params.creditAdded || 0) > 0))
+      ? `Discount / Credit (رعایت/ادھار): -Rs. ${Math.round(totalDiscount > 0 ? totalDiscount : (params.creditAdded || 0))}`
       : null,
     doubleLine,
-    `NET TOTAL:                        Rs. ${Math.round(params.netTotal)}`,
-    `Payment Mode:                     ${params.paymentMethod}`,
-    `Cash Received:                    Rs. ${Math.round(params.receivedAmount)}`,
+    `Cash Received (وصول شدہ نقد):     Rs. ${Math.round(params.receivedAmount)}`,
     params.changeReturned > 0
-      ? `Change Returned:                  Rs. ${Math.round(params.changeReturned)}`
+      ? `Change Returned (بقایا واپسی):    Rs. ${Math.round(params.changeReturned)}`
       : null,
     (params.paymentMethod === 'CREDIT' || (params.newBalance !== undefined && params.newBalance > 0))
       ? [
