@@ -257,7 +257,10 @@ billingRouter.post(
         netTotal = parsed.receivedAmount;
       }
 
-      const receivedAmount = parsed.paymentMethod === 'CREDIT' ? 0 : parsed.receivedAmount;
+      // If CREDIT sale: customer may pay partial cash now (receivedAmount), and the remaining balance is added to credit ledger
+      const receivedAmount = Math.max(0, parsed.receivedAmount || 0);
+      const actualReceivedForBill = Math.min(netTotal, receivedAmount);
+      const debtAmount = parsed.paymentMethod === 'CREDIT' ? Math.max(0, netTotal - actualReceivedForBill) : 0;
       const changeReturned =
         parsed.paymentMethod === 'CREDIT' ? 0 : Math.max(0, receivedAmount - netTotal);
 
@@ -302,7 +305,7 @@ billingRouter.post(
         if (parsed.paymentMethod === 'CREDIT' && customerId) {
           const currentCust = await tx.customer.findUnique({ where: { id: customerId } });
           prevBalance = currentCust?.currentBalance || 0;
-          debtAmount = netTotal - receivedAmount;
+          debtAmount = Math.max(0, netTotal - actualReceivedForBill);
           newBalance = prevBalance + debtAmount;
         }
 
@@ -317,7 +320,7 @@ billingRouter.post(
           discount: parsed.discount,
           shortDiscount,
           netTotal,
-          receivedAmount,
+          receivedAmount: actualReceivedForBill,
           changeReturned,
           paymentMethod: parsed.paymentMethod,
           prevBalance,
@@ -337,7 +340,7 @@ billingRouter.post(
             subtotal,
             discount,
             netTotal,
-            receivedAmount,
+            receivedAmount: actualReceivedForBill,
             changeReturned,
             paymentMethod: parsed.paymentMethod,
             status: parsed.paymentMethod === 'CREDIT' ? 'CREDIT' : 'PAID',

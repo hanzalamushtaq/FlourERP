@@ -232,7 +232,7 @@ export const PisaiBillingScreen: React.FC = () => {
         ratePerKg: currentRate,
         feeAmount: numCharge,
         discount: numDiscount,
-        receivedAmount: isCreditSale ? 0 : numReceived,
+        receivedAmount: numReceived || 0,
         paymentMethod: isCreditSale ? 'CREDIT' : 'CASH',
         customerName: customerName.trim() || undefined,
         customerPhone: customerPhone.trim() || undefined,

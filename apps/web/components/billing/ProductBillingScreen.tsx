@@ -666,7 +666,7 @@ export const ProductBillingScreen: React.FC = () => {
           };
         }),
         discount: numDiscount,
-        receivedAmount: isCreditSale ? (numReceived > 0 && numReceived < netTotal ? numReceived : 0) : numReceived,
+        receivedAmount: numReceived || 0,
         paymentMethod: isCreditSale ? 'CREDIT' : 'CASH',
       };
 

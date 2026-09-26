@@ -161,7 +161,9 @@ pisaiRouter.post(
 
       const discount = Math.min(parsed.feeAmount, parsed.discount);
       const netTotal = Math.max(0, parsed.feeAmount - discount);
-      const receivedAmount = parsed.paymentMethod === 'CREDIT' ? 0 : parsed.receivedAmount;
+      const receivedAmount = Math.max(0, parsed.receivedAmount || 0);
+      const actualReceivedForTicket = Math.min(netTotal, receivedAmount);
+      const debtAmount = parsed.paymentMethod === 'CREDIT' ? Math.max(0, netTotal - actualReceivedForTicket) : 0;
       const changeReturned =
         parsed.paymentMethod === 'CREDIT' ? 0 : Math.max(0, receivedAmount - netTotal);
       const calculatedRate = parsed.ratePerKg || Math.round(parsed.feeAmount / parsed.weightKg);
@@ -234,7 +236,7 @@ pisaiRouter.post(
             feeAmount: parsed.feeAmount,
             discount,
             netTotal,
-            receivedAmount,
+            receivedAmount: actualReceivedForTicket,
             changeReturned,
             paymentMethod: parsed.paymentMethod,
             status: parsed.paymentMethod === 'CREDIT' ? 'CREDIT' : 'PAID',
@@ -250,7 +252,7 @@ pisaiRouter.post(
         if (parsed.paymentMethod === 'CREDIT' && customerId) {
           const currentCust = await tx.customer.findUnique({ where: { id: customerId } });
           const prevBalance = currentCust?.currentBalance || 0;
-          const debtAmount = netTotal - receivedAmount;
+          const debtAmount = Math.max(0, netTotal - actualReceivedForTicket);
           const newBalance = prevBalance + debtAmount;
 
           await tx.customer.update({
