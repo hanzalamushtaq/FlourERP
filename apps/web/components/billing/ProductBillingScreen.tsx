@@ -263,6 +263,8 @@ export const ProductBillingScreen: React.FC = () => {
   const [selectedCustomerCredit, setSelectedCustomerCredit] = useState<number | null>(null);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [selectedCustomerIndex, setSelectedCustomerIndex] = useState<number>(-1);
+  const [selectedProductIndex, setSelectedProductIndex] = useState<number>(-1);
 
   // Hover & Tactile States
   const [hoveredBtn, setHoveredBtn] = useState<'cash' | 'credit' | null>(null);
@@ -372,8 +374,10 @@ export const ProductBillingScreen: React.FC = () => {
 
     if (val.trim().length > 0) {
       setOpenSuggestionsRow(index);
+      setSelectedProductIndex(0);
     } else {
       setOpenSuggestionsRow(null);
+      setSelectedProductIndex(-1);
     }
   };
 
@@ -390,6 +394,7 @@ export const ProductBillingScreen: React.FC = () => {
       return updated;
     });
     setOpenSuggestionsRow(null);
+    setSelectedProductIndex(-1);
     setIsReceivedAutoUpdated(true);
 
     setTimeout(() => {
@@ -398,12 +403,45 @@ export const ProductBillingScreen: React.FC = () => {
     }, 50);
   };
 
-  // Enter key navigation on Item input
+  // Enter key & Arrow key navigation on Item input
   const handleItemKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    const currentItem = billItems[index];
+    const q = (currentItem?.itemName || '').toLowerCase().trim();
+    const matchingProducts = products.filter(
+      (p) => p.nameUr.toLowerCase().includes(q) || p.nameEn.toLowerCase().includes(q)
+    );
+
+    // Arrow navigation when dropdown is visible
+    if (openSuggestionsRow === index && matchingProducts.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedProductIndex((prev) => (prev + 1) % matchingProducts.length);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedProductIndex((prev) => (prev <= 0 ? matchingProducts.length - 1 : prev - 1));
+        return;
+      }
+      if (e.key === 'Enter') {
+        if (selectedProductIndex >= 0 && selectedProductIndex < matchingProducts.length) {
+          e.preventDefault();
+          handleSelectProduct(matchingProducts[selectedProductIndex], index);
+          setSelectedProductIndex(-1);
+          return;
+        }
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setOpenSuggestionsRow(null);
+        setSelectedProductIndex(-1);
+        return;
+      }
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault();
       setOpenSuggestionsRow(null);
-      const currentItem = billItems[index];
 
       // If user did NOT fill the item input -> take to receiving payment input!
       if (!currentItem || currentItem.itemName.trim() === '') {
@@ -561,6 +599,7 @@ export const ProductBillingScreen: React.FC = () => {
   const handleCustomerNameChange = (val: string) => {
     setCustomerName(val);
     setSelectedCustomerCredit(null);
+    setSelectedCustomerIndex(0);
     if (val.trim().length > 0) {
       const sess = getSession();
       fetch(`${getApiBaseUrl()}/api/customers/search?q=${encodeURIComponent(val)}`, {
@@ -571,12 +610,14 @@ export const ProductBillingScreen: React.FC = () => {
           if (json.success && json.data.customers && json.data.customers.length > 0) {
             setSuggestions(json.data.customers);
             setShowSuggestions(true);
+            setSelectedCustomerIndex(0);
           } else {
             const filtered = MOCK_CUSTOMERS.filter((c) =>
               c.name.toLowerCase().includes(val.toLowerCase())
             );
             setSuggestions(filtered);
             setShowSuggestions(filtered.length > 0);
+            setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
           }
         })
         .catch(() => {
@@ -585,10 +626,12 @@ export const ProductBillingScreen: React.FC = () => {
           );
           setSuggestions(filtered);
           setShowSuggestions(filtered.length > 0);
+          setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
         });
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      setSelectedCustomerIndex(-1);
     }
   };
 
@@ -597,6 +640,7 @@ export const ProductBillingScreen: React.FC = () => {
     setCustomerPhone(cust.phone || '');
     setSelectedCustomerCredit(cust.currentBalance ?? null);
     setShowSuggestions(false);
+    setSelectedCustomerIndex(-1);
     customerPhoneInputRef.current?.focus();
   };
 
@@ -1468,38 +1512,50 @@ export const ProductBillingScreen: React.FC = () => {
                             marginTop: '4px',
                           }}
                         >
-                          {matchingProducts.map((p) => (
-                            <div
-                              key={p.id}
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleSelectProduct(p, idx);
-                              }}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleSelectProduct(p, idx);
-                              }}
-                              style={{
-                                padding: '10px 14px',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
-                              }}
-                              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#F8FAFC')}
-                              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#FFFFFF')}
-                            >
-                              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '19px' : '15px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                                {isUrdu ? p.nameUr : p.nameEn}
-                              </span>
-                              <span style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#38BDF8' : '#1877F2', fontFamily: 'var(--font-mono)' }}>
-                                {isUrdu ? `${p.ratePerKg} روپے` : `Rs ${p.ratePerKg}`}
-                              </span>
-                            </div>
-                          ))}
+                          {matchingProducts.map((p, pIdx) => {
+                            const isHighlighted = pIdx === selectedProductIndex;
+                            return (
+                              <div
+                                key={p.id}
+                                ref={(el) => {
+                                  if (isHighlighted && el) {
+                                    el.scrollIntoView({ block: 'nearest' });
+                                  }
+                                }}
+                                onMouseEnter={() => setSelectedProductIndex(pIdx)}
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleSelectProduct(p, idx);
+                                }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleSelectProduct(p, idx);
+                                }}
+                                style={{
+                                  padding: '10px 14px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
+                                  backgroundColor: isHighlighted
+                                    ? (isDark ? '#334155' : '#EFF6FF')
+                                    : (isDark ? '#1E293B' : '#FFFFFF'),
+                                  borderLeft: isHighlighted ? '4px solid #1877F2' : '4px solid transparent',
+                                  transition: 'background-color 0.1s ease',
+                                }}
+                              >
+                                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '19px' : '15px', fontWeight: 800, color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A') }}>
+                                  {isUrdu ? p.nameUr : p.nameEn}
+                                </span>
+                                <span style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#38BDF8' : '#1877F2', fontFamily: 'var(--font-mono)' }}>
+                                  {isUrdu ? `${p.ratePerKg} روپے` : `Rs ${p.ratePerKg}`}
+                                </span>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -1721,6 +1777,33 @@ export const ProductBillingScreen: React.FC = () => {
               value={customerName}
               onChange={(e) => handleCustomerNameChange(e.target.value)}
               onKeyDown={(e) => {
+                if (showSuggestions && suggestions.length > 0) {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setSelectedCustomerIndex((prev) => (prev + 1) % suggestions.length);
+                    return;
+                  }
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setSelectedCustomerIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+                    return;
+                  }
+                  if (e.key === 'Enter') {
+                    if (selectedCustomerIndex >= 0 && selectedCustomerIndex < suggestions.length) {
+                      e.preventDefault();
+                      handleSelectCustomer(suggestions[selectedCustomerIndex]);
+                      setSelectedCustomerIndex(-1);
+                      return;
+                    }
+                  }
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setShowSuggestions(false);
+                    setSelectedCustomerIndex(-1);
+                    return;
+                  }
+                }
+
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   // If empty take to save and print (or directly save & print)
@@ -1790,56 +1873,66 @@ export const ProductBillingScreen: React.FC = () => {
                   marginTop: '4px',
                 }}
               >
-                {suggestions.map((c) => (
-                  <div
-                    key={c.id}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleSelectCustomer(c);
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleSelectCustomer(c);
-                    }}
-                    style={{
-                      padding: '8px 12px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#F8FAFC')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#FFFFFF')}
-                  >
-                    <div>
-                      <span className="font-nastaleeq" style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                        {c.name}
-                      </span>
-                      {c.phone && (
-                        <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '11px', marginLeft: '6px' }}>
-                          ({c.phone})
+                {suggestions.map((c, cIdx) => {
+                  const isHighlighted = cIdx === selectedCustomerIndex;
+                  return (
+                    <div
+                      key={c.id || cIdx}
+                      ref={(el) => {
+                        if (isHighlighted && el) {
+                          el.scrollIntoView({ block: 'nearest' });
+                        }
+                      }}
+                      onMouseEnter={() => setSelectedCustomerIndex(cIdx)}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSelectCustomer(c);
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSelectCustomer(c);
+                      }}
+                      style={{
+                        padding: '10px 14px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        backgroundColor: isHighlighted ? (isDark ? '#334155' : '#EFF6FF') : (isDark ? '#1E293B' : '#FFFFFF'),
+                        borderLeft: isHighlighted ? '4px solid #1877F2' : '4px solid transparent',
+                        transition: 'background-color 0.1s ease',
+                      }}
+                    >
+                      <div>
+                        <span className="font-nastaleeq" style={{ fontWeight: 800, color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A'), fontSize: isUrdu ? '18px' : '15px' }}>
+                          {c.name}
+                        </span>
+                        {c.phone && (
+                          <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '11px', marginLeft: '6px' }}>
+                            ({c.phone})
+                          </span>
+                        )}
+                      </div>
+                      {c.currentBalance !== undefined && c.currentBalance > 0 && (
+                        <span
+                          style={{
+                            color: isDark ? '#FCA5A5' : '#DC2626',
+                            backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEE2E2',
+                            border: isDark ? '1px solid #EF4444' : 'none',
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: 800,
+                          }}
+                        >
+                          {isUrdu ? `${c.currentBalance.toLocaleString()} ادھار` : `Rs ${c.currentBalance.toLocaleString()} Due`}
                         </span>
                       )}
                     </div>
-                    {c.currentBalance !== undefined && c.currentBalance > 0 && (
-                      <span
-                        style={{
-                          color: isDark ? '#FCA5A5' : '#DC2626',
-                          backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEE2E2',
-                          border: isDark ? '1px solid #EF4444' : 'none',
-                          padding: '1px 6px',
-                          borderRadius: '4px',
-                          fontSize: '11px',
-                          fontWeight: 800,
-                        }}
-                      >
-                        {isUrdu ? `${c.currentBalance.toLocaleString()} ادھار` : `Rs ${c.currentBalance.toLocaleString()} Due`}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

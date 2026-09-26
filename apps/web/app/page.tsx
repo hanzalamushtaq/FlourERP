@@ -34,7 +34,7 @@ import { useTheme } from '../context/ThemeContext';
 
 export default function Home() {
   const { isUrdu, t } = useLanguage();
-  const { isDark } = useTheme();
+  const { isDark, isNightMode } = useTheme();
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'billing' | 'pisai' | 'udhaar' | 'reports' | 'stock' | 'admin' | 'rates' | 'settings'
@@ -183,8 +183,8 @@ export default function Home() {
       style={{
         display: 'flex',
         minHeight: '100vh',
-        backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
-        color: isDark ? '#F8FAFC' : '#0F172A',
+        backgroundColor: isNightMode ? '#0B0F19' : '#FFFFFF',
+        color: '#0F172A',
         width: '100%',
         overflowX: 'hidden',
         position: 'relative',
@@ -285,7 +285,15 @@ export default function Home() {
         />
 
         {/* View Router based on active tab and logged-in role */}
-        <main className="app-main-content" style={{ flex: 1, paddingBottom: '32px' }}>
+        <main
+          className="app-main-content"
+          style={{
+            flex: 1,
+            paddingBottom: '32px',
+            backgroundColor: isNightMode ? '#0B0F19' : 'transparent',
+            transition: 'background-color 0.2s ease',
+          }}
+        >
           {/* Dashboard Tab: Unified Approved Dashboard for both Operator and Admin */}
           {activeTab === 'dashboard' && (
             <div className="dashboard-nastaleeq-scope">

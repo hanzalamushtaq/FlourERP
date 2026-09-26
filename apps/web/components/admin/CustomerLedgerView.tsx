@@ -457,6 +457,24 @@ export const CustomerLedgerView: React.FC = () => {
               placeholder={t('گاہک تلاش کریں...', 'Search customers...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (filteredCustomers.length > 0) {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const currentIndex = filteredCustomers.findIndex((c) => c.id === selectedCustomer?.id);
+                    const nextIndex = currentIndex < filteredCustomers.length - 1 ? currentIndex + 1 : 0;
+                    setSelectedCustomer(filteredCustomers[nextIndex]);
+                    return;
+                  }
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const currentIndex = filteredCustomers.findIndex((c) => c.id === selectedCustomer?.id);
+                    const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredCustomers.length - 1;
+                    setSelectedCustomer(filteredCustomers[prevIndex]);
+                    return;
+                  }
+                }
+              }}
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 border: 'none',
@@ -489,11 +507,16 @@ export const CustomerLedgerView: React.FC = () => {
               </div>
             ) : (
               filteredCustomers.map((cust) => {
-                const isSelected = selectedCustomer.id === cust.id;
+                const isSelected = selectedCustomer?.id === cust.id;
 
                 return (
                   <div
                     key={cust.id}
+                    ref={(el) => {
+                      if (isSelected && el) {
+                        el.scrollIntoView({ block: 'nearest' });
+                      }
+                    }}
                     onClick={() => setSelectedCustomer(cust)}
                     onMouseEnter={() => setHoveredCustomer(cust.id)}
                     onMouseLeave={() => setHoveredCustomer(null)}

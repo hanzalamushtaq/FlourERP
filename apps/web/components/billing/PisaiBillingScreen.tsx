@@ -95,6 +95,7 @@ export const PisaiBillingScreen: React.FC = () => {
   const [customerPhone, setCustomerPhone] = useState<string>('');
   const [suggestions, setSuggestions] = useState<typeof MOCK_CUSTOMERS>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [selectedCustomerIndex, setSelectedCustomerIndex] = useState<number>(-1);
 
   // Hover & Tactile States for Dashboard-Style Polish
   const [hoveredService, setHoveredService] = useState<'safai_pisai' | 'pisai' | null>(null);
@@ -178,12 +179,14 @@ export const PisaiBillingScreen: React.FC = () => {
           if (json.success && json.data.customers && json.data.customers.length > 0) {
             setSuggestions(json.data.customers);
             setShowSuggestions(true);
+            setSelectedCustomerIndex(0);
           } else {
             const filtered = MOCK_CUSTOMERS.filter((c) =>
               c.name.toLowerCase().includes(val.toLowerCase())
             );
             setSuggestions(filtered);
             setShowSuggestions(filtered.length > 0);
+            setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
           }
         })
         .catch(() => {
@@ -192,10 +195,12 @@ export const PisaiBillingScreen: React.FC = () => {
           );
           setSuggestions(filtered);
           setShowSuggestions(filtered.length > 0);
+          setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
         });
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      setSelectedCustomerIndex(-1);
     }
   };
 
@@ -203,6 +208,7 @@ export const PisaiBillingScreen: React.FC = () => {
     setCustomerName(cust.name);
     setCustomerPhone(cust.phone || '');
     setShowSuggestions(false);
+    setSelectedCustomerIndex(-1);
     feeInputRef.current?.focus();
   };
 
@@ -1556,6 +1562,32 @@ export const PisaiBillingScreen: React.FC = () => {
               placeholder={t('گاہک کا نام لکھیں...', 'Enter customer name...')}
               value={customerName}
               onChange={(e) => handleCustomerNameChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (showSuggestions && suggestions.length > 0) {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setSelectedCustomerIndex((prev) => (prev + 1) % suggestions.length);
+                    return;
+                  }
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setSelectedCustomerIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+                    return;
+                  }
+                  if (e.key === 'Enter') {
+                    if (selectedCustomerIndex >= 0 && selectedCustomerIndex < suggestions.length) {
+                      e.preventDefault();
+                      handleSelectCustomer(suggestions[selectedCustomerIndex]);
+                      return;
+                    }
+                  }
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setShowSuggestions(false);
+                    return;
+                  }
+                }
+              }}
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
                 width: '100%',
@@ -1573,7 +1605,7 @@ export const PisaiBillingScreen: React.FC = () => {
               }}
             />
 
-            {/* Suggestions Dropdown */}
+            {/* Suggestions Dropdown with Keyboard Navigation */}
             {showSuggestions && suggestions.length > 0 && (
               <div
                 style={{
@@ -1582,38 +1614,50 @@ export const PisaiBillingScreen: React.FC = () => {
                   right: 0,
                   left: 0,
                   backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  border: isDark ? '1px solid #475569' : 'none',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                  zIndex: 20,
+                  border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1',
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                  zIndex: 30,
                   marginTop: '4px',
-                  maxHeight: '140px',
+                  maxHeight: '180px',
                   overflowY: 'auto',
                 }}
               >
-                {suggestions.map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => handleSelectCustomer(c)}
-                    style={{
-                      padding: '8px 12px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      borderBottom: isDark ? '1px solid #334155' : 'none',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#334155' : '#F8FAFC')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isDark ? '#1E293B' : '#FFFFFF')}
-                  >
-                    <span className="font-nastaleeq" style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                      {c.name}
-                    </span>
-                    <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '12px', marginRight: '8px' }}>
-                      {c.phone}
-                    </span>
-                  </div>
-                ))}
+                {suggestions.map((c, idx) => {
+                  const isHighlighted = idx === selectedCustomerIndex;
+                  return (
+                    <div
+                      key={c.id}
+                      ref={(el) => {
+                        if (isHighlighted && el) {
+                          el.scrollIntoView({ block: 'nearest' });
+                        }
+                      }}
+                      onClick={() => handleSelectCustomer(c)}
+                      onMouseEnter={() => setSelectedCustomerIndex(idx)}
+                      style={{
+                        padding: '9px 14px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottom: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
+                        backgroundColor: isHighlighted
+                          ? (isDark ? '#334155' : '#EFF6FF')
+                          : (isDark ? '#1E293B' : '#FFFFFF'),
+                        borderLeft: isHighlighted ? '3px solid #1877F2' : '3px solid transparent',
+                        transition: 'background-color 0.1s ease',
+                      }}
+                    >
+                      <span className="font-nastaleeq" style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A') }}>
+                        {c.name}
+                      </span>
+                      <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '12px', marginRight: '8px', fontFamily: 'var(--font-mono)' }}>
+                        {c.phone}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

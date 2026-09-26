@@ -88,7 +88,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
   onOpenPriceModal,
 }) => {
   const { language, setLanguage, isUrdu, t } = useLanguage();
-  const { theme, resolvedTheme, setTheme, toggleTheme, isDark } = useTheme();
+  const { theme, resolvedTheme, setTheme, toggleTheme, isDark, isNightMode } = useTheme();
   const [currentTime, setCurrentTime] = useState<string>('06:45 PM');
 
   const isAdmin =
@@ -265,8 +265,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           onClick={toggleTheme}
           title={
             theme === 'system'
-              ? t(`سسٹم تھیم (آٹو) - اب ${isDark ? 'ڈارک' : 'لائٹ'} ہے`, `System Theme (Auto) - Currently ${isDark ? 'Dark' : 'Light'}`)
-              : isDark
+              ? t(`سسٹم تھیم (آٹو) - اب ${isNightMode ? 'ڈارک' : 'لائٹ'} ہے`, `System Theme (Auto) - Currently ${isNightMode ? 'Dark' : 'Light'}`)
+              : isNightMode
               ? t('ڈارک موڈ آن ہے - لائٹ پر سوئچ کریں', 'Dark Mode - Switch to Light')
               : t('لائٹ موڈ آن ہے - ڈارک پر سوئچ کریں', 'Light Mode - Switch to Dark')
           }
@@ -275,8 +275,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             width: '38px',
             height: '38px',
             borderRadius: '10px',
-            backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
-            border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
+            backgroundColor: isNightMode ? '#1E293B' : '#F8FAFC',
+            border: isNightMode ? '1.5px solid #334155' : '1.5px solid #E2E8F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -287,7 +287,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             transition: 'all 0.15s ease',
           }}
         >
-          {isDark ? (
+          {isNightMode ? (
             <Moon size={18} strokeWidth={2.2} color="#FBBF24" />
           ) : (
             <Sun size={18} strokeWidth={2.2} color="#D97706" />

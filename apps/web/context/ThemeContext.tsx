@@ -12,6 +12,7 @@ interface ThemeContextType {
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   isDark: boolean;
+  isNightMode: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -130,7 +131,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         resolvedTheme,
         setTheme,
         toggleTheme,
-        isDark: resolvedTheme === 'dark',
+        isDark: false, // Cards and components retain their vibrant colors
+        isNightMode: resolvedTheme === 'dark',
       }}
     >
       {children}
@@ -147,6 +149,7 @@ export const useTheme = (): ThemeContextType => {
       setTheme: () => {},
       toggleTheme: () => {},
       isDark: false,
+      isNightMode: false,
     };
   }
   return context;
