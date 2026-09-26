@@ -308,22 +308,27 @@ export const ReceiptPreviewModal: React.FC<ReceiptPreviewModalProps> = ({
             <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('سب ٹوٹل:', 'Subtotal:')}</span>
             <span>{isUrdu ? `${data.subtotal} روپے` : `Rs ${data.subtotal}`}</span>
           </div>
-          {(data.discount > 0 || (data.shortDiscount && data.shortDiscount > 0)) && (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '4px',
-                color: '#B91C1C',
-                fontWeight: 700,
-              }}
-            >
-              <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                {t('رعایت / کٹوتی (Less):', 'Discount / Less:')}
-              </span>
-              <span>{isUrdu ? `- ${((data.discount || 0) + (data.shortDiscount || 0))} روپے` : `- Rs ${((data.discount || 0) + (data.shortDiscount || 0))}`}</span>
-            </div>
-          )}
+          {(() => {
+            const calculatedDiscount = Math.max(0, (data.subtotal || 0) - (data.netTotal || 0));
+            const displayDiscount = calculatedDiscount > 0 ? calculatedDiscount : ((data.discount || 0) + (data.shortDiscount || 0));
+            if (displayDiscount <= 0) return null;
+            return (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '4px',
+                  color: '#B91C1C',
+                  fontWeight: 700,
+                }}
+              >
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('رعایت / کٹوتی (Less):', 'Discount / Less:')}
+                </span>
+                <span>{isUrdu ? `- ${displayDiscount} روپے` : `- Rs ${displayDiscount}`}</span>
+              </div>
+            );
+          })()}
           <div
             style={{
               display: 'flex',

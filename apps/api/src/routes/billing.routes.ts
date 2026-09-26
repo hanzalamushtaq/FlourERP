@@ -90,7 +90,7 @@ function generateEscPosPayload(params: {
     return `${name} ${qty} ${rate} ${tot}`;
   });
 
-  const totalDiscount = (params.discount || 0) + (params.shortDiscount || 0);
+  const totalDiscount = Math.max(0, Math.round((params.subtotal || 0) - (params.netTotal || 0)));
 
   const totals = [
     line,
