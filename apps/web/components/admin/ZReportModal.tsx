@@ -13,6 +13,7 @@ import {
   Sparkles,
   Receipt,
   HandCoins,
+  Unlock,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { getSession, ensureValidToken } from '../../lib/auth';
@@ -149,6 +150,46 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
       }, 2000);
     } catch (err: any) {
       setErrorMessage(`Network error: ${err.message}`);
+      setIsProcessing(false);
+    }
+  };
+
+  const handleUnlockDay = async () => {
+    const confirmUnlock = window.confirm(
+      isUrdu
+        ? 'کیا آپ واقعی آج کا کاروباری دن دوبارہ کھولنا چاہتے ہیں تاکہ بلنگ جاری رکھی جا سکے؟'
+        : 'Are you sure you want to unlock today’s business day to resume billing?'
+    );
+    if (!confirmUnlock) return;
+
+    setIsProcessing(true);
+    setErrorMessage(null);
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch(`${getApiBaseUrl()}/api/closing/unlock`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({}),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || 'Failed to unlock business day');
+      }
+      alert(
+        isUrdu
+          ? 'کاروباری دن کامیابی سے ان لاک ہو گیا ہے! اب آپ بل اور ٹوکن بنا سکتے ہیں۔'
+          : 'Business day successfully unlocked! You can now issue bills and tokens.'
+      );
+      setLiveData((prev) => ({ ...prev, isClosed: false }));
+      onConfirmCloseShift();
+      onClose();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Unlock error');
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -299,14 +340,47 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
                 backgroundColor: '#eff6ff',
                 border: '1.5px solid #60a5fa',
                 borderRadius: '10px',
-                padding: '10px 14px',
-                color: '#1e40af',
-                fontSize: '13px',
-                fontWeight: 800,
+                padding: '12px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '10px',
               }}
-              className={isUrdu ? 'font-nastaleeq' : ''}
             >
-              {t('یہ دن پہلے ہی بند اور محفوظ ہو چکا ہے۔ مزید ترمیم ممکن نہیں ہے۔', 'This business day is already closed and locked against backdated edits.')}
+              <div>
+                <div style={{ color: '#1e40af', fontSize: '14px', fontWeight: 800 }} className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('یہ کاروباری دن کلوز اور لاک ہو چکا ہے۔', 'This business day is closed and locked.')}
+                </div>
+                <div style={{ color: '#3b82f6', fontSize: '12px', fontWeight: 600 }}>
+                  {t('نئے بلز اور پسائی ٹوکنز جاری کرنے کے لیے دن کو ان لاک کریں۔', 'Unlock to resume issuing bills and grinding tokens.')}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleUnlockDay}
+                disabled={isProcessing}
+                style={{
+                  backgroundColor: '#dc2626',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.25)',
+                }}
+              >
+                <Unlock size={15} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                  {t('کاروبار ان لاک کریں', 'Unlock Business Day')}
+                </span>
+              </button>
             </div>
           )}
 

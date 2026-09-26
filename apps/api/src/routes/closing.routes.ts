@@ -414,3 +414,51 @@ closingRouter.get('/records', requireAuth, async (_req: Request, res: Response) 
     });
   }
 });
+
+/**
+ * POST /api/closing/unlock
+ * Allows Admin/SuperAdmin to unlock a closed day so billing can resume
+ */
+closingRouter.post(
+  '/unlock',
+  requireAuth,
+  requirePermission('can_close_day'),
+  async (req: Request, res: Response) => {
+    try {
+      const dateStr = (req.body && req.body.date) || getLocalDateString();
+      const existing = await prisma.dailyClosingRecord.findUnique({
+        where: { closingDate: dateStr },
+      });
+
+      if (!existing) {
+        return res.json({
+          success: true,
+          message: 'Business day is already open and unlocked.',
+        });
+      }
+
+      await prisma.dailyClosingRecord.delete({
+        where: { closingDate: dateStr },
+      });
+
+      await recordActivityLog({
+        userId: req.user!.id,
+        action: 'DAILY_CLOSING_REOPENED',
+        entityType: 'DailyClosingRecord',
+        entityId: existing.id,
+        details: { closingDate: dateStr, reason: req.body?.reason || 'Reopened by Admin' },
+        ipAddress: req.ip,
+      });
+
+      return res.json({
+        success: true,
+        message: `Business day ${dateStr} has been successfully unlocked. Billing and grinding tokens can now be created.`,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        success: false,
+        error: { code: 'SERVER_ERROR', message: error.message },
+      });
+    }
+  }
+);
