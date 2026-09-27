@@ -1414,7 +1414,6 @@ body.is-native-app .pos-header-container,
     box-sizing: border-box !important;
   }
 
-  .pos-header-container,
   .dashboard-3-action-cards,
   .kpi-strip-container {
     max-width: 100% !important;

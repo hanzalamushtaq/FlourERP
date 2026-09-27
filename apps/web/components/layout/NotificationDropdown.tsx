@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { getSession } from '../../lib/auth';
 import { getApiBaseUrl } from '../../lib/api';
 
@@ -44,6 +45,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   onOpenZReport,
 }) => {
   const { isUrdu, t } = useLanguage();
+  const { isDark } = useTheme();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isRateConfirmedToday, setIsRateConfirmedToday] = useState<boolean | null>(null);
   const [pendingRequestsCount, setPendingRequestsCount] = useState<number>(0);
@@ -287,7 +289,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       {/* Top Right Bell Icon Button */}
       <button
         type="button"
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           setIsOpen((prev) => !prev);
           fetchStatus();
         }}
@@ -297,13 +300,17 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           width: '38px',
           height: '38px',
           borderRadius: '10px',
-          backgroundColor: isOpen ? '#EFF6FF' : '#F8FAFC',
-          border: isOpen ? '1.5px solid #1877F2' : '1.5px solid #E2E8F0',
+          backgroundColor: isOpen
+            ? (isDark ? '#334155' : '#EFF6FF')
+            : (isDark ? '#1E293B' : '#F8FAFC'),
+          border: isOpen
+            ? '1.5px solid #1877F2'
+            : (isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0'),
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          color: isOpen ? '#1877F2' : '#0F172A',
+          color: isOpen ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A'),
           position: 'relative',
           outline: 'none',
           boxShadow: 'none',
@@ -333,6 +340,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               padding: '0 4px',
               boxShadow: '0 2px 5px rgba(220, 38, 38, 0.4)',
               border: '2px solid #FFFFFF',
+              pointerEvents: 'none',
             }}
           >
             {unreadCount}
@@ -340,258 +348,291 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         )}
       </button>
 
-      {/* Dropdown Panel */}
+      {/* Dropdown Panel + Backdrop */}
       {isOpen && (
-        <div
-          className="notification-panel-dropdown"
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 8px)',
-            right: 0,
-            left: 'auto',
-            width: '360px',
-            maxWidth: 'calc(100vw - 32px)',
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            boxShadow: '0 12px 35px -5px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08)',
-            zIndex: 100,
-            overflow: 'hidden',
-            direction: isUrdu ? 'rtl' : 'ltr',
-          }}
-        >
-          {/* Header */}
+        <>
+          {/* Backdrop on mobile & desktop to dismiss on outside click/tap */}
           <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(false);
+            }}
             style={{
-              padding: '12px 16px',
-              backgroundColor: '#F8FAFC',
-              borderBottom: '1px solid #E2E8F0',
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+              zIndex: 9998,
+              backdropFilter: 'blur(2px)',
+            }}
+          />
+
+          <div
+            className="notification-panel-dropdown"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'fixed',
+              top: 'max(76px, calc(env(safe-area-inset-top, 0px) + 68px))',
+              right: isUrdu ? '12px' : 'auto',
+              left: isUrdu ? 'auto' : '12px',
+              width: 'calc(100vw - 24px)',
+              maxWidth: '380px',
+              maxHeight: 'calc(100vh - 120px)',
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+              borderRadius: '16px',
+              boxShadow: isDark
+                ? '0 20px 45px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+                : '0 20px 40px -5px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.08)',
+              zIndex: 9999,
+              overflow: 'hidden',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              flexDirection: 'column',
+              direction: isUrdu ? 'rtl' : 'ltr',
+              animation: 'fadeInScale 0.15s ease-out',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Bell size={18} color="#1877F2" strokeWidth={2.2} />
-              <span
-                className={isUrdu ? 'font-nastaleeq' : ''}
-                style={{ fontWeight: 800, fontSize: isUrdu ? '17px' : '14px', color: '#0F172A' }}
-              >
-                {t('اطلاعات و الرٹس', 'Notifications & Alerts')}
-              </span>
-              {unreadCount > 0 && (
+            {/* Header */}
+            <div
+              style={{
+                padding: '12px 16px',
+                backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                borderBottom: `1px solid ${isDark ? '#334155' : '#E2E8F0'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Bell size={18} color="#1877F2" strokeWidth={2.2} />
                 <span
+                  className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    backgroundColor: '#FEE2E2',
-                    color: '#991B1B',
-                    fontSize: '11px',
                     fontWeight: 800,
-                    padding: '2px 7px',
-                    borderRadius: '10px',
+                    fontSize: isUrdu ? '17px' : '14px',
+                    color: isDark ? '#F8FAFC' : '#0F172A',
                   }}
                 >
-                  {unreadCount} {t('فوری', 'Action')}
+                  {t('اطلاعات و الرٹس', 'Notifications & Alerts')}
                 </span>
+                {unreadCount > 0 && (
+                  <span
+                    style={{
+                      backgroundColor: '#FEE2E2',
+                      color: '#991B1B',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      padding: '2px 7px',
+                      borderRadius: '10px',
+                    }}
+                  >
+                    {unreadCount} {t('فوری', 'Action')}
+                  </span>
+                )}
+              </div>
+
+              {visibleNotifications.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleMarkAllRead}
+                  title={t('تمام پڑھ لیں', 'Mark all as read')}
+                  className="touch-active"
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    color: isDark ? '#94A3B8' : '#64748B',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 6px',
+                    borderRadius: '6px',
+                  }}
+                >
+                  <Check size={14} />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('تمام پڑھے گئے', 'Mark read')}
+                  </span>
+                </button>
               )}
             </div>
 
-            {visibleNotifications.length > 0 && (
+            {/* Notification List */}
+            <div
+              style={{
+                maxHeight: '380px',
+                overflowY: 'auto',
+                padding: '10px 12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              {visibleNotifications.length === 0 ? (
+                <div style={{ padding: '30px 16px', textAlign: 'center', color: isDark ? '#64748B' : '#94A3B8' }}>
+                  <CheckCircle2 size={32} color="#10B981" style={{ margin: '0 auto 8px' }} />
+                  <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 700, color: isDark ? '#E2E8F0' : '#1E293B' }}>
+                    {t('کوئی نئی اطلاع نہیں ہے', 'No new notifications')}
+                  </div>
+                  <div style={{ fontSize: '12px', marginTop: '4px', color: isDark ? '#94A3B8' : '#64748B' }}>
+                    {t('تمام الرٹس کلیئر ہیں', 'All alerts are up to date')}
+                  </div>
+                </div>
+              ) : (
+                visibleNotifications.map((item) => {
+                  const style = getSeverityStyle(item.severity);
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        backgroundColor: item.read
+                          ? (isDark ? '#0F172A' : '#FFFFFF')
+                          : (isDark ? 'rgba(15, 23, 42, 0.85)' : style.bg),
+                        border: `1.5px solid ${item.read ? (isDark ? '#334155' : '#E2E8F0') : style.border}`,
+                        borderRadius: '12px',
+                        padding: '12px',
+                        position: 'relative',
+                        transition: 'all 0.15s ease',
+                        boxShadow: item.read ? 'none' : '0 2px 6px rgba(0,0,0,0.02)',
+                      }}
+                    >
+                      {/* Top Row: Title + Time + Dismiss */}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                          {item.type === 'rate_verify' && <Tag size={16} color={style.iconColor} strokeWidth={2.4} />}
+                          {item.type === 'price_request' && <AlertTriangle size={16} color={style.iconColor} strokeWidth={2.4} />}
+                          {item.type === 'closing' && <Clock size={16} color={style.iconColor} strokeWidth={2.4} />}
+                          {item.type === 'system' && <Database size={16} color={style.iconColor} strokeWidth={2.4} />}
+
+                          <span
+                            className={isUrdu ? 'font-nastaleeq' : ''}
+                            style={{
+                              fontWeight: 800,
+                              fontSize: isUrdu ? '15px' : '13px',
+                              color: isDark ? '#F8FAFC' : '#0F172A',
+                              lineHeight: 1.3,
+                            }}
+                          >
+                            {isUrdu ? item.titleUr : item.titleEn}
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              padding: '2px 6px',
+                              borderRadius: '6px',
+                              backgroundColor: style.badgeBg,
+                              color: style.badgeText,
+                            }}
+                          >
+                            {item.time}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDismiss(item.id, e)}
+                            title={t('ہٹائیں', 'Dismiss')}
+                            style={{
+                              border: 'none',
+                              backgroundColor: 'transparent',
+                              color: isDark ? '#64748B' : '#94A3B8',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p
+                        className={isUrdu ? 'font-nastaleeq' : ''}
+                        style={{
+                          margin: '6px 0 0',
+                          fontSize: isUrdu ? '13px' : '12px',
+                          color: isDark ? '#CBD5E1' : '#475569',
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {isUrdu ? item.descUr : item.descEn}
+                      </p>
+
+                      {/* Action Button (e.g. Verify Rates Now) */}
+                      {item.onAction && (
+                        <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-start' }}>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              item.onAction?.();
+                              setIsOpen(false);
+                            }}
+                            className="touch-active"
+                            style={{
+                              backgroundColor: item.severity === 'urgent' ? '#DC2626' : '#1877F2',
+                              color: '#FFFFFF',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '6px 12px',
+                              fontSize: isUrdu ? '13px' : '11.5px',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                            }}
+                          >
+                            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                              {isUrdu ? item.actionLabelUr : item.actionLabelEn}
+                            </span>
+                            <ChevronRight size={14} style={{ transform: isUrdu ? 'rotate(180deg)' : 'none' }} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                padding: '8px 16px',
+                backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                borderTop: `1px solid ${isDark ? '#334155' : '#E2E8F0'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '11.5px',
+                color: isDark ? '#94A3B8' : '#64748B',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+                {t('کلاؤڈ سسٹمز آن لائن', 'Cloud Systems Online')}
+              </span>
               <button
                 type="button"
-                onClick={handleMarkAllRead}
-                title={t('تمام پڑھ لیں', 'Mark all as read')}
-                className="touch-active"
+                onClick={fetchStatus}
                 style={{
                   border: 'none',
                   backgroundColor: 'transparent',
-                  color: '#64748B',
-                  fontSize: '12px',
+                  color: '#1877F2',
+                  fontSize: '11px',
+                  fontWeight: 700,
                   cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '4px 6px',
-                  borderRadius: '6px',
                 }}
               >
-                <Check size={14} />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                  {t('تمام پڑھے گئے', 'Mark read')}
-                </span>
+                {t('ریفریش', 'Refresh')}
               </button>
-            )}
+            </div>
           </div>
-
-          {/* Notification List */}
-          <div
-            style={{
-              maxHeight: '380px',
-              overflowY: 'auto',
-              padding: '10px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-            }}
-          >
-            {visibleNotifications.length === 0 ? (
-              <div style={{ padding: '30px 16px', textAlign: 'center', color: '#94A3B8' }}>
-                <CheckCircle2 size={32} color="#10B981" style={{ margin: '0 auto 8px' }} />
-                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 700 }}>
-                  {t('کوئی نئی اطلاع نہیں ہے', 'No new notifications')}
-                </div>
-                <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                  {t('تمام الرٹس کلیئر ہیں', 'All alerts are up to date')}
-                </div>
-              </div>
-            ) : (
-              visibleNotifications.map((item) => {
-                const style = getSeverityStyle(item.severity);
-                return (
-                  <div
-                    key={item.id}
-                    style={{
-                      backgroundColor: item.read ? '#FFFFFF' : style.bg,
-                      border: `1.5px solid ${item.read ? '#E2E8F0' : style.border}`,
-                      borderRadius: '12px',
-                      padding: '12px',
-                      position: 'relative',
-                      transition: 'all 0.15s ease',
-                      boxShadow: item.read ? 'none' : '0 2px 6px rgba(0,0,0,0.02)',
-                    }}
-                  >
-                    {/* Top Row: Title + Time + Dismiss */}
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                        {item.type === 'rate_verify' && <Tag size={16} color={style.iconColor} strokeWidth={2.4} />}
-                        {item.type === 'price_request' && <AlertTriangle size={16} color={style.iconColor} strokeWidth={2.4} />}
-                        {item.type === 'closing' && <Clock size={16} color={style.iconColor} strokeWidth={2.4} />}
-                        {item.type === 'system' && <Database size={16} color={style.iconColor} strokeWidth={2.4} />}
-
-                        <span
-                          className={isUrdu ? 'font-nastaleeq' : ''}
-                          style={{
-                            fontWeight: 800,
-                            fontSize: isUrdu ? '15px' : '13px',
-                            color: '#0F172A',
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {isUrdu ? item.titleUr : item.titleEn}
-                        </span>
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                        <span
-                          style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            padding: '2px 6px',
-                            borderRadius: '6px',
-                            backgroundColor: style.badgeBg,
-                            color: style.badgeText,
-                          }}
-                        >
-                          {item.time}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(e) => handleDismiss(item.id, e)}
-                          title={t('ہٹائیں', 'Dismiss')}
-                          style={{
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            color: '#94A3B8',
-                            cursor: 'pointer',
-                            padding: '2px',
-                            display: 'flex',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    <p
-                      className={isUrdu ? 'font-nastaleeq' : ''}
-                      style={{
-                        margin: '6px 0 0',
-                        fontSize: isUrdu ? '13px' : '12px',
-                        color: '#475569',
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {isUrdu ? item.descUr : item.descEn}
-                    </p>
-
-                    {/* Action Button (e.g. Verify Rates Now) */}
-                    {item.onAction && (
-                      <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-start' }}>
-                        <button
-                          type="button"
-                          onClick={item.onAction}
-                          className="touch-active"
-                          style={{
-                            backgroundColor: item.severity === 'urgent' ? '#DC2626' : '#1877F2',
-                            color: '#FFFFFF',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '6px 12px',
-                            fontSize: isUrdu ? '13px' : '11.5px',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                          }}
-                        >
-                          <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                            {isUrdu ? item.actionLabelUr : item.actionLabelEn}
-                          </span>
-                          <ChevronRight size={14} style={{ transform: isUrdu ? 'rotate(180deg)' : 'none' }} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-          {/* Footer */}
-          <div
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#F8FAFC',
-              borderTop: '1px solid #E2E8F0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '11.5px',
-              color: '#64748B',
-            }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10B981' }} />
-              {t('کلاؤڈ سسٹمز آن لائن', 'Cloud Systems Online')}
-            </span>
-            <button
-              type="button"
-              onClick={fetchStatus}
-              style={{
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: '#1877F2',
-                fontSize: '11px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              {t('ریفریش', 'Refresh')}
-            </button>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

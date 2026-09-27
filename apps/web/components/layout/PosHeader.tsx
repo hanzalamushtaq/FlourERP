@@ -631,7 +631,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       }}
     >
       {/* Title & Icon & Bell Side (Always on the Right) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, overflow: 'hidden', direction: 'rtl' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, direction: 'rtl' }}>
         {/* Top Right Bell Icon with Notifications & Daily Rate Alert */}
         <NotificationDropdown
           isAdmin={isAdmin}
