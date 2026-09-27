@@ -137,6 +137,10 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
         flexDirection: 'column',
         boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : 'none',
         width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
         transition: 'background-color 0.2s ease, border-color 0.2s ease',
       }}
     >
@@ -160,13 +164,16 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
         {t('حالیہ بلز شفٹ لاگ', 'Recent Shift Bills')}
       </h3>
 
-      {/* Table Container */}
+      {/* Table Container - ONLY this container scrolls horizontally on mobile */}
       <div
+        className="table-horizontal-scroll"
         style={{
           width: '100%',
+          maxWidth: '100%',
           borderRadius: '8px',
           overflowX: 'auto',
           WebkitOverflowScrolling: 'touch',
+          display: 'block',
         }}
       >
         <table

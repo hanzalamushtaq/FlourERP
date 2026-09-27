@@ -295,6 +295,10 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
         flexDirection: 'column',
         boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.25)' : 'none',
         width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
         transition: 'background-color 0.2s ease, border-color 0.2s ease',
       }}
     >
@@ -306,6 +310,8 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
           alignItems: 'center',
           gap: '10px',
           marginBottom: '14px',
+          maxWidth: '100%',
+          overflowX: 'hidden',
         }}
       >
         <h3
@@ -332,6 +338,9 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
             borderRadius: '10px',
             padding: '3px',
             gap: '4px',
+            maxWidth: '100%',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
           }}
         >
           {/* Option 1: In Queue */}
@@ -468,13 +477,23 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
         </div>
       </div>
 
-      {/* Table Container */}
-      <div style={{ width: '100%', borderRadius: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      {/* Table Container - ONLY this container scrolls horizontally on mobile */}
+      <div
+        className="table-horizontal-scroll"
+        style={{
+          width: '100%',
+          maxWidth: '100%',
+          borderRadius: '8px',
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          display: 'block',
+        }}
+      >
         <table
           style={{
             width: '100%',
             borderCollapse: 'collapse',
-            minWidth: '380px',
+            minWidth: '420px',
           }}
         >
           <thead>

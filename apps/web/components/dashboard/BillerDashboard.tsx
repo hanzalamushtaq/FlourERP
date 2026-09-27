@@ -167,12 +167,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
 
   return (
     <div
+      className="dashboard-root-container"
       style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '14px',
         width: '100%',
         maxWidth: '1280px',
+        minWidth: 0,
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
         margin: '0 auto',
         padding: '16px 16px 24px 16px',
       }}
