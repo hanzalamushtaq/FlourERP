@@ -15,10 +15,10 @@ interface ShiftKpiCardsProps {
 }
 
 export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
-  todaySales = 145890,
-  creditRecovery = 25500,
-  todayPisaiKg = 12340,
-  cashDrawerBalance = 183730,
+  todaySales = 0,
+  creditRecovery = 0,
+  todayPisaiKg = 0,
+  cashDrawerBalance = 0,
 }) => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();

@@ -46,10 +46,10 @@ export const CounterDashboard: React.FC<CounterDashboardProps> = ({
 
       {/* 2. Key Metrics Row */}
       <ShiftKpiCards
-        todaySales={184500}
-        creditRecovery={42000}
-        todayPisaiKg={1250}
-        cashDrawerBalance={126500}
+        todaySales={0}
+        creditRecovery={0}
+        todayPisaiKg={0}
+        cashDrawerBalance={0}
         onCardClick={onMetricCardClick}
       />
 
