@@ -216,11 +216,13 @@ export default function Home() {
       className={isUrdu ? 'dashboard-nastaleeq-scope' : ''}
       style={{
         display: 'flex',
-        minHeight: '100vh',
+        height: '100%',
+        maxHeight: '100vh',
         backgroundColor: isNightMode ? '#0B0F19' : '#FFFFFF',
         color: '#0F172A',
         width: '100%',
-        overflowX: 'hidden',
+        maxWidth: '100vw',
+        overflow: 'hidden',
         position: 'relative',
         transition: 'background-color 0.2s ease',
       }}
@@ -268,8 +270,8 @@ export default function Home() {
           flexDirection: 'column',
           minWidth: 0,
           maxWidth: '100vw',
-          height: '100dvh',
-          minHeight: '100vh',
+          height: '100%',
+          maxHeight: '100dvh',
           overflowY: 'auto',
           overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',

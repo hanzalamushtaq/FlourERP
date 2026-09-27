@@ -106,6 +106,23 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
   const { language, setLanguage, isUrdu, t } = useLanguage();
   const { theme, resolvedTheme, setTheme, toggleTheme, isDark, isNightMode } = useTheme();
   const [currentTime, setCurrentTime] = useState<string>('06:45 PM');
+  const [isNativeApp, setIsNativeApp] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isNative =
+        !!(window as any).Capacitor ||
+        navigator.userAgent.includes('wv') ||
+        navigator.userAgent.includes('Capacitor') ||
+        window.matchMedia('(display-mode: standalone)').matches ||
+        !!(window.navigator as any).standalone;
+      if (isNative) {
+        setIsNativeApp(true);
+        document.documentElement.classList.add('is-native-app');
+        document.body.classList.add('is-native-app');
+      }
+    }
+  }, []);
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -655,7 +672,9 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         zIndex: 50,
         borderBottom: '1px solid #F1F5F9',
         padding: '12px 16px 10px 16px',
-        paddingTop: 'max(14px, env(safe-area-inset-top, 14px))',
+        paddingTop: isNativeApp
+          ? 'max(42px, calc(env(safe-area-inset-top, 0px) + 38px))'
+          : 'max(16px, env(safe-area-inset-top, 16px))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -664,8 +683,9 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         direction: 'rtl',
         boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
         width: '100%',
-        minHeight: '56px',
+        minHeight: isNativeApp ? '86px' : '58px',
         boxSizing: 'border-box',
+        overflow: 'visible',
       }}
     >
       {/* Title & Icon & Bell Side (Always on the Right) */}

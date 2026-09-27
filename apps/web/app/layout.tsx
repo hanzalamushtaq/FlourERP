@@ -14,9 +14,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: 'cover',
 };
 
-// Inline script to prevent theme flash (FOUC)
+// Inline script to prevent theme flash (FOUC) and detect native app for safe-area insets
 const themeInitScript = `
   (function() {
     try {
@@ -30,6 +31,14 @@ const themeInitScript = `
         document.documentElement.classList.remove('dark');
         document.documentElement.setAttribute('data-theme', 'light');
         document.documentElement.style.colorScheme = 'light';
+      }
+
+      var isNative = !!window.Capacitor || 
+                     (navigator.userAgent && (navigator.userAgent.indexOf('wv') > -1 || navigator.userAgent.indexOf('Capacitor') > -1)) ||
+                     (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+                     !!(window.navigator && window.navigator.standalone);
+      if (isNative) {
+        document.documentElement.classList.add('is-native-app');
       }
     } catch (e) {}
   })();
