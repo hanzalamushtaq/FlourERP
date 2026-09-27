@@ -76,10 +76,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
         headers: { Authorization: `Bearer ${session.token}` },
       });
       if (res.status === 401) {
-        const fresh = await ensureValidToken(session);
-        if (!fresh) {
-          if (typeof window !== 'undefined') window.dispatchEvent(new Event('flour_erp_unauthorized'));
-        }
+        await ensureValidToken(session).catch(() => {});
         return;
       }
       if (res.ok) {

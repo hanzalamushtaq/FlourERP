@@ -82,6 +82,7 @@ import { getApiBaseUrl } from './api';
 
 export function isTokenExpired(token?: string | null): boolean {
   if (!token) return true;
+  if (token.startsWith('local-token-')) return false;
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return true;
@@ -101,6 +102,10 @@ export function isTokenExpired(token?: string | null): boolean {
 export async function ensureValidToken(user?: UserSession | null): Promise<string | null> {
   const current = user || getSession();
   if (!current) return null;
+
+  if (current.token && current.token.startsWith('local-token-')) {
+    return current.token;
+  }
 
   // If token is already a real 3-part JWT and not expired, use it
   if (current.token && current.token.split('.').length === 3 && !isTokenExpired(current.token)) {

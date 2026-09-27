@@ -4,9 +4,14 @@ export const getApiBaseUrl = (): string => {
     if (custom && custom.trim()) {
       return custom.trim().replace(/\/+$/, '');
     }
+    // If running in browser locally on localhost, connect to local backend port 5000
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:5000';
+    }
   }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  // Default to live Render backend for mobile app, Vercel, and remote clients
+  return process.env.NEXT_PUBLIC_API_URL || 'https://flourmill-ahkk.onrender.com';
 };
 
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  process.env.NEXT_PUBLIC_API_URL || 'https://flourmill-ahkk.onrender.com';

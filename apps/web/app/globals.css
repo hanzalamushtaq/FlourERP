@@ -2077,3 +2077,79 @@ html.dark ::-webkit-scrollbar-thumb {
 html.dark ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* ==============================================================================
+   14. LOGIN SCREEN DUAL-THEME HIGH-CONTRAST ENGINE
+   Guarantee 100% crisp readability for labels, cards, and inputs in both modes
+   ============================================================================== */
+.login-screen-root {
+  background-color: #F8FAFC;
+  background-image: radial-gradient(#CBD5E1 1.2px, #F8FAFC 1.2px);
+}
+html.dark .login-screen-root {
+  background-color: #0B0F19 !important;
+  background-image: radial-gradient(#1E293B 1.2px, #0B0F19 1.2px) !important;
+}
+
+.login-card-container {
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0F172A !important;
+}
+html.dark .login-card-container {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(51, 65, 85, 0.5) !important;
+}
+
+.login-field-label {
+  color: #0F172A !important;
+  font-weight: 900 !important;
+  font-size: 15px !important;
+  display: block !important;
+  margin-bottom: 6px !important;
+}
+html.dark .login-field-label {
+  color: #F8FAFC !important;
+}
+
+.login-input-field {
+  background-color: #F8FAFC !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+}
+html.dark .login-input-field {
+  background-color: #0F172A !important;
+  border: 1.5px solid #334155 !important;
+  color: #F8FAFC !important;
+}
+html.dark .login-input-field:focus {
+  border-color: #10B981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
+}
+
+.login-brand-title {
+  color: #0F172A !important;
+}
+html.dark .login-brand-title {
+  color: #F8FAFC !important;
+}
+
+.login-brand-subtitle {
+  color: #64748B !important;
+}
+html.dark .login-brand-subtitle {
+  color: #94A3B8 !important;
+}
+
+.login-demo-accordion {
+  background-color: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  color: #0F172A !important;
+}
+html.dark .login-demo-accordion {
+  background-color: #0F172A !important;
+  border: 1.5px solid #334155 !important;
+  color: #F8FAFC !important;
+}

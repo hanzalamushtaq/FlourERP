@@ -75,8 +75,10 @@ export default function Home() {
   // Check saved session on mount
   useEffect(() => {
     const handleUnauthorized = () => {
-      clearSession();
-      setCurrentUser(null);
+      const current = getSession();
+      if (current && !current.token?.startsWith('local-token-')) {
+        ensureValidToken(current).catch(() => {});
+      }
     };
     if (typeof window !== 'undefined') {
       window.addEventListener('flour_erp_unauthorized', handleUnauthorized);
@@ -84,32 +86,20 @@ export default function Home() {
 
     const saved = getSession();
     if (saved) {
+      setCurrentUser(saved);
+      const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
+      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
+      if (savedTab && validTabs.includes(savedTab)) {
+        setActiveTab(savedTab);
+      }
+
       if (isTokenExpired(saved.token)) {
-        // Token is expired! Silently renew before mounting dashboard
         ensureValidToken(saved).then((freshToken) => {
-          if (freshToken && !isTokenExpired(freshToken)) {
+          if (freshToken) {
             const refreshed = getSession();
-            if (refreshed) {
-              setCurrentUser(refreshed);
-              const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
-              const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
-              if (savedTab && validTabs.includes(savedTab)) {
-                setActiveTab(savedTab);
-              }
-            }
-          } else {
-            // Cannot renew token, clear stale session and show LoginScreen
-            clearSession();
-            setCurrentUser(null);
+            if (refreshed) setCurrentUser(refreshed);
           }
-        });
-      } else {
-        setCurrentUser(saved);
-        const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
-        const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
-        if (savedTab && validTabs.includes(savedTab)) {
-          setActiveTab(savedTab);
-        }
+        }).catch(() => {});
       }
     }
 
