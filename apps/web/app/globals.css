@@ -980,38 +980,69 @@ h4.font-nastaleeq {
    Every component, every mini point - fully mobile ready
    ========================================================= */
 
-/* === HEADER MOBILE FIXES === */
-@media (max-width: 480px) {
+/* === HEADER MOBILE FIXES (Safe-Area Aware to Prevent Top Cutoff) === */
+@media (max-width: 768px) {
   .pos-header-container {
-    padding: 6px 8px !important;
-    gap: 4px !important;
+    padding-top: max(16px, env(safe-area-inset-top, 16px)) !important;
+    padding-bottom: 12px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    min-height: 58px !important;
+    box-sizing: border-box !important;
+    gap: 6px !important;
   }
 
   .header-title-responsive {
-    font-size: clamp(11px, 3.2vw, 16px) !important;
-    max-width: calc(100vw - 160px);
+    font-size: clamp(14px, 3.8vw, 18px) !important;
+    line-height: 1.4 !important;
+    overflow: visible !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .pos-header-container {
+    padding-top: max(16px, env(safe-area-inset-top, 16px)) !important;
+    padding-bottom: 10px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    min-height: 56px !important;
+    gap: 6px !important;
+  }
+
+  .header-title-responsive {
+    font-size: clamp(13px, 3.6vw, 17px) !important;
+    line-height: 1.4 !important;
+    overflow: visible !important;
+    max-width: calc(100vw - 140px);
   }
 
   .header-lang-switcher {
-    padding: 1px !important;
-    gap: 0px !important;
+    padding: 2px !important;
+    gap: 2px !important;
   }
 
   .header-lang-btn {
-    padding: 2px 5px !important;
-    font-size: 10px !important;
+    padding: 3px 6px !important;
+    font-size: 11px !important;
   }
 }
 
 @media (max-width: 380px) {
   .pos-header-container {
-    padding: 5px 6px !important;
-    gap: 3px !important;
+    padding-top: max(16px, env(safe-area-inset-top, 16px)) !important;
+    padding-bottom: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    min-height: 54px !important;
+    gap: 4px !important;
   }
 
   .header-title-responsive {
-    font-size: 11px !important;
-    max-width: calc(100vw - 130px);
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    max-width: calc(100vw - 120px);
   }
 }
 
@@ -1050,23 +1081,21 @@ h4.font-nastaleeq {
   }
 }
 
-/* === DASHBOARD 3 ACTION CARDS - Mobile Responsive (Large Font, Minimal Padding) === */
+/* === DASHBOARD 3 ACTION CARDS - Mobile Responsive (Balanced, Clean Font & Spacing) === */
 @media (max-width: 820px) {
   .dashboard-3-action-cards {
     grid-template-columns: 1fr !important;
     gap: 10px !important;
   }
 
-  /* Mobile: padding kafi kam */
   .dashboard-3-action-cards>div {
-    padding: 8px 12px !important;
-    min-height: 80px !important;
+    padding: 10px 14px !important;
+    min-height: 74px !important;
   }
 
-  /* Mobile: font size large and prominent for elderly staff */
   .dashboard-3-action-cards>div h2 {
-    font-size: 34px !important;
-    line-height: 1.2 !important;
+    font-size: 26px !important;
+    line-height: 1.25 !important;
     padding: 0 !important;
     margin: 0 !important;
     white-space: normal !important;
@@ -1075,13 +1104,13 @@ h4.font-nastaleeq {
 
 @media (max-width: 480px) {
   .dashboard-3-action-cards>div {
-    padding: 6px 10px !important;
-    min-height: 72px !important;
+    padding: 8px 12px !important;
+    min-height: 66px !important;
   }
 
   .dashboard-3-action-cards>div h2 {
-    font-size: 30px !important;
-    line-height: 1.18 !important;
+    font-size: 24px !important;
+    line-height: 1.2 !important;
     padding: 0 !important;
     margin: 0 !important;
   }
@@ -1089,12 +1118,52 @@ h4.font-nastaleeq {
 
 @media (max-width: 360px) {
   .dashboard-3-action-cards>div {
-    padding: 5px 8px !important;
-    min-height: 66px !important;
+    padding: 6px 10px !important;
+    min-height: 60px !important;
   }
 
   .dashboard-3-action-cards>div h2 {
-    font-size: 26px !important;
+    font-size: 22px !important;
+  }
+}
+
+/* === RATES TOP 3 ACTION CARDS - Mobile Responsive (Prevent Huge Font) === */
+.rates-top-3-grid > div {
+  padding: 14px 18px !important;
+  min-height: 76px !important;
+}
+
+.rates-top-3-grid > div h2 {
+  font-size: 26px !important;
+  line-height: 1.25 !important;
+}
+
+@media (max-width: 820px) {
+  .rates-top-3-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .rates-top-3-grid > div {
+    padding: 10px 14px !important;
+    min-height: 64px !important;
+  }
+
+  .rates-top-3-grid > div h2 {
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .rates-top-3-grid > div {
+    padding: 8px 12px !important;
+    min-height: 56px !important;
+  }
+
+  .rates-top-3-grid > div h2 {
+    font-size: 20px !important;
+    line-height: 1.2 !important;
   }
 }
 

@@ -654,7 +654,8 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         top: 0,
         zIndex: 50,
         borderBottom: '1px solid #F1F5F9',
-        padding: '9px 16px',
+        padding: '12px 16px 10px 16px',
+        paddingTop: 'max(14px, env(safe-area-inset-top, 14px))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -663,6 +664,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         direction: 'rtl',
         boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
         width: '100%',
+        minHeight: '56px',
         boxSizing: 'border-box',
       }}
     >
@@ -699,10 +701,12 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             color: '#0F172A',
             margin: 0,
             letterSpacing: '-0.02em',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            overflow: 'visible',
             whiteSpace: 'nowrap',
             minWidth: 0,
+            lineHeight: 1.4,
+            paddingTop: '2px',
+            paddingBottom: '2px',
           }}
         >
           {title || t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')}

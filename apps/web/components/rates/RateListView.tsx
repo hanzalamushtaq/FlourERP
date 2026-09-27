@@ -320,12 +320,12 @@ export const RateListView: React.FC = () => {
           style={{
             background: '#1877f2',
             borderRadius: '16px',
-            padding: '16px 20px',
+            padding: '14px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            minHeight: '96px',
+            minHeight: '80px',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'total'
@@ -337,9 +337,9 @@ export const RateListView: React.FC = () => {
         >
           <div
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
+              width: '50px',
+              height: '50px',
+              borderRadius: '12px',
               backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
@@ -358,11 +358,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '38px' : '22px',
+                fontSize: isUrdu ? '26px' : '20px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
               }}
             >
               {t('روزانہ نرخ نامہ لسٹ', 'Daily Rate List')}
@@ -384,12 +384,12 @@ export const RateListView: React.FC = () => {
           style={{
             background: '#D97706',
             borderRadius: '16px',
-            padding: '16px 20px',
+            padding: '14px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            minHeight: '96px',
+            minHeight: '80px',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'save'
@@ -401,9 +401,9 @@ export const RateListView: React.FC = () => {
         >
           <div
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
+              width: '50px',
+              height: '50px',
+              borderRadius: '12px',
               backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
@@ -415,18 +415,18 @@ export const RateListView: React.FC = () => {
               transform: hoveredCard === 'save' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
             }}
           >
-            <Check size={32} color={isDark ? '#FDE047' : '#D97706'} strokeWidth={2.8} />
+            <Check size={28} color={isDark ? '#FDE047' : '#D97706'} strokeWidth={2.8} />
           </div>
 
           <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '38px' : '22px',
+                fontSize: isUrdu ? '26px' : '20px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
               }}
             >
               {t('تمام ریٹس لاگو کریں', 'Apply All Rates')}
@@ -448,12 +448,12 @@ export const RateListView: React.FC = () => {
           style={{
             background: '#0E8A54',
             borderRadius: '16px',
-            padding: '16px 20px',
+            padding: '14px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            minHeight: '96px',
+            minHeight: '80px',
             transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform:
               pressedCard === 'print'
@@ -465,9 +465,9 @@ export const RateListView: React.FC = () => {
         >
           <div
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
+              width: '50px',
+              height: '50px',
+              borderRadius: '12px',
               backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
               display: 'flex',
@@ -486,11 +486,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '38px' : '22px',
+                fontSize: isUrdu ? '26px' : '20px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
               }}
             >
               {t('ریٹ لسٹ پرنٹ کریں', 'Print Rate List')}
