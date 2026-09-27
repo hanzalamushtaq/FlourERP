@@ -9,6 +9,9 @@ import { RecentInvoicesTable } from './RecentInvoicesTable';
 import { ReceiptData } from '../ui/ReceiptPreviewModal';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { getApiBaseUrl } from '../../lib/api';
+import { getSession } from '../../lib/auth';
+import { ShiftInvoiceItem } from './RecentInvoicesTable';
 
 // 1. Receipt Printer SVG Illustration matching reference image
 const ReceiptPrinterIcon = () => (
@@ -91,6 +94,62 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   const [hoveredCard, setHoveredCard] = React.useState<string | null>(null);
   const [pressedCard, setPressedCard] = React.useState<string | null>(null);
 
+  // Live Metrics & Recent Bills from Database
+  const [metrics, setMetrics] = React.useState({
+    todaySales: 0,
+    creditRecovery: 0,
+    todayPisaiKg: 0,
+    cashDrawerBalance: 0,
+  });
+  const [recentBills, setRecentBills] = React.useState<ShiftInvoiceItem[]>([]);
+
+  const fetchLiveData = async () => {
+    try {
+      const session = getSession();
+      const headers = session?.token ? { Authorization: `Bearer ${session.token}` } : {};
+
+      // 1. Fetch live KPIs
+      const kpiRes = await fetch(`${getApiBaseUrl()}/api/reports/dashboard-kpis?range=today`, { headers });
+      if (kpiRes.ok) {
+        const kpiJson = await kpiRes.json();
+        if (kpiJson.success && kpiJson.data) {
+          const d = kpiJson.data;
+          setMetrics({
+            todaySales: d.sales?.totalAmount || 0,
+            creditRecovery: d.udhaar?.totalOutstanding || 0,
+            todayPisaiKg: d.pisai?.weightKg || 0,
+            cashDrawerBalance: d.cash?.netCashInHand || 0,
+          });
+        }
+      }
+
+      // 2. Fetch recent bills
+      const billsRes = await fetch(`${getApiBaseUrl()}/api/bills?limit=10`, { headers });
+      if (billsRes.ok) {
+        const billsJson = await billsRes.json();
+        if (billsJson.success && Array.isArray(billsJson.data?.bills)) {
+          const mapped: ShiftInvoiceItem[] = billsJson.data.bills.map((b: any) => ({
+            invoiceNumber: b.billNumberFormatted || `B-${b.billNumber}`,
+            customerName: b.customer?.name || (isUrdu ? 'عام گاہک' : 'Walk-in Customer'),
+            customerPhone: b.customer?.phone || '',
+            itemsDetail: b.items?.map((it: any) => `${it.productName} (${it.quantityKg} کلو)`).join(', ') || '',
+            totalAmount: b.netTotal,
+            paymentMethod: b.paymentMethod === 'CREDIT' ? 'credit' : 'cash',
+          }));
+          setRecentBills(mapped);
+        }
+      }
+    } catch {
+      // Keep defaults if offline
+    }
+  };
+
+  React.useEffect(() => {
+    fetchLiveData();
+    const interval = setInterval(fetchLiveData, 10000);
+    return () => clearInterval(interval);
+  }, [isUrdu]);
+
   return (
     <div
       style={{
@@ -123,7 +182,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             borderRadius: '16px',
             border: 'none',
             outline: 'none',
-            padding: '16px 20px',
+            padding: '22px 26px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -160,15 +219,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           </div>
 
           {/* Right Text */}
-          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start' }}>
+          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '28px' : '20px',
+                fontSize: isUrdu ? '32px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.4,
+                padding: '2px 8px',
+                lineHeight: 1.25,
               }}
             >
               {t('نیا بل بنائیں', 'Create New Bill')}
@@ -194,7 +254,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             borderRadius: '16px',
             border: 'none',
             outline: 'none',
-            padding: '16px 20px',
+            padding: '22px 26px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -231,15 +291,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           </div>
 
           {/* Right Text */}
-          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start' }}>
+          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '28px' : '20px',
+                fontSize: isUrdu ? '32px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.4,
+                padding: '2px 8px',
+                lineHeight: 1.25,
               }}
             >
               {t('گندم پسائی ٹوکن', 'Milling Token')}
@@ -265,7 +326,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
             borderRadius: '16px',
             border: 'none',
             outline: 'none',
-            padding: '16px 20px',
+            padding: '22px 26px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -302,15 +363,16 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           </div>
 
           {/* Right Text */}
-          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start' }}>
+          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '28px' : '20px',
+                fontSize: isUrdu ? '32px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.4,
+                padding: '2px 8px',
+                lineHeight: 1.25,
               }}
             >
               {t('ادھار کھاتے و وصولی', 'Customer Ledger')}
@@ -321,10 +383,10 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
 
       {/* 3. Key Metrics Single Card with 4 Compartments matching reference image */}
       <ShiftKpiCards
-        todaySales={145890}
-        creditRecovery={25500}
-        todayPisaiKg={12340}
-        cashDrawerBalance={183730}
+        todaySales={metrics.todaySales}
+        creditRecovery={metrics.creditRecovery}
+        todayPisaiKg={metrics.todayPisaiKg}
+        cashDrawerBalance={metrics.cashDrawerBalance}
         onCardClick={(metric) => {
           if (metric === 'sales') onNewBill();
           else if (metric === 'pisai') onNewPisaiToken();
@@ -337,6 +399,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
       <div className="dashboard-tables-grid">
         <ChakkiQueueCard />
         <RecentInvoicesTable
+          invoices={recentBills}
           onReprint={onReprintReceipt}
           onViewAllInvoices={onViewAllInvoices}
         />

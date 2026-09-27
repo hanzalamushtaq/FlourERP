@@ -67,7 +67,7 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
             borderRadius: '16px',
             border: 'none',
             outline: 'none',
-            padding: '16px 20px',
+            padding: '22px 26px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -101,11 +101,12 @@ export const HeroActionCards: React.FC<HeroActionCardsProps> = ({
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '30px' : '22px',
+                  fontSize: isUrdu ? '32px' : '22px',
                   fontWeight: 900,
                   color: '#FFFFFF',
-                  lineHeight: isUrdu ? 1.4 : 1.2,
+                  lineHeight: isUrdu ? 1.25 : 1.2,
                   margin: 0,
+                  padding: '2px 8px',
                 }}
               >
                 {card.title}

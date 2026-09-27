@@ -130,10 +130,10 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               <span
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '18px' : '14px',
+                  fontSize: isUrdu ? '22px' : '15px',
                   fontWeight: 800,
                   color: isDark ? '#94A3B8' : '#334155',
-                  lineHeight: 1.4,
+                  lineHeight: 1.3,
                 }}
               >
                 {item.title}
@@ -143,10 +143,10 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
             {/* Center: Large Amount + Currency */}
             <div
               style={{
-                fontSize: '26px',
+                fontSize: '28px',
                 fontWeight: 900,
                 color: isDark ? '#F8FAFC' : '#0F172A',
-                lineHeight: 1.3,
+                lineHeight: 1.2,
                 display: 'flex',
                 alignItems: 'baseline',
                 justifyContent: 'center',
@@ -160,7 +160,7 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
               {isUrdu && (
                 <span
                   className="font-nastaleeq"
-                  style={{ fontSize: '16px', fontWeight: 800, color: isDark ? '#94A3B8' : '#64748B' }}
+                  style={{ fontSize: '20px', fontWeight: 800, color: isDark ? '#94A3B8' : '#64748B' }}
                 >
                   روپے
                 </span>

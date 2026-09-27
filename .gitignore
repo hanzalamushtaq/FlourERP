@@ -11,3 +11,4 @@
 *.tsbuildinfo
 apps/api/backups/
 .planning
+.idea/

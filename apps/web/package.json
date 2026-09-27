@@ -6,9 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cap:sync": "cd ../.. && npx cap sync android",
+    "cap:build": "next build && cd ../.. && npx cap sync android",
+    "cap:open": "cd ../.. && npx cap open android"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/keyboard": "^8.0.5",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
     "lucide-react": "^0.395.0",
     "next": "^14.2.35",
     "react": "^18.3.1",

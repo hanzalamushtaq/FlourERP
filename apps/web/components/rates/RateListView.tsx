@@ -358,11 +358,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '20px' : '17px',
+                fontSize: isUrdu ? '38px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.3,
+                lineHeight: 1.2,
               }}
             >
               {t('روزانہ نرخ نامہ لسٹ', 'Daily Rate List')}
@@ -422,11 +422,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '20px' : '17px',
+                fontSize: isUrdu ? '38px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.3,
+                lineHeight: 1.2,
               }}
             >
               {t('تمام ریٹس لاگو کریں', 'Apply All Rates')}
@@ -486,11 +486,11 @@ export const RateListView: React.FC = () => {
             <h2
               className={isUrdu ? 'font-nastaleeq' : ''}
               style={{
-                fontSize: isUrdu ? '20px' : '17px',
+                fontSize: isUrdu ? '38px' : '22px',
                 fontWeight: 900,
                 color: '#FFFFFF',
                 margin: 0,
-                lineHeight: 1.3,
+                lineHeight: 1.2,
               }}
             >
               {t('ریٹ لسٹ پرنٹ کریں', 'Print Rate List')}
@@ -503,12 +503,13 @@ export const RateListView: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '24px' }}>🌾</span>
-          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0 }}>
+          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '28px' : '22px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0, lineHeight: 1.2 }}>
             {t('آٹا و تیار اناج مصنوعات کے یومیہ ریٹس', 'Flour & Grain Products Daily Rates')}
           </h3>
           <span
+            className={isUrdu ? 'font-nastaleeq' : ''}
             style={{
-              fontSize: isUrdu ? '13px' : '11.5px',
+              fontSize: isUrdu ? '17px' : '12px',
               fontWeight: 800,
               color: isDark ? '#FBBF24' : '#78350F',
               backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7',
@@ -534,7 +535,7 @@ export const RateListView: React.FC = () => {
             border: isDark ? '1.5px solid #D97706' : '2px solid #8C582B',
             borderRadius: '10px',
             padding: '6px 14px',
-            fontSize: isUrdu ? '16px' : '13px',
+            fontSize: isUrdu ? '20px' : '14px',
             fontWeight: 900,
             cursor: 'pointer',
             boxShadow: isDark ? '0 2px 6px rgba(0, 0, 0, 0.3)' : '0 2px 6px rgba(140, 88, 43, 0.12)',
@@ -599,8 +600,9 @@ export const RateListView: React.FC = () => {
                 {/* Per KG Derived Badge & Yesterday Rate */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-end', gap: '3px' }}>
                   <span
+                    className={isUrdu ? 'font-nastaleeq' : ''}
                     style={{
-                      fontSize: isUrdu ? '15px' : '12.5px',
+                      fontSize: isUrdu ? '18px' : '13px',
                       fontWeight: 900,
                       color: isDark ? '#FDE047' : '#78350F',
                       backgroundColor: isDark ? 'rgba(245, 158, 11, 0.18)' : '#FEF3C7',
@@ -613,7 +615,7 @@ export const RateListView: React.FC = () => {
                   >
                     {isUrdu ? `1 کلو: ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)} روپے` : `1 KG: Rs ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)}`}
                   </span>
-                  <span style={{ fontSize: isUrdu ? '13px' : '11px', color: isDark ? '#94A3B8' : '#78716C', fontWeight: 700 }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '11px', color: isDark ? '#94A3B8' : '#78716C', fontWeight: 700 }}>
                     {t('کل کا من ریٹ:', 'Yesterday Maund:')} {isUrdu ? `${item.yesterdayMaund.toLocaleString()} روپے` : `Rs ${item.yesterdayMaund.toLocaleString()}`}
                   </span>
                 </div>
@@ -624,7 +626,7 @@ export const RateListView: React.FC = () => {
                 <h4
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: isUrdu ? '24px' : '18px',
+                    fontSize: isUrdu ? '32px' : '20px',
                     fontWeight: 900,
                     color: isDark ? '#FFFFFF' : '#1F2937',
                     margin: 0,
@@ -648,7 +650,7 @@ export const RateListView: React.FC = () => {
                   gap: '8px',
                 }}
               >
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, color: isDark ? '#FBBF24' : '#8C582B' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '14px', fontWeight: 800, color: isDark ? '#FBBF24' : '#8C582B' }}>
                   {t('روپے', 'Rs')}
                 </span>
                 <input
@@ -676,14 +678,14 @@ export const RateListView: React.FC = () => {
                     border: isDark ? '1.5px solid #475569' : '2px solid #8C582B',
                     backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
                     color: isDark ? '#F8FAFC' : '#1F2937',
-                    fontSize: '19px',
+                    fontSize: '22px',
                     fontWeight: 900,
                     fontFamily: 'var(--font-mono)',
                     outline: 'none',
                     boxShadow: 'none',
                   }}
                 />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: isDark ? '#94A3B8' : '#6B7280' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', fontWeight: 800, color: isDark ? '#94A3B8' : '#6B7280' }}>
                   {t('/ من', '/ Maund')}
                 </span>
               </div>
@@ -692,8 +694,9 @@ export const RateListView: React.FC = () => {
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 {diff > 0 ? (
                   <span
+                    className={isUrdu ? 'font-nastaleeq' : ''}
                     style={{
-                      fontSize: '11px',
+                      fontSize: isUrdu ? '15px' : '12px',
                       fontWeight: 800,
                       color: isDark ? '#F87171' : '#DC2626',
                       backgroundColor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2',
@@ -707,8 +710,9 @@ export const RateListView: React.FC = () => {
                   </span>
                 ) : diff < 0 ? (
                   <span
+                    className={isUrdu ? 'font-nastaleeq' : ''}
                     style={{
-                      fontSize: '11px',
+                      fontSize: isUrdu ? '15px' : '12px',
                       fontWeight: 800,
                       color: isDark ? '#4ADE80' : '#16A34A',
                       backgroundColor: isDark ? 'rgba(34, 197, 94, 0.18)' : '#DCFCE7',
@@ -721,7 +725,7 @@ export const RateListView: React.FC = () => {
                     {isUrdu ? `${diff.toLocaleString()} روپے کمی (فی من) ▼` : `Rs ${diff.toLocaleString()} Decrease (per maund) ▼`}
                   </span>
                 ) : (
-                  <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : '#9CA3AF', fontWeight: 700 }}>
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: isDark ? '#94A3B8' : '#9CA3AF', fontWeight: 700 }}>
                     {t('قیمت مستحکم', 'Price Stable')}
                   </span>
                 )}
@@ -799,16 +803,16 @@ export const RateListView: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '20px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0, lineHeight: 1.2 }}>
+                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '30px' : '20px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0, lineHeight: 1.2 }}>
                       {pisaiTitle}
                     </h4>
-                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: isDark ? '#CBD5E1' : '#6B7280', fontWeight: 600, marginTop: '2px' }}>
+                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#CBD5E1' : '#6B7280', fontWeight: 600, marginTop: '2px' }}>
                       {pisaiNote}
                     </div>
                     <div
                       className={isUrdu ? 'font-nastaleeq' : ''}
                       style={{
-                        fontSize: isUrdu ? '15px' : '12.5px',
+                        fontSize: isUrdu ? '18px' : '13px',
                         color: isDark ? '#FDE047' : '#78350F',
                         fontWeight: 900,
                         backgroundColor: isDark ? 'rgba(245, 158, 11, 0.18)' : '#FEF3C7',
@@ -827,7 +831,7 @@ export const RateListView: React.FC = () => {
 
                 {/* Direct Price Input (Rate Per Mann / 40 KG) */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: isDark ? '#FBBF24' : '#8C582B' }}>Rs</span>
+                  <span style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#FBBF24' : '#8C582B' }}>Rs</span>
                   <input
                     type="number"
                     value={p.ratePerMaund === 0 ? '' : p.ratePerMaund}

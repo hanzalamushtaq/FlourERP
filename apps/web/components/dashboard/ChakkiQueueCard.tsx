@@ -76,7 +76,7 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
       });
       if (res.ok) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.data?.records) && json.data.records.length > 0) {
+        if (json.success && Array.isArray(json.data?.records)) {
           const mapped: ChakkiQueueItem[] = json.data.records.map((r: any) => ({
             id: r.id,
             tokenNumber: r.tokenNumber,

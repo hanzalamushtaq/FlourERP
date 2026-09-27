@@ -43,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preload" href="/fonts/JameelNooriNastaleeqRegular.woff" as="font" type="font/woff" crossOrigin="anonymous" />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>

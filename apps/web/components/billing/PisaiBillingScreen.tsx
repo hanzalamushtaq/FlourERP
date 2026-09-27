@@ -574,7 +574,7 @@ export const PisaiBillingScreen: React.FC = () => {
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
                   margin: 0,
-                  fontSize: isUrdu ? '20px' : '15px',
+                  fontSize: isUrdu ? '25px' : '17px',
                   fontWeight: 900,
                   color: isDark ? '#F8FAFC' : '#0F172A',
                 }}
@@ -582,9 +582,10 @@ export const PisaiBillingScreen: React.FC = () => {
                 {t('ٹوکن نمبر اسٹیٹس اور فوری کارروائی', 'Token Status & Action Lookup')}
               </h3>
               <p
+                className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
                   margin: 0,
-                  fontSize: isUrdu ? '14px' : '12px',
+                  fontSize: isUrdu ? '17px' : '13px',
                   color: isDark ? '#94A3B8' : '#64748B',
                 }}
               >
@@ -607,13 +608,13 @@ export const PisaiBillingScreen: React.FC = () => {
               placeholder={t('ٹوکن نمبر درج کریں (مثال: 1001 یا 101)', 'Enter Token # (e.g. 1001 or 101)...')}
               style={{
                 width: '100%',
-                height: '42px',
+                height: '46px',
                 padding: '0 14px',
                 borderRadius: '10px',
                 border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
                 backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
                 color: isDark ? '#F8FAFC' : '#0F172A',
-                fontSize: '15px',
+                fontSize: isUrdu ? '20px' : '16px',
                 fontWeight: 700,
                 outline: 'none',
                 fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
@@ -649,14 +650,14 @@ export const PisaiBillingScreen: React.FC = () => {
             type="submit"
             disabled={!searchTokenInput.trim() || isSearchingToken}
             style={{
-              height: '42px',
-              padding: '0 18px',
+              height: '46px',
+              padding: '0 20px',
               borderRadius: '10px',
               border: 'none',
               backgroundColor: '#1877F2',
               color: '#FFFFFF',
               fontWeight: 800,
-              fontSize: isUrdu ? '16px' : '14px',
+              fontSize: isUrdu ? '22px' : '15px',
               cursor: searchTokenInput.trim() && !isSearchingToken ? 'pointer' : 'not-allowed',
               display: 'flex',
               alignItems: 'center',
@@ -1225,7 +1226,7 @@ export const PisaiBillingScreen: React.FC = () => {
               serviceType === 'safai_pisai'
                 ? '0 6px 16px rgba(217, 119, 6, 0.35)'
                 : '0 2px 6px rgba(15, 23, 42, 0.04)',
-            padding: '10px 16px',
+            padding: '14px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1266,13 +1267,14 @@ export const PisaiBillingScreen: React.FC = () => {
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '21px' : '16px',
+                  fontSize: isUrdu ? '28px' : '20px',
                   fontWeight: 900,
                   color: serviceType === 'safai_pisai'
                     ? '#FFFFFF'
                     : (isDark ? '#F8FAFC' : '#0F172A'),
                   margin: 0,
-                  lineHeight: 1.3,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
                   letterSpacing: '0',
                 }}
               >
@@ -1306,7 +1308,7 @@ export const PisaiBillingScreen: React.FC = () => {
               serviceType === 'pisai'
                 ? '0 6px 16px rgba(24, 119, 242, 0.35)'
                 : '0 2px 6px rgba(15, 23, 42, 0.04)',
-            padding: '10px 16px',
+            padding: '14px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1347,13 +1349,14 @@ export const PisaiBillingScreen: React.FC = () => {
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '22px' : '17px',
+                  fontSize: isUrdu ? '28px' : '20px',
                   fontWeight: 900,
                   color: serviceType === 'pisai'
                     ? '#FFFFFF'
                     : (isDark ? '#F8FAFC' : '#0F172A'),
                   margin: 0,
-                  lineHeight: 1.3,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
                   letterSpacing: '0',
                 }}
               >
@@ -1463,7 +1466,7 @@ export const PisaiBillingScreen: React.FC = () => {
           {/* 1. Weight Entry */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '15px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '16px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('گندم کا وزن:', 'Wheat Weight (KG):')}
               </span>
             </div>
@@ -1510,7 +1513,7 @@ export const PisaiBillingScreen: React.FC = () => {
                 style={{
                   position: 'absolute',
                   right: '10px',
-                  fontSize: isUrdu ? '19px' : '14px',
+                  fontSize: isUrdu ? '22px' : '15px',
                   fontWeight: 900,
                   color: isDark ? '#FDE047' : '#D97706',
                   backgroundColor: isDark ? 'rgba(180, 83, 9, 0.2)' : '#FFFBEB',
@@ -1527,10 +1530,10 @@ export const PisaiBillingScreen: React.FC = () => {
           {/* 2. Grinding Fee (Calculated / Editable) */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '15px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '16px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('پسائی اجرت:', 'Grinding Fee (Rs):')}
               </span>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 800 }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '14px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 800 }}>
                 {isUrdu ? `(${numWeight} کلو × ${currentRate} روپے)` : `(${numWeight} KG × Rs ${currentRate})`}
               </span>
             </div>
@@ -1580,7 +1583,7 @@ export const PisaiBillingScreen: React.FC = () => {
                 style={{
                   position: 'absolute',
                   right: '10px',
-                  fontSize: isUrdu ? '19px' : '14px',
+                  fontSize: isUrdu ? '22px' : '15px',
                   fontWeight: 900,
                   color: isDark ? '#FDE047' : '#D97706',
                   backgroundColor: isDark ? 'rgba(180, 83, 9, 0.2)' : '#FFFBEB',
@@ -1676,7 +1679,7 @@ export const PisaiBillingScreen: React.FC = () => {
           {/* 3. Cash Received */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '15px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '16px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('وصول رقم:', 'Received Amount (Rs):')}
               </span>
               <button
@@ -1692,7 +1695,7 @@ export const PisaiBillingScreen: React.FC = () => {
                   color: isDark ? '#34D399' : '#0E8A54',
                   borderRadius: '6px',
                   padding: isUrdu ? '2px 10px' : '2px 8px',
-                  fontSize: isUrdu ? '15px' : '12px',
+                  fontSize: isUrdu ? '17px' : '13px',
                   fontWeight: 800,
                   cursor: 'pointer',
                   display: 'flex',
@@ -2063,7 +2066,7 @@ export const PisaiBillingScreen: React.FC = () => {
               <span
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '22px' : '16px',
+                  fontSize: isUrdu ? '25px' : '16px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   letterSpacing: '-0.01em',
@@ -2134,7 +2137,7 @@ export const PisaiBillingScreen: React.FC = () => {
               <span
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '20px' : '15px',
+                  fontSize: isUrdu ? '23px' : '15px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   letterSpacing: '-0.01em',

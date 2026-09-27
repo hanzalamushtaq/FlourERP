@@ -245,7 +245,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
             borderRadius: '14px',
             border: '2px solid #1E40AF',
             boxShadow: '0 6px 16px rgba(24, 119, 242, 0.26)',
-            padding: '10px 16px',
+            padding: '14px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -279,11 +279,12 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '20px' : '16px',
+                  fontSize: isUrdu ? '28px' : '20px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   margin: 0,
-                  lineHeight: 1.3,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
                   letterSpacing: '0',
                 }}
               >
@@ -305,7 +306,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
             borderRadius: '14px',
             border: '2px solid #065F46',
             boxShadow: '0 6px 16px rgba(14, 138, 84, 0.26)',
-            padding: '10px 16px',
+            padding: '14px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -339,23 +340,23 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
                 <span
                   className={isUrdu ? 'font-nastaleeq' : ''}
                   style={{
-                    fontSize: isUrdu ? '17px' : '13px',
+                    fontSize: isUrdu ? '28px' : '16px',
                     fontWeight: 900,
                     color: '#FFFFFF',
                     margin: 0,
-                    lineHeight: 1.2,
+                    lineHeight: 1.1,
                   }}
                 >
                   {t('مجموعی ادھار کھاتہ', 'Total Ledger')}
                 </span>
                 <span
                   style={{
-                    fontSize: '11px',
+                    fontSize: '13px',
                     fontWeight: 800,
                     backgroundColor: '#ECFDF5',
                     color: '#0E8A54',
-                    padding: '1px 6px',
-                    borderRadius: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
                   }}
                 >
                   {customers.length}
@@ -364,7 +365,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
               <span
                 dir="ltr"
                 style={{
-                  fontSize: 'clamp(18px, 5vw, 22px)',
+                  fontSize: '26px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   fontFamily: 'var(--font-mono)',
@@ -667,7 +668,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
                   backgroundColor: '#1877F2',
                   color: '#FFFFFF',
                   fontWeight: 900,
-                  fontSize: isUrdu ? '16px' : '14px',
+                  fontSize: isUrdu ? '24px' : '14px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -675,7 +676,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
                   boxShadow: '0 4px 12px rgba(24, 119, 242, 0.25)',
                 }}
               >
-                <UserPlus size={16} />
+                <UserPlus size={18} />
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>
                   {t('+ نیا کسٹمر کھاتہ بنائیں', '+ Create Customer Account')}
                 </span>

@@ -254,7 +254,7 @@ export const WarehouseStockView: React.FC = () => {
             borderRadius: '14px',
             border: '2px solid #1E40AF',
             boxShadow: '0 6px 16px rgba(24, 119, 242, 0.26)',
-            padding: '10px 20px',
+            padding: '14px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -292,11 +292,12 @@ export const WarehouseStockView: React.FC = () => {
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '21px' : '16px',
+                  fontSize: isUrdu ? '28px' : '20px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   margin: 0,
-                  lineHeight: 1.3,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
                   letterSpacing: '0',
                 }}
               >
@@ -324,7 +325,7 @@ export const WarehouseStockView: React.FC = () => {
             borderRadius: '14px',
             border: '2px solid #065F46',
             boxShadow: '0 6px 16px rgba(14, 138, 84, 0.26)',
-            padding: '10px 20px',
+            padding: '14px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -362,11 +363,12 @@ export const WarehouseStockView: React.FC = () => {
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '21px' : '16px',
+                  fontSize: isUrdu ? '28px' : '20px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   margin: 0,
-                  lineHeight: 1.3,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
                   letterSpacing: '0',
                 }}
               >
