@@ -5,6 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Flour ERP',
   webDir: 'apps/web/out',
   server: {
+    url: 'https://flour-mill-xi.vercel.app',
     androidScheme: 'https',
     cleartext: true,
   },
