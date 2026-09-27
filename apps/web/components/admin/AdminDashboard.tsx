@@ -163,12 +163,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       title: isUrdu ? 'کل گاہک ادھار کھاتہ' : 'Total Customer Udhaar',
       numValue: kpiData
         ? kpiData.udhaar.totalOutstanding.toLocaleString()
-        : '83,250',
+        : '0',
       subtitle: kpiData
         ? isUrdu
           ? `${kpiData.udhaar.debtorsCount} فعال ادھار کھاتہ داران`
           : `${kpiData.udhaar.debtorsCount} active credit accounts`
-        : isUrdu ? '7 فعال ادھار کھاتہ داران' : '7 active credit accounts',
+        : isUrdu ? '0 فعال ادھار کھاتہ داران' : '0 active credit accounts',
       icon: <Users size={20} color={isDark ? '#C084FC' : '#7E22CE'} />,
       bg: isDark ? '#1E293B' : '#FAF5FF',
       border: isDark ? '#581C87' : '#E9D5FF',

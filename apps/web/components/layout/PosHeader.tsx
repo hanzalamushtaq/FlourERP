@@ -89,7 +89,7 @@ interface PosHeaderProps {
 
 export const PosHeader: React.FC<PosHeaderProps> = ({
   onOpenZReport,
-  operatorName = 'محمد عاصف',
+  operatorName = '',
   roleName = 'Biller',
   canCloseDay = true,
   onLogout,

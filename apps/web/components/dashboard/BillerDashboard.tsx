@@ -81,7 +81,7 @@ interface BillerDashboardProps {
 }
 
 export const BillerDashboard: React.FC<BillerDashboardProps> = ({
-  billerName = 'محمد عاصف',
+  billerName = '',
   counterId = '01',
   onNewBill,
   onNewPisaiToken,

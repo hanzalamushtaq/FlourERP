@@ -89,10 +89,7 @@ const INITIAL_ROLES: RoleItem[] = [
   },
 ];
 
-const INITIAL_STAFF: StaffUser[] = [
-  { id: '1', username: 'hanzala', fullName: 'Hanzala Mushtaq', roleName: 'SuperAdmin' },
-  { id: '2', username: 'asif', fullName: 'محمد عاصف', roleName: 'Biller' },
-];
+const INITIAL_STAFF: StaffUser[] = [];
 
 interface RoleManagementModalProps {
   isOpen: boolean;
