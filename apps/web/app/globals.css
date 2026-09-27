@@ -689,9 +689,9 @@ h4.font-nastaleeq {
 }
 
 .header-title-responsive {
-  font-size: clamp(16px, 2.5vw, 22px);
-  font-weight: 800 !important;
-  line-height: 1.35;
+  font-size: 21px !important;
+  font-weight: 900 !important;
+  line-height: 1.35 !important;
   letter-spacing: 0 !important;
 }
 
@@ -1036,8 +1036,8 @@ body.is-native-app .pos-header-container,
   }
 
   .header-title-responsive {
-    font-size: clamp(16px, 4vw, 19px) !important;
-    font-weight: 800 !important;
+    font-size: 21px !important;
+    font-weight: 900 !important;
     line-height: 1.35 !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -1120,8 +1120,8 @@ body.is-native-app .pos-header-container,
   }
 
   .header-title-responsive {
-    font-size: clamp(14.5px, 3.8vw, 17.5px) !important;
-    font-weight: 800 !important;
+    font-size: 20px !important;
+    font-weight: 900 !important;
     line-height: 1.35 !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -1199,8 +1199,8 @@ body.is-native-app .pos-header-container,
   }
 
   .header-title-responsive {
-    font-size: 14px !important;
-    font-weight: 800 !important;
+    font-size: 18px !important;
+    font-weight: 900 !important;
     line-height: 1.35 !important;
     letter-spacing: 0 !important;
   }

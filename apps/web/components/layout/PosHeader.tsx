@@ -659,18 +659,19 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         <h1
           className={`${isUrdu ? 'font-nastaleeq dashboard-header-nastaleeq' : ''} header-title-responsive`}
           style={{
+            fontSize: isUrdu ? '21px' : '18px',
             fontWeight: 900,
             color: '#0F172A',
             margin: 0,
-            letterSpacing: '-0.02em',
+            letterSpacing: '0',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             minWidth: 0,
             flex: 1,
             lineHeight: 1.35,
-            paddingTop: '1px',
-            paddingBottom: '1px',
+            paddingTop: '2px',
+            paddingBottom: '2px',
           }}
         >
           {title || t('بلر ڈیوٹی بورڈ', 'Biller Station')}
