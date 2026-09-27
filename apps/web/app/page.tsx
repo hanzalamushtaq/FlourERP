@@ -298,8 +298,13 @@ export default function Home() {
             }
           }}
           onNavigateTab={(tab, extra) => {
+            if (tab === 'stock') {
+              setActiveTab('dashboard');
+              return;
+            }
             if (extra?.subTab) {
-              setReportSubTab(extra.subTab as ReportSubTab);
+              const safeSub = (extra.subTab === 'purchase' || extra.subTab === 'supplier') ? 'sales' : extra.subTab;
+              setReportSubTab(safeSub as ReportSubTab);
             }
             if (extra?.customerId || extra?.customerName) {
               setSelectedCustomerIdForLedger(extra.customerId || null);
@@ -312,26 +317,24 @@ export default function Home() {
           }}
           title={
             activeTab === 'dashboard'
-              ? t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')
+              ? t('بلر ڈیوٹی بورڈ', 'Biller Station')
               : activeTab === 'admin'
-              ? t('مالک و ایڈمنسٹریٹر کمانڈ سنٹر', 'Administrator Command Center')
+              ? t('ایڈمن کمانڈ سنٹر', 'Admin Center')
               : activeTab === 'billing'
-              ? t('نیا بل (پروڈکٹ سیلز)', 'New Bill (Product Sales)')
+              ? t('نیا بل (سیلز)', 'New Bill (Sales)')
               : activeTab === 'pisai'
-              ? t('گندم پسائی و ٹوکن جاری کریں', 'Wheat Milling & Token Issue')
+              ? t('گندم پسائی و ٹوکن', 'Milling & Token')
               : activeTab === 'udhaar'
-              ? t('کسٹمر ادھار کھاتہ و وصولی', 'Customer Ledger & Recovery')
+              ? t('کسٹمر ادھار کھاتہ', 'Customer Ledger')
               : activeTab === 'reports'
-              ? t('مالیاتی روزنامچہ و حسابات', 'Financial Journal & Reports')
+              ? t('مالیاتی رپورٹس', 'Financial Reports')
               : activeTab === 'rates'
-              ? t('روزانہ نرخ نامہ و ریٹ لسٹ', 'Daily Rate List & Pricing')
-              : activeTab === 'stock'
-              ? t('گودام و اسٹاک انوینٹری', 'Warehouse & Stock Inventory')
+              ? t('روزانہ ریٹ لسٹ', 'Daily Rate List')
               : activeTab === 'settings'
-              ? t('عمومی معلومات و مل پروفائل', 'General Information & Mill Profile')
+              ? t('پروفائل و سیٹنگز', 'Profile & Settings')
               : userIsAdmin
-              ? t('ایڈمن کنٹرول پینل', 'Admin Control Panel')
-              : t('کاؤنٹر بلر ورک سپیس', 'Counter Biller Workspace')
+              ? t('ایڈمن پینل', 'Admin Panel')
+              : t('بلر ورک سپیس', 'Biller Workspace')
           }
         />
 

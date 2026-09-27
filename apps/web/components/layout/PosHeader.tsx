@@ -59,8 +59,6 @@ const renderHeaderIcon = (tab?: string) => {
       return <BookOpen size={21} color={iconColor} strokeWidth={2} />;
     case 'rates':
       return <Tag size={21} color={iconColor} strokeWidth={2} />;
-    case 'stock':
-      return <Boxes size={21} color={iconColor} strokeWidth={1.8} />;
     case 'reports':
       return <Calculator size={21} color={iconColor} strokeWidth={2} />;
     case 'admin':
@@ -352,25 +350,6 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       },
     },
     {
-      id: 'srv-stock',
-      category: 'service' as const,
-      titleEn: 'Warehouse & Stock Inventory',
-      titleUr: 'گودام و اسٹاک انوینٹری',
-      subtitleEn: 'Bags stock & wheat storage count',
-      subtitleUr: 'گودام اسٹاک اور بوریوں کی گنتی',
-      badgeEn: 'Stock',
-      badgeUr: 'اسٹاک',
-      badgeBg: 'rgba(14, 118, 110, 0.12)',
-      badgeColor: '#0F766E',
-      icon: <Boxes size={18} color="#0F766E" />,
-      keywords: ['stock', 'inventory', 'warehouse', 'bags', 'اسٹاک', 'گودام', 'بوریاں'],
-      action: () => {
-        onNavigateTab?.('stock');
-        setIsSearchOpen(false);
-        setSearchQuery('');
-      },
-    },
-    {
       id: 'srv-settings',
       category: 'service' as const,
       titleEn: 'General Settings & Profile',
@@ -503,44 +482,6 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       keywords: ['user sales', 'cashier report', 'staff sales', 'یوزر رپورٹ'],
       action: () => {
         onNavigateTab?.('reports', { subTab: 'user_sales' });
-        setIsSearchOpen(false);
-        setSearchQuery('');
-      },
-    },
-    {
-      id: 'rep-purchase',
-      category: 'report' as const,
-      titleEn: 'Raw Wheat Purchase Report',
-      titleUr: 'خام گندم خریداری رپورٹ',
-      subtitleEn: 'Grain procurement & supplier intake',
-      subtitleUr: 'گندم اور خام مال کی خریداری کا خلاصہ',
-      badgeEn: 'Report',
-      badgeUr: 'رپورٹ',
-      badgeBg: 'rgba(14, 138, 84, 0.12)',
-      badgeColor: '#0E8A54',
-      icon: <ShoppingBag size={18} color="#0E8A54" />,
-      keywords: ['purchase report', 'wheat purchase', 'خریداری رپورٹ', 'گندم خریداری'],
-      action: () => {
-        onNavigateTab?.('reports', { subTab: 'purchase' });
-        setIsSearchOpen(false);
-        setSearchQuery('');
-      },
-    },
-    {
-      id: 'rep-supplier',
-      category: 'report' as const,
-      titleEn: 'Wheat Supplier Accounts Report',
-      titleUr: 'گندم سپلائر کھاتہ رپورٹ',
-      subtitleEn: 'Supplier payables & ledger summary',
-      subtitleUr: 'گندم سپلائرز کے واجب الادا کھاتے',
-      badgeEn: 'Report',
-      badgeUr: 'رپورٹ',
-      badgeBg: 'rgba(8, 145, 178, 0.12)',
-      badgeColor: '#0891B2',
-      icon: <FileText size={18} color="#0891B2" />,
-      keywords: ['supplier report', 'payables', 'سپلائر رپورٹ', 'سپلائر'],
-      action: () => {
-        onNavigateTab?.('reports', { subTab: 'supplier' });
         setIsSearchOpen(false);
         setSearchQuery('');
       },
@@ -689,7 +630,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       }}
     >
       {/* Title & Icon & Bell Side (Always on the Right) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1, direction: 'rtl' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1, overflow: 'hidden', direction: 'rtl' }}>
         {/* Top Right Bell Icon with Notifications & Daily Rate Alert */}
         <NotificationDropdown
           isAdmin={isAdmin}
@@ -721,20 +662,22 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
             color: '#0F172A',
             margin: 0,
             letterSpacing: '-0.02em',
-            overflow: 'visible',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             minWidth: 0,
-            lineHeight: 1.4,
-            paddingTop: '2px',
-            paddingBottom: '2px',
+            flex: 1,
+            lineHeight: 1.35,
+            paddingTop: '1px',
+            paddingBottom: '1px',
           }}
         >
-          {title || t('کاؤنٹر بلر ڈیوٹی بورڈ', 'Biller Duty Station')}
+          {title || t('بلر ڈیوٹی بورڈ', 'Biller Station')}
         </h1>
       </div>
 
       {/* Action Buttons Side (Always on the Left) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, direction: 'ltr' }}>
+      <div className="header-action-controls-left" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, direction: 'ltr' }}>
         {/* Mobile Hamburger Menu Button (Full Left Corner) */}
         {onToggleSidebar && !isMobileNavOpen && (
           <button

@@ -77,12 +77,10 @@ const INITIAL_LEDGER: LedgerItem[] = [];
 ───────────────────────────────────────────────────────────── */
 const REPORT_META: Record<ReportSubTab, { labelEn: string; labelUr: string; icon: React.ReactNode; color: string; bgColor: string; borderColor: string; descriptionUr: string }> = {
   sales:      { labelEn: 'Sales Report',           labelUr: 'سیلز رپورٹ',          icon: <BarChart2 size={18} />,     color: '#1877F2', bgColor: '#EFF6FF', borderColor: '#BFDBFE', descriptionUr: 'روزانہ آمدن، فیس پسائی، اخراجات اور خالص نقد کیش کا تفصیلی ریکارڈ' },
-  audit:      { labelEn: 'Audit Report',           labelUr: 'آڈٹ رپورٹ',           icon: <ShieldAlert size={18} />,   color: '#7C3AED', bgColor: '#F5F3FF', borderColor: '#DDD6FE', descriptionUr: 'صارفین کی تمام سرگرمیاں، لاگ ان سیشنز اور حساس کارروائیوں کا محفوظ لاگ' },
-  purchase:   { labelEn: 'Purchase Report',        labelUr: 'خریداری رپورٹ',        icon: <ShoppingCart size={18} />, color: '#0E8A54', bgColor: '#F0FDF4', borderColor: '#86EFAC', descriptionUr: 'گندم اور خام مال کی خریداری اور سپلائر کی ترسیل کا خلاصہ' },
   customer:   { labelEn: 'Customer Report',        labelUr: 'کسٹمر رپورٹ',         icon: <Users size={18} />,         color: '#D97706', bgColor: '#FFFBEB', borderColor: '#FDE68A', descriptionUr: 'گاہکوں کے ادھار کھاتے، بقایا جات اور وصولیوں کی مکمل تفصیل' },
-  supplier:   { labelEn: 'Supplier Report',        labelUr: 'سپلائر رپورٹ',         icon: <Truck size={18} />,         color: '#0891B2', bgColor: '#ECFEFF', borderColor: '#A5F3FC', descriptionUr: 'گندم سپلائرز، ادا شدہ رقوم اور واجب الادا کھاتوں کی تفصیل' },
   daily_log:  { labelEn: 'Daily Log Report',       labelUr: 'روزانہ لاگ رپورٹ',    icon: <BookOpen size={18} />,      color: '#DC2626', bgColor: '#FEF2F2', borderColor: '#FECACA', descriptionUr: 'دن بھر کی تمام رسیدوں، ٹوکنز اور لین دین کی وقت وار مکمل ڈائری' },
   user_sales: { labelEn: 'User Wise Sales Report', labelUr: 'یوزر وائز سیلز رپورٹ', icon: <UserCheck size={18} />,    color: '#475569', bgColor: '#F8FAFC', borderColor: '#CBD5E1', descriptionUr: 'ہر کاؤنٹر کیشیئر اور آپریٹر کی الگ الگ سیل، پسائی اور جمع شدہ کیش' },
+  audit:      { labelEn: 'Audit Report',           labelUr: 'آڈٹ رپورٹ',           icon: <ShieldAlert size={18} />,   color: '#7C3AED', bgColor: '#F5F3FF', borderColor: '#DDD6FE', descriptionUr: 'صارفین کی تمام سرگرمیاں، لاگ ان سیشنز اور حساس کارروائیوں کا محفوظ لاگ' },
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -627,7 +625,8 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
     return Array.from(map.values());
   }, [auditLogs, ledger]);
 
-  const meta = REPORT_META[activeSubTab];
+  const currentTab: ReportSubTab = (REPORT_META as any)[activeSubTab] ? activeSubTab : 'sales';
+  const meta = REPORT_META[currentTab];
 
   /* ────── Render ────── */
   return (
@@ -1251,41 +1250,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
         </div>
       )}
 
-      {/* ═════════════════════════════════════════════════════════════
-          6. PURCHASE & SUPPLIER REPORTS VIEW
-         ═════════════════════════════════════════════════════════════ */}
-      {(activeSubTab === 'purchase' || activeSubTab === 'supplier') && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-            <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(34, 197, 94, 0.3)' : '1.5px solid #86EFAC', boxShadow: '0 2px 6px rgba(16,185,129,0.06)' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#4ADE80' : '#166534', fontWeight: 800, display: 'block' }}>
-                {isUrdu ? 'ماہانہ گندم آمد (خریداری)' : 'Monthly Wheat Intake'}
-              </span>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#4ADE80' : '#15803D', fontFamily: 'var(--font-mono)' }}>
-                450 {isUrdu ? 'بوری (45,000 کلو)' : 'Bags (45,000 KG)'}
-              </span>
-            </div>
-            <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', padding: '18px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(14, 165, 233, 0.3)' : '1.5px solid #A5F3FC', boxShadow: '0 2px 6px rgba(8,145,178,0.06)' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', color: isDark ? '#38BDF8' : '#155E75', fontWeight: 800, display: 'block' }}>
-                {isUrdu ? 'سپلائر واجب الادا رقم' : 'Pending Supplier Payments'}
-              </span>
-              <span style={{ fontSize: '28px', fontWeight: 900, color: isDark ? '#38BDF8' : '#0891B2', fontFamily: 'var(--font-mono)' }}>
-                Rs 185,000
-              </span>
-            </div>
-          </div>
 
-          <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', padding: '24px', textAlign: 'center' }}>
-            <ShoppingCart size={40} color={isDark ? '#4ADE80' : '#0E8A54'} style={{ margin: '0 auto 12px' }} />
-            <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: '0 0 8px', fontSize: isUrdu ? '24px' : '17px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#0F172A' }}>
-              {isUrdu ? 'سپلائر و خریداری ماڈیول مکمل فعال ہے' : 'Supplier & Grain Purchase Ingestion Ready'}
-            </h3>
-            <p className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#94A3B8' : '#64748B' }}>
-              {isUrdu ? 'نیا گندم چالان یا سپلائر ادائیگی ریکارڈ کرنے کے لیے نیچے دیے گئے بٹن کا استعمال فرمائیں۔' : 'Use below to record grain purchase delivery or pay supplier ledger balance.'}
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* VOID MODAL */}
       {voidModalOpen && (

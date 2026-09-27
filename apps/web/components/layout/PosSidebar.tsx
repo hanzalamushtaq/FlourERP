@@ -23,16 +23,14 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
-export type ReportSubTab = 'sales' | 'audit' | 'purchase' | 'customer' | 'supplier' | 'daily_log' | 'user_sales';
+export type ReportSubTab = 'sales' | 'customer' | 'daily_log' | 'user_sales' | 'audit';
 
 const REPORT_SUB_ITEMS: { id: ReportSubTab; labelEn: string; labelUr: string; icon: React.ReactNode }[] = [
   { id: 'sales',      labelEn: 'Sales Report',           labelUr: 'سیلز رپورٹ',          icon: <BarChart2 size={15} /> },
-  { id: 'audit',      labelEn: 'Audit Report',           labelUr: 'آڈٹ رپورٹ',           icon: <ShieldAlert size={15} /> },
-  { id: 'purchase',   labelEn: 'Purchase Report',        labelUr: 'خریداری رپورٹ',        icon: <ShoppingCart size={15} /> },
   { id: 'customer',   labelEn: 'Customer Report',        labelUr: 'کسٹمر رپورٹ',         icon: <Users size={15} /> },
-  { id: 'supplier',   labelEn: 'Supplier Report',        labelUr: 'سپلائر رپورٹ',         icon: <Truck size={15} /> },
   { id: 'daily_log',  labelEn: 'Daily Log Report',       labelUr: 'روزانہ لاگ رپورٹ',    icon: <BookOpen size={15} /> },
   { id: 'user_sales', labelEn: 'User Wise Sales Report', labelUr: 'یوزر وائز سیلز رپورٹ', icon: <UserCheck size={15} /> },
+  { id: 'audit',      labelEn: 'Audit Report',           labelUr: 'آڈٹ رپورٹ',           icon: <ShieldAlert size={15} /> },
 ];
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
