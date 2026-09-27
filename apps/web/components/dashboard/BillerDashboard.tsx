@@ -112,7 +112,10 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
       // 1. Fetch live KPIs
       const kpiRes = await fetch(`${getApiBaseUrl()}/api/reports/dashboard-kpis?range=today`, { headers });
       if (kpiRes.status === 401) {
-        await ensureValidToken(session);
+        const fresh = await ensureValidToken(session);
+        if (!fresh) {
+          if (typeof window !== 'undefined') window.dispatchEvent(new Event('flour_erp_unauthorized'));
+        }
         return;
       }
       if (kpiRes.ok) {
@@ -131,7 +134,10 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
       // 2. Fetch recent bills
       const billsRes = await fetch(`${getApiBaseUrl()}/api/bills?limit=10`, { headers });
       if (billsRes.status === 401) {
-        await ensureValidToken(session);
+        const fresh = await ensureValidToken(session);
+        if (!fresh) {
+          if (typeof window !== 'undefined') window.dispatchEvent(new Event('flour_erp_unauthorized'));
+        }
         return;
       }
       if (billsRes.ok) {

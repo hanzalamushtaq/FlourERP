@@ -24,6 +24,7 @@ import {
   getSession,
   clearSession,
   ensureValidToken,
+  isTokenExpired,
   isAdmin,
   isBiller,
   hasPermission,
@@ -73,22 +74,50 @@ export default function Home() {
 
   // Check saved session on mount
   useEffect(() => {
+    const handleUnauthorized = () => {
+      clearSession();
+      setCurrentUser(null);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('flour_erp_unauthorized', handleUnauthorized);
+    }
+
     const saved = getSession();
     if (saved) {
-      setCurrentUser(saved);
-      const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
-      const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
-      if (savedTab && validTabs.includes(savedTab)) {
-        setActiveTab(savedTab);
-      }
-      // Silently upgrade token if it was an offline mock token
-      ensureValidToken(saved).then((token) => {
-        if (token && token !== saved.token) {
-          const refreshed = getSession();
-          if (refreshed) setCurrentUser(refreshed);
+      if (isTokenExpired(saved.token)) {
+        // Token is expired! Silently renew before mounting dashboard
+        ensureValidToken(saved).then((freshToken) => {
+          if (freshToken && !isTokenExpired(freshToken)) {
+            const refreshed = getSession();
+            if (refreshed) {
+              setCurrentUser(refreshed);
+              const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
+              const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
+              if (savedTab && validTabs.includes(savedTab)) {
+                setActiveTab(savedTab);
+              }
+            }
+          } else {
+            // Cannot renew token, clear stale session and show LoginScreen
+            clearSession();
+            setCurrentUser(null);
+          }
+        });
+      } else {
+        setCurrentUser(saved);
+        const savedTab = localStorage.getItem('flour_erp_active_tab') as any;
+        const validTabs = ['dashboard', 'billing', 'pisai', 'udhaar', 'reports', 'admin', 'rates', 'settings'];
+        if (savedTab && validTabs.includes(savedTab)) {
+          setActiveTab(savedTab);
         }
-      });
+      }
     }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('flour_erp_unauthorized', handleUnauthorized);
+      }
+    };
   }, []);
 
   // Global Keyboard Shortcuts (F8, F2, F3, Esc, Alt+K)
