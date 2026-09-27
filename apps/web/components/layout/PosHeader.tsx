@@ -612,11 +612,11 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         top: 0,
         zIndex: 50,
         borderBottom: '1px solid #F1F5F9',
-        padding: '12px 16px 12px 16px',
+        padding: '16px',
         paddingTop: isNativeApp
-          ? 'max(32px, calc(env(safe-area-inset-top, 0px) + 22px))'
-          : 'max(12px, calc(env(safe-area-inset-top, 0px) + 12px))',
-        paddingBottom: '12px',
+          ? 'max(42px, calc(env(safe-area-inset-top, 0px) + 28px))'
+          : 'max(16px, calc(env(safe-area-inset-top, 0px) + 14px))',
+        paddingBottom: '16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -625,7 +625,7 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
         direction: 'rtl',
         boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
         width: '100%',
-        minHeight: isNativeApp ? '74px' : '64px',
+        minHeight: isNativeApp ? '88px' : '78px',
         boxSizing: 'border-box',
         overflow: 'visible',
       }}

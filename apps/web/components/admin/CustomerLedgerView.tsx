@@ -335,21 +335,24 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
               <UdhaarBookSvg />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span
-                  className={isUrdu ? 'font-nastaleeq' : ''}
+                <h2
+                  className={`ledger-card-title ${isUrdu ? 'font-nastaleeq' : ''}`}
                   style={{
-                    fontSize: isUrdu ? '28px' : '16px',
+                    fontSize: isUrdu ? '28px' : '20px',
                     fontWeight: 900,
                     color: '#FFFFFF',
                     margin: 0,
-                    lineHeight: 1.1,
+                    padding: '2px 8px',
+                    lineHeight: 1.25,
+                    letterSpacing: '0',
                   }}
                 >
                   {t('مجموعی ادھار کھاتہ', 'Total Ledger')}
-                </span>
+                </h2>
                 <span
+                  className="ledger-count-pill"
                   style={{
                     fontSize: '13px',
                     fontWeight: 800,
@@ -364,13 +367,15 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
               </div>
               <span
                 dir="ltr"
+                className="ledger-card-amount"
                 style={{
-                  fontSize: '26px',
+                  fontSize: '24px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   fontFamily: 'var(--font-mono)',
-                  lineHeight: 1.1,
+                  lineHeight: 1.2,
                   marginTop: '2px',
+                  padding: '0 8px',
                 }}
               >
                 Rs {totalOutstandingUdhaar.toLocaleString()}

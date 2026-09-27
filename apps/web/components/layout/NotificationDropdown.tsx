@@ -346,7 +346,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           className="notification-panel-dropdown"
           style={{
             position: 'absolute',
-            top: '46px',
+            top: 'calc(100% + 8px)',
             right: 0,
             left: 'auto',
             width: '360px',
