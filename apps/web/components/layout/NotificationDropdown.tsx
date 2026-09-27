@@ -75,9 +75,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   // Fetch daily rate verification status
   const fetchStatus = () => {
     const session = getSession();
-    const headers: Record<string, string> = session?.token
-      ? { Authorization: `Bearer ${session.token}` }
-      : {};
+    if (!session?.token) return;
+    const headers: Record<string, string> = { Authorization: `Bearer ${session.token}` };
     const baseUrl = getApiBaseUrl();
 
     // Check daily price status

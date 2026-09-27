@@ -106,10 +106,15 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   const fetchLiveData = async () => {
     try {
       const session = getSession();
-      const headers = session?.token ? { Authorization: `Bearer ${session.token}` } : {};
+      if (!session?.token) return;
+      const headers = { Authorization: `Bearer ${session.token}` };
 
       // 1. Fetch live KPIs
       const kpiRes = await fetch(`${getApiBaseUrl()}/api/reports/dashboard-kpis?range=today`, { headers });
+      if (kpiRes.status === 401) {
+        await ensureValidToken(session);
+        return;
+      }
       if (kpiRes.ok) {
         const kpiJson = await kpiRes.json();
         if (kpiJson.success && kpiJson.data) {
@@ -125,6 +130,10 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
 
       // 2. Fetch recent bills
       const billsRes = await fetch(`${getApiBaseUrl()}/api/bills?limit=10`, { headers });
+      if (billsRes.status === 401) {
+        await ensureValidToken(session);
+        return;
+      }
       if (billsRes.ok) {
         const billsJson = await billsRes.json();
         if (billsJson.success && Array.isArray(billsJson.data?.bills)) {

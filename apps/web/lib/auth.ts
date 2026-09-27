@@ -80,16 +80,34 @@ export function clearSession(): void {
 
 import { getApiBaseUrl } from './api';
 
+export function isTokenExpired(token?: string | null): boolean {
+  if (!token) return true;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = typeof window !== 'undefined'
+      ? decodeURIComponent(atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))
+      : Buffer.from(base64, 'base64').toString('utf-8');
+    const payload = JSON.parse(jsonPayload);
+    if (!payload.exp) return false;
+    return Math.floor(Date.now() / 1000) >= payload.exp - 60;
+  } catch {
+    return true;
+  }
+}
+
 export async function ensureValidToken(user?: UserSession | null): Promise<string | null> {
   const current = user || getSession();
   if (!current) return null;
 
-  // If token is already a real 3-part JWT
-  if (current.token && current.token.split('.').length === 3) {
+  // If token is already a real 3-part JWT and not expired, use it
+  if (current.token && current.token.split('.').length === 3 && !isTokenExpired(current.token)) {
     return current.token;
   }
 
-  // Token is local or mock, automatically obtain real JWT from backend API
+  // Token is expired, mock, or missing: automatically obtain fresh JWT from backend API
   const uname = current.username?.toLowerCase();
   const preset = PRESET_USERS[uname];
   if (preset) {

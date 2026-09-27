@@ -17,7 +17,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
 import { getApiBaseUrl } from '../../lib/api';
-import { getSession } from '../../lib/auth';
+import { getSession, ensureValidToken } from '../../lib/auth';
 import { sound } from '../../lib/audioFeedback';
 
 export interface ChakkiQueueItem {
@@ -71,9 +71,14 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
   const fetchQueue = async () => {
     try {
       const session = getSession();
+      if (!session?.token) return;
       const res = await fetch(`${getApiBaseUrl()}/api/pisai/queue?limit=50`, {
-        headers: session?.token ? { Authorization: `Bearer ${session.token}` } : {},
+        headers: { Authorization: `Bearer ${session.token}` },
       });
+      if (res.status === 401) {
+        await ensureValidToken(session);
+        return;
+      }
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data?.records)) {
