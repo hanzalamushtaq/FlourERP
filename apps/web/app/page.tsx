@@ -65,6 +65,97 @@ export default function Home() {
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
 
+  // Refs for Android hardware back button handler
+  const isReceiptOpenRef = React.useRef(isReceiptOpen);
+  isReceiptOpenRef.current = isReceiptOpen;
+
+  const isPriceModalOpenRef = React.useRef(isPriceModalOpen);
+  isPriceModalOpenRef.current = isPriceModalOpen;
+
+  const isZReportOpenRef = React.useRef(isZReportOpen);
+  isZReportOpenRef.current = isZReportOpen;
+
+  const isMobileNavOpenRef = React.useRef(isMobileNavOpen);
+  isMobileNavOpenRef.current = isMobileNavOpen;
+
+  const activeTabRef = React.useRef(activeTab);
+  activeTabRef.current = activeTab;
+
+  const currentUserRef = React.useRef(currentUser);
+  currentUserRef.current = currentUser;
+
+  // Android Hardware / Gesture Back Button Handling (One Step Back)
+  useEffect(() => {
+    let appListenerHandle: any = null;
+
+    const handleBackAction = async () => {
+      // 1. Close open modals first
+      if (isReceiptOpenRef.current) {
+        setIsReceiptOpen(false);
+        return;
+      }
+      if (isPriceModalOpenRef.current) {
+        setIsPriceModalOpen(false);
+        return;
+      }
+      if (isZReportOpenRef.current) {
+        setIsZReportOpen(false);
+        return;
+      }
+
+      // 2. Close mobile sidebar drawer if open
+      if (isMobileNavOpenRef.current) {
+        setIsMobileNavOpen(false);
+        return;
+      }
+
+      // 3. If in a sub-view / sub-tab, navigate back to dashboard
+      if (currentUserRef.current && activeTabRef.current !== 'dashboard') {
+        setActiveTab('dashboard');
+        setSelectedCustomerIdForLedger(null);
+        setCustomerSearchForLedger('');
+        setSelectedProductIdForBilling(undefined);
+        return;
+      }
+
+      // 4. If already on dashboard or on login screen, close/exit the app
+      try {
+        const { App } = await import('@capacitor/app');
+        await App.exitApp();
+      } catch (err) {
+        if (typeof window !== 'undefined' && (window as any).navigator?.app?.exitApp) {
+          (window as any).navigator.app.exitApp();
+        }
+      }
+    };
+
+    const registerBackButton = async () => {
+      try {
+        const { App } = await import('@capacitor/app');
+        appListenerHandle = await App.addListener('backButton', () => {
+          handleBackAction();
+        });
+      } catch (e) {
+        // Not running in Capacitor or plugin not supported
+      }
+    };
+
+    const handleDocBackButton = (e: Event) => {
+      e.preventDefault();
+      handleBackAction();
+    };
+
+    registerBackButton();
+    document.addEventListener('backbutton', handleDocBackButton);
+
+    return () => {
+      if (appListenerHandle && typeof appListenerHandle.remove === 'function') {
+        appListenerHandle.remove();
+      }
+      document.removeEventListener('backbutton', handleDocBackButton);
+    };
+  }, []);
+
   // Synchronize activeTab to localStorage so page refresh maintains the current tab
   useEffect(() => {
     if (typeof window !== 'undefined' && activeTab) {

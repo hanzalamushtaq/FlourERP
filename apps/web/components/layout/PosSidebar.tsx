@@ -245,6 +245,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
     >
       {/* Top Header Row: Small Logo aligned with Toggle Button */}
       <div
+        className="pos-sidebar-top-header"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -291,8 +292,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
               title={t('سائیڈ بار بند کریں', 'Close Sidebar')}
               className="touch-active mobile-sidebar-close-btn"
               style={{
-                width: '36px',
-                height: '36px',
+                width: '38px',
+                height: '38px',
                 borderRadius: '10px',
                 backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
                 border: isDark ? '1.5px solid #334155' : '1.5px solid #E2E8F0',

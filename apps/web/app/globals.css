@@ -655,6 +655,19 @@ h4.font-nastaleeq {
   .desktop-sidebar-collapse-btn {
     display: none !important;
   }
+
+  .pos-sidebar-top-header {
+    padding-top: max(48px, calc(env(safe-area-inset-top, 0px) + 24px)) !important;
+    padding-bottom: 14px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  html.dark .pos-sidebar,
+  [data-theme='dark'] .pos-sidebar {
+    background-color: #0B0F19 !important;
+    border-right-color: #1E293B !important;
+  }
 }
 
 @keyframes mobileBackdropFade {
@@ -1008,6 +1021,15 @@ body.is-native-app .pos-header-container,
   align-items: center !important;
 }
 
+html.is-native-app .pos-sidebar-top-header,
+body.is-native-app .pos-sidebar-top-header,
+.is-native-app .pos-sidebar-top-header {
+  padding-top: max(52px, calc(env(safe-area-inset-top, 0px) + 28px)) !important;
+  padding-bottom: 14px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
 @media all and (display-mode: standalone) {
   .pos-header-container {
     padding-top: max(42px, calc(env(safe-area-inset-top, 0px) + 28px)) !important;
@@ -1017,6 +1039,11 @@ body.is-native-app .pos-header-container,
     overflow: visible !important;
     display: flex !important;
     align-items: center !important;
+  }
+
+  .pos-sidebar-top-header {
+    padding-top: max(52px, calc(env(safe-area-inset-top, 0px) + 28px)) !important;
+    padding-bottom: 14px !important;
   }
 }
 
