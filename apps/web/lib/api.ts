@@ -6,7 +6,7 @@ export const getApiBaseUrl = (): string => {
     }
     // If running in browser locally on localhost, connect to local backend port 5000
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return 'http://localhost:5000';
+      return 'http://127.0.0.1:5000';
     }
   }
   // Default to live Render backend for mobile app, Vercel, and remote clients

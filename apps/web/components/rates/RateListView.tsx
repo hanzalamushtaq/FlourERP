@@ -1,22 +1,21 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Check,
   RotateCcw,
   Printer,
   Plus,
-  Minus,
-  Clock,
   ShieldCheck,
   X,
-  Scale,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { getSession } from '../../lib/auth';
+import { getApiBaseUrl } from '../../lib/api';
 
-// --- 1. Custom Handcrafted Vector SVGs matching Dashboard & Billing aesthetic ---
+// --- Vector SVGs for Flour Products ---
 
 // Chakki Atta Burlap Sack
 const ChakkiAttaSvg = () => (
@@ -84,29 +83,6 @@ const DesiAttaSvg = () => (
   </svg>
 );
 
-// Safai + Pisai Mill Icon
-const SafaiPisaiSvg = () => (
-  <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="18" cy="18" r="14" stroke="#4A2810" strokeWidth="2.2" strokeDasharray="3 2" fill="#FAF4ED" />
-    <circle cx="18" cy="18" r="10" fill="#C99462" stroke="#4A2810" strokeWidth="2" />
-    <path d="M12 18H24M18 12V24M14 14L22 22M22 14L14 22" stroke="#FAF4ED" strokeWidth="1.6" strokeLinecap="round" />
-    <ellipse cx="28" cy="9" rx="3.5" ry="2" transform="rotate(-30 28 9)" fill="#D97706" stroke="#4A2810" strokeWidth="1.2" />
-    <path d="M28 5L28 9" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M8 8L9 10L11 11L9 12L8 14L7 12L5 11L7 10L8 8Z" fill="#D97706" />
-  </svg>
-);
-
-// Pisai Only Stone Mill Icon
-const PisaiOnlySvg = () => (
-  <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 13L18 8L26 13L18 17L10 13Z" fill="#8C582B" stroke="#4A2810" strokeWidth="2.2" strokeLinejoin="round" />
-    <path d="M10 17L18 21L26 17V24L18 28L10 24V17Z" fill="#C99462" stroke="#4A2810" strokeWidth="2.2" strokeLinejoin="round" />
-    <path d="M15 4H21L19 8H17L15 4Z" fill="#FAF4ED" stroke="#4A2810" strokeWidth="1.8" />
-    <path d="M18 28V33M15 31H21" stroke="#FAF4ED" strokeWidth="2" strokeLinecap="round" />
-    <path d="M7 21C6 17 7 13 10 11" stroke="#D97706" strokeWidth="1.8" strokeLinecap="round" />
-  </svg>
-);
-
 // Scales / Rate Sheet Vector Icon
 const RateBadgeSvg = () => (
   <svg width="40" height="36" viewBox="0 0 58 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -134,42 +110,17 @@ interface RateItem {
   id: string;
   nameUr: string;
   nameEn: string;
-  yesterdayMaund: number;
-  todayMaund: number;
+  yesterdayRate: number; // Rate per KG
+  todayRate: number;     // Rate per KG
 }
 
 const INITIAL_RATES: RateItem[] = [
-  { id: '1', nameUr: 'چکی آٹا', nameEn: 'Chakki Whole Wheat Atta', yesterdayMaund: 5600, todayMaund: 5600 },
-  { id: '2', nameUr: 'فائن آٹا', nameEn: 'Fine Quality Atta', yesterdayMaund: 5920, todayMaund: 5920 },
-  { id: '3', nameUr: 'میدہ اسپیشل', nameEn: 'Maida Special Grade', yesterdayMaund: 6200, todayMaund: 6200 },
-  { id: '4', nameUr: 'خالص سوجی', nameEn: 'Pure Suji / Semolina', yesterdayMaund: 6400, todayMaund: 6400 },
-  { id: '5', nameUr: 'چوکر', nameEn: 'Wheat Chokar / Bran', yesterdayMaund: 3800, todayMaund: 3800 },
-  { id: '6', nameUr: 'دیسی گندم آٹا', nameEn: 'Desi Organic Atta', yesterdayMaund: 5800, todayMaund: 5800 },
-];
-
-interface PisaiRateItem {
-  id: string;
-  titleUr: string;
-  titleEn: string;
-  ratePerMaund: number;
-  note: string;
-}
-
-const INITIAL_PISAI_RATES: PisaiRateItem[] = [
-  {
-    id: 'safai_pisai',
-    titleUr: 'صفائی و پسائی',
-    titleEn: 'Cleaning & Milling',
-    ratePerMaund: 480,
-    note: 'مکمل چھانٹی و چکی پسائی چارجز',
-  },
-  {
-    id: 'pisai_only',
-    titleUr: 'صرف پسائی',
-    titleEn: 'Grinding Only',
-    ratePerMaund: 400,
-    note: 'صاف شدہ گندم کی چکی پسائی',
-  },
+  { id: '1', nameUr: 'چکی آٹا', nameEn: 'Chakki Whole Wheat Atta', yesterdayRate: 140, todayRate: 140 },
+  { id: '2', nameUr: 'فائن آٹا', nameEn: 'Fine Quality Atta', yesterdayRate: 148, todayRate: 148 },
+  { id: '3', nameUr: 'میدہ اسپیشل', nameEn: 'Maida Special Grade', yesterdayRate: 155, todayRate: 155 },
+  { id: '4', nameUr: 'خالص سوجی', nameEn: 'Pure Suji / Semolina', yesterdayRate: 160, todayRate: 160 },
+  { id: '5', nameUr: 'چوکر', nameEn: 'Wheat Chokar / Bran', yesterdayRate: 95, todayRate: 95 },
+  { id: '6', nameUr: 'دیسی گندم آٹا', nameEn: 'Desi Organic Atta', yesterdayRate: 145, todayRate: 145 },
 ];
 
 const renderProductSvg = (id: string) => {
@@ -188,7 +139,6 @@ export const RateListView: React.FC = () => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
   const [rates, setRates] = useState<RateItem[]>(INITIAL_RATES);
-  const [pisaiRates, setPisaiRates] = useState<PisaiRateItem[]>(INITIAL_PISAI_RATES);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [pressedCard, setPressedCard] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -200,40 +150,76 @@ export const RateListView: React.FC = () => {
   const [newItemName, setNewItemName] = useState<string>('');
   const [newItemRate, setNewItemRate] = useState<string>('');
 
-  const setDirectMaundRate = (id: string, val: number) => {
-    setRates((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, todayMaund: Math.max(0, val) } : item))
-    );
-  };
+  // Fetch actual products and daily rates from DB on mount
+  useEffect(() => {
+    const session = getSession();
+    const baseUrl = getApiBaseUrl();
+    fetch(`${baseUrl}/api/prices/daily-status`, {
+      headers: session?.token ? { Authorization: `Bearer ${session.token}` } : {},
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data?.products && json.data.products.length > 0) {
+          const loaded: RateItem[] = json.data.products.map((p: any) => ({
+            id: p.id,
+            nameEn: p.nameEn,
+            nameUr: p.nameUr || p.nameEn,
+            yesterdayRate: Number(p.currentRate) || 0,
+            todayRate: Number(p.currentRate) || 0,
+          }));
+          setRates(loaded);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
-  const setDirectPisaiRate = (id: string, val: number) => {
-    setPisaiRates((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ratePerMaund: Math.max(0, val) } : p))
+  const setDirectKgRate = (id: string, val: number) => {
+    setRates((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, todayRate: Math.max(0, val) } : item))
     );
   };
 
   const handleResetToYesterday = () => {
     setRates((prev) =>
-      prev.map((item) => ({ ...item, todayMaund: item.yesterdayMaund }))
+      prev.map((item) => ({ ...item, todayRate: item.yesterdayRate }))
     );
     setSavedBanner(true);
     setTimeout(() => setSavedBanner(false), 3000);
   };
 
-  const handleSaveAndBroadcast = () => {
+  const handleSaveAndBroadcast = async () => {
+    const session = getSession();
+    const baseUrl = getApiBaseUrl();
+    try {
+      const updates = rates.map((p) => ({
+        productId: p.id,
+        rate: p.todayRate,
+      }));
+      await fetch(`${baseUrl}/api/prices/daily-confirm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}),
+        },
+        body: JSON.stringify({
+          notes: 'Daily price confirmation via Daily Rate List',
+          updates,
+        }),
+      });
+    } catch {}
     setSavedBanner(true);
     setTimeout(() => setSavedBanner(false), 3500);
   };
 
   const handleAddNewItem = () => {
     if (!newItemName.trim() || !newItemRate) return;
-    const maundVal = parseFloat(newItemRate) || 4000;
+    const kgVal = parseFloat(newItemRate) || 140;
     const newItem: RateItem = {
       id: Date.now().toString(),
       nameUr: newItemName.trim(),
-      nameEn: 'Special Item',
-      yesterdayMaund: maundVal,
-      todayMaund: maundVal,
+      nameEn: newItemName.trim(),
+      yesterdayRate: kgVal,
+      todayRate: kgVal,
     };
     setRates((prev) => [...prev, newItem]);
     setNewItemName('');
@@ -291,7 +277,7 @@ export const RateListView: React.FC = () => {
                 {t('آج کے تمام نرخ نامے تصدیق اور لاگو ہو چکے ہیں!', 'All daily rates have been verified and applied!')}
               </div>
               <div style={{ fontSize: '12px', color: '#047857', fontWeight: 700 }}>
-                {t('بلنگ کاؤنٹرز (F8) اور پسائی ٹوکن (F2) پر نیا ریٹ فوری نافذ العمل ہے۔', 'New rates are now active across all billing and milling counters.')}
+                {t('بلنگ کاؤنٹرز (F8) پر نیا ریٹ فوری نافذ العمل ہے۔', 'New rates are now active across all billing counters.')}
               </div>
             </div>
           </div>
@@ -518,7 +504,7 @@ export const RateListView: React.FC = () => {
               border: isDark ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid #FDE68A',
             }}
           >
-            {t('فی من ریٹ (روپے / 40 کلو)', 'Rate per Maund (Rs / 40 KG)')}
+            {t('فی کلو ریٹ (روپے / کلو)', 'Rate per KG (Rs / KG)')}
           </span>
         </div>
 
@@ -545,11 +531,11 @@ export const RateListView: React.FC = () => {
           <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('+ نئی پروڈکٹ شامل کریں', '+ Add Product')}</span>
         </button>
       </div>
+
       {/* 3. FLOUR PRODUCTS DASHBOARD CARDS GRID (Responsive Grid) */}
       <div className="rates-top-3-grid">
         {rates.map((item) => {
-          const diff = item.todayMaund - item.yesterdayMaund;
-          const perKg = item.todayMaund > 0 ? item.todayMaund / 40 : 0;
+          const diff = item.todayRate - item.yesterdayRate;
           const isItemHovered = hoveredItem === item.id;
 
           return (
@@ -613,10 +599,10 @@ export const RateListView: React.FC = () => {
                       boxShadow: 'none',
                     }}
                   >
-                    {isUrdu ? `1 کلو: ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)} روپے` : `1 KG: Rs ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)}`}
+                    {isUrdu ? `1 کلو: ${item.todayRate} روپے` : `1 KG: Rs ${item.todayRate}`}
                   </span>
                   <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '11px', color: isDark ? '#94A3B8' : '#78716C', fontWeight: 700 }}>
-                    {t('کل کا من ریٹ:', 'Yesterday Maund:')} {isUrdu ? `${item.yesterdayMaund.toLocaleString()} روپے` : `Rs ${item.yesterdayMaund.toLocaleString()}`}
+                    {t('کل کا ریٹ:', 'Yesterday:')} {isUrdu ? `${item.yesterdayRate} روپے / کلو` : `Rs ${item.yesterdayRate} / KG`}
                   </span>
                 </div>
               </div>
@@ -637,7 +623,7 @@ export const RateListView: React.FC = () => {
                 </h4>
               </div>
 
-              {/* Card Bottom: Direct Price Input */}
+              {/* Card Bottom: Direct Price Input (Rate Per KG) */}
               <div
                 style={{
                   backgroundColor: isDark ? '#0B0F19' : '#FAF8F5',
@@ -655,11 +641,12 @@ export const RateListView: React.FC = () => {
                 </span>
                 <input
                   type="number"
-                  value={item.todayMaund === 0 ? '' : item.todayMaund}
+                  step="any"
+                  value={item.todayRate === 0 ? '' : item.todayRate}
                   placeholder="0"
                   onChange={(e) => {
                     const val = e.target.value;
-                    setDirectMaundRate(item.id, val === '' ? 0 : parseFloat(val) || 0);
+                    setDirectKgRate(item.id, val === '' ? 0 : parseFloat(val) || 0);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
@@ -686,7 +673,7 @@ export const RateListView: React.FC = () => {
                   }}
                 />
                 <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '13px', fontWeight: 800, color: isDark ? '#94A3B8' : '#6B7280' }}>
-                  {t('/ من', '/ Maund')}
+                  {t('/ کلو', '/ KG')}
                 </span>
               </div>
 
@@ -706,7 +693,7 @@ export const RateListView: React.FC = () => {
                       fontFamily: 'var(--font-mono)',
                     }}
                   >
-                    {isUrdu ? `+${diff.toLocaleString()} روپے اضافہ (فی من) ▲` : `+Rs ${diff.toLocaleString()} Increase (per maund) ▲`}
+                    {isUrdu ? `+${diff} روپے اضافہ (فی کلو) ▲` : `+Rs ${diff} Increase (per KG) ▲`}
                   </span>
                 ) : diff < 0 ? (
                   <span
@@ -722,7 +709,7 @@ export const RateListView: React.FC = () => {
                       fontFamily: 'var(--font-mono)',
                     }}
                   >
-                    {isUrdu ? `${diff.toLocaleString()} روپے کمی (فی من) ▼` : `Rs ${diff.toLocaleString()} Decrease (per maund) ▼`}
+                    {isUrdu ? `${diff} روپے کمی (فی کلو) ▼` : `Rs ${diff} Decrease (per KG) ▼`}
                   </span>
                 ) : (
                   <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: isDark ? '#94A3B8' : '#9CA3AF', fontWeight: 700 }}>
@@ -735,146 +722,7 @@ export const RateListView: React.FC = () => {
         })}
       </div>
 
-      {/* 4. PISAI SERVICE CHARGES (2 Large Dashboard Cards matching PisaiBillingScreen) */}
-      <div style={{ marginTop: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <span style={{ fontSize: '24px' }}>⚙️</span>
-          <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '22px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0 }}>
-            {t('گندم چکی پسائی و صفائی کے ریٹس', 'Wheat Cleaning & Milling Rates')}
-          </h3>
-          <span
-            style={{
-              fontSize: isUrdu ? '13px' : '11.5px',
-              fontWeight: 800,
-              color: isDark ? '#34D399' : '#065F46',
-              backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#D1FAE5',
-              padding: '2px 8px',
-              borderRadius: '6px',
-              border: isDark ? '1px solid rgba(16, 185, 129, 0.3)' : 'none',
-            }}
-          >
-            {t('فی من نرخ (روپے / 40 کلو)', 'Rate per Maund (Rs / 40 KG)')}
-          </span>
-        </div>
-
-        <div className="rates-pisai-2-grid">
-          {pisaiRates.map((p) => {
-            const perKg = p.ratePerMaund > 0 ? p.ratePerMaund / 40 : 0;
-            const pisaiTitle = p.id === 'safai_pisai'
-              ? t('صفائی و پسائی', 'Cleaning & Milling')
-              : t('صرف پسائی', 'Grinding Only');
-            const pisaiNote = p.id === 'safai_pisai'
-              ? t('گندم واشنگ، چھانٹی، صفائی اور چکی پتھر پسائی', 'Washing, sorting, cleaning & stone milling')
-              : t('کسٹمر کی لائی گئی صاف گندم کی پسائی', 'Direct milling of customer cleaned wheat');
-
-            return (
-              <div
-                key={p.id}
-                className="dash-card-animated"
-                style={{
-                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderRadius: '16px',
-                  border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
-                  padding: '18px 20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.2)' : 'none',
-                  transition: 'all 0.22s ease',
-                }}
-              >
-                {/* Squircle Tile + Titles */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div
-                    style={{
-                      width: '54px',
-                      height: '54px',
-                      borderRadius: '14px',
-                      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: 'none',
-                      border: isDark ? '1.5px solid #334155' : '1.5px solid #EBE4DA',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {p.id === 'safai_pisai' ? <SafaiPisaiSvg /> : <PisaiOnlySvg />}
-                  </div>
-
-                  <div>
-                    <h4 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '30px' : '20px', fontWeight: 900, color: isDark ? '#FFFFFF' : '#1F2937', margin: 0, lineHeight: 1.2 }}>
-                      {pisaiTitle}
-                    </h4>
-                    <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#CBD5E1' : '#6B7280', fontWeight: 600, marginTop: '2px' }}>
-                      {pisaiNote}
-                    </div>
-                    <div
-                      className={isUrdu ? 'font-nastaleeq' : ''}
-                      style={{
-                        fontSize: isUrdu ? '18px' : '13px',
-                        color: isDark ? '#FDE047' : '#78350F',
-                        fontWeight: 900,
-                        backgroundColor: isDark ? 'rgba(245, 158, 11, 0.18)' : '#FEF3C7',
-                        border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : 'none',
-                        padding: '2px 8px',
-                        borderRadius: '6px',
-                        display: 'inline-block',
-                        marginTop: '4px',
-                        fontFamily: isUrdu ? 'inherit' : 'var(--font-mono)',
-                      }}
-                    >
-                      {isUrdu ? `فی کلو: ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)} روپے` : `Per KG: Rs ${perKg % 1 === 0 ? perKg : perKg.toFixed(2)}`}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Direct Price Input (Rate Per Mann / 40 KG) */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '15px', fontWeight: 800, color: isDark ? '#FBBF24' : '#8C582B' }}>Rs</span>
-                  <input
-                    type="number"
-                    value={p.ratePerMaund === 0 ? '' : p.ratePerMaund}
-                    placeholder="0"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setDirectPisaiRate(p.id, val === '' ? 0 : parseFloat(val) || 0);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                        e.preventDefault();
-                      }
-                    }}
-                    onWheel={(e) => (e.target as HTMLElement).blur()}
-                    onFocus={(e) => e.target.select()}
-                    style={{
-                      width: '95px',
-                      height: '38px',
-                      textAlign: 'center',
-                      direction: 'ltr',
-                      unicodeBidi: 'isolate',
-                      borderRadius: '8px',
-                      border: isDark ? '1.5px solid #475569' : '2px solid #8C582B',
-                      backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                      color: isDark ? '#F8FAFC' : '#1F2937',
-                      fontSize: '18px',
-                      fontWeight: 900,
-                      fontFamily: 'var(--font-mono)',
-                      outline: 'none',
-                      boxShadow: 'none',
-                    }}
-                  />
-                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12.5px', fontWeight: 800, color: isDark ? '#94A3B8' : '#6B7280' }}>
-                    {t('/ من (40 KG)', '/ Maund (40 KG)')}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 5. BOTTOM BAR: QUICK CONTROLS & OFFICIAL POLICY */}
+      {/* 4. BOTTOM BAR: QUICK CONTROLS & OFFICIAL POLICY */}
       <div
         style={{
           backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
@@ -979,7 +827,7 @@ export const RateListView: React.FC = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header (ALWAYS PINNED AT TOP) */}
+            {/* Modal Header */}
             <div
               className="no-print"
               style={{
@@ -1075,11 +923,11 @@ export const RateListView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 3-Column Rates Table Header */}
+                {/* Rates Table Header */}
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '1.4fr 1.1fr 1fr',
+                    gridTemplateColumns: '1.5fr 1fr 1fr',
                     backgroundColor: '#0F172A',
                     color: '#FFFFFF',
                     borderRadius: '8px',
@@ -1092,21 +940,20 @@ export const RateListView: React.FC = () => {
                   className={isUrdu ? 'font-nastaleeq' : ''}
                 >
                   <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('پروڈکٹ کا نام', 'Product')}</span>
-                  <span style={{ textAlign: 'center' }}>{t('فی کلو ریٹ', 'Rate / KG')}</span>
-                  <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('فی من (40 کلو)', 'Rate / Maund')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('کل کا ریٹ (فی کلو)', 'Yesterday / KG')}</span>
+                  <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('آج کا ریٹ (فی کلو)', 'Today Rate / KG')}</span>
                 </div>
 
                 {/* Products Rates Rows */}
                 <div style={{ display: 'flex', flexDirection: 'column', marginTop: '4px' }}>
                   {rates.map((r, idx) => {
-                    const perKg = (r.todayMaund / 40).toFixed(2).replace(/\.00$/, '');
                     return (
                       <div
                         key={r.id}
                         style={{
                           display: 'grid',
-                          gridTemplateColumns: '1.4fr 1.1fr 1fr',
-                          padding: '7px 12px',
+                          gridTemplateColumns: '1.5fr 1fr 1fr',
+                          padding: '8px 12px',
                           borderBottom: '1px solid #E2E8F0',
                           backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
                           alignItems: 'center',
@@ -1127,117 +974,32 @@ export const RateListView: React.FC = () => {
                         <div style={{ textAlign: 'center' }}>
                           <span
                             style={{
+                              color: '#64748B',
+                              fontSize: isUrdu ? '13px' : '11px',
+                              fontWeight: 700,
+                              fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                            }}
+                          >
+                            {isUrdu ? `${r.yesterdayRate} روپے` : `Rs ${r.yesterdayRate}`}
+                          </span>
+                        </div>
+                        <div style={{ textAlign: isUrdu ? 'left' : 'right' }}>
+                          <span
+                            style={{
                               backgroundColor: '#FFFBEB',
                               color: '#B45309',
                               padding: '2px 8px',
                               borderRadius: '6px',
-                              fontSize: isUrdu ? '13px' : '11px',
-                              fontWeight: 800,
+                              fontSize: isUrdu ? '14px' : '12px',
+                              fontWeight: 900,
                               fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
                               border: '1px solid #FDE68A',
                               display: 'inline-block',
                             }}
                           >
-                            {isUrdu ? `${perKg} روپے / کلو` : `Rs ${perKg}/KG`}
+                            {isUrdu ? `${r.todayRate} روپے / کلو` : `Rs ${r.todayRate} / KG`}
                           </span>
                         </div>
-                        <span
-                          dir="ltr"
-                          style={{
-                            fontWeight: 900,
-                            color: '#0F172A',
-                            fontSize: '15px',
-                            fontFamily: 'var(--font-mono)',
-                            textAlign: isUrdu ? 'left' : 'right',
-                          }}
-                        >
-                          Rs {r.todayMaund.toLocaleString()}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Milling Charges Section */}
-                <div style={{ marginTop: '14px' }}>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1.4fr 1.1fr 1fr',
-                      backgroundColor: '#1E293B',
-                      color: '#FFFFFF',
-                      borderRadius: '8px',
-                      padding: '6px 12px',
-                      fontSize: isUrdu ? '14px' : '11px',
-                      fontWeight: 900,
-                      alignItems: 'center',
-                      direction: isUrdu ? 'rtl' : 'ltr',
-                      marginBottom: '2px',
-                    }}
-                    className={isUrdu ? 'font-nastaleeq' : ''}
-                  >
-                    <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('پسائی و صفائی کے ریٹس', 'Milling Charges')}</span>
-                    <span style={{ textAlign: 'center' }}>{t('فی کلو', 'Per KG')}</span>
-                    <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('فی من', 'Per Maund')}</span>
-                  </div>
-                  {pisaiRates.map((p, idx) => {
-                    const title = p.id === 'safai_pisai'
-                      ? t('صفائی اور پسائی', 'Cleaning & Milling')
-                      : t('صرف پسائی', 'Milling Only');
-                    const perKg = (p.ratePerMaund / 40).toFixed(2).replace(/\.00$/, '');
-                    return (
-                      <div
-                        key={p.id}
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1.4fr 1.1fr 1fr',
-                          padding: '7px 12px',
-                          borderBottom: '1px solid #E2E8F0',
-                          backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
-                          alignItems: 'center',
-                          direction: isUrdu ? 'rtl' : 'ltr',
-                        }}
-                      >
-                        <span
-                          className={isUrdu ? 'font-nastaleeq' : ''}
-                          style={{
-                            fontWeight: 800,
-                            fontSize: isUrdu ? '16px' : '13px',
-                            color: '#334155',
-                            textAlign: isUrdu ? 'right' : 'left',
-                          }}
-                        >
-                          {title}
-                        </span>
-                        <div style={{ textAlign: 'center' }}>
-                          <span
-                            style={{
-                              backgroundColor: '#EFF6FF',
-                              color: '#1D4ED8',
-                              padding: '2px 8px',
-                              borderRadius: '6px',
-                              fontSize: isUrdu ? '13px' : '11px',
-                              fontWeight: 800,
-                              fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
-                              border: '1px solid #DBEAFE',
-                              display: 'inline-block',
-                            }}
-                          >
-                            {isUrdu ? `${perKg} روپے / کلو` : `Rs ${perKg}/KG`}
-                          </span>
-                        </div>
-                        <span
-                          dir="ltr"
-                          style={{
-                            fontWeight: 900,
-                            color: '#0F172A',
-                            fontSize: '15px',
-                            fontFamily: 'var(--font-mono)',
-                            textAlign: isUrdu ? 'left' : 'right',
-                          }}
-                        >
-                          Rs {p.ratePerMaund.toLocaleString()}
-                        </span>
                       </div>
                     );
                   })}
@@ -1267,7 +1029,7 @@ export const RateListView: React.FC = () => {
               </div>
             </div>
 
-            {/* Modal Actions Footer (ALWAYS PINNED AT BOTTOM - NEVER CUT OFF) */}
+            {/* Modal Actions Footer */}
             <div
               className="no-print"
               style={{
@@ -1409,11 +1171,11 @@ export const RateListView: React.FC = () => {
 
               <div>
                 <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px', fontWeight: 800, color: isDark ? '#E2E8F0' : '#374151', display: 'block', marginBottom: '6px' }}>
-                  {t('فی من ریٹ (روپے / 40 کلو):', 'Rate per Maund (Rs / 40 KG):')}
+                  {t('فی کلو ریٹ (روپے / کلو):', 'Rate per KG (Rs / KG):')}
                 </label>
                 <input
                   type="number"
-                  placeholder="5600"
+                  placeholder="140"
                   value={newItemRate}
                   onChange={(e) => setNewItemRate(e.target.value)}
                   style={{

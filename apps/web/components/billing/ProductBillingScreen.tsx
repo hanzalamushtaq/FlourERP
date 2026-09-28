@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Product } from '../ui/TouchCard';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
-import { Printer, Tag, Check, BookOpen, Plus, Trash2, X, AlertTriangle, Lock, RotateCcw } from 'lucide-react';
+import { Printer, Tag, Check, BookOpen, Plus, Trash2, X, AlertTriangle, Lock, RotateCcw, Search, UserCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getSession, ensureValidToken, clearSession } from '../../lib/auth';
@@ -164,6 +164,8 @@ export interface BillItem {
   itemName: string;
   quantity: string;
   ratePerKg: number;
+  linePrice?: string;
+  calcMode?: 'WEIGHT_TO_AMOUNT' | 'AMOUNT_TO_WEIGHT';
 }
 
 export interface ProductBillingScreenProps {
@@ -191,7 +193,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
     emoji: '🌾',
   });
 
-  // Load custom products from localStorage or backend API
+  // Load products: use localStorage for instant display, but ALWAYS fetch active products from backend API
   useEffect(() => {
     try {
       const saved = localStorage.getItem(PRODUCTS_STORAGE_KEY);
@@ -199,7 +201,6 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           setProducts(parsed);
-          return;
         }
       }
     } catch {}
@@ -211,7 +212,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
           const seen = new Set<string>();
           const mapped: Product[] = [];
           json.data.products.forEach((p: any, idx: number) => {
-            const key = `${p.nameUr?.trim()}_${p.currentRate}`;
+            const key = `${p.nameUr?.trim()}_${p.nameEn?.trim()}`;
             if (!seen.has(key)) {
               seen.add(key);
               mapped.push({
@@ -245,6 +246,8 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
       itemName: isUrdu ? INITIAL_PRODUCTS[0].nameUr : INITIAL_PRODUCTS[0].nameEn,
       quantity: '10',
       ratePerKg: INITIAL_PRODUCTS[0].ratePerKg,
+      linePrice: String(Math.round(10 * INITIAL_PRODUCTS[0].ratePerKg)),
+      calcMode: 'WEIGHT_TO_AMOUNT',
     },
   ]);
   const [activeRowIndex, setActiveRowIndex] = useState<number>(0);
@@ -256,11 +259,23 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
         setBillItems((prev) => {
           const updated = [...prev];
           if (updated.length > 0) {
+            const cur = updated[0];
+            let newQty = cur.quantity;
+            let newPrice = cur.linePrice;
+            if (cur.calcMode === 'AMOUNT_TO_WEIGHT' && cur.linePrice && match.ratePerKg > 0) {
+              const pVal = parseFloat(cur.linePrice) || 0;
+              newQty = String(Math.round((pVal / match.ratePerKg) * 100) / 100);
+            } else {
+              const qVal = parseFloat(cur.quantity) || 0;
+              newPrice = qVal > 0 ? String(Math.round(qVal * match.ratePerKg)) : '';
+            }
             updated[0] = {
-              ...updated[0],
+              ...cur,
               productId: match.id,
               itemName: isUrdu ? match.nameUr : match.nameEn,
               ratePerKg: match.ratePerKg,
+              quantity: newQty,
+              linePrice: newPrice,
             };
           }
           return updated;
@@ -278,11 +293,14 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
   // Customer State & Autocomplete
   const [customerName, setCustomerName] = useState<string>('');
   const [customerPhone, setCustomerPhone] = useState<string>('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedCustomerCredit, setSelectedCustomerCredit] = useState<number | null>(null);
+  const [dbCustomers, setDbCustomers] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedCustomerIndex, setSelectedCustomerIndex] = useState<number>(-1);
   const [selectedProductIndex, setSelectedProductIndex] = useState<number>(-1);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Hover & Tactile States
   const [hoveredBtn, setHoveredBtn] = useState<'cash' | 'credit' | null>(null);
@@ -297,9 +315,22 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
   // Dynamic Input Refs for Navigation
   const itemInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const quantityInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const priceInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const receivedInputRef = useRef<HTMLInputElement>(null);
   const customerNameInputRef = useRef<HTMLInputElement>(null);
   const customerPhoneInputRef = useRef<HTMLInputElement>(null);
+  const customerContainerRef = useRef<HTMLDivElement>(null);
+
+  // Close customer suggestions dropdown on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (customerContainerRef.current && !customerContainerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   // Rate guard check (BILL-04)
   const unpricedItems = billItems.filter(
@@ -309,13 +340,18 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
 
   // Calculations across all multi-item rows
   const subtotal = billItems.reduce((acc, item) => {
+    if (item.calcMode === 'AMOUNT_TO_WEIGHT' && item.linePrice !== undefined && item.linePrice.trim() !== '') {
+      return acc + Math.round(parseFloat(item.linePrice) || 0);
+    }
     const qty = parseFloat(item.quantity) || 0;
     return acc + Math.round(qty * item.ratePerKg);
   }, 0);
 
-  const totalWeight = billItems.reduce((acc, item) => {
-    return acc + (parseFloat(item.quantity) || 0);
-  }, 0);
+  const totalWeight = Math.round(
+    billItems.reduce((acc, item) => {
+      return acc + (parseFloat(item.quantity) || 0);
+    }, 0) * 100
+  ) / 100;
 
   const numDiscount = parseFloat(discountValue) || 0;
   const netTotal = Math.max(0, subtotal - numDiscount);
@@ -331,14 +367,30 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
   const balanceRemaining = Math.max(0, netTotal - numReceived);
   const changeToReturn = Math.max(0, numReceived - netTotal);
 
-  // Focus initial item or quantity on mount (desktop only, to keep mobile keyboard closed)
+  // Prefetch customers from database on mount for instant zero-latency search
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
-      if (quantityInputRefs.current[0]) {
-        quantityInputRefs.current[0]?.focus();
-        quantityInputRefs.current[0]?.select();
+    let isMounted = true;
+    const loadCustomers = async () => {
+      try {
+        const sess = getSession();
+        const res = await fetch(`${getApiBaseUrl()}/api/customers`, {
+          headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && json.success && Array.isArray(json.data?.customers)) {
+            setDbCustomers(json.data.customers);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to prefetch customers:', err);
       }
-    }
+    };
+    loadCustomers();
+    return () => {
+      isMounted = false;
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
   }, []);
 
   // When user taps on a product card at the top
@@ -350,11 +402,25 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
 
     setBillItems((prev) => {
       const updated = [...prev];
+      const cur = updated[targetIdx];
+      let newQty = cur.quantity;
+      let newPrice = cur.linePrice;
+
+      if (cur.calcMode === 'AMOUNT_TO_WEIGHT' && cur.linePrice && p.ratePerKg > 0) {
+        const pVal = parseFloat(cur.linePrice) || 0;
+        newQty = String(Math.round((pVal / p.ratePerKg) * 100) / 100);
+      } else {
+        const qVal = parseFloat(cur.quantity) || 0;
+        newPrice = qVal > 0 ? String(Math.round(qVal * p.ratePerKg)) : '';
+      }
+
       updated[targetIdx] = {
-        ...updated[targetIdx],
+        ...cur,
         productId: p.id,
         itemName: isUrdu ? p.nameUr : p.nameEn,
         ratePerKg: p.ratePerKg,
+        quantity: newQty,
+        linePrice: newPrice,
       };
       return updated;
     });
@@ -381,11 +447,28 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
 
     setBillItems((prev) => {
       const updated = [...prev];
+      const cur = updated[index];
+      const newRate = matched ? matched.ratePerKg : cur.ratePerKg;
+      let newQty = cur.quantity;
+      let newPrice = cur.linePrice;
+
+      if (matched && matched.ratePerKg > 0) {
+        if (cur.calcMode === 'AMOUNT_TO_WEIGHT' && cur.linePrice) {
+          const pVal = parseFloat(cur.linePrice) || 0;
+          newQty = String(Math.round((pVal / matched.ratePerKg) * 100) / 100);
+        } else if (cur.quantity) {
+          const qVal = parseFloat(cur.quantity) || 0;
+          newPrice = String(Math.round(qVal * matched.ratePerKg));
+        }
+      }
+
       updated[index] = {
-        ...updated[index],
+        ...cur,
         itemName: val,
-        productId: matched ? matched.id : updated[index].productId,
-        ratePerKg: matched ? matched.ratePerKg : updated[index].ratePerKg,
+        productId: matched ? matched.id : cur.productId,
+        ratePerKg: newRate,
+        quantity: newQty,
+        linePrice: newPrice,
       };
       return updated;
     });
@@ -403,11 +486,25 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
   const handleSelectProduct = (p: Product, index: number) => {
     setBillItems((prev) => {
       const updated = [...prev];
+      const cur = updated[index];
+      let newQty = cur.quantity;
+      let newPrice = cur.linePrice;
+
+      if (cur.calcMode === 'AMOUNT_TO_WEIGHT' && cur.linePrice && p.ratePerKg > 0) {
+        const pVal = parseFloat(cur.linePrice) || 0;
+        newQty = String(Math.round((pVal / p.ratePerKg) * 100) / 100);
+      } else {
+        const qVal = parseFloat(cur.quantity) || 0;
+        newPrice = qVal > 0 ? String(Math.round(qVal * p.ratePerKg)) : '';
+      }
+
       updated[index] = {
-        ...updated[index],
+        ...cur,
         productId: p.id,
         itemName: isUrdu ? p.nameUr : p.nameEn,
         ratePerKg: p.ratePerKg,
+        quantity: newQty,
+        linePrice: newPrice,
       };
       return updated;
     });
@@ -473,7 +570,65 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
     }
   };
 
-  // Enter key navigation on Quantity input
+  // Quantity change handler with automatic price calculation
+  const handleQuantityChange = (val: string, index: number) => {
+    setBillItems((prev) => {
+      const updated = [...prev];
+      const cur = updated[index];
+      const rate = cur.ratePerKg || 0;
+      let newPrice = cur.linePrice || '';
+
+      if (val.trim() === '') {
+        newPrice = '';
+      } else {
+        const q = parseFloat(val);
+        if (!isNaN(q) && rate > 0) {
+          newPrice = String(Math.round(q * rate));
+        }
+      }
+
+      updated[index] = {
+        ...cur,
+        quantity: val,
+        linePrice: newPrice,
+        calcMode: 'WEIGHT_TO_AMOUNT',
+      };
+      return updated;
+    });
+    setIsReceivedAutoUpdated(true);
+  };
+
+  // Price/Amount change handler with precise weight calculation
+  const handlePriceChange = (val: string, index: number) => {
+    setBillItems((prev) => {
+      const updated = [...prev];
+      const cur = updated[index];
+      const rate = cur.ratePerKg || 0;
+      let newQty = cur.quantity || '';
+
+      if (val.trim() === '') {
+        newQty = '';
+      } else {
+        const p = parseFloat(val);
+        if (!isNaN(p) && rate > 0) {
+          // Precise calculation to max 2 decimal places (e.g. 100 / 140 = 0.71)
+          const raw = p / rate;
+          newQty = String(Math.round(raw * 100) / 100);
+        }
+      }
+
+      updated[index] = {
+        ...cur,
+        linePrice: val,
+        quantity: newQty,
+        calcMode: 'AMOUNT_TO_WEIGHT',
+      };
+      return updated;
+    });
+    setIsReceivedAutoUpdated(true);
+  };
+
+  // Enter key navigation on Quantity input -> moves to Price input
   const handleQuantityKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault();
@@ -481,22 +636,30 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
     }
     if (e.key === 'Enter') {
       e.preventDefault();
-      // When press enter create a new row for new product!
-      const nextIdx = billItems.length;
-      const newRow: BillItem = {
-        id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        productId: '',
-        itemName: '',
-        quantity: '',
-        ratePerKg: 0,
-      };
+      if (priceInputRefs.current[index]) {
+        priceInputRefs.current[index]?.focus();
+        priceInputRefs.current[index]?.select();
+      }
+    }
+  };
 
-      setBillItems((prev) => [...prev, newRow]);
-      setActiveRowIndex(nextIdx);
+  // Enter key navigation on Price input -> adds new row or moves to Payment
+  const handlePriceKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const current = billItems[index];
+      const hasContent = current && (current.itemName.trim() !== '' || (parseFloat(current.quantity) || 0) > 0 || (parseFloat(current.linePrice || '0') > 0));
 
-      setTimeout(() => {
-        itemInputRefs.current[nextIdx]?.focus();
-      }, 50);
+      if (hasContent) {
+        handleAddNewRow();
+      } else {
+        receivedInputRef.current?.focus();
+        receivedInputRef.current?.select();
+      }
     }
   };
 
@@ -509,6 +672,8 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
       itemName: '',
       quantity: '',
       ratePerKg: 0,
+      linePrice: '',
+      calcMode: 'WEIGHT_TO_AMOUNT',
     };
     setBillItems((prev) => [...prev, newRow]);
     setActiveRowIndex(nextIdx);
@@ -527,6 +692,8 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
           itemName: '',
           quantity: '',
           ratePerKg: 0,
+          linePrice: '',
+          calcMode: 'WEIGHT_TO_AMOUNT',
         },
       ]);
       setActiveRowIndex(0);
@@ -613,53 +780,151 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
     }
   };
 
-  // Customer name autocomplete suggestions (Live API with fallback)
+  // Dynamic Customer Search & Suggestions (starts-with prioritized)
   const handleCustomerNameChange = (val: string) => {
     setCustomerName(val);
     setSelectedCustomerCredit(null);
-    setSelectedCustomerIndex(0);
-    if (val.trim().length > 0) {
-      const sess = getSession();
-      fetch(`${getApiBaseUrl()}/api/customers/search?q=${encodeURIComponent(val)}`, {
-        headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.success && json.data.customers && json.data.customers.length > 0) {
-            setSuggestions(json.data.customers);
-            setShowSuggestions(true);
-            setSelectedCustomerIndex(0);
-          } else {
-            const filtered = MOCK_CUSTOMERS.filter((c) =>
-              c.name.toLowerCase().includes(val.toLowerCase())
-            );
-            setSuggestions(filtered);
-            setShowSuggestions(filtered.length > 0);
-            setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
-          }
-        })
-        .catch(() => {
-          const filtered = MOCK_CUSTOMERS.filter((c) =>
-            c.name.toLowerCase().includes(val.toLowerCase())
-          );
-          setSuggestions(filtered);
-          setShowSuggestions(filtered.length > 0);
-          setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
+    setSelectedCustomerId(null);
+
+    const q = val.trim().toLowerCase();
+    if (!q) {
+      if (dbCustomers.length > 0) {
+        setSuggestions(dbCustomers.slice(0, 8));
+        setShowSuggestions(true);
+        setSelectedCustomerIndex(0);
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setSelectedCustomerIndex(-1);
+      }
+      return;
+    }
+
+    // 1. Instant 0ms In-Memory Filter with Starts-With Priority
+    const filterAndSort = (list: any[]) => {
+      const matched = list.filter((c: any) => {
+        const name = (c.name || '').toLowerCase();
+        const phone = (c.phone || '');
+        return name.includes(q) || phone.includes(q);
+      });
+      matched.sort((a: any, b: any) => {
+        const aStarts = (a.name || '').toLowerCase().startsWith(q);
+        const bStarts = (b.name || '').toLowerCase().startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+      return matched;
+    };
+
+    const immediateMatches = filterAndSort(dbCustomers);
+    setSuggestions(immediateMatches);
+    setShowSuggestions(true);
+    setSelectedCustomerIndex(immediateMatches.length > 0 ? 0 : -1);
+
+    // 2. Debounced API search to pick up newly added customers
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const sess = getSession();
+        const res = await fetch(`${getApiBaseUrl()}/api/customers/search?q=${encodeURIComponent(val)}`, {
+          headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
         });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data?.customers)) {
+            setDbCustomers((prev) => {
+              const map = new Map(prev.map((c) => [c.id, c]));
+              json.data.customers.forEach((c: any) => map.set(c.id, c));
+              return Array.from(map.values());
+            });
+            const freshMatches = filterAndSort(json.data.customers);
+            setSuggestions(freshMatches);
+            setShowSuggestions(true);
+          }
+        }
+      } catch {}
+    }, 200);
+  };
+
+  const handleCustomerFocus = () => {
+    const q = customerName.trim().toLowerCase();
+    if (!q) {
+      if (dbCustomers.length > 0) {
+        setSuggestions(dbCustomers.slice(0, 8));
+        setShowSuggestions(true);
+        setSelectedCustomerIndex(0);
+      }
     } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setSelectedCustomerIndex(-1);
+      const matched = dbCustomers.filter((c: any) => {
+        const name = (c.name || '').toLowerCase();
+        const phone = (c.phone || '');
+        return name.includes(q) || phone.includes(q);
+      });
+      matched.sort((a: any, b: any) => {
+        const aStarts = (a.name || '').toLowerCase().startsWith(q);
+        const bStarts = (b.name || '').toLowerCase().startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+      setSuggestions(matched);
+      setShowSuggestions(true);
+      setSelectedCustomerIndex(matched.length > 0 ? 0 : -1);
     }
   };
 
-  const handleSelectCustomer = (cust: { name: string; phone?: string | null; currentBalance?: number }) => {
+  const handleSelectCustomer = (cust: any) => {
     setCustomerName(cust.name);
     setCustomerPhone(cust.phone || '');
-    setSelectedCustomerCredit(cust.currentBalance ?? null);
+    setSelectedCustomerId(cust.id);
+    setSelectedCustomerCredit(cust.currentBalance ?? 0);
     setShowSuggestions(false);
     setSelectedCustomerIndex(-1);
-    customerPhoneInputRef.current?.focus();
+    sound.beep();
+  };
+
+  const handleClearCustomer = () => {
+    setCustomerName('');
+    setCustomerPhone('');
+    setSelectedCustomerId(null);
+    setSelectedCustomerCredit(null);
+    setShowSuggestions(false);
+    setSelectedCustomerIndex(-1);
+    customerNameInputRef.current?.focus();
+  };
+
+  // Reset billing form for fresh new bill entry
+  const resetBillForm = () => {
+    const defaultProduct = products.length > 0 ? products[0] : INITIAL_PRODUCTS[0];
+    setBillItems([
+      {
+        id: `item-${Date.now()}`,
+        productId: defaultProduct.id,
+        itemName: isUrdu ? defaultProduct.nameUr : defaultProduct.nameEn,
+        quantity: '',
+        ratePerKg: defaultProduct.ratePerKg,
+        linePrice: '',
+        calcMode: 'WEIGHT_TO_AMOUNT',
+      },
+    ]);
+    setActiveRowIndex(0);
+    setDiscountValue('0');
+    setShowDiscount(false);
+    setCustomerName('');
+    setCustomerPhone('');
+    setSelectedCustomerId(null);
+    setSelectedCustomerCredit(null);
+    setShowSuggestions(false);
+    setSelectedCustomerIndex(-1);
+    setReceivedAmount('');
+    setIsReceivedAutoUpdated(true);
+    setTimeout(() => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+        quantityInputRefs.current[0]?.focus();
+        quantityInputRefs.current[0]?.select();
+      }
+    }, 100);
   };
 
   // Submit Handler (Atomic Sequence, Rate Guard, Discount Guard via /api/bills)
@@ -709,22 +974,32 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
       // Ensure we have a valid signed backend JWT token
       let token = await ensureValidToken(sess);
 
+      const hasAmountToWeight = validRows.some((r) => r.calcMode === 'AMOUNT_TO_WEIGHT');
       const payload = {
-        calculationMode: 'WEIGHT_TO_AMOUNT',
+        calculationMode: hasAmountToWeight ? 'AMOUNT_TO_WEIGHT' : 'WEIGHT_TO_AMOUNT',
         customerName: customerName.trim() || undefined,
         customerPhone: customerPhone.trim() || undefined,
         items: validRows.map((r) => {
           const matched =
+            products.find((p) => p.id === r.productId) ||
             products.find(
               (p) =>
-                p.id === r.productId ||
                 p.nameEn.toLowerCase() === r.itemName.toLowerCase() ||
-                p.nameUr === r.itemName
-            ) || products[0];
+                p.nameUr.trim() === r.itemName.trim() ||
+                (r.itemName && p.nameEn.toLowerCase().includes(r.itemName.toLowerCase()))
+            ) ||
+            products[0];
+          const lineTotal =
+            r.calcMode === 'AMOUNT_TO_WEIGHT' && r.linePrice !== undefined && r.linePrice.trim() !== ''
+              ? Math.round(parseFloat(r.linePrice) || 0)
+              : Math.round((parseFloat(r.quantity) || 0) * r.ratePerKg);
+          const qty = Math.round((parseFloat(r.quantity) || 0) * 100) / 100;
           return {
             productId: matched ? matched.id : r.productId,
-            quantityKg: parseFloat(r.quantity) || 0,
-            totalAmount: Math.round((parseFloat(r.quantity) || 0) * r.ratePerKg),
+            productName: r.itemName || matched?.nameEn,
+            quantityKg: qty,
+            ratePerKg: r.ratePerKg,
+            totalAmount: lineTotal,
           };
         }),
         discount: numDiscount,
@@ -812,13 +1087,17 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
 
       const receiptItems = validRows.map((it) => {
         const prod = products.find((p) => p.id === it.productId);
-        const qty = parseFloat(it.quantity) || 0;
+        const qty = Math.round((parseFloat(it.quantity) || 0) * 100) / 100;
+        const lineTotal =
+          it.calcMode === 'AMOUNT_TO_WEIGHT' && it.linePrice !== undefined && it.linePrice.trim() !== ''
+            ? Math.round(parseFloat(it.linePrice) || 0)
+            : Math.round(qty * it.ratePerKg);
         return {
           nameEn: prod ? prod.nameEn : it.itemName,
           nameUr: prod ? prod.nameUr : it.itemName,
           weightKg: qty,
           ratePerKg: it.ratePerKg,
-          total: Math.round(qty * it.ratePerKg),
+          total: lineTotal,
         };
       });
 
@@ -843,6 +1122,9 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
 
       setReceiptData(receipt);
       setIsReceiptOpen(true);
+
+      // Auto-refresh / reset for next bill entry immediately
+      resetBillForm();
     } catch (err: any) {
       sound.playWarningSound();
       alert(`Error: ${err.message}`);
@@ -1578,7 +1860,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                       )}
                     </div>
 
-                    {/* Input 2: Quantity */}
+                    {/* Input 2: Quantity / Weight */}
                     <div style={{ position: 'relative' }}>
                       <label
                         className={isUrdu ? 'font-nastaleeq' : ''}
@@ -1590,7 +1872,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                           marginBottom: '6px',
                         }}
                       >
-                        {t('مقدار (کلو):', 'Quantity (KG):')}
+                        {t('وزن (کلو):', 'Weight (KG):')}
                       </label>
                       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                         <input
@@ -1604,15 +1886,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                           onFocus={() => {
                             setActiveRowIndex(idx);
                           }}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setBillItems((prev) => {
-                              const updated = [...prev];
-                              updated[idx] = { ...updated[idx], quantity: val };
-                              return updated;
-                            });
-                            setIsReceivedAutoUpdated(true);
-                          }}
+                          onChange={(e) => handleQuantityChange(e.target.value, idx)}
                           onKeyDown={(e) => handleQuantityKeyDown(e, idx)}
                           onWheel={(e) => (e.target as HTMLElement).blur()}
                           style={{
@@ -1647,6 +1921,71 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                           }}
                         >
                           {t('کلو', 'KG')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Input 3: Price / Amount */}
+                    <div style={{ position: 'relative' }}>
+                      <label
+                        className={isUrdu ? 'font-nastaleeq' : ''}
+                        style={{
+                          display: 'block',
+                          fontSize: isUrdu ? '18px' : '14px',
+                          fontWeight: 900,
+                          color: isDark ? '#E2E8F0' : '#1E293B',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        {t('رقم (روپے):', 'Price (Rs):')}
+                      </label>
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <input
+                          ref={(el) => {
+                            priceInputRefs.current[idx] = el;
+                          }}
+                          type="number"
+                          step="any"
+                          placeholder="1400"
+                          value={item.linePrice !== undefined ? item.linePrice : ''}
+                          onFocus={() => {
+                            setActiveRowIndex(idx);
+                          }}
+                          onChange={(e) => handlePriceChange(e.target.value, idx)}
+                          onKeyDown={(e) => handlePriceKeyDown(e, idx)}
+                          onWheel={(e) => (e.target as HTMLElement).blur()}
+                          style={{
+                            width: '100%',
+                            height: '52px',
+                            borderRadius: '10px',
+                            border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                            backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+                            fontSize: '24px',
+                            fontWeight: 900,
+                            fontFamily: 'var(--font-mono)',
+                            color: isDark ? '#38BDF8' : '#1877F2',
+                            padding: '0 56px 0 14px',
+                            direction: 'ltr',
+                            unicodeBidi: 'isolate',
+                            outline: 'none',
+                            boxShadow: 'none',
+                          }}
+                        />
+                        <span
+                          className={isUrdu ? 'font-nastaleeq' : ''}
+                          style={{
+                            position: 'absolute',
+                            right: '12px',
+                            fontSize: isUrdu ? '18px' : '13px',
+                            fontWeight: 900,
+                            color: isDark ? '#38BDF8' : '#1877F2',
+                            backgroundColor: isDark ? '#1E293B' : '#EFF6FF',
+                            border: isDark ? '1px solid #334155' : '1px solid #BFDBFE',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                          }}
+                        >
+                          {t('روپے', 'Rs')}
                         </span>
                       </div>
                     </div>
@@ -1775,87 +2114,135 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
             </div>
           </div>
 
-          {/* Customer Name */}
-          <div style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                {t('گاہک کا نام (اختیاری):', 'Customer Name (Optional):')}
-              </span>
-              {balanceRemaining > 0 && (
+          {/* Customer Search Bar & Suggestions */}
+          <div ref={customerContainerRef} style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Search size={16} color={isDark ? '#60A5FA' : '#1877F2'} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
+                  {t('گاہک تلاش کریں / منتخب کریں:', 'Search & Select Customer:')}
+                </span>
+              </div>
+              {balanceRemaining > 0 && !selectedCustomerId && (
                 <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: '#F87171', fontWeight: 800 }}>
-                  {t('* ادھار کے لیے نام ضروری ہے', '* Name is required for credit')}
+                  {t('* ادھار کے لیے گاہک کا انتخاب ضروری ہے', '* Customer required for credit')}
                 </span>
               )}
             </div>
 
-            <input
-              ref={customerNameInputRef}
-              type="text"
-              placeholder={t('گاہک کا نام لکھیں یا خالی چھوڑ کر Enter دبائیں...', 'Enter customer name or press Enter if empty...')}
-              value={customerName}
-              onChange={(e) => handleCustomerNameChange(e.target.value)}
-              onKeyDown={(e) => {
-                if (showSuggestions && suggestions.length > 0) {
-                  if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    setSelectedCustomerIndex((prev) => (prev + 1) % suggestions.length);
-                    return;
-                  }
-                  if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    setSelectedCustomerIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
-                    return;
-                  }
-                  if (e.key === 'Enter') {
-                    if (selectedCustomerIndex >= 0 && selectedCustomerIndex < suggestions.length) {
+            {/* Input with Search Icon & Clear Button */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  pointerEvents: 'none',
+                  color: isDark ? '#64748B' : '#94A3B8',
+                }}
+              >
+                <Search size={18} />
+              </div>
+
+              <input
+                ref={customerNameInputRef}
+                type="text"
+                placeholder={t('گاہک کا نام درج کریں...', 'Enter customer name...')}
+                value={customerName}
+                onFocus={handleCustomerFocus}
+                onChange={(e) => handleCustomerNameChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (showSuggestions && suggestions.length > 0) {
+                    if (e.key === 'ArrowDown') {
                       e.preventDefault();
-                      handleSelectCustomer(suggestions[selectedCustomerIndex]);
+                      setSelectedCustomerIndex((prev) => (prev + 1) % suggestions.length);
+                      return;
+                    }
+                    if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setSelectedCustomerIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+                      return;
+                    }
+                    if (e.key === 'Enter') {
+                      if (selectedCustomerIndex >= 0 && selectedCustomerIndex < suggestions.length) {
+                        e.preventDefault();
+                        handleSelectCustomer(suggestions[selectedCustomerIndex]);
+                        return;
+                      }
+                    }
+                    if (e.key === 'Escape') {
+                      e.preventDefault();
+                      setShowSuggestions(false);
                       setSelectedCustomerIndex(-1);
                       return;
                     }
                   }
-                  if (e.key === 'Escape') {
+
+                  if (e.key === 'Enter') {
                     e.preventDefault();
                     setShowSuggestions(false);
-                    setSelectedCustomerIndex(-1);
-                    return;
+                    handleFinalSubmit(false);
                   }
-                }
+                }}
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  width: '100%',
+                  height: '50px',
+                  borderRadius: '10px',
+                  border: selectedCustomerId
+                    ? (isDark ? '2px solid #10B981' : '2px solid #059669')
+                    : showSuggestions
+                    ? (isDark ? '2px solid #3B82F6' : '2px solid #2563EB')
+                    : (isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1'),
+                  backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+                  paddingLeft: '44px',
+                  paddingRight: customerName ? '44px' : '14px',
+                  fontSize: isUrdu ? '19px' : '15px',
+                  fontWeight: 700,
+                  outline: 'none',
+                  boxShadow: 'none',
+                  textAlign: 'left',
+                  color: isDark ? '#F8FAFC' : '#0F172A',
+                  transition: 'border-color 0.15s ease',
+                }}
+              />
 
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  // If empty take to save and print (or directly save & print)
-                  handleFinalSubmit(false);
-                }
-              }}
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{
-                width: '100%',
-                height: '50px',
-                borderRadius: '10px',
-                border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
-                backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
-                padding: '0 14px',
-                fontSize: isUrdu ? '20px' : '15px',
-                fontWeight: 700,
-                outline: 'none',
-                boxShadow: 'none',
-                textAlign: 'left',
-                color: isDark ? '#F8FAFC' : '#0F172A',
-              }}
-            />
+              {/* Clear button when text entered */}
+              {customerName && (
+                <button
+                  type="button"
+                  onClick={handleClearCustomer}
+                  title={t('صاف کریں', 'Clear')}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    width: '26px',
+                    height: '26px',
+                    borderRadius: '50%',
+                    backgroundColor: isDark ? '#334155' : '#E2E8F0',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: isDark ? '#CBD5E1' : '#475569',
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
 
-            {/* Selected Customer Previous Balance Badge */}
-            {selectedCustomerCredit !== null && (
+            {/* Selected Customer Active Status Banner */}
+            {selectedCustomerId && (
               <div
                 style={{
                   marginTop: '6px',
-                  padding: '5px 10px',
-                  borderRadius: '6px',
-                  backgroundColor: selectedCustomerCredit > 0
-                    ? (isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2')
-                    : (isDark ? 'rgba(34, 197, 94, 0.15)' : '#F0FDF4'),
-                  border: `1px solid ${selectedCustomerCredit > 0 ? (isDark ? '#EF4444' : '#FCA5A5') : (isDark ? '#22C55E' : '#86EFAC')}`,
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5',
+                  border: isDark ? '1px solid #059669' : '1px solid #A7F3D0',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -1863,17 +2250,48 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                   fontWeight: 800,
                 }}
               >
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: selectedCustomerCredit > 0 ? (isDark ? '#FCA5A5' : '#991B1B') : (isDark ? '#86EFAC' : '#166534') }}>
-                  {t('سابقہ واجب الادا ادھار:', 'Previous Customer Credit:')}
-                </span>
-                <span style={{ color: selectedCustomerCredit > 0 ? (isDark ? '#F87171' : '#DC2626') : (isDark ? '#4ADE80' : '#16A34A'), fontSize: '13px' }}>
-                  {isUrdu ? `${selectedCustomerCredit.toLocaleString()} روپے` : `Rs ${selectedCustomerCredit.toLocaleString()}`}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <UserCheck size={16} color="#059669" />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: isDark ? '#6EE7B7' : '#065F46', fontSize: '13px' }}>
+                    {t('منتخب گاہک:', 'Selected:')} <strong>{customerName}</strong>
+                    {customerPhone && <span style={{ marginLeft: '4px', opacity: 0.8 }}>({customerPhone})</span>}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: 900,
+                      backgroundColor: (selectedCustomerCredit || 0) > 0 ? (isDark ? '#7F1D1D' : '#FEE2E2') : (isDark ? '#064E3B' : '#D1FAE5'),
+                      color: (selectedCustomerCredit || 0) > 0 ? (isDark ? '#FCA5A5' : '#DC2626') : (isDark ? '#6EE7B7' : '#047857'),
+                    }}
+                  >
+                    {(selectedCustomerCredit || 0) > 0
+                      ? `${t('سابقہ ادھار', 'Previous Due')}: Rs ${selectedCustomerCredit?.toLocaleString()}`
+                      : t('صاف کھاتہ (کوئی ادھار نہیں)', 'Clean Ledger (0 Due)')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleClearCustomer}
+                    style={{
+                      border: 'none',
+                      background: 'none',
+                      color: isDark ? '#94A3B8' : '#64748B',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    {t('تبدیل کریں', 'Change')}
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* Suggestions Dropdown */}
-            {showSuggestions && suggestions.length > 0 && (
+            {/* Dynamic Suggestions Dropdown */}
+            {showSuggestions && (
               <div
                 onMouseDown={(e) => e.preventDefault()}
                 style={{
@@ -1882,17 +2300,40 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                   right: 0,
                   left: 0,
                   backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-                  borderRadius: '8px',
-                  border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.25)',
-                  zIndex: 20,
-                  maxHeight: '160px',
+                  borderRadius: '10px',
+                  border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                  boxShadow: '0 12px 28px rgba(0,0,0,0.3)',
+                  zIndex: 100,
+                  maxHeight: '220px',
                   overflowY: 'auto',
                   marginTop: '4px',
                 }}
               >
+                {/* Header hint */}
+                <div
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    color: isDark ? '#94A3B8' : '#64748B',
+                    backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
+                    borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {suggestions.length > 0
+                      ? t(`ڈیٹا بیس سے تجاویز (${suggestions.length})`, `Customers from Database (${suggestions.length})`)
+                      : t('کوئی گاہک نہیں ملا', 'No customer found')}
+                  </span>
+                  <span>{t('↑↓ سے چنیں، Enter دبائیں', '↑↓ navigate, Enter select')}</span>
+                </div>
+
                 {suggestions.map((c, cIdx) => {
                   const isHighlighted = cIdx === selectedCustomerIndex;
+                  const initial = (c.name || 'C').charAt(0).toUpperCase();
+
                   return (
                     <div
                       key={c.id || cIdx}
@@ -1920,37 +2361,110 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                         alignItems: 'center',
                         backgroundColor: isHighlighted ? (isDark ? '#334155' : '#EFF6FF') : (isDark ? '#1E293B' : '#FFFFFF'),
                         borderLeft: isHighlighted ? '4px solid #1877F2' : '4px solid transparent',
+                        borderBottom: isDark ? '1px solid #293548' : '1px solid #F1F5F9',
                         transition: 'background-color 0.1s ease',
                       }}
                     >
-                      <div>
-                        <span className="font-nastaleeq" style={{ fontWeight: 800, color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A'), fontSize: isUrdu ? '18px' : '15px' }}>
-                          {c.name}
-                        </span>
-                        {c.phone && (
-                          <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '11px', marginLeft: '6px' }}>
-                            ({c.phone})
-                          </span>
-                        )}
-                      </div>
-                      {c.currentBalance !== undefined && c.currentBalance > 0 && (
-                        <span
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {/* Initial Avatar Bubble */}
+                        <div
                           style={{
-                            color: isDark ? '#FCA5A5' : '#DC2626',
-                            backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEE2E2',
-                            border: isDark ? '1px solid #EF4444' : 'none',
-                            padding: '1px 6px',
-                            borderRadius: '4px',
-                            fontSize: '11px',
-                            fontWeight: 800,
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            backgroundColor: isHighlighted ? '#1877F2' : (isDark ? '#334155' : '#E0E7FF'),
+                            color: isHighlighted ? '#FFFFFF' : (isDark ? '#93C5FD' : '#3730A3'),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '14px',
+                            fontWeight: 900,
                           }}
                         >
-                          {isUrdu ? `${c.currentBalance.toLocaleString()} ادھار` : `Rs ${c.currentBalance.toLocaleString()} Due`}
-                        </span>
-                      )}
+                          {initial}
+                        </div>
+
+                        <div>
+                          <span
+                            className={isUrdu ? 'font-nastaleeq' : ''}
+                            style={{
+                              fontWeight: 800,
+                              color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A'),
+                              fontSize: isUrdu ? '18px' : '15px',
+                            }}
+                          >
+                            {c.name}
+                          </span>
+                          {c.phone && (
+                            <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '11px', marginLeft: '6px' }}>
+                              ({c.phone})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {c.currentBalance !== undefined && c.currentBalance > 0 ? (
+                          <span
+                            style={{
+                              color: isDark ? '#FCA5A5' : '#DC2626',
+                              backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEE2E2',
+                              border: isDark ? '1px solid #EF4444' : 'none',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: 800,
+                            }}
+                          >
+                            {isUrdu ? `${c.currentBalance.toLocaleString()} ادھار` : `Rs ${c.currentBalance.toLocaleString()} Due`}
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              color: isDark ? '#6EE7B7' : '#059669',
+                              backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {t('صاف کھاتہ', '0 Due')}
+                          </span>
+                        )}
+                        {isHighlighted && (
+                          <span style={{ fontSize: '11px', color: '#1877F2', fontWeight: 800 }}>↵</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
+
+                {/* If typing a new name not yet in DB */}
+                {customerName.trim() && !suggestions.some((s) => s.name.toLowerCase() === customerName.trim().toLowerCase()) && (
+                  <div
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setShowSuggestions(false);
+                    }}
+                    style={{
+                      padding: '8px 14px',
+                      fontSize: '12px',
+                      color: isDark ? '#94A3B8' : '#64748B',
+                      backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                      borderTop: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                      fontStyle: 'italic',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <Plus size={14} color="#10B981" />
+                    <span>
+                      {t(`نیا گاہک محفوظ ہوگا: "${customerName}"`, `Will save as new customer: "${customerName}"`)}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -2045,7 +2559,11 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                   .filter((it) => (parseFloat(it.quantity) || 0) > 0)
                   .map((it, i) => {
                     const q = parseFloat(it.quantity) || 0;
-                    const tot = Math.round(q * it.ratePerKg);
+                    const formattedQ = Math.round(q * 100) / 100;
+                    const tot =
+                      it.calcMode === 'AMOUNT_TO_WEIGHT' && it.linePrice !== undefined && it.linePrice.trim() !== ''
+                        ? Math.round(parseFloat(it.linePrice) || 0)
+                        : Math.round(q * it.ratePerKg);
                     return (
                       <div
                         key={it.id || i}
@@ -2061,7 +2579,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                           {it.itemName || t('آئٹم', 'Item')}
                         </span>
                         <span style={{ color: isDark ? '#94A3B8' : '#334155', fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: isUrdu ? '16px' : '13px' }}>
-                          {q} {isUrdu ? 'کلو' : 'KG'} × {it.ratePerKg} ={' '}
+                          {formattedQ} {isUrdu ? 'کلو' : 'KG'} × {it.ratePerKg} ={' '}
                           <strong style={{ color: isDark ? '#38BDF8' : '#0F172A', fontSize: isUrdu ? '17px' : '14px', fontWeight: 900 }}>Rs {tot.toLocaleString()}</strong>
                         </span>
                       </div>

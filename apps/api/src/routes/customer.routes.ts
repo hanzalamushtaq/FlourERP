@@ -93,14 +93,32 @@ customerRouter.get('/search', requireAuth, async (req: Request, res: Response) =
       where: query
         ? {
             OR: [
-              { name: { contains: query } },
+              { name: { contains: query, mode: 'insensitive' } },
               { phone: { contains: query } },
             ],
           }
         : undefined,
-      take: 10,
+      take: 25,
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        currentBalance: true,
+        address: true,
+      },
       orderBy: { name: 'asc' },
     });
+
+    if (query) {
+      const qLower = query.toLowerCase();
+      customers.sort((a, b) => {
+        const aStarts = a.name.toLowerCase().startsWith(qLower);
+        const bStarts = b.name.toLowerCase().startsWith(qLower);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return a.name.localeCompare(b.name);
+      });
+    }
 
     return res.json({
       success: true,
@@ -159,7 +177,7 @@ customerRouter.get('/', requireAuth, async (req: Request, res: Response) => {
       where: query
         ? {
             OR: [
-              { name: { contains: query } },
+              { name: { contains: query, mode: 'insensitive' } },
               { phone: { contains: query } },
             ],
           }

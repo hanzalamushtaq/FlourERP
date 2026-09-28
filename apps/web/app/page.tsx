@@ -167,12 +167,34 @@ export default function Home() {
   useEffect(() => {
     const handleUnauthorized = () => {
       const current = getSession();
-      if (current && !current.token?.startsWith('local-token-')) {
-        ensureValidToken(current).catch(() => {});
+      if (current) {
+        ensureValidToken(current, true).then((fresh) => {
+          if (fresh) {
+            const refreshed = getSession();
+            if (refreshed) setCurrentUser(refreshed);
+          } else {
+            setCurrentUser(null);
+          }
+        }).catch(() => {
+          setCurrentUser(null);
+        });
       }
     };
+
+    const handleRefreshed = (e: any) => {
+      if (e.detail) {
+        setCurrentUser(e.detail);
+      }
+    };
+
+    const handleCleared = () => {
+      setCurrentUser(null);
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('flour_erp_unauthorized', handleUnauthorized);
+      window.addEventListener('flour_erp_token_refreshed', handleRefreshed);
+      window.addEventListener('flour_erp_session_cleared', handleCleared);
     }
 
     const saved = getSession();
@@ -184,19 +206,20 @@ export default function Home() {
         setActiveTab(savedTab);
       }
 
-      if (isTokenExpired(saved.token)) {
-        ensureValidToken(saved).then((freshToken) => {
-          if (freshToken) {
-            const refreshed = getSession();
-            if (refreshed) setCurrentUser(refreshed);
-          }
-        }).catch(() => {});
-      }
+      // Always ensure token is verified against the active backend
+      ensureValidToken(saved, isTokenExpired(saved.token)).then((freshToken) => {
+        if (freshToken) {
+          const refreshed = getSession();
+          if (refreshed) setCurrentUser(refreshed);
+        }
+      }).catch(() => {});
     }
 
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('flour_erp_unauthorized', handleUnauthorized);
+        window.removeEventListener('flour_erp_token_refreshed', handleRefreshed);
+        window.removeEventListener('flour_erp_session_cleared', handleCleared);
       }
     };
   }, []);

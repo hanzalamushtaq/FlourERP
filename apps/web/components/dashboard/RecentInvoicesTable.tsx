@@ -50,9 +50,10 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
   const [invoicesList, setInvoicesList] = useState<ShiftInvoiceItem[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<ShiftInvoiceItem | null>(null);
 
-  // Edit fields inside Action Window
-  const [editCustomerName, setEditCustomerName] = useState<string>('');
-  const [editCustomerPhone, setEditCustomerPhone] = useState<string>('');
+  // Edit price / financial fields inside Action Window
+  const [editPrice, setEditPrice] = useState<string>('');
+  const [editReceived, setEditReceived] = useState<string>('');
+  const [editDiscount, setEditDiscount] = useState<string>('0');
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
@@ -64,25 +65,247 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
   const handleRowClick = (inv: ShiftInvoiceItem) => {
     sound.beep();
     setSelectedInvoice(inv);
-    setEditCustomerName(inv.customerName);
-    setEditCustomerPhone(inv.customerPhone || '');
+    setEditPrice(String(inv.totalAmount || 0));
+    setEditReceived(String(inv.rawReceiptData?.cashReceived ?? inv.totalAmount ?? 0));
+    setEditDiscount(String(inv.rawReceiptData?.discount ?? 0));
     setSaveSuccess(false);
   };
 
-  // Save changes to bill customer details
+  // Direct 80mm Thermal Printer Print function
+  const printThermal80mm = (inv: ShiftInvoiceItem) => {
+    sound.beep();
+    try {
+      let iframe = document.getElementById('thermal-print-iframe') as HTMLIFrameElement;
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'thermal-print-iframe';
+        iframe.style.position = 'fixed';
+        iframe.style.top = '-9999px';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const doc = iframe.contentWindow?.document;
+      if (!doc) {
+        window.print();
+        return;
+      }
+
+      const receipt = inv.rawReceiptData;
+      const cleanNum = inv.invoiceNumber.replace(/^[^\d]*/, '') || inv.invoiceNumber;
+      const totalAmt = inv.totalAmount;
+      const custName = inv.customerName;
+      const itemsList = receipt?.items && receipt.items.length > 0 ? receipt.items : [
+        {
+          nameEn: inv.itemsDetail || 'Chakki Product',
+          nameUr: inv.itemsDetail || 'چکی آٹا / پروڈکٹ',
+          weightKg: 1,
+          ratePerKg: totalAmt,
+          total: totalAmt,
+        }
+      ];
+
+      const receiptHtml = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <title>Receipt #${cleanNum}</title>
+          <style>
+            @page {
+              size: 80mm auto !important;
+              margin: 0mm !important;
+            }
+            * {
+              box-sizing: border-box;
+              margin: 0;
+              padding: 0;
+            }
+            body {
+              width: 72mm;
+              margin: 0 auto;
+              padding: 2mm 1mm 16mm 1mm;
+              font-family: 'Courier New', Courier, 'Lucida Console', monospace, system-ui, sans-serif;
+              font-size: 13px;
+              font-weight: 600;
+              color: #000000;
+              line-height: 1.3;
+              background: #ffffff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            .center { text-align: center; }
+            .right { text-align: right; }
+            .left { text-align: left; }
+            .bold { font-weight: 900; }
+            .dashed {
+              border-bottom: 1px dashed #000000;
+              margin: 5px 0;
+            }
+            .solid-double {
+              border-bottom: 2px solid #000000;
+              margin: 5px 0;
+            }
+            .header-title {
+              font-size: 18px;
+              font-weight: 900;
+              text-align: center;
+              margin-bottom: 2px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .sub-header {
+              font-size: 10px;
+              text-align: center;
+              color: #111;
+            }
+            .row {
+              display: flex;
+              justify-content: space-between;
+              align-items: baseline;
+              margin: 2px 0;
+            }
+            .table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 4px 0;
+            }
+            .table th {
+              border-bottom: 1px dashed #000;
+              padding: 3px 0;
+              font-size: 13px;
+              font-weight: 900;
+            }
+            .table td {
+              padding: 3px 0;
+              vertical-align: top;
+            }
+            .large-total {
+              font-size: 18px;
+              font-weight: 900;
+            }
+            .cutter-space {
+              height: 18mm;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="center bold" style="font-size: 13px; margin-bottom: 4px;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+          <div class="header-title">AL-MADINA FLOUR MILLS</div>
+          <div class="sub-header">Main Bazaar, Near Clock Tower • Ph: 0300-1234567</div>
+          <div class="dashed"></div>
+
+          <div class="row">
+            <span>BILL NO:</span>
+            <span class="bold">#${cleanNum}</span>
+          </div>
+          <div class="row">
+            <span>DATE/TIME:</span>
+            <span>${receipt?.timestamp || new Date().toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+          </div>
+          <div class="row">
+            <span>OPERATOR:</span>
+            <span>${receipt?.billerName || 'Hanzala Mushtaq (Owner)'}</span>
+          </div>
+          ${custName ? `
+          <div class="row">
+            <span>CUSTOMER:</span>
+            <span class="bold">${custName}</span>
+          </div>` : ''}
+
+          <div class="dashed"></div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="left">ITEM</th>
+                <th class="center">QTY x RATE</th>
+                <th class="right">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsList.map((it: any) => `
+                <tr>
+                  <td class="left bold">${it.nameUr || it.nameEn}</td>
+                  <td class="center">${Math.round((it.weightKg || 1) * 100) / 100} KG</td>
+                  <td class="right bold">Rs ${it.total || totalAmt}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="dashed"></div>
+
+          <div class="solid-double"></div>
+          <div class="row large-total">
+            <span>TOTAL BILL:</span>
+            <span>Rs ${totalAmt}</span>
+          </div>
+          <div class="solid-double"></div>
+
+          <div class="row">
+            <span>Cash Received:</span>
+            <span class="bold">Rs ${receipt?.cashReceived ?? totalAmt}</span>
+          </div>
+
+          <div class="row">
+            <span>Payment Mode:</span>
+            <span class="bold">${inv.paymentMethod.toUpperCase()}</span>
+          </div>
+
+          <div class="center" style="margin-top: 8px; font-size: 10px;">
+            <div>Thank you for your patronage!</div>
+            <div style="font-size: 9px; margin-top: 2px;">مال موقع پر چیک کریں۔ بعد میں واپسی نہ ہوگی۔</div>
+            <div style="font-size: 8px; margin-top: 4px; color: #555;">* Powered by FlourERP (80mm POS) *</div>
+          </div>
+
+          <div class="cutter-space"></div>
+        </body>
+        </html>
+      `;
+
+      doc.open();
+      doc.write(receiptHtml);
+      doc.close();
+
+      setTimeout(() => {
+        try {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        } catch (e) {
+          console.error('Thermal print error:', e);
+          window.print();
+        }
+      }, 250);
+    } catch (err) {
+      console.error('Thermal print failed:', err);
+      window.print();
+    }
+  };
+
+  // Save changes to bill price & financials
   const handleSaveChanges = async () => {
     if (!selectedInvoice) return;
     setIsSaving(true);
     sound.beep();
 
-    const updatedInv = {
+    const newPriceNum = parseFloat(editPrice) || selectedInvoice.totalAmount;
+    const newReceivedNum = parseFloat(editReceived) || newPriceNum;
+    const newDiscountNum = parseFloat(editDiscount) || 0;
+
+    const updatedInv: ShiftInvoiceItem = {
       ...selectedInvoice,
-      customerName: editCustomerName.trim() || selectedInvoice.customerName,
-      customerPhone: editCustomerPhone.trim(),
+      totalAmount: newPriceNum,
       rawReceiptData: selectedInvoice.rawReceiptData
         ? {
             ...selectedInvoice.rawReceiptData,
-            customerName: editCustomerName.trim() || selectedInvoice.customerName,
+            netTotal: newPriceNum,
+            subtotal: newPriceNum + newDiscountNum,
+            cashReceived: newReceivedNum,
+            discount: newDiscountNum,
           }
         : undefined,
     };
@@ -104,25 +327,25 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
           ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}),
         },
         body: JSON.stringify({
-          customerName: editCustomerName.trim(),
-          customerPhone: editCustomerPhone.trim(),
+          netTotal: newPriceNum,
+          receivedAmount: newReceivedNum,
+          discount: newDiscountNum,
         }),
       });
       setSaveSuccess(true);
+      sound.playSuccessChime();
       setTimeout(() => setSaveSuccess(false), 2000);
-    } catch {
+    } catch (e) {
+      console.error('Save bill price failed:', e);
       setSaveSuccess(true);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Handle print from modal or row
-  const handlePrintClick = (receipt?: ReceiptData) => {
-    sound.beep();
-    if (receipt) {
-      onReprint(receipt);
-    }
+  // Handle print directly to 80mm thermal receipt
+  const handlePrintClick = (invoice: ShiftInvoiceItem) => {
+    printThermal80mm(invoice);
   };
 
   return (
@@ -508,7 +731,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        inv.rawReceiptData && handlePrintClick(inv.rawReceiptData);
+                        handlePrintClick(inv);
                       }}
                       className="touch-active print-btn-animated"
                       title={t('رسید پرنٹ کریں', 'Print Receipt')}
@@ -730,15 +953,16 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                 </div>
               </div>
 
-              {/* Edit Details Section */}
+              {/* Edit Bill Price / Financial Details Section */}
               <div
                 style={{
-                  border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                  border: isDark ? '1.5px solid #2563EB' : '1.5px solid #3B82F6',
                   borderRadius: '12px',
                   padding: '14px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '10px',
+                  backgroundColor: isDark ? 'rgba(37, 99, 235, 0.08)' : '#EFF6FF',
                 }}
               >
                 <div
@@ -746,45 +970,83 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    fontWeight: 800,
+                    fontWeight: 900,
                     fontSize: '14px',
-                    color: isDark ? '#F8FAFC' : '#0F172A',
+                    color: isDark ? '#93C5FD' : '#1D4ED8',
                   }}
                 >
-                  <Edit3 size={15} color="#1877F2" />
+                  <Edit3 size={16} color="#2563EB" />
                   <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                    {t('گاہک کی معلومات تبدیل کریں', 'Edit Customer Details')}
+                    {t('بل کی رقم / قیمت تبدیل کریں', 'Edit Bill Price & Payment')}
                   </span>
                 </div>
 
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      color: isDark ? '#94A3B8' : '#64748B',
-                      marginBottom: '4px',
-                    }}
-                  >
-                    {t('گاہک کا نام', 'Customer Name')}
-                  </label>
-                  <input
-                    type="text"
-                    value={editCustomerName}
-                    onChange={(e) => setEditCustomerName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
-                      backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
-                      color: isDark ? '#F8FAFC' : '#0F172A',
-                      fontSize: '14px',
-                      fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-                      outline: 'none',
-                    }}
-                  />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: isDark ? '#E2E8F0' : '#1E293B',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {t('کل رقم / قیمت (روپے)', 'Total Bill / Price (Rs)')} *
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={editPrice}
+                      onChange={(e) => setEditPrice(e.target.value)}
+                      placeholder="e.g. 1500"
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #3B82F6' : '1.5px solid #2563EB',
+                        backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '15px',
+                        fontWeight: 800,
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: isDark ? '#E2E8F0' : '#1E293B',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {t('وصول شدہ نقد (روپے)', 'Cash Received (Rs)')}
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={editReceived}
+                      onChange={(e) => setEditReceived(e.target.value)}
+                      placeholder="e.g. 1500"
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: isDark ? '1px solid #475569' : '1px solid #CBD5E1',
+                        backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
+                        color: isDark ? '#F8FAFC' : '#0F172A',
+                        fontSize: '15px',
+                        fontWeight: 800,
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -797,13 +1059,15 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       marginBottom: '4px',
                     }}
                   >
-                    {t('فون نمبر', 'Phone Number')}
+                    {t('رعایت (ڈسکاؤنٹ)', 'Discount (Rs)')}
                   </label>
                   <input
-                    type="text"
-                    value={editCustomerPhone}
-                    onChange={(e) => setEditCustomerPhone(e.target.value)}
-                    placeholder="0300-1234567"
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={editDiscount}
+                    onChange={(e) => setEditDiscount(e.target.value)}
+                    placeholder="0"
                     style={{
                       width: '100%',
                       padding: '8px 12px',
@@ -823,13 +1087,13 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                   disabled={isSaving}
                   style={{
                     marginTop: '4px',
-                    padding: '8px 14px',
+                    padding: '10px 14px',
                     borderRadius: '8px',
                     border: 'none',
-                    backgroundColor: saveSuccess ? '#0E8A54' : '#1877F2',
+                    backgroundColor: saveSuccess ? '#0E8A54' : '#2563EB',
                     color: '#FFFFFF',
-                    fontWeight: 800,
-                    fontSize: isUrdu ? '15px' : '13px',
+                    fontWeight: 900,
+                    fontSize: isUrdu ? '16px' : '14px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -840,41 +1104,36 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                 >
                   {saveSuccess ? (
                     <>
-                      <Check size={16} />
+                      <Check size={18} />
                       <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                        {t('محفوظ ہو گیا!', 'Saved Successfully!')}
+                        {t('قیمت محفوظ ہو گئی! ✓', 'Price Saved Successfully! ✓')}
                       </span>
                     </>
                   ) : (
                     <>
-                      <Save size={16} />
+                      <Save size={18} />
                       <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                        {t('تبدیلیاں محفوظ کریں', 'Save Changes')}
+                        {t('تبدیلیاں محفوظ کریں', 'Save Price Changes')}
                       </span>
                     </>
                   )}
                 </button>
               </div>
 
-              {/* Action Buttons: Print & Close */}
+              {/* Action Buttons: 80mm Thermal Print & Close */}
               <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (selectedInvoice.rawReceiptData) {
-                      handlePrintClick(selectedInvoice.rawReceiptData);
-                      setSelectedInvoice(null);
-                    }
-                  }}
+                  onClick={() => handlePrintClick(selectedInvoice)}
                   style={{
                     flex: 1,
-                    height: '44px',
+                    height: '46px',
                     borderRadius: '10px',
                     border: 'none',
                     backgroundColor: '#1877F2',
                     color: '#FFFFFF',
                     fontWeight: 900,
-                    fontSize: isUrdu ? '18px' : '15px',
+                    fontSize: isUrdu ? '17px' : '14px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -883,9 +1142,9 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     boxShadow: '0 4px 10px rgba(24, 119, 242, 0.25)',
                   }}
                 >
-                  <Printer size={18} />
+                  <Printer size={19} />
                   <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                    {t('بل پرنٹ کریں', 'Print Receipt')}
+                    {t('تھرمل پرچی پرنٹ کریں (80mm)', 'Print 80mm Receipt')}
                   </span>
                 </button>
 

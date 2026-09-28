@@ -7,8 +7,8 @@ const PORT = Number(process.env.PORT) || 5000;
 const startServer = async () => {
   try {
     const app = createApp();
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`✓ FlourERP API running on http://0.0.0.0:${PORT}`);
+    const server = app.listen(PORT, () => {
+      console.log(`✓ FlourERP API running on port ${PORT} (IPv4/IPv6 dual-stack)`);
     });
 
     // Connect to database resiliently
@@ -32,6 +32,9 @@ const startServer = async () => {
 
     process.on('SIGTERM', shutdown);
     process.on('SIGINT', shutdown);
+    process.on('unhandledRejection', (reason) => {
+      console.error('⚠️ Unhandled Promise Rejection (server continuing):', reason);
+    });
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

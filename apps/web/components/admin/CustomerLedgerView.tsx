@@ -16,9 +16,12 @@ import {
   BookOpen,
   Calendar,
   User,
+  Download,
+  FileText,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
+import { generateTabularPdf } from '../../lib/pdfReportGenerator';
 
 // Handcrafted Vector SVG for Ledger Book
 const UdhaarBookSvg = () => (
@@ -228,6 +231,99 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
 
   const totalOutstandingUdhaar = customers.reduce((sum, c) => sum + c.balance, 0);
 
+  const handleDownloadGeneralLedgerPdf = () => {
+    const rows = customers.map((c, idx) => [
+      idx + 1,
+      c.name,
+      c.phone || '-',
+      c.balance > 0 ? (isUrdu ? 'ادھار واجب' : 'Unpaid') : (isUrdu ? 'کلیئر' : 'Clear'),
+      `Rs ${c.balance.toLocaleString()}`,
+    ]);
+
+    const activeDebtors = customers.filter((c) => c.balance > 0).length;
+
+    generateTabularPdf({
+      title: isUrdu ? 'مجموعی کسٹمر ادھار کھاتہ فہرست رپورٹ' : 'General Customer Ledger & Receivables Report',
+      subtitle: `Total Registered Customers: ${customers.length} • Active Debtors: ${activeDebtors}`,
+      summaryCards: [
+        { label: isUrdu ? 'مجموعی واجب الادا ادھار' : 'Total Receivables', value: `Rs ${totalOutstandingUdhaar.toLocaleString()}`, color: '#DC2626' },
+        { label: isUrdu ? 'فعال ادھار دار گاہک' : 'Active Debtors', value: String(activeDebtors), color: '#D97706' },
+        { label: isUrdu ? 'کل کسٹمرز' : 'Total Customers', value: String(customers.length), color: '#1877F2' },
+      ],
+      tables: [
+        {
+          title: isUrdu ? 'تمام گاہکوں کے بقایا جات کی تفصیلی فہرست' : 'All Customer Accounts & Outstanding Balances Table',
+          headers: [
+            isUrdu ? 'نمبر شمار' : 'Sr #',
+            isUrdu ? 'گاہک کا نام' : 'Customer Name',
+            isUrdu ? 'فون نمبر' : 'Phone',
+            isUrdu ? 'کیفیت' : 'Status',
+            isUrdu ? 'بقایا رقم (روپے)' : 'Balance (Rs)',
+          ],
+          rows,
+          footers: [
+            isUrdu ? 'مجموعی ٹوٹل ادھار' : 'Total Outstanding Balance',
+            '',
+            '',
+            '',
+            `Rs ${totalOutstandingUdhaar.toLocaleString()}`,
+          ],
+          alignments: ['center', 'left', 'center', 'center', 'right'],
+        },
+      ],
+      isUrdu,
+      notes: isUrdu ? 'مجموعی ادھار کھاتہ جات - ہنی فلور ملز ای آر پی' : 'General Customer Ledger - Honey Mills ERP',
+    });
+  };
+
+  const handleDownloadCustomerStatementPdf = () => {
+    if (!selectedCustomer) return;
+
+    const rows = (selectedCustomer.transactions || []).map((tx) => [
+      tx.date,
+      tx.type === 'purchase' ? (isUrdu ? 'ادھار خریداری' : 'Credit Purchase') : (isUrdu ? 'نقد وصولی' : 'Cash Repayment'),
+      tx.description,
+      tx.type === 'purchase' ? `+ Rs ${tx.amount.toLocaleString()}` : '-',
+      tx.type === 'payment' ? `- Rs ${tx.amount.toLocaleString()}` : '-',
+      `Rs ${tx.runningBalance.toLocaleString()}`,
+    ]);
+
+    generateTabularPdf({
+      title: isUrdu ? `کھاتہ اسٹیٹمنٹ: ${selectedCustomer.name}` : `Customer Ledger Statement: ${selectedCustomer.name}`,
+      subtitle: `Phone: ${selectedCustomer.phone || 'N/A'} • Account ID: ${selectedCustomer.id}`,
+      summaryCards: [
+        { label: isUrdu ? 'موجودہ بقایا کھاتہ' : 'Current Balance', value: `Rs ${selectedCustomer.balance.toLocaleString()}`, color: selectedCustomer.balance > 0 ? '#DC2626' : '#15803D' },
+        { label: isUrdu ? 'کل ٹرانزیکشنز' : 'Total Transactions', value: String(selectedCustomer.transactions?.length || 0), color: '#1877F2' },
+        { label: isUrdu ? 'کھاتہ کیفیت' : 'Ledger Status', value: selectedCustomer.balance > 0 ? (isUrdu ? 'ادھار واجب' : 'Unpaid') : (isUrdu ? 'کلیئر' : 'Clear'), color: selectedCustomer.balance > 0 ? '#B45309' : '#15803D' },
+      ],
+      tables: [
+        {
+          title: isUrdu ? 'تاریخ وار ادھار و وصولی کی مکمل تفصیل' : 'Chronological Debit & Credit Transactions Table',
+          headers: [
+            isUrdu ? 'تاریخ و وقت' : 'Date & Time',
+            isUrdu ? 'قسم' : 'Type',
+            isUrdu ? 'تفصیل' : 'Description',
+            isUrdu ? 'ادھار اضافہ (+)' : 'Debit (+)',
+            isUrdu ? 'وصولی ادائیگی (-)' : 'Credit (-)',
+            isUrdu ? 'بقایا بیلنس' : 'Running Balance',
+          ],
+          rows,
+          footers: [
+            isUrdu ? 'خالص بقایا کھاتہ' : 'Net Closing Balance',
+            '',
+            '',
+            '',
+            '',
+            `Rs ${selectedCustomer.balance.toLocaleString()}`,
+          ],
+          alignments: ['left', 'center', 'left', 'right', 'right', 'right'],
+        },
+      ],
+      isUrdu,
+      notes: isUrdu ? `کسٹمر اسٹیٹمنٹ - ${selectedCustomer.name} - ہنی فلور ملز و آٹا چکی` : `Customer Statement for ${selectedCustomer.name}`,
+    });
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
       {/* 1. TOP DASHBOARD ACTION CARDS (Responsive on Mobile & Desktop) */}
@@ -379,6 +475,76 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
                 }}
               >
                 Rs {totalOutstandingUdhaar.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3: جنرل لیجر PDF ڈاؤن لوڈ - Royal Indigo Action Card */}
+        <div
+          onClick={handleDownloadGeneralLedgerPdf}
+          className="dual-action-card touch-active"
+          style={{
+            width: '100%',
+            maxWidth: '360px',
+            background: 'linear-gradient(135deg, #6D28D9 0%, #4C1D95 100%)',
+            borderRadius: '14px',
+            border: '2px solid #5B21B6',
+            boxShadow: '0 6px 16px rgba(109, 40, 217, 0.26)',
+            padding: '14px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            direction: isUrdu ? 'rtl' : 'ltr',
+            cursor: 'pointer',
+            minHeight: '62px',
+            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Icon + Info */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.12)',
+                flexShrink: 0,
+              }}
+            >
+              <Download size={22} color={isDark ? '#C4B5FD' : '#6D28D9'} strokeWidth={2.4} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
+              <h2
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '26px' : '18px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
+                }}
+              >
+                {t('جنرل لیجر رپورٹ PDF', 'General Ledger PDF')}
+              </h2>
+              <span
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '15px' : '11px',
+                  color: '#DDD6FE',
+                  fontWeight: 700,
+                  padding: '0 8px',
+                }}
+              >
+                {t('تمام کھاتوں کا جدول ڈاؤن لوڈ', 'Download All Balances Table')}
               </span>
             </div>
           </div>
@@ -753,65 +919,116 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
             </div>
           </div>
 
-          {/* Action Bar: Dashboard-Style Hero Button (Log Cash Repayment) */}
-          <button
-            type="button"
-            onClick={() => setIsRepaymentOpen(true)}
-            onMouseEnter={() => setHoveredRepayBtn(true)}
-            onMouseLeave={() => {
-              setHoveredRepayBtn(false);
-              setPressedRepayBtn(false);
-            }}
-            onMouseDown={() => setPressedRepayBtn(true)}
-            onMouseUp={() => setPressedRepayBtn(false)}
-            onTouchStart={() => setPressedRepayBtn(true)}
-            onTouchEnd={() => setPressedRepayBtn(false)}
-            className="touch-active"
-            style={{
-              height: '52px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
-              color: '#FFFFFF',
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(14, 138, 84, 0.22)',
-              outline: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0 18px',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {/* White Squircle Icon Tile */}
-            <div
+          {/* Action Bar: Dashboard-Style Hero Buttons (Log Cash Repayment & Download Statement PDF) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px', width: '100%' }}>
+            <button
+              type="button"
+              onClick={() => setIsRepaymentOpen(true)}
+              onMouseEnter={() => setHoveredRepayBtn(true)}
+              onMouseLeave={() => {
+                setHoveredRepayBtn(false);
+                setPressedRepayBtn(false);
+              }}
+              onMouseDown={() => setPressedRepayBtn(true)}
+              onMouseUp={() => setPressedRepayBtn(false)}
+              onTouchStart={() => setPressedRepayBtn(true)}
+              onTouchEnd={() => setPressedRepayBtn(false)}
+              className="touch-active"
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '9px',
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#FFFFFF',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+                height: '52px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(14, 138, 84, 0.22)',
+                outline: 'none',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                justifyContent: 'space-between',
+                padding: '0 18px',
+                transition: 'all 0.15s ease',
               }}
             >
-              <DollarSign size={20} color={isDark ? '#4ADE80' : '#0E8A54'} strokeWidth={2.5} />
-            </div>
+              {/* White Squircle Icon Tile */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '9px',
+                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <DollarSign size={20} color={isDark ? '#4ADE80' : '#0E8A54'} strokeWidth={2.5} />
+              </div>
 
-            {/* Bold Text */}
-            <span
-              className={isUrdu ? 'font-nastaleeq' : ''}
+              {/* Bold Text */}
+              <span
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '22px' : '16px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                }}
+              >
+                {t('ادھار وصولی درج کریں', 'Log Cash Repayment')}
+              </span>
+            </button>
+
+            {/* Download Statement PDF Button */}
+            <button
+              type="button"
+              onClick={handleDownloadCustomerStatementPdf}
+              className="touch-active"
               style={{
-                fontSize: isUrdu ? '22px' : '17px',
-                fontWeight: 900,
+                height: '52px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)',
                 color: '#FFFFFF',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(24, 119, 242, 0.25)',
+                outline: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 18px',
+                transition: 'all 0.15s ease',
               }}
             >
-              {t('ادھار وصولی درج کریں', 'Log Cash Repayment')}
-            </span>
-          </button>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '9px',
+                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Download size={20} color={isDark ? '#93C5FD' : '#1877F2'} strokeWidth={2.5} />
+              </div>
+
+              <span
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '22px' : '16px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                }}
+              >
+                {t('اسٹیٹمنٹ PDF ڈاؤن لوڈ', 'Download Statement PDF')}
+              </span>
+            </button>
+          </div>
 
           {/* Chronological Append-Only Transactions Ledger */}
           <div>

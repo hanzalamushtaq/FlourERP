@@ -35,6 +35,7 @@ import {
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import type { ReportSubTab } from '../layout/PosSidebar';
+import { generateTabularPdf } from '../../lib/pdfReportGenerator';
 
 /* ─────────────────────────────────────────────────────────────
    Types
@@ -76,7 +77,8 @@ const INITIAL_LEDGER: LedgerItem[] = [];
    Report Metadata
 ───────────────────────────────────────────────────────────── */
 const REPORT_META: Record<ReportSubTab, { labelEn: string; labelUr: string; icon: React.ReactNode; color: string; bgColor: string; borderColor: string; descriptionUr: string }> = {
-  sales:      { labelEn: 'Sales Report',           labelUr: 'سیلز رپورٹ',          icon: <BarChart2 size={18} />,     color: '#1877F2', bgColor: '#EFF6FF', borderColor: '#BFDBFE', descriptionUr: 'روزانہ آمدن، فیس پسائی، اخراجات اور خالص نقد کیش کا تفصیلی ریکارڈ' },
+  sales:      { labelEn: 'Sales Report',           labelUr: 'سیلز رپورٹ',          icon: <BarChart2 size={18} />,     color: '#1877F2', bgColor: '#EFF6FF', borderColor: '#BFDBFE', descriptionUr: 'روزانہ آمدن، فیس پسائی اور پراڈکٹ وائز سیلز کا تفصیلی ریکارڈ' },
+  expense:    { labelEn: 'Expense Report',         labelUr: 'اخراجات رپورٹ',        icon: <TrendingDown size={18} />,  color: '#EA580C', bgColor: '#FFF7ED', borderColor: '#FED7AA', descriptionUr: 'مل کے تمام روزمرہ اخراجات، لیبر، بجلی اور متفرق بلوں کا تفصیلی ریکارڈ' },
   customer:   { labelEn: 'Customer Report',        labelUr: 'کسٹمر رپورٹ',         icon: <Users size={18} />,         color: '#D97706', bgColor: '#FFFBEB', borderColor: '#FDE68A', descriptionUr: 'گاہکوں کے ادھار کھاتے، بقایا جات اور وصولیوں کی مکمل تفصیل' },
   daily_log:  { labelEn: 'Daily Log Report',       labelUr: 'روزانہ لاگ رپورٹ',    icon: <BookOpen size={18} />,      color: '#DC2626', bgColor: '#FEF2F2', borderColor: '#FECACA', descriptionUr: 'دن بھر کی تمام رسیدوں، ٹوکنز اور لین دین کی وقت وار مکمل ڈائری' },
   user_sales: { labelEn: 'User Wise Sales Report', labelUr: 'یوزر وائز سیلز رپورٹ', icon: <UserCheck size={18} />,    color: '#475569', bgColor: '#F8FAFC', borderColor: '#CBD5E1', descriptionUr: 'ہر کاؤنٹر کیشیئر اور آپریٹر کی الگ الگ سیل، پسائی اور جمع شدہ کیش' },
@@ -419,6 +421,36 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
   const [customerStats, setCustomerStats] = useState<{ totalReceivables: number; activeDebtorsCount: number; totalCustomers: number } | null>(null);
   const [customerList, setCustomerList] = useState<any[]>([]);
 
+  // Product Sales State (for Sales Report product-wise breakdown)
+  const [productSales, setProductSales] = useState<{
+    products: Array<{
+      id: string;
+      nameEn: string;
+      nameUr: string;
+      unit: string;
+      totalQuantityKg: number;
+      totalAmount: number;
+      ordersCount: number;
+      averageRate: number;
+    }>;
+    totalSoldKg: number;
+    totalRevenue: number;
+  }>({ products: [], totalSoldKg: 0, totalRevenue: 0 });
+
+  // Expenses State (for dedicated Expense Report tab)
+  const [expensesData, setExpensesData] = useState<{
+    expenses: Array<{
+      id: string;
+      category: string;
+      description: string;
+      amount: number;
+      createdAt: string;
+      recordedBy?: { fullName: string; username: string };
+    }>;
+    totalAmount: number;
+    count: number;
+  }>({ expenses: [], totalAmount: 0, count: 0 });
+
   const fetchLedgerStream = async (range: string) => {
     try {
       const sess = getSession();
@@ -429,6 +461,34 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
       const json = await res.json();
       if (json.success && json.data.items) setLedger(json.data.items);
     } catch {}
+  };
+
+  const fetchProductSales = async (range: string) => {
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch(`${getApiBaseUrl()}/api/reports/product-sales?range=${range}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (json.success && json.data) setProductSales(json.data);
+    } catch (err) {
+      console.error('Failed to load product sales:', err);
+    }
+  };
+
+  const fetchExpensesData = async () => {
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch(`${getApiBaseUrl()}/api/expenses`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (json.success && json.data) setExpensesData(json.data);
+    } catch (err) {
+      console.error('Failed to load expenses data:', err);
+    }
   };
 
   const fetchAuditLogs = async () => {
@@ -464,6 +524,12 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
   useEffect(() => {
     if (activeSubTab === 'sales' || activeSubTab === 'user_sales' || activeSubTab === 'daily_log') {
       fetchLedgerStream(dateFilter);
+    }
+    if (activeSubTab === 'sales') {
+      fetchProductSales(dateFilter);
+    }
+    if (activeSubTab === 'expense') {
+      fetchExpensesData();
     }
     if (activeSubTab === 'audit' || activeSubTab === 'user_sales') {
       fetchAuditLogs();
@@ -566,6 +632,322 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadProductSalesPdf = () => {
+    const periodLabel = dateFilter === 'today' ? (isUrdu ? 'آج' : 'Today')
+      : dateFilter === 'yesterday' ? (isUrdu ? 'گزشتہ کل' : 'Yesterday')
+      : dateFilter === '7days' ? (isUrdu ? 'پچھلے 7 دن' : 'Last 7 Days')
+      : (isUrdu ? 'موجودہ ماہ' : 'This Month');
+
+    const productRows = productSales.products.map((p, idx) => {
+      const sharePct = productSales.totalSoldKg > 0 ? Math.round((p.totalQuantityKg / productSales.totalSoldKg) * 100) : 0;
+      return [
+        `#${idx + 1}`,
+        isUrdu ? p.nameUr : p.nameEn,
+        p.unit || 'KG',
+        `${p.totalQuantityKg.toLocaleString()} KG`,
+        `Rs ${p.averageRate.toLocaleString()}`,
+        `Rs ${p.totalAmount.toLocaleString()}`,
+        `${sharePct}%`,
+      ];
+    });
+
+    generateTabularPdf({
+      title: isUrdu ? 'پراڈکٹ وائز سیلز رپورٹ (سب سے زیادہ بکنے والا مال)' : 'Product-Wise Sales Ranking Report (Best Selling Products)',
+      subtitle: `${isUrdu ? 'مدت' : 'Period'}: ${periodLabel} • ${isUrdu ? 'تاریخ اجرا' : 'Generated'}: ${new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+      summaryCards: [
+        { label: isUrdu ? 'کل فروخت شدہ مال (وزن)' : 'Total Volume Sold', value: `${productSales.totalSoldKg.toLocaleString()} KG`, color: '#1877F2' },
+        { label: isUrdu ? 'مجموعی سیلز آمدن (Revenue)' : 'Total Sales Revenue', value: `Rs ${productSales.totalRevenue.toLocaleString()}`, color: '#15803D' },
+        { label: isUrdu ? 'سب سے زیادہ بکنے والی آئٹم' : 'Top Selling Product', value: productSales.products[0] ? (isUrdu ? productSales.products[0].nameUr : productSales.products[0].nameEn) : (isUrdu ? 'کوئی نہیں' : 'None'), color: '#D97706' },
+        { label: isUrdu ? 'کل فروخت شدہ اقسام' : 'Total Products Sold', value: `${productSales.products.length} ${isUrdu ? 'مصنوعات' : 'Products'}`, color: '#7C3AED' },
+      ],
+      tables: [
+        {
+          title: isUrdu ? 'مصنوعات کی فروخت کا درجہ وار جدول (سب سے زیادہ فروخت)' : 'Product-Wise Sales Ranking Table (Highest Selling)',
+          headers: [
+            isUrdu ? 'درجہ' : 'Rank',
+            isUrdu ? 'مصنوعہ کا نام' : 'Product Name',
+            isUrdu ? 'پیمانہ' : 'Unit',
+            isUrdu ? 'کل فروخت وزن' : 'Sold Quantity',
+            isUrdu ? 'اوسط ریٹ' : 'Avg Rate',
+            isUrdu ? 'حاصل شدہ رقم' : 'Total Revenue',
+            isUrdu ? 'سیلز میں حصہ' : 'Volume Share',
+          ],
+          rows: productRows,
+          footers: [
+            isUrdu ? 'مجموعی ٹوٹل' : 'Total',
+            '',
+            '',
+            `${productSales.totalSoldKg.toLocaleString()} KG`,
+            '',
+            `Rs ${productSales.totalRevenue.toLocaleString()}`,
+            '100%',
+          ],
+          alignments: ['center', 'left', 'center', 'right', 'right', 'right', 'center'],
+        },
+      ],
+      isUrdu,
+      notes: isUrdu ? 'نوٹ: یہ رپورٹ صرف مصنوعات کی درجہ وار فروخت، مقدار اور آمدن کی تصدیق شدہ تفصیل ہے۔' : 'Note: This report strictly reflects product-wise sales ranking, sold quantities, and generated revenue.',
+    });
+  };
+
+  const handleDownloadPdfReport = () => {
+    const periodLabel = dateFilter === 'today' ? (isUrdu ? 'آج' : 'Today')
+      : dateFilter === 'yesterday' ? (isUrdu ? 'گزشتہ کل' : 'Yesterday')
+      : dateFilter === '7days' ? (isUrdu ? 'پچھلے 7 دن' : 'Last 7 Days')
+      : (isUrdu ? 'موجودہ ماہ' : 'This Month');
+
+    if (activeSubTab === 'sales') {
+      handleDownloadProductSalesPdf();
+      return;
+    }
+
+    if (activeSubTab === 'expense') {
+      const rows = expensesData.expenses.map((e, idx) => {
+        const { date, time } = formatAuditDateTime(e.createdAt);
+        return [
+          idx + 1,
+          `${date} ${time}`,
+          e.category,
+          e.description,
+          e.recordedBy?.fullName || 'Admin',
+          `Rs ${e.amount.toLocaleString()}`,
+        ];
+      });
+
+      const catCount: Record<string, number> = {};
+      expensesData.expenses.forEach((e) => {
+        catCount[e.category] = (catCount[e.category] || 0) + e.amount;
+      });
+      let topCat = 'N/A';
+      let maxCatAmt = 0;
+      Object.entries(catCount).forEach(([k, v]) => {
+        if (v > maxCatAmt) {
+          maxCatAmt = v;
+          topCat = k;
+        }
+      });
+
+      generateTabularPdf({
+        title: isUrdu ? 'مل و دکان کے اخراجات کی تفصیلی رپورٹ' : 'Shop & Mill Operational Expenses Report',
+        subtitle: `${isUrdu ? 'کل اخراجات' : 'Total Expenses'}: Rs ${expensesData.totalAmount.toLocaleString()} • ${isUrdu ? 'اندراجات' : 'Entries'}: ${expensesData.count}`,
+        summaryCards: [
+          { label: isUrdu ? 'کل دکان اخراجات' : 'Total Expenses', value: `Rs ${expensesData.totalAmount.toLocaleString()}`, color: '#DC2626' },
+          { label: isUrdu ? 'اخراجات کے اندراجات' : 'Expense Entries', value: String(expensesData.count), color: '#EA580C' },
+          { label: isUrdu ? 'سب سے بڑا خرچہ شعبہ' : 'Highest Expense Head', value: topCat, color: '#7C3AED' },
+        ],
+        tables: [
+          {
+            title: isUrdu ? 'تمام درج شدہ اخراجات کی تفصیل' : 'Itemized Expenses Log Table',
+            headers: [
+              isUrdu ? 'نمبر شمار' : 'Sr #',
+              isUrdu ? 'تاریخ و وقت' : 'Date & Time',
+              isUrdu ? 'شعبہ / قسم' : 'Category',
+              isUrdu ? 'خرچے کی تفصیل' : 'Description',
+              isUrdu ? 'درج کنندہ' : 'Logged By',
+              isUrdu ? 'رقم (روپے)' : 'Amount (Rs)',
+            ],
+            rows,
+            footers: [
+              isUrdu ? 'مجموعی اخراجات' : 'Total Expenses Sum',
+              '',
+              '',
+              '',
+              '',
+              `Rs ${expensesData.totalAmount.toLocaleString()}`,
+            ],
+            alignments: ['center', 'left', 'center', 'left', 'left', 'right'],
+          },
+        ],
+        isUrdu,
+        notes: isUrdu ? 'نوٹ: اخراجات کا ریکارڈ الگ رکھا گیا ہے اور سیلز ریونیو سے کٹوتی نہیں کی گئی۔' : 'Note: Expenses are recorded independently and not deducted from sales revenue.',
+      });
+      return;
+    }
+
+    if (activeSubTab === 'customer') {
+      const rows = customerList.map((c, idx) => {
+        const bal = Number(c.currentBalance ?? c.balance ?? 0);
+        return [
+          idx + 1,
+          c.name,
+          c.phone || '-',
+          bal > 0 ? (isUrdu ? 'ادھار واجب' : 'Unpaid') : (isUrdu ? 'کلیئر' : 'Clear'),
+          `Rs ${bal.toLocaleString()}`,
+        ];
+      });
+
+      const totalRec = Number(customerStats?.totalReceivables ?? 0);
+
+      generateTabularPdf({
+        title: isUrdu ? 'کسٹمر ادھار کھاتے و واجبات رپورٹ' : 'Customer Ledger & Receivables Report',
+        subtitle: `${isUrdu ? 'رجسٹرڈ گاہک' : 'Total Customers'}: ${customerStats?.totalCustomers ?? customerList.length} • ${isUrdu ? 'فعال ادھار دار' : 'Active Debtors'}: ${customerStats?.activeDebtorsCount ?? 0}`,
+        summaryCards: [
+          { label: isUrdu ? 'کل واجب الادا ادھار' : 'Total Receivables', value: `Rs ${totalRec.toLocaleString()}`, color: '#DC2626' },
+          { label: isUrdu ? 'فعال ادھار دار گاہک' : 'Active Debtors', value: String(customerStats?.activeDebtorsCount ?? 0), color: '#D97706' },
+          { label: isUrdu ? 'رجسٹرڈ کسٹمرز' : 'Registered Customers', value: String(customerStats?.totalCustomers ?? customerList.length), color: '#1877F2' },
+        ],
+        tables: [
+          {
+            title: isUrdu ? 'گاہکوں کے بقایا کھاتوں کی جدول فہرست' : 'Customer Account Balances Table',
+            headers: [
+              isUrdu ? 'نمبر شمار' : 'Sr #',
+              isUrdu ? 'گاہک کا نام' : 'Customer Name',
+              isUrdu ? 'فون نمبر' : 'Phone',
+              isUrdu ? 'کھاتہ کیفیت' : 'Status',
+              isUrdu ? 'بقایا ادھار (روپے)' : 'Balance (Rs)',
+            ],
+            rows,
+            footers: [
+              isUrdu ? 'مجموعی واجب الادا ادھار' : 'Total Outstanding Balance',
+              '',
+              '',
+              '',
+              `Rs ${totalRec.toLocaleString()}`,
+            ],
+            alignments: ['center', 'left', 'center', 'center', 'right'],
+          },
+        ],
+        isUrdu,
+        notes: isUrdu ? 'کسٹمر ادھار کھاتہ جات - ہنی فلور ملز' : 'Customer Ledger Accounts - Honey Mills ERP',
+      });
+      return;
+    }
+
+    if (activeSubTab === 'daily_log') {
+      const rows = ledger.map((item, idx) => [
+        idx + 1,
+        item.timestamp,
+        item.category,
+        isUrdu && item.descriptionUr ? item.descriptionUr : item.description,
+        item.reference,
+        item.type === 'inflow' ? `+ Rs ${item.amount.toLocaleString()}` : item.type === 'outflow' ? `- Rs ${item.amount.toLocaleString()}` : `Rs ${item.amount.toLocaleString()}`,
+      ]);
+
+      generateTabularPdf({
+        title: isUrdu ? 'روزانہ مالیاتی و ٹرانزیکشن ڈائری رپورٹ' : 'Daily Transaction Log & Financial Diary',
+        subtitle: `${isUrdu ? 'مدت' : 'Period'}: ${periodLabel} • ${isUrdu ? 'کل اندراجات' : 'Total Entries'}: ${ledger.length}`,
+        summaryCards: [
+          { label: isUrdu ? 'کل کیش آمدن (+)' : 'Total Inflow (+)', value: `Rs ${totalInflow.toLocaleString()}`, color: '#15803D' },
+          { label: isUrdu ? 'کل کیش اخراجات (-)' : 'Total Outflow (-)', value: `Rs ${totalOutflow.toLocaleString()}`, color: '#DC2626' },
+          { label: isUrdu ? 'کل اندراجات' : 'Total Entries', value: String(ledger.length), color: '#1877F2' },
+        ],
+        tables: [
+          {
+            title: isUrdu ? 'وقت وار لین دین کی مکمل ڈائری' : 'Chronological Financial Transactions Table',
+            headers: [
+              isUrdu ? 'نمبر شمار' : 'Sr #',
+              isUrdu ? 'وقت' : 'Timestamp',
+              isUrdu ? 'قسم' : 'Category',
+              isUrdu ? 'تفصیل' : 'Description',
+              isUrdu ? 'حوالہ نمبر' : 'Ref #',
+              isUrdu ? 'رقم' : 'Amount',
+            ],
+            rows,
+            alignments: ['center', 'left', 'center', 'left', 'center', 'right'],
+          },
+        ],
+        isUrdu,
+        notes: isUrdu ? 'روزانہ لاگ رپورٹ - ہنی فلور ملز' : 'Daily Activity Log - Honey Mills ERP',
+      });
+      return;
+    }
+
+    if (activeSubTab === 'user_sales') {
+      const rows = userSalesStats.map((u, idx) => [
+        idx + 1,
+        u.name,
+        u.role,
+        String(u.billsCount + u.pisaiCount),
+        `Rs ${u.salesAmount.toLocaleString()}`,
+        `Rs ${u.cashCollected.toLocaleString()}`,
+      ]);
+
+      const totalHandled = userSalesStats.reduce((s, u) => s + u.billsCount + u.pisaiCount, 0);
+      const totalCol = userSalesStats.reduce((s, u) => s + u.cashCollected, 0);
+
+      generateTabularPdf({
+        title: isUrdu ? 'اسٹاف و کاؤنٹر کیشیئر سیلز کارکردگی رپورٹ' : 'User-Wise Sales & Cashier Performance Report',
+        subtitle: `${isUrdu ? 'فعال ملازمین' : 'Active Staff'}: ${userSalesStats.length} • ${isUrdu ? 'کل جمع شدہ کیش' : 'Total Cash'}: Rs ${totalCol.toLocaleString()}`,
+        summaryCards: [
+          { label: isUrdu ? 'کل جمع شدہ کیش' : 'Total Cash Collected', value: `Rs ${totalCol.toLocaleString()}`, color: '#15803D' },
+          { label: isUrdu ? 'کل رسیدیں و ٹوکنز' : 'Total Bills Handled', value: String(totalHandled), color: '#1877F2' },
+          { label: isUrdu ? 'فعال کیشیئرز و آپریٹرز' : 'Active Staff Count', value: String(userSalesStats.length), color: '#7C3AED' },
+        ],
+        tables: [
+          {
+            title: isUrdu ? 'کاؤنٹر اسٹاف کارکردگی و حساب کتاب' : 'Staff Breakdown & Cash Collection Table',
+            headers: [
+              isUrdu ? 'نمبر شمار' : 'Sr #',
+              isUrdu ? 'صارف / کیشیئر' : 'User / Cashier',
+              isUrdu ? 'عہدہ' : 'Role',
+              isUrdu ? 'بلز و ٹوکنز' : 'Bills Handled',
+              isUrdu ? 'کل سیلز' : 'Total Sales',
+              isUrdu ? 'جمع شدہ کیش' : 'Cash Collected',
+            ],
+            rows,
+            footers: [
+              isUrdu ? 'مجموعی ٹوٹل' : 'Total',
+              '',
+              '',
+              String(totalHandled),
+              '',
+              `Rs ${totalCol.toLocaleString()}`,
+            ],
+            alignments: ['center', 'left', 'center', 'center', 'right', 'right'],
+          },
+        ],
+        isUrdu,
+        notes: isUrdu ? 'یوزر وائز سیلز رپورٹ - ہنی فلور ملز' : 'User-Wise Sales Report - Honey Mills ERP',
+      });
+      return;
+    }
+
+    if (activeSubTab === 'audit') {
+      const rows = filteredAuditLogs.map((log, idx) => {
+        const { date, time } = formatAuditDateTime(log.createdAt);
+        const aMeta = getActionMeta(log.action, isUrdu, isDark);
+        const eMeta = getEntityMeta(log.entityType, isUrdu, isDark);
+        const detailsStr = typeof log.details === 'object' ? JSON.stringify(log.details) : (log.details || '-');
+        return [
+          idx + 1,
+          `${date} ${time}`,
+          aMeta.label,
+          log.user?.fullName || 'System',
+          eMeta.label,
+          detailsStr,
+        ];
+      });
+
+      generateTabularPdf({
+        title: isUrdu ? 'سسٹم سیکیورٹی و ایکٹیویٹی آڈٹ لاگ رپورٹ' : 'System Security & Activity Audit Trail Report',
+        subtitle: `${isUrdu ? 'کل سرگرمیاں' : 'Total Events'}: ${filteredAuditLogs.length} • ${isUrdu ? 'فلٹر' : 'Filter'}: ${auditFilter.toUpperCase()}`,
+        summaryCards: [
+          { label: isUrdu ? 'کل سرگرمیاں' : 'Total Log Events', value: String(auditMetrics.total), color: '#7C3AED' },
+          { label: isUrdu ? 'کامیاب لاگ ان' : 'Total Logins', value: String(auditMetrics.logins), color: '#15803D' },
+          { label: isUrdu ? 'حساس کارروائیاں (منسوخی)' : 'Sensitive Voids', value: String(auditMetrics.voids), color: '#DC2626' },
+        ],
+        tables: [
+          {
+            title: isUrdu ? 'صارفین کی تمام سرگرمیوں کا محفوظ آڈٹ ٹریل' : 'Immutable Audit Log Trail Table',
+            headers: [
+              isUrdu ? 'نمبر شمار' : 'Sr #',
+              isUrdu ? 'تاریخ و وقت' : 'Date & Time',
+              isUrdu ? 'کارروائی' : 'Action',
+              isUrdu ? 'صارف' : 'User',
+              isUrdu ? 'شعبہ' : 'Department',
+              isUrdu ? 'تفصیل' : 'Details',
+            ],
+            rows,
+            alignments: ['center', 'left', 'center', 'left', 'center', 'left'],
+          },
+        ],
+        isUrdu,
+        notes: isUrdu ? 'سیکیورٹی آڈٹ رپورٹ - ہنی فلور ملز' : 'System Audit Log - Honey Mills ERP',
+      });
+      return;
+    }
   };
 
   // Sales totals
@@ -674,28 +1056,132 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
         </div>
 
         {/* Global Tab Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Universal PDF Download Button for Every Tab */}
+          <button
+            type="button"
+            onClick={handleDownloadPdfReport}
+            className="touch-active"
+            style={{
+              height: '42px',
+              padding: '0 18px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: isUrdu ? '18px' : '13.5px',
+              fontWeight: 900,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(24,119,242,0.25)',
+            }}
+          >
+            <Download size={17} color="#FFFFFF" />
+            <span className={isUrdu ? 'font-nastaleeq' : ''}>
+              {activeSubTab === 'sales'
+                ? t('پراڈکٹ سیلز PDF ڈاؤن لوڈ', 'Download Product Sales PDF')
+                : t('رپورٹ PDF ڈاؤن لوڈ', 'Download Tabular PDF')}
+            </span>
+          </button>
+
+          {(activeSubTab === 'sales' || activeSubTab === 'expense') && (
+            <button
+              type="button"
+              onClick={() => setIsExpenseOpen(true)}
+              className="touch-active"
+              style={{
+                height: '42px',
+                padding: '0 18px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: isUrdu ? '18px' : '13.5px',
+                fontWeight: 900,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 12px rgba(14,138,84,0.25)',
+              }}
+            >
+              <PlusCircle size={17} color="#FFFFFF" />
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('اخراجات درج کریں', 'Log Expense')}</span>
+            </button>
+          )}
+
           {activeSubTab === 'sales' && (
-            <>
-              <button type="button" onClick={() => setIsExpenseOpen(true)} className="touch-active" style={{ height: '42px', padding: '0 18px', borderRadius: '10px', background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)', color: '#FFFFFF', border: 'none', fontSize: isUrdu ? '18px' : '13.5px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(14,138,84,0.25)' }}>
-                <PlusCircle size={17} color="#FFFFFF" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('اخراجات درج کریں', 'Log Expense')}</span>
-              </button>
-              <button type="button" onClick={handleExportCsv} className="touch-active" style={{ height: '42px', padding: '0 16px', borderRadius: '10px', backgroundColor: '#FFFFFF', color: '#334155', border: '1.5px solid #CBD5E1', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px' }}>
-                <Download size={16} color="#334155" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('ایکسپورٹ CSV', 'Export CSV')}</span>
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              className="touch-active"
+              style={{
+                height: '42px',
+                padding: '0 16px',
+                borderRadius: '10px',
+                backgroundColor: '#FFFFFF',
+                color: '#334155',
+                border: '1.5px solid #CBD5E1',
+                fontSize: isUrdu ? '17px' : '13px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '7px',
+              }}
+            >
+              <FileText size={16} color="#334155" />
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('ایکسپورٹ CSV', 'Export CSV')}</span>
+            </button>
           )}
 
           {activeSubTab === 'audit' && (
             <>
-              <button type="button" onClick={fetchAuditLogs} className="touch-active" style={{ height: '42px', padding: '0 16px', borderRadius: '10px', backgroundColor: '#F8FAFC', color: '#334155', border: '1.5px solid #CBD5E1', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px' }}>
+              <button
+                type="button"
+                onClick={fetchAuditLogs}
+                className="touch-active"
+                style={{
+                  height: '42px',
+                  padding: '0 16px',
+                  borderRadius: '10px',
+                  backgroundColor: '#F8FAFC',
+                  color: '#334155',
+                  border: '1.5px solid #CBD5E1',
+                  fontSize: isUrdu ? '17px' : '13px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '7px',
+                }}
+              >
                 <RefreshCw size={16} color="#334155" className={isLoadingAudit ? 'animate-spin' : ''} />
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('تازہ کریں', 'Refresh')}</span>
               </button>
-              <button type="button" onClick={handleExportAuditCsv} className="touch-active" style={{ height: '42px', padding: '0 16px', borderRadius: '10px', backgroundColor: '#7C3AED', color: '#FFFFFF', border: 'none', fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px', boxShadow: '0 4px 12px rgba(124,58,237,0.25)' }}>
-                <Download size={16} color="#FFFFFF" />
+              <button
+                type="button"
+                onClick={handleExportAuditCsv}
+                className="touch-active"
+                style={{
+                  height: '42px',
+                  padding: '0 16px',
+                  borderRadius: '10px',
+                  backgroundColor: '#7C3AED',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  fontSize: isUrdu ? '17px' : '13px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '7px',
+                  boxShadow: '0 4px 12px rgba(124,58,237,0.25)',
+                }}
+              >
+                <FileText size={16} color="#FFFFFF" />
                 <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('ایکسپورٹ لاگ CSV', 'Export Audit CSV')}</span>
               </button>
             </>
@@ -1009,28 +1495,186 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
             </div>
           </div>
 
-          {/* 3 KPI Cards */}
+          {/* 3 KPI Cards - Pure Revenue (Do NOT deduct expenses) */}
           <div className="reports-summary-3-cards">
+            {/* Card 1: Total Revenue (Gross Inflow) */}
             <div style={{ backgroundColor: isDark ? 'rgba(21, 128, 61, 0.15)' : '#F0FDF4', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(34, 197, 94, 0.3)' : '1.5px solid #86EFAC', boxShadow: '0 2px 8px rgba(16,185,129,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
               <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#4ADE80' : '#15803D', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
                 <span>+{totalInflow.toLocaleString()}</span>
                 <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#86EFAC' : '#166534' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
               </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#86EFAC' : '#166534', textAlign: 'right' }}>{isUrdu ? 'کل آمدن (سیل و فیس)' : 'Total Revenue'}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#86EFAC' : '#166534', textAlign: 'right' }}>{isUrdu ? 'کل سیلز آمدن (Revenue)' : 'Total Sales Revenue'}</span>
             </div>
-            <div style={{ backgroundColor: isDark ? 'rgba(220, 38, 38, 0.15)' : '#FEF2F2', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(239, 68, 68, 0.3)' : '1.5px solid #FECACA', boxShadow: '0 2px 8px rgba(239,68,68,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
-              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#F87171' : '#DC2626', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
-                <span>-{totalOutflow.toLocaleString()}</span>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#FCA5A5' : '#991B1B' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
+
+            {/* Card 2: Total Volume Sold (KG) */}
+            <div style={{ backgroundColor: isDark ? 'rgba(24, 119, 242, 0.15)' : '#EFF6FF', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(59, 130, 246, 0.3)' : '1.5px solid #BFDBFE', boxShadow: '0 2px 8px rgba(24,119,242,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#60A5FA' : '#1877F2', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
+                <span>{productSales.totalSoldKg.toLocaleString()}</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#93C5FD' : '#1D4ED8' }}>{isUrdu ? 'کلو' : 'KG'}</span>
               </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B', textAlign: 'right' }}>{isUrdu ? 'کل اخراجات و واپسی' : 'Total Expenses'}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#93C5FD' : '#1D4ED8', textAlign: 'right' }}>{isUrdu ? 'کل فروخت شدہ مال (وزن)' : 'Total Volume Sold'}</span>
             </div>
+
+            {/* Card 3: Top Selling Product */}
             <div style={{ backgroundColor: isDark ? 'rgba(217, 119, 6, 0.15)' : '#FFFBEB', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(245, 158, 11, 0.3)' : '1.5px solid #FDE68A', boxShadow: '0 2px 8px rgba(217,119,6,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
-              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#FBBF24' : '#B45309', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
-                <span>{netDayCash.toLocaleString()}</span>
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#FDE68A' : '#92400E' }}>{isUrdu ? 'روپے' : 'PKR'}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '17px', fontWeight: 900, color: isDark ? '#FBBF24' : '#B45309', lineHeight: 1.2 }}>
+                  {productSales.products[0] ? (isUrdu ? productSales.products[0].nameUr : productSales.products[0].nameEn) : (isUrdu ? 'کوئی نہیں' : 'None')}
+                </span>
+                {productSales.products[0] && (
+                  <span style={{ fontSize: '13px', color: isDark ? '#FCD34D' : '#92400E', fontWeight: 800, fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                    {productSales.products[0].totalQuantityKg.toLocaleString()} KG • Rs {productSales.products[0].totalAmount.toLocaleString()}
+                  </span>
+                )}
               </div>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#FDE68A' : '#92400E', textAlign: 'right' }}>{isUrdu ? 'خالص نقد کیش' : 'Net Cash Balance'}</span>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#FDE68A' : '#92400E', textAlign: 'right' }}>{t('سب سے زیادہ فروخت', 'Top Selling Item')}</span>
+            </div>
+          </div>
+
+          {/* Product-Wise Sales Ranking Table (Which product sells most) */}
+          <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', overflow: 'hidden', boxShadow: '0 4px 12px rgba(15,23,42,0.04)' }}>
+            <div style={{ padding: '16px 20px', backgroundColor: isDark ? '#0F172A' : '#0F172A', color: '#FFFFFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: isDark ? '1px solid #334155' : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <BarChart2 size={20} color="#60A5FA" />
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: isUrdu ? '22px' : '16px', fontWeight: 900, color: '#FFFFFF' }}>
+                  {t('پراڈکٹ وائز سیلز رپورٹ (سب سے زیادہ بکنے والا مال)', 'Product-Wise Sales Ranking (Best Selling Products)')}
+                </h3>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#93C5FD', backgroundColor: 'rgba(59, 130, 246, 0.2)', padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.4)' }}>
+                  {productSales.products.length} {isUrdu ? 'مصنوعات' : 'Products'}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleDownloadProductSalesPdf}
+                  className="touch-active"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    backgroundColor: '#1877F2',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontSize: isUrdu ? '15px' : '12px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(24,119,242,0.3)',
+                    transition: 'opacity 0.15s ease',
+                  }}
+                  title={isUrdu ? 'صرف پراڈکٹ وائز سیلز پی ڈی ایف محفوظ کریں' : 'Save Product-Wise Sales PDF'}
+                >
+                  <Download size={14} color="#FFFFFF" />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('پی ڈی ایف محفوظ کریں', 'Save PDF')}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="responsive-table-scroll">
+              <div style={{ minWidth: '760px' }}>
+                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'grid', gridTemplateColumns: '0.8fr 2fr 1fr 1.4fr 1.2fr 1.4fr 1.4fr', padding: '12px 20px', backgroundColor: isDark ? '#151D2F' : '#F1F5F9', borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0', fontWeight: 900, fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#E2E8F0' : '#334155', alignItems: 'center', direction: isUrdu ? 'rtl' : 'ltr' }}>
+                  <span style={{ textAlign: 'center' }}>{t('درجہ', 'Rank')}</span>
+                  <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('مصنوعہ کا نام', 'Product Name')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('پیمانہ', 'Unit')}</span>
+                  <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('کل فروخت شدہ وزن', 'Total Sold (KG)')}</span>
+                  <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('اوسط ریٹ', 'Avg Rate')}</span>
+                  <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('حاصل شدہ رقم', 'Total Revenue')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('سیلز میں حصہ', 'Volume Share')}</span>
+                </div>
+
+                {productSales.products.length === 0 ? (
+                  <div style={{ padding: '36px', textAlign: 'center', color: isDark ? '#94A3B8' : '#64748B', fontSize: isUrdu ? '18px' : '14px' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('اس مدت میں کوئی پراڈکٹ سیل درج نہیں ہوئی ہے۔', 'No product sales recorded in this selected period.')}
+                  </div>
+                ) : (
+                  productSales.products.map((p, idx) => {
+                    const sharePct = productSales.totalSoldKg > 0 ? Math.round((p.totalQuantityKg / productSales.totalSoldKg) * 100) : 0;
+                    const isTop1 = idx === 0;
+                    const isTop2 = idx === 1;
+                    const isTop3 = idx === 2;
+
+                    return (
+                      <div
+                        key={p.id || idx}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '0.8fr 2fr 1fr 1.4fr 1.2fr 1.4fr 1.4fr',
+                          padding: '14px 20px',
+                          borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                          backgroundColor: idx % 2 === 0 ? (isDark ? '#1E293B' : '#FFFFFF') : (isDark ? '#162032' : '#F8FAFC'),
+                          alignItems: 'center',
+                          direction: isUrdu ? 'rtl' : 'ltr',
+                        }}
+                      >
+                        {/* Rank Badge */}
+                        <div style={{ textAlign: 'center' }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '30px',
+                              height: '30px',
+                              borderRadius: '8px',
+                              fontWeight: 900,
+                              fontSize: '13px',
+                              fontFamily: 'var(--font-mono)',
+                              backgroundColor: isTop1 ? '#FEF3C7' : isTop2 ? '#E2E8F0' : isTop3 ? '#FFEDD5' : (isDark ? '#0F172A' : '#F1F5F9'),
+                              color: isTop1 ? '#B45309' : isTop2 ? '#475569' : isTop3 ? '#C2410C' : (isDark ? '#94A3B8' : '#64748B'),
+                              border: isTop1 ? '1.5px solid #FDE68A' : isTop2 ? '1.5px solid #CBD5E1' : isTop3 ? '1.5px solid #FED7AA' : '1px solid transparent',
+                            }}
+                          >
+                            #{idx + 1}
+                          </span>
+                        </div>
+
+                        {/* Product Name */}
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '20px' : '15px', lineHeight: 1.2 }}>
+                            {isUrdu ? p.nameUr : p.nameEn}
+                          </span>
+                          <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600 }}>
+                            {p.nameEn}
+                          </span>
+                        </div>
+
+                        {/* Unit */}
+                        <div style={{ textAlign: 'center' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#CBD5E1' : '#475569', backgroundColor: isDark ? '#0F172A' : '#E2E8F0', padding: '2px 8px', borderRadius: '6px' }}>
+                            {p.unit || 'KG'}
+                          </span>
+                        </div>
+
+                        {/* Sold Quantity */}
+                        <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '17px', color: isDark ? '#60A5FA' : '#1877F2' }}>
+                          {p.totalQuantityKg.toLocaleString()} KG
+                        </span>
+
+                        {/* Average Rate */}
+                        <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '14px', color: isDark ? '#CBD5E1' : '#475569' }}>
+                          Rs {p.averageRate.toLocaleString()}
+                        </span>
+
+                        {/* Total Revenue */}
+                        <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '17px', color: isDark ? '#4ADE80' : '#15803D' }}>
+                          Rs {p.totalAmount.toLocaleString()}
+                        </span>
+
+                        {/* Share Bar */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+                          <div style={{ width: '100%', maxWidth: '100px', height: '8px', backgroundColor: isDark ? '#334155' : '#E2E8F0', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ width: `${Math.min(100, Math.max(5, sharePct))}%`, height: '100%', backgroundColor: isTop1 ? '#F59E0B' : '#1877F2', borderRadius: '4px' }} />
+                          </div>
+                          <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', fontWeight: 800, color: isDark ? '#94A3B8' : '#64748B' }}>
+                            {sharePct}% {isUrdu ? 'حصہ' : 'share'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
           </div>
 
@@ -1116,6 +1760,168 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ activeSubTab }) => {
           </div>
         </>
       )}
+
+      {/* ═════════════════════════════════════════════════════════════
+          2B. EXPENSE REPORT VIEW (DEDICATED EXPENSES & PDF)
+         ═════════════════════════════════════════════════════════════ */}
+      {activeSubTab === 'expense' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* 3 KPI Cards */}
+          <div className="reports-summary-3-cards">
+            {/* Card 1: Total Expenses */}
+            <div style={{ backgroundColor: isDark ? 'rgba(220, 38, 38, 0.15)' : '#FEF2F2', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(239, 68, 68, 0.3)' : '1.5px solid #FECACA', boxShadow: '0 2px 8px rgba(239,68,68,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#F87171' : '#DC2626', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
+                <span>Rs {expensesData.totalAmount.toLocaleString()}</span>
+              </div>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B', textAlign: 'right' }}>
+                {t('کل دکان اخراجات', 'Total Expenses')}
+              </span>
+            </div>
+
+            {/* Card 2: Total Entries */}
+            <div style={{ backgroundColor: isDark ? 'rgba(234, 88, 12, 0.15)' : '#FFF7ED', padding: '16px 22px', borderRadius: '16px', border: isDark ? '1.5px solid rgba(249, 115, 22, 0.3)' : '1.5px solid #FED7AA', boxShadow: '0 2px 8px rgba(234,88,12,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '76px' }}>
+              <div style={{ fontSize: '30px', fontWeight: 900, color: isDark ? '#FB923C' : '#EA580C', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'baseline', gap: '6px', direction: 'ltr' }}>
+                <span>{expensesData.count}</span>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isDark ? '#FDBA74' : '#C2410C' }}>{isUrdu ? 'اندراجات' : 'Entries'}</span>
+              </div>
+              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '15px', fontWeight: 900, color: isDark ? '#FDBA74' : '#C2410C', textAlign: 'right' }}>
+                {t('اخراجات کی تعداد', 'Total Expense Logs')}
+              </span>
+            </div>
+
+            {/* Card 3: "+ Log Expense" Action Tile */}
+            <div
+              onClick={() => setIsExpenseOpen(true)}
+              className="touch-active"
+              style={{
+                background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
+                padding: '16px 22px',
+                borderRadius: '16px',
+                border: '1.5px solid #065F46',
+                boxShadow: '0 4px 12px rgba(14,138,84,0.22)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                minHeight: '76px',
+                cursor: 'pointer',
+              }}
+            >
+              <div style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <PlusCircle size={22} color="#0E8A54" strokeWidth={2.4} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-end' }}>
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '17px', fontWeight: 900, color: '#FFFFFF', margin: 0 }}>
+                  {t('+ نیا خرچہ درج کریں', '+ Log New Expense')}
+                </h3>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '11px', color: '#A7F3D0', fontWeight: 700 }}>
+                  {t('بجلی، لیبر، مرمت و متفرق', 'Electricity, labor, repair...')}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Expenses Tabular Table */}
+          <div style={{ backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderRadius: '16px', border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1', overflow: 'hidden', boxShadow: '0 4px 12px rgba(15,23,42,0.04)' }}>
+            <div style={{ padding: '16px 20px', backgroundColor: isDark ? '#0F172A' : '#0F172A', color: '#FFFFFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: isDark ? '1px solid #334155' : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <TrendingDown size={20} color="#F87171" />
+                <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ margin: 0, fontSize: isUrdu ? '22px' : '16px', fontWeight: 900, color: '#FFFFFF' }}>
+                  {t('تمام درج شدہ اخراجات کی تفصیلی فہرست', 'Itemized Expenses Log Table')}
+                </h3>
+              </div>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#FECACA', backgroundColor: 'rgba(239, 68, 68, 0.2)', padding: '4px 10px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
+                {expensesData.count} {isUrdu ? 'اندراجات' : 'Records'}
+              </span>
+            </div>
+
+            <div className="responsive-table-scroll">
+              <div style={{ minWidth: '760px' }}>
+                <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.6fr 1.2fr 2fr 1.4fr 1.2fr', padding: '12px 20px', backgroundColor: isDark ? '#151D2F' : '#F1F5F9', borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0', fontWeight: 900, fontSize: isUrdu ? '17px' : '13px', color: isDark ? '#E2E8F0' : '#334155', alignItems: 'center', direction: isUrdu ? 'rtl' : 'ltr' }}>
+                  <span style={{ textAlign: 'center' }}>{t('نمبر شمار', 'Sr #')}</span>
+                  <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('تاریخ و وقت', 'Date & Time')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('شعبہ / قسم', 'Category')}</span>
+                  <span style={{ textAlign: isUrdu ? 'right' : 'left' }}>{t('خرچے کی تفصیل', 'Description')}</span>
+                  <span style={{ textAlign: 'center' }}>{t('درج کنندہ', 'Logged By')}</span>
+                  <span style={{ textAlign: isUrdu ? 'left' : 'right' }}>{t('رقم (روپے)', 'Amount (Rs)')}</span>
+                </div>
+
+                {expensesData.expenses.length === 0 ? (
+                  <div style={{ padding: '36px', textAlign: 'center', color: isDark ? '#94A3B8' : '#64748B', fontSize: isUrdu ? '18px' : '14px' }} className={isUrdu ? 'font-nastaleeq' : ''}>
+                    {t('کوئی خرچہ درج نہیں ہوا ہے۔ نیا خرچہ شامل کرنے کے لیے اوپر والے بٹن پر کلک کریں۔', 'No expenses recorded yet. Click above to log your first expense.')}
+                  </div>
+                ) : (
+                  expensesData.expenses.map((exp, idx) => {
+                    const { date, time } = formatAuditDateTime(exp.createdAt);
+                    let catLabel = exp.category;
+                    if (exp.category === 'ELECTRICITY') catLabel = isUrdu ? 'بجلی بل' : 'Electricity';
+                    else if (exp.category === 'LABOR') catLabel = isUrdu ? 'مزدوری' : 'Labor';
+                    else if (exp.category === 'TEA_FOOD') catLabel = isUrdu ? 'چائے پانی' : 'Tea & Food';
+                    else if (exp.category === 'MAINTENANCE') catLabel = isUrdu ? 'مرمت' : 'Maintenance';
+                    else if (exp.category === 'TRANSPORT') catLabel = isUrdu ? 'کرایہ / گاڑی' : 'Transport';
+                    else if (exp.category === 'MISC') catLabel = isUrdu ? 'متفرق' : 'Misc';
+
+                    return (
+                      <div
+                        key={exp.id || idx}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '0.8fr 1.6fr 1.2fr 2fr 1.4fr 1.2fr',
+                          padding: '14px 20px',
+                          borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                          backgroundColor: idx % 2 === 0 ? (isDark ? '#1E293B' : '#FFFFFF') : (isDark ? '#162032' : '#F8FAFC'),
+                          alignItems: 'center',
+                          direction: isUrdu ? 'rtl' : 'ltr',
+                        }}
+                      >
+                        <span style={{ textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '13px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 800 }}>
+                          #{idx + 1}
+                        </span>
+
+                        <div dir="ltr" style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-end', fontFamily: 'var(--font-mono)' }}>
+                          <span style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: '13px' }}>{date}</span>
+                          <span style={{ fontSize: '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600 }}>{time}</span>
+                        </div>
+
+                        <div style={{ textAlign: 'center' }}>
+                          <span
+                            className={isUrdu ? 'font-nastaleeq' : ''}
+                            style={{
+                              padding: '3px 10px',
+                              borderRadius: '12px',
+                              fontSize: isUrdu ? '15px' : '11.5px',
+                              fontWeight: 800,
+                              backgroundColor: isDark ? 'rgba(234, 88, 12, 0.2)' : '#FFEDD5',
+                              color: isDark ? '#FB923C' : '#C2410C',
+                              border: isDark ? '1px solid rgba(234, 88, 12, 0.4)' : '1px solid #FED7AA',
+                              display: 'inline-block',
+                            }}
+                          >
+                            {catLabel}
+                          </span>
+                        </div>
+
+                        <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800, color: isDark ? '#F8FAFC' : '#0F172A', fontSize: isUrdu ? '19px' : '14px' }}>
+                          {exp.description}
+                        </span>
+
+                        <span style={{ textAlign: 'center', fontSize: '12px', fontWeight: 700, color: isDark ? '#CBD5E1' : '#475569' }}>
+                          {exp.recordedBy?.fullName || 'Admin'}
+                        </span>
+
+                        <span dir="ltr" style={{ textAlign: isUrdu ? 'left' : 'right', fontFamily: 'var(--font-mono)', fontWeight: 900, fontSize: '17px', color: isDark ? '#F87171' : '#DC2626' }}>
+                          - Rs {exp.amount.toLocaleString()}
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {/* ═════════════════════════════════════════════════════════════
           3. USER-WISE SALES REPORT VIEW

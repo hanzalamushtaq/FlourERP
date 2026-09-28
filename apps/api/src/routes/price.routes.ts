@@ -39,39 +39,60 @@ function getTodayDateString(): string {
  * GET /api/prices/daily-status
  * Check if today's daily prices have been confirmed (PRICE-02)
  */
+let dailyStatusCache: { data: any; expiresAt: number } | null = null;
+
+export const invalidateDailyStatusCache = () => {
+  dailyStatusCache = null;
+};
+
 priceRouter.get('/daily-status', requireAuth, async (_req: Request, res: Response) => {
   try {
     const today = getTodayDateString();
 
-    const confirmation = await prisma.dailyPriceConfirmation.findUnique({
-      where: { confirmationDate: today },
-      include: {
-        confirmedBy: {
-          select: { id: true, fullName: true, username: true },
-        },
-      },
-    });
+    if (dailyStatusCache && dailyStatusCache.expiresAt > Date.now()) {
+      return res.json({
+        success: true,
+        data: dailyStatusCache.data,
+      });
+    }
 
-    const products = await prisma.product.findMany({
-      where: { isActive: true },
-      select: {
-        id: true,
-        nameEn: true,
-        nameUr: true,
-        unit: true,
-        currentRate: true,
-      },
-      orderBy: { createdAt: 'asc' },
-    });
+    const [confirmation, products] = await Promise.all([
+      prisma.dailyPriceConfirmation.findUnique({
+        where: { confirmationDate: today },
+        include: {
+          confirmedBy: {
+            select: { id: true, fullName: true, username: true },
+          },
+        },
+      }),
+      prisma.product.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          nameEn: true,
+          nameUr: true,
+          unit: true,
+          currentRate: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+    ]);
+
+    const resData = {
+      date: today,
+      isConfirmedToday: !!confirmation,
+      confirmation: confirmation || null,
+      products,
+    };
+
+    dailyStatusCache = {
+      data: resData,
+      expiresAt: Date.now() + 10000, // 10s cache
+    };
 
     return res.json({
       success: true,
-      data: {
-        date: today,
-        isConfirmedToday: !!confirmation,
-        confirmation: confirmation || null,
-        products,
-      },
+      data: resData,
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -147,6 +168,8 @@ priceRouter.post(
 
         return confirmation;
       });
+
+      invalidateDailyStatusCache();
 
       return res.json({
         success: true,

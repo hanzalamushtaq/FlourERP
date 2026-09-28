@@ -86,7 +86,8 @@ export const PisaiBillingScreen: React.FC = () => {
   // Customer State & Autocomplete
   const [customerName, setCustomerName] = useState<string>('');
   const [customerPhone, setCustomerPhone] = useState<string>('');
-  const [suggestions, setSuggestions] = useState<typeof MOCK_CUSTOMERS>([]);
+  const [dbCustomers, setDbCustomers] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedCustomerIndex, setSelectedCustomerIndex] = useState<number>(-1);
 
@@ -162,42 +163,77 @@ export const PisaiBillingScreen: React.FC = () => {
       .catch(() => {});
   }, []);
 
-  // Autocomplete via /api/customers/search with local fallback
+  // Prefetch customers from DB on mount
+  useEffect(() => {
+    const sess = getSession();
+    fetch(`${getApiBaseUrl()}/api/customers`, {
+      headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data?.customers)) {
+          setDbCustomers(json.data.customers);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Autocomplete via in-memory instant filter + /api/customers/search
   const handleCustomerNameChange = (val: string) => {
     setCustomerName(val);
-    if (val.trim().length > 0) {
-      const sess = getSession();
-      fetch(`${getApiBaseUrl()}/api/customers/search?q=${encodeURIComponent(val)}`, {
-        headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.success && json.data.customers && json.data.customers.length > 0) {
-            setSuggestions(json.data.customers);
-            setShowSuggestions(true);
-            setSelectedCustomerIndex(0);
-          } else {
-            const filtered = MOCK_CUSTOMERS.filter((c) =>
-              c.name.toLowerCase().includes(val.toLowerCase())
-            );
-            setSuggestions(filtered);
-            setShowSuggestions(filtered.length > 0);
-            setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
-          }
-        })
-        .catch(() => {
-          const filtered = MOCK_CUSTOMERS.filter((c) =>
-            c.name.toLowerCase().includes(val.toLowerCase())
-          );
-          setSuggestions(filtered);
-          setShowSuggestions(filtered.length > 0);
-          setSelectedCustomerIndex(filtered.length > 0 ? 0 : -1);
-        });
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setSelectedCustomerIndex(-1);
+    const q = val.trim().toLowerCase();
+    if (!q) {
+      if (dbCustomers.length > 0) {
+        setSuggestions(dbCustomers.slice(0, 8));
+        setShowSuggestions(true);
+        setSelectedCustomerIndex(0);
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setSelectedCustomerIndex(-1);
+      }
+      return;
     }
+
+    const filterAndSort = (list: any[]) => {
+      const matched = list.filter((c: any) => {
+        const name = (c.name || '').toLowerCase();
+        const phone = (c.phone || '');
+        return name.includes(q) || phone.includes(q);
+      });
+      matched.sort((a: any, b: any) => {
+        const aStarts = (a.name || '').toLowerCase().startsWith(q);
+        const bStarts = (b.name || '').toLowerCase().startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+      return matched;
+    };
+
+    const immediate = filterAndSort(dbCustomers);
+    setSuggestions(immediate);
+    setShowSuggestions(immediate.length > 0);
+    setSelectedCustomerIndex(immediate.length > 0 ? 0 : -1);
+
+    const sess = getSession();
+    fetch(`${getApiBaseUrl()}/api/customers/search?q=${encodeURIComponent(val)}`, {
+      headers: sess?.token ? { Authorization: `Bearer ${sess.token}` } : {},
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data?.customers)) {
+          setDbCustomers((prev) => {
+            const map = new Map(prev.map((c) => [c.id, c]));
+            json.data.customers.forEach((c: any) => map.set(c.id, c));
+            return Array.from(map.values());
+          });
+          const fresh = filterAndSort(json.data.customers);
+          setSuggestions(fresh);
+          setShowSuggestions(fresh.length > 0);
+        }
+      })
+      .catch(() => {});
   };
 
   const handleSelectCustomer = (cust: { name: string; phone?: string | null }) => {
@@ -244,7 +280,7 @@ export const PisaiBillingScreen: React.FC = () => {
     }
 
     const hasCustomerDetails = customerName.trim().length > 0;
-    const isCreditSale = forcedCredit !== undefined ? forcedCredit : (hasCustomerDetails || balanceRemaining > 0);
+    const isCreditSale = forcedCredit !== undefined ? forcedCredit : false;
 
     if (isCreditSale && !canCredit) {
       alert(isUrdu ? 'آپ کو ادھار جاری کرنے کا اختیار حاصل نہیں ہے۔' : 'You do not have permission to issue credit.');
@@ -262,8 +298,8 @@ export const PisaiBillingScreen: React.FC = () => {
         weightKg: numWeight,
         ratePerKg: currentRate,
         feeAmount: numCharge,
-        discount: numDiscount,
-        receivedAmount: numReceived || 0,
+        discount: 0,
+        receivedAmount: isCreditSale ? 0 : numCharge,
         paymentMethod: isCreditSale ? 'CREDIT' : 'CASH',
         customerName: customerName.trim() || undefined,
         customerPhone: customerPhone.trim() || undefined,
@@ -322,9 +358,9 @@ export const PisaiBillingScreen: React.FC = () => {
           serviceType: serviceType === 'safai_pisai' ? 'SAFAI_PISAI' : 'PISAI_ONLY',
           weightKg: numWeight,
           feeAmount: numCharge,
-          discount: numDiscount,
-          netTotal: netTotal,
-          receivedAmount: isCreditSale ? 0 : numReceived,
+          discount: 0,
+          netTotal: numCharge,
+          receivedAmount: isCreditSale ? 0 : numCharge,
           paymentMethod: isCreditSale ? 'CREDIT' : 'CASH',
           biller: {
             fullName: sess?.fullName || (isUrdu ? 'محمد عاصف (کاؤنٹر 01)' : 'Muhammad Asif'),
@@ -1555,8 +1591,7 @@ export const PisaiBillingScreen: React.FC = () => {
                   }
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    receivedInputRef.current?.focus();
-                    receivedInputRef.current?.select();
+                    customerNameInputRef.current?.focus();
                   }
                 }}
                 onWheel={(e) => (e.target as HTMLElement).blur()}
@@ -1595,191 +1630,14 @@ export const PisaiBillingScreen: React.FC = () => {
                 {isUrdu ? 'روپے' : 'Rs'}
               </span>
             </div>
-
-            {/* 2b. Optional RBAC Discount Control */}
-            {canDiscount && (
-              <div style={{ marginTop: '4px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (showDiscount) {
-                        setDiscountValue('0');
-                      }
-                      setShowDiscount(!showDiscount);
-                    }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: isDark ? '#FBBF24' : '#D97706',
-                      fontSize: isUrdu ? '14px' : '12px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                      {showDiscount ? t('− رعایت ہٹائیں', '− Remove Discount') : t('+ رعایت درج کریں (مجاز)', '+ Add Discount (Authorized)')}
-                    </span>
-                  </button>
-                  {showDiscount && (
-                    <span style={{ fontSize: '12px', color: isDark ? '#4ADE80' : '#16A34A', fontWeight: 800 }}>
-                      {isUrdu ? 'مجاز رعایت' : 'Authorized'}
-                    </span>
-                  )}
-                </div>
-
-                {showDiscount && (
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <input
-                      type="number"
-                      step="any"
-                      min="0"
-                      value={discountValue}
-                      onChange={(e) => {
-                        setDiscountValue(e.target.value);
-                        setIsReceivedAutoUpdated(true);
-                      }}
-                      placeholder="0"
-                      style={{
-                        width: '100%',
-                        height: '40px',
-                        borderRadius: '8px',
-                        border: '1.5px dashed #F59E0B',
-                        backgroundColor: isDark ? '#0B0F19' : '#FFFBEB',
-                        fontSize: '20px',
-                        fontWeight: 900,
-                        fontFamily: 'var(--font-mono)',
-                        color: isDark ? '#FDE047' : '#B45309',
-                        padding: '0 56px 0 12px',
-                        direction: 'ltr',
-                        outline: 'none',
-                      }}
-                    />
-                    <span
-                      style={{
-                        position: 'absolute',
-                        right: '10px',
-                        fontSize: isUrdu ? '15px' : '12px',
-                        fontWeight: 800,
-                        color: isDark ? '#FDE047' : '#B45309',
-                      }}
-                    >
-                      {isUrdu ? 'روپے رعایت' : 'Rs Off'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
-          {/* 3. Cash Received */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-              <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '24px' : '16px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                {t('وصول رقم:', 'Received Amount (Rs):')}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setReceivedAmount(chargeAmount);
-                  setIsReceivedAutoUpdated(true);
-                }}
-                className="touch-active"
-                style={{
-                  background: isDark ? 'rgba(5, 150, 105, 0.2)' : '#ECFDF5',
-                  border: isDark ? '1px solid #059669' : 'none',
-                  color: isDark ? '#34D399' : '#0E8A54',
-                  borderRadius: '6px',
-                  padding: isUrdu ? '2px 10px' : '2px 8px',
-                  fontSize: isUrdu ? '17px' : '13px',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  boxShadow: 'none',
-                  outline: 'none',
-                  transition: 'background-color 0.15s ease',
-                }}
-              >
-                <Check size={14} strokeWidth={2.5} />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('مکمل ادا', 'Paid in Full')}</span>
-              </button>
-            </div>
-
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <input
-                ref={receivedInputRef}
-                type="number"
-                step="any"
-                value={receivedAmount}
-                onChange={(e) => {
-                  setReceivedAmount(e.target.value);
-                  setIsReceivedAutoUpdated(false);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    return;
-                  }
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    customerNameInputRef.current?.focus();
-                  }
-                }}
-                onWheel={(e) => (e.target as HTMLElement).blur()}
-                style={{
-                  width: '100%',
-                  height: '46px',
-                  borderRadius: '9px',
-                  border: isDark ? '1.5px solid #475569' : 'none',
-                  backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
-                  fontSize: '28px',
-                  fontWeight: 900,
-                  fontFamily: 'var(--font-mono)',
-                  color: isDark ? '#F8FAFC' : '#0F172A',
-                  padding: '0 56px 0 12px',
-                  direction: 'ltr',
-                  unicodeBidi: 'isolate',
-                  outline: 'none',
-                  boxShadow: 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              />
-              <span
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  fontSize: isUrdu ? '19px' : '14px',
-                  fontWeight: 900,
-                  color: isDark ? '#FDE047' : '#D97706',
-                  backgroundColor: isDark ? 'rgba(180, 83, 9, 0.2)' : '#FFFBEB',
-                  border: isDark ? '1px solid #78350F' : 'none',
-                  padding: '2px 8px',
-                  borderRadius: '6px',
-                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-                }}
-              >
-                {isUrdu ? 'روپے' : 'Rs'}
-              </span>
-            </div>
-          </div>
-
-          {/* 4. Customer Name */}
+          {/* 3. Customer Name */}
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
               <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '19px' : '15px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('گاہک کا نام (اختیاری):', 'Customer Name (Optional):')}
               </span>
-              {balanceRemaining > 0 && (
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '15px' : '12px', color: '#F87171', fontWeight: 800 }}>
-                  {t('* ادھار کے لیے نام ضروری ہے', '* Name is required for credit')}
-                </span>
-              )}
             </div>
 
             <input
@@ -1954,59 +1812,6 @@ export const PisaiBillingScreen: React.FC = () => {
               {isUrdu ? `${netTotal.toLocaleString()} روپے` : `Rs ${netTotal.toLocaleString()}`}
             </div>
 
-            {numDiscount > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: isDark ? '#4ADE80' : '#16A34A', fontSize: isUrdu ? '16px' : '13px', fontWeight: 800, marginTop: '-2px' }}>
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('رعایت:', 'Discount:')}</span>
-                <span style={{ fontFamily: 'var(--font-mono)' }}>-Rs {numDiscount.toLocaleString()}</span>
-              </div>
-            )}
-
-            {/* Balance or Return Status */}
-            {balanceRemaining > 0 ? (
-              <div
-                style={{
-                  backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2',
-                  border: isDark ? '1px solid #EF4444' : 'none',
-                  borderRadius: '6px',
-                  padding: '6px 10px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <span
-                  className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: isDark ? '#FCA5A5' : '#B91C1C' }}
-                >
-                  {t('باقی ادھار:', 'Credit Balance:')}
-                </span>
-                <span style={{ fontSize: isUrdu ? '20px' : '16px', fontWeight: 900, color: isDark ? '#F87171' : '#B91C1C', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                  {isUrdu ? `${balanceRemaining.toLocaleString()} روپے` : `Rs ${balanceRemaining.toLocaleString()}`}
-                </span>
-              </div>
-            ) : changeToReturn > 0 ? (
-              <div
-                style={{
-                  backgroundColor: isDark ? 'rgba(34, 197, 94, 0.15)' : '#ECFDF5',
-                  border: isDark ? '1px solid #22C55E' : 'none',
-                  borderRadius: '6px',
-                  padding: '6px 10px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <span
-                  className={isUrdu ? 'font-nastaleeq' : ''}
-                  style={{ fontSize: isUrdu ? '17px' : '13px', fontWeight: 800, color: isDark ? '#86EFAC' : '#0E8A54' }}
-                >
-                  {t('گاہک کو واپسی:', 'Change Due:')}
-                </span>
-                <span style={{ fontSize: isUrdu ? '20px' : '16px', fontWeight: 900, color: isDark ? '#4ADE80' : '#0E8A54', fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                  {isUrdu ? `${changeToReturn.toLocaleString()} روپے` : `Rs ${changeToReturn.toLocaleString()}`}
-                </span>
-              </div>
-            ) : null}
           </div>
 
           {/* 2 Big Dashboard-Style Hero Action Buttons */}

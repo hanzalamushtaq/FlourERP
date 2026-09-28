@@ -40,10 +40,19 @@ function getDateRange(filter?: string): { startDate: Date; endDate: Date } {
  * GET /api/reports/dashboard-kpis
  * Pre-aggregated owner dashboard cards (REP-01)
  */
+const kpiCache = new Map<string, { data: any; expiresAt: number }>();
+
 reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Response) => {
   try {
     const { range } = req.query;
-    const { startDate, endDate } = getDateRange(typeof range === 'string' ? range : 'today');
+    const rangeKey = typeof range === 'string' ? range : 'today';
+
+    const cached = kpiCache.get(rangeKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return res.json({ success: true, data: cached.data });
+    }
+
+    const { startDate, endDate } = getDateRange(rangeKey);
 
     const dateFilter = {
       createdAt: {
@@ -52,56 +61,58 @@ reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Respo
       },
     };
 
-    // 1. Product Sales
-    const bills = await prisma.bill.findMany({
-      where: dateFilter,
-      select: { netTotal: true, receivedAmount: true, paymentMethod: true },
-    });
+    // Execute all 6 aggregate queries in parallel to minimize cross-region network round-trips
+    const [bills, pisaiTickets, expenses, repayments, returns, customers] = await Promise.all([
+      // 1. Product Sales
+      prisma.bill.findMany({
+        where: dateFilter,
+        select: { netTotal: true, receivedAmount: true, paymentMethod: true },
+      }),
+      // 2. Pisai Milling Revenue
+      prisma.pisaiRecord.findMany({
+        where: dateFilter,
+        select: { netTotal: true, receivedAmount: true, weightKg: true },
+      }),
+      // 3. Shop Expenses
+      prisma.expense.findMany({
+        where: dateFilter,
+        select: { amount: true },
+      }),
+      // 4. Cash Repayments received during period
+      prisma.ledgerEntry.findMany({
+        where: {
+          ...dateFilter,
+          type: 'CREDIT_PAYMENT',
+        },
+        select: { amount: true },
+      }),
+      // 5. Cash Returns processed during period
+      prisma.billReturn.findMany({
+        where: {
+          ...dateFilter,
+          refundMethod: 'CASH',
+        },
+        select: { amount: true },
+      }),
+      // 6. Outstanding Customer Udhaar
+      prisma.customer.findMany({
+        select: { currentBalance: true },
+      }),
+    ]);
+
     const totalSalesAmount = bills.reduce((sum, b) => sum + b.netTotal, 0);
     const cashFromSales = bills.reduce((sum, b) => sum + b.receivedAmount, 0);
     const totalBillsCount = bills.length;
 
-    // 2. Pisai Milling Revenue
-    const pisaiTickets = await prisma.pisaiRecord.findMany({
-      where: dateFilter,
-      select: { netTotal: true, receivedAmount: true, weightKg: true },
-    });
     const totalPisaiRevenue = pisaiTickets.reduce((sum, p) => sum + p.netTotal, 0);
     const cashFromPisai = pisaiTickets.reduce((sum, p) => sum + p.receivedAmount, 0);
     const totalPisaiWeightKg = pisaiTickets.reduce((sum, p) => sum + p.weightKg, 0);
     const totalPisaiTokensCount = pisaiTickets.length;
 
-    // 3. Shop Expenses
-    const expenses = await prisma.expense.findMany({
-      where: dateFilter,
-      select: { amount: true },
-    });
     const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-
-    // 4. Cash Repayments received during period
-    const repayments = await prisma.ledgerEntry.findMany({
-      where: {
-        ...dateFilter,
-        type: 'CREDIT_PAYMENT',
-      },
-      select: { amount: true },
-    });
     const totalRepaymentsCash = repayments.reduce((sum, r) => sum + r.amount, 0);
-
-    // 5. Cash Returns processed during period
-    const returns = await prisma.billReturn.findMany({
-      where: {
-        ...dateFilter,
-        refundMethod: 'CASH',
-      },
-      select: { amount: true },
-    });
     const totalCashRefunds = returns.reduce((sum, r) => sum + r.amount, 0);
 
-    // 6. Outstanding Customer Udhaar (Current cumulative state across all customers)
-    const customers = await prisma.customer.findMany({
-      select: { currentBalance: true },
-    });
     const totalCustomerUdhaar = customers.reduce(
       (sum, c) => sum + (c.currentBalance > 0 ? c.currentBalance : 0),
       0
@@ -114,35 +125,52 @@ reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Respo
       cashFromSales + cashFromPisai + totalRepaymentsCash - totalExpenses - totalCashRefunds
     );
 
+    const resultData = {
+      sales: {
+        totalAmount: totalSalesAmount,
+        billsCount: totalBillsCount,
+        cashCollected: cashFromSales,
+      },
+      pisai: {
+        totalRevenue: totalPisaiRevenue,
+        tokensCount: totalPisaiTokensCount,
+        weightKg: totalPisaiWeightKg,
+        cashCollected: cashFromPisai,
+      },
+      expenses: {
+        totalAmount: totalExpenses,
+        count: expenses.length,
+      },
+      udhaar: {
+        totalOutstanding: totalCustomerUdhaar,
+        debtorsCount: activeDebtorsCount,
+      },
+      cash: {
+        netCashInHand,
+        cashFromSales,
+        cashFromPisai,
+        cashFromRepayments: totalRepaymentsCash,
+        cashPaidExpenses: totalExpenses,
+        cashPaidRefunds: totalCashRefunds,
+      },
+      dateRange: {
+        startDate,
+        endDate,
+        range: rangeKey,
+      },
+    };
+
+    kpiCache.set(rangeKey, {
+      data: resultData,
+      expiresAt: Date.now() + 5000, // 5s cache
+    });
+
     return res.json({
       success: true,
-      data: {
-        sales: {
-          totalAmount: totalSalesAmount,
-          billsCount: totalBillsCount,
-          cashCollected: cashFromSales,
-        },
-        pisai: {
-          totalRevenue: totalPisaiRevenue,
-          tokensCount: totalPisaiTokensCount,
-          weightKg: totalPisaiWeightKg,
-          cashCollected: cashFromPisai,
-        },
-        expenses: {
-          totalAmount: totalExpenses,
-          count: expenses.length,
-        },
-        udhaar: {
-          totalOutstanding: totalCustomerUdhaar,
-          debtorsCount: activeDebtorsCount,
-        },
-        cash: {
-          netCashInHand,
-          inflows: cashFromSales + cashFromPisai + totalRepaymentsCash,
-          outflows: totalExpenses + totalCashRefunds,
-        },
-      },
+      data: resultData,
     });
+
+
   } catch (error: any) {
     return res.status(500).json({
       success: false,
@@ -310,6 +338,86 @@ reportRouter.get('/ledger-stream', requireAuth, async (req: Request, res: Respon
       data: {
         items: formatted,
         count: formatted.length,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
+ * GET /api/reports/product-sales
+ * Product-wise sales breakdown ranked by quantity sold and revenue
+ */
+reportRouter.get('/product-sales', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { range } = req.query;
+    const { startDate, endDate } = getDateRange(typeof range === 'string' ? range : 'today');
+
+    const billItems = await prisma.billItem.findMany({
+      where: {
+        bill: {
+          createdAt: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      },
+      include: {
+        product: true,
+      },
+    });
+
+    const productMap = new Map<string, {
+      id: string;
+      nameEn: string;
+      nameUr: string;
+      unit: string;
+      totalQuantityKg: number;
+      totalAmount: number;
+      ordersCount: number;
+      averageRate: number;
+    }>();
+
+    for (const item of billItems) {
+      const pid = item.productId;
+      if (!productMap.has(pid)) {
+        productMap.set(pid, {
+          id: pid,
+          nameEn: item.product?.nameEn || item.productName || 'Item',
+          nameUr: item.product?.nameUr || item.productName || 'آئٹم',
+          unit: item.product?.unit || 'KG',
+          totalQuantityKg: 0,
+          totalAmount: 0,
+          ordersCount: 0,
+          averageRate: item.ratePerKg,
+        });
+      }
+      const p = productMap.get(pid)!;
+      p.totalQuantityKg += Number(item.quantityKg) || 0;
+      p.totalAmount += Number(item.totalAmount) || 0;
+      p.ordersCount += 1;
+    }
+
+    // Rank descending by quantity sold (most sold on top)
+    const products = Array.from(productMap.values()).map((p) => ({
+      ...p,
+      averageRate: p.totalQuantityKg > 0 ? Math.round((p.totalAmount / p.totalQuantityKg) * 100) / 100 : p.averageRate,
+    })).sort((a, b) => b.totalQuantityKg - a.totalQuantityKg);
+
+    const totalSoldKg = products.reduce((acc, p) => acc + p.totalQuantityKg, 0);
+    const totalRevenue = products.reduce((acc, p) => acc + p.totalAmount, 0);
+
+    return res.json({
+      success: true,
+      data: {
+        products,
+        totalSoldKg,
+        totalRevenue,
+        range: typeof range === 'string' ? range : 'today',
       },
     });
   } catch (error: any) {

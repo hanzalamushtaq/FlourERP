@@ -7,6 +7,9 @@ import { ThemeProvider } from '../context/ThemeContext';
 export const metadata: Metadata = {
   title: 'Flour Mill (Chakki) Billing & Management System',
   description: 'Fast, touch-first billing & financial management system for retail flour shop',
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export const viewport: Viewport = {

@@ -10,7 +10,7 @@ import { ReceiptData } from '../ui/ReceiptPreviewModal';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getApiBaseUrl } from '../../lib/api';
-import { getSession } from '../../lib/auth';
+import { getSession, ensureValidToken } from '../../lib/auth';
 import { ShiftInvoiceItem } from './RecentInvoicesTable';
 
 // 1. Receipt Printer SVG Illustration matching reference image
@@ -105,16 +105,28 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
 
   const fetchLiveData = async () => {
     try {
-      const session = getSession();
-      if (!session?.token) return;
-      const headers = { Authorization: `Bearer ${session.token}` };
+      let session = getSession();
+      if (!session?.token) {
+        const fresh = await ensureValidToken(session, true).catch(() => null);
+        if (!fresh) return;
+        session = getSession();
+      }
+      const headers = { Authorization: `Bearer ${session?.token}` };
 
-      // 1. Fetch live KPIs
-      const kpiRes = await fetch(`${getApiBaseUrl()}/api/reports/dashboard-kpis?range=today`, { headers });
-      if (kpiRes.status === 401) {
-        await ensureValidToken(session).catch(() => {});
+      // Fetch live KPIs and recent bills concurrently in parallel
+      const [kpiRes, billsRes] = await Promise.all([
+        fetch(`${getApiBaseUrl()}/api/reports/dashboard-kpis?range=today`, { headers }),
+        fetch(`${getApiBaseUrl()}/api/bills?limit=10`, { headers }),
+      ]);
+
+      if (kpiRes.status === 401 || billsRes.status === 401) {
+        const fresh = await ensureValidToken(session, true).catch(() => null);
+        if (fresh) {
+          fetchLiveData();
+        }
         return;
       }
+
       if (kpiRes.ok) {
         const kpiJson = await kpiRes.json();
         if (kpiJson.success && kpiJson.data) {
@@ -122,28 +134,42 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
           setMetrics({
             todaySales: d.sales?.totalAmount || 0,
             creditRecovery: d.udhaar?.totalOutstanding || 0,
-            todayPisaiKg: d.pisai?.weightKg || 0,
+            todayPisaiKg: d.pisai?.totalRevenue || d.pisai?.weightKg || 0,
             cashDrawerBalance: d.cash?.netCashInHand || 0,
           });
         }
       }
 
-      // 2. Fetch recent bills
-      const billsRes = await fetch(`${getApiBaseUrl()}/api/bills?limit=10`, { headers });
-      if (billsRes.status === 401) {
-        await ensureValidToken(session).catch(() => {});
-        return;
-      }
       if (billsRes.ok) {
         const billsJson = await billsRes.json();
         if (billsJson.success && Array.isArray(billsJson.data?.bills)) {
           const mapped: ShiftInvoiceItem[] = billsJson.data.bills.map((b: any) => ({
             invoiceNumber: b.billNumberFormatted || `B-${b.billNumber}`,
-            customerName: b.customer?.name || (isUrdu ? 'عام گاہک' : 'Walk-in Customer'),
-            customerPhone: b.customer?.phone || '',
-            itemsDetail: b.items?.map((it: any) => `${it.productName} (${it.quantityKg} کلو)`).join(', ') || '',
+            customerName: b.customerName || b.customer?.name || (isUrdu ? 'عام گاہک' : 'Walk-in Customer'),
+            customerPhone: b.customerPhone || b.customer?.phone || '',
+            itemsDetail: b.items?.map((it: any) => `${it.productName} (${Math.round((it.quantityKg || 0) * 100) / 100} کلو)`).join(', ') || '',
             totalAmount: b.netTotal,
             paymentMethod: b.paymentMethod === 'CREDIT' ? 'credit' : 'cash',
+            rawReceiptData: {
+              type: 'product',
+              billNumber: String(b.billNumber).padStart(6, '0'),
+              timestamp: new Date(b.createdAt).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', hour12: true }),
+              billerName: b.biller?.fullName || 'Cashier',
+              customerName: b.customerName || b.customer?.name,
+              isCredit: b.paymentMethod === 'CREDIT',
+              items: b.items?.map((it: any) => ({
+                nameEn: it.productName,
+                nameUr: it.productName,
+                weightKg: Math.round((it.quantityKg || 0) * 100) / 100,
+                ratePerKg: it.ratePerKg || Math.round((it.totalAmount || 0) / (it.quantityKg || 1)),
+                total: it.totalAmount,
+              })) || [],
+              subtotal: b.subtotal,
+              discount: b.discount || 0,
+              shortDiscount: b.shortDiscount || 0,
+              netTotal: b.netTotal,
+              cashReceived: b.receivedAmount,
+            },
           }));
           setRecentBills(mapped);
         }
@@ -155,8 +181,20 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
 
   React.useEffect(() => {
     fetchLiveData();
-    const interval = setInterval(fetchLiveData, 10000);
-    return () => clearInterval(interval);
+    const handleRefreshed = () => fetchLiveData();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('flour_erp_token_refreshed', handleRefreshed);
+    }
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      fetchLiveData();
+    }, 15000);
+    return () => {
+      clearInterval(interval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('flour_erp_token_refreshed', handleRefreshed);
+      }
+    };
   }, [isUrdu]);
 
   return (

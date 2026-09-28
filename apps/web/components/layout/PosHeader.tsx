@@ -28,6 +28,7 @@ import {
   ShoppingBag,
   ArrowRight,
   TrendingUp,
+  TrendingDown,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -482,6 +483,25 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       keywords: ['user sales', 'cashier report', 'staff sales', 'یوزر رپورٹ'],
       action: () => {
         onNavigateTab?.('reports', { subTab: 'user_sales' });
+        setIsSearchOpen(false);
+        setSearchQuery('');
+      },
+    },
+    {
+      id: 'rep-expense',
+      category: 'report' as const,
+      titleEn: 'Expense Report',
+      titleUr: 'دکان اخراجات رپورٹ',
+      subtitleEn: 'Daily expenses & utility bills',
+      subtitleUr: 'روزانہ اخراجات، یوٹیلٹی بلز اور متفرق مدات',
+      badgeEn: 'Report',
+      badgeUr: 'رپورٹ',
+      badgeBg: 'rgba(234, 88, 12, 0.12)',
+      badgeColor: '#EA580C',
+      icon: <TrendingDown size={18} color="#EA580C" />,
+      keywords: ['expense', 'kharcha', 'expenses', 'اخراجات', 'خرچہ'],
+      action: () => {
+        onNavigateTab?.('reports', { subTab: 'expense' });
         setIsSearchOpen(false);
         setSearchQuery('');
       },

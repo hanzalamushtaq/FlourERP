@@ -21,12 +21,14 @@ import {
   Truck,
   UserCheck,
   ChevronDown,
+  TrendingDown,
 } from 'lucide-react';
 
-export type ReportSubTab = 'sales' | 'customer' | 'daily_log' | 'user_sales' | 'audit';
+export type ReportSubTab = 'sales' | 'expense' | 'customer' | 'daily_log' | 'user_sales' | 'audit';
 
 const REPORT_SUB_ITEMS: { id: ReportSubTab; labelEn: string; labelUr: string; icon: React.ReactNode }[] = [
   { id: 'sales',      labelEn: 'Sales Report',           labelUr: 'سیلز رپورٹ',          icon: <BarChart2 size={15} /> },
+  { id: 'expense',    labelEn: 'Expense Report',         labelUr: 'اخراجات رپورٹ',       icon: <TrendingDown size={15} /> },
   { id: 'customer',   labelEn: 'Customer Report',        labelUr: 'کسٹمر رپورٹ',         icon: <Users size={15} /> },
   { id: 'daily_log',  labelEn: 'Daily Log Report',       labelUr: 'روزانہ لاگ رپورٹ',    icon: <BookOpen size={15} /> },
   { id: 'user_sales', labelEn: 'User Wise Sales Report', labelUr: 'یوزر وائز سیلز رپورٹ', icon: <UserCheck size={15} /> },

@@ -70,13 +70,20 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
   // Fetch live queue from backend
   const fetchQueue = async () => {
     try {
-      const session = getSession();
-      if (!session?.token) return;
+      let session = getSession();
+      if (!session?.token) {
+        const fresh = await ensureValidToken(session, true).catch(() => null);
+        if (!fresh) return;
+        session = getSession();
+      }
       const res = await fetch(`${getApiBaseUrl()}/api/pisai/queue?limit=50`, {
-        headers: { Authorization: `Bearer ${session.token}` },
+        headers: { Authorization: `Bearer ${session?.token}` },
       });
       if (res.status === 401) {
-        await ensureValidToken(session).catch(() => {});
+        const fresh = await ensureValidToken(session, true).catch(() => null);
+        if (fresh) {
+          fetchQueue();
+        }
         return;
       }
       if (res.ok) {
@@ -109,8 +116,17 @@ export const ChakkiQueueCard: React.FC<ChakkiQueueCardProps> = ({ onTokenDeliver
 
   useEffect(() => {
     fetchQueue();
+    const handleRefreshed = () => fetchQueue();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('flour_erp_token_refreshed', handleRefreshed);
+    }
     const interval = setInterval(fetchQueue, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('flour_erp_token_refreshed', handleRefreshed);
+      }
+    };
   }, []);
 
   // Filter items

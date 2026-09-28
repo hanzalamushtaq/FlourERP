@@ -845,14 +845,27 @@ h4.font-nastaleeq {
 
 .item-qty-input-row {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 12px;
+  grid-template-columns: 1.3fr 0.85fr 0.85fr;
+  gap: 10px;
   align-items: end;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 680px) {
+  .item-qty-input-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .item-qty-input-row > div:first-child {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 400px) {
   .item-qty-input-row {
     grid-template-columns: 1fr !important;
+  }
+  .item-qty-input-row > div:first-child {
+    grid-column: span 1;
   }
 }
 

@@ -20,6 +20,17 @@ declare global {
   }
 }
 
+const userCache = new Map<string, { user: AuthenticatedUser; expiresAt: number }>();
+const CACHE_TTL_MS = 3 * 60 * 1000; // 3 minutes cache
+
+export const invalidateUserCache = (userId?: string) => {
+  if (userId) {
+    userCache.delete(userId);
+  } else {
+    userCache.clear();
+  }
+};
+
 export const requireAuth = async (
   req: Request,
   res: Response,
@@ -40,6 +51,13 @@ export const requireAuth = async (
     const token = authHeader.split(' ')[1];
     const payload = verifyToken(token);
 
+    // Fast-path: Check memory cache first to avoid ~300ms remote database round-trip
+    const cached = userCache.get(payload.userId);
+    if (cached && cached.expiresAt > Date.now()) {
+      req.user = cached.user;
+      return next();
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
       include: {
@@ -56,6 +74,7 @@ export const requireAuth = async (
     });
 
     if (!user || !user.isActive) {
+      userCache.delete(payload.userId);
       return res.status(401).json({
         success: false,
         error: {
@@ -65,7 +84,7 @@ export const requireAuth = async (
       });
     }
 
-    req.user = {
+    const authUser: AuthenticatedUser = {
       id: user.id,
       username: user.username,
       fullName: user.fullName,
@@ -75,6 +94,12 @@ export const requireAuth = async (
       permissions: user.role.permissions.map((rp) => rp.permission.code),
     };
 
+    userCache.set(payload.userId, {
+      user: authUser,
+      expiresAt: Date.now() + CACHE_TTL_MS,
+    });
+
+    req.user = authUser;
     next();
   } catch (error) {
     return res.status(401).json({

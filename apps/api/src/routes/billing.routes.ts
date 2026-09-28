@@ -11,6 +11,7 @@ export const billingRouter = Router();
 // Validation Schemas
 const BillItemInputSchema = z.object({
   productId: z.string().min(1, 'Product ID is required'),
+  productName: z.string().optional(),
   quantityKg: z.number().positive('Quantity must be greater than 0'),
   ratePerKg: z.number().optional(), // Can be validated against DB rate
   totalAmount: z.number().nonnegative(),
@@ -84,7 +85,10 @@ function generateEscPosPayload(params: {
 
   const itemLines = params.items.map((item) => {
     const name = (item.nameEn + '                ').slice(0, 17);
-    const qty = (item.quantityKg.toFixed(2) + '     ').slice(0, 7);
+    const formattedQty = Number.isInteger(item.quantityKg)
+      ? String(item.quantityKg)
+      : String(Number(item.quantityKg.toFixed(2)));
+    const qty = (formattedQty + '       ').slice(0, 7);
     const rate = (Math.round(item.ratePerKg) + '     ').slice(0, 6);
     const tot = String(Math.round(item.totalAmount)).padStart(7, ' ');
     return `${name} ${qty} ${rate} ${tot}`;
@@ -193,14 +197,38 @@ billingRouter.post(
       for (const item of parsed.items) {
         let prod = productMap.get(item.productId);
         if (!prod) {
-          // Fallback: check if item.productId is a 1-based index (e.g. '1', '2', etc.)
           const allActive = await prisma.product.findMany({
             where: { isActive: true },
             orderBy: { createdAt: 'asc' },
           });
+
+          // Fallback 1: check if item.productId is a 1-based index (e.g. '1', '2', etc.)
           const idx = parseInt(item.productId, 10);
           if (!isNaN(idx) && idx >= 1 && idx <= allActive.length) {
             prod = allActive[idx - 1];
+          }
+
+          // Fallback 2: check if product name matches (English or Urdu)
+          if (!prod && item.productName) {
+            const search = item.productName.trim().toLowerCase();
+            prod = allActive.find(
+              (p) =>
+                p.nameEn.toLowerCase() === search ||
+                p.nameUr.trim() === item.productName?.trim() ||
+                p.nameEn.toLowerCase().includes(search) ||
+                search.includes(p.nameEn.toLowerCase())
+            );
+          }
+
+          // Fallback 3: check if single matching product by rate
+          if (!prod && item.ratePerKg && item.ratePerKg > 0) {
+            const matchingByRate = allActive.filter((p) => p.currentRate === item.ratePerKg);
+            if (matchingByRate.length === 1) {
+              prod = matchingByRate[0];
+            }
+          }
+
+          if (prod) {
             item.productId = prod.id;
             productMap.set(prod.id, prod);
           }
@@ -231,7 +259,9 @@ billingRouter.post(
       const calculatedItems = parsed.items.map((item) => {
         const prod = productMap.get(item.productId)!;
         const rate = prod.currentRate;
-        const total = Math.round(item.quantityKg * rate);
+        const total = (parsed.calculationMode === 'AMOUNT_TO_WEIGHT' && item.totalAmount > 0)
+          ? Math.round(item.totalAmount)
+          : Math.round(item.quantityKg * rate);
         return {
           productId: prod.id,
           productName: `${prod.nameEn} (${prod.nameUr})`,
@@ -267,7 +297,7 @@ billingRouter.post(
       if (parsed.customerName && parsed.customerName.trim().length > 0) {
         const trimmedName = parsed.customerName.trim();
         let customer = await prisma.customer.findFirst({
-          where: { name: trimmedName },
+          where: { name: { equals: trimmedName, mode: 'insensitive' } },
         });
         if (!customer) {
           customer = await prisma.customer.create({
@@ -497,6 +527,79 @@ billingRouter.get('/', requireAuth, async (req: Request, res: Response) => {
           totalPages: Math.ceil(total / limitNum),
         },
       },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: error.message },
+    });
+  }
+});
+
+/**
+ * PATCH /api/bills/:id
+ * Update bill financial details (price, received amount, discount) or customer info
+ */
+billingRouter.patch('/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { netTotal, receivedAmount, discount, customerName, customerPhone } = req.body;
+    const cleanId = String(id).replace(/^[^\d]*/, '');
+    const isNum = cleanId !== '' && !isNaN(Number(cleanId));
+
+    const bill = await prisma.bill.findFirst({
+      where: isNum ? { billNumber: Number(cleanId) } : { id },
+      include: { items: true },
+    });
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Bill not found for update' },
+      });
+    }
+
+    const dataToUpdate: any = {};
+    if (netTotal !== undefined && !isNaN(Number(netTotal))) {
+      dataToUpdate.netTotal = Math.round(Number(netTotal));
+      dataToUpdate.subtotal = Math.round(Number(netTotal)) + (bill.discount || 0);
+    }
+    if (receivedAmount !== undefined && !isNaN(Number(receivedAmount))) {
+      dataToUpdate.receivedAmount = Math.round(Number(receivedAmount));
+      const targetNet = dataToUpdate.netTotal !== undefined ? dataToUpdate.netTotal : bill.netTotal;
+      dataToUpdate.changeReturned = Math.max(0, dataToUpdate.receivedAmount - targetNet);
+    }
+    if (discount !== undefined && !isNaN(Number(discount))) {
+      dataToUpdate.discount = Math.round(Number(discount));
+      if (dataToUpdate.netTotal !== undefined) {
+        dataToUpdate.subtotal = dataToUpdate.netTotal + dataToUpdate.discount;
+      }
+    }
+    if (customerName !== undefined) {
+      dataToUpdate.customerName = customerName;
+    }
+
+    const updated = await prisma.bill.update({
+      where: { id: bill.id },
+      data: dataToUpdate,
+      include: { items: true, biller: { select: { fullName: true } } },
+    });
+
+    // Audit log
+    await prisma.activityLog.create({
+      data: {
+        userId: req.user!.id,
+        action: 'UPDATE_BILL',
+        entityType: 'Bill',
+        entityId: bill.id,
+        details: JSON.stringify({ billNumber: bill.billNumber, updated: dataToUpdate }),
+        ipAddress: req.ip,
+      },
+    });
+
+    return res.json({
+      success: true,
+      data: { bill: updated },
     });
   } catch (error: any) {
     return res.status(500).json({

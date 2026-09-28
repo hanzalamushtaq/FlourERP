@@ -99,20 +99,20 @@ export function isTokenExpired(token?: string | null): boolean {
   }
 }
 
-export async function ensureValidToken(user?: UserSession | null): Promise<string | null> {
+export async function ensureValidToken(user?: UserSession | null, forceRefresh: boolean = false): Promise<string | null> {
   const current = user || getSession();
   if (!current) return null;
 
-  if (current.token && current.token.startsWith('local-token-')) {
+  if (!forceRefresh && current.token && current.token.startsWith('local-token-')) {
     return current.token;
   }
 
-  // If token is already a real 3-part JWT and not expired, use it
-  if (current.token && current.token.split('.').length === 3 && !isTokenExpired(current.token)) {
+  // If token is already a real 3-part JWT and not expired, and not forced, use it
+  if (!forceRefresh && current.token && current.token.split('.').length === 3 && !isTokenExpired(current.token)) {
     return current.token;
   }
 
-  // Token is expired, mock, or missing: automatically obtain fresh JWT from backend API
+  // Token is expired, invalid, or forced to refresh: automatically obtain fresh JWT from backend API
   const uname = current.username?.toLowerCase();
   const preset = PRESET_USERS[uname];
   if (preset) {
@@ -135,12 +135,23 @@ export async function ensureValidToken(user?: UserSession | null): Promise<strin
             permissions: json.data.user.permissions || current.permissions,
           };
           saveSession(updated);
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('flour_erp_token_refreshed', { detail: updated }));
+          }
           return json.data.token;
         }
       }
     } catch (e) {
       console.error('Failed to auto-upgrade session token', e);
     }
+  }
+
+  if (forceRefresh) {
+    clearSession();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('flour_erp_session_cleared'));
+    }
+    return null;
   }
 
   return current.token || null;
