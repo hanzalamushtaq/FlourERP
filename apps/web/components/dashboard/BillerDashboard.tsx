@@ -97,7 +97,7 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   // Live Metrics & Recent Bills from Database
   const [metrics, setMetrics] = React.useState({
     todaySales: 0,
-    creditRecovery: 0,
+    todayCredit: 0,
     todayPisaiKg: 0,
     cashDrawerBalance: 0,
   });
@@ -131,11 +131,22 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
         const kpiJson = await kpiRes.json();
         if (kpiJson.success && kpiJson.data) {
           const d = kpiJson.data;
+          const salesTotal = d.sales?.totalAmount || 0;
+          const millingRevenue = d.pisai?.totalRevenue || d.pisai?.weightKg || 0;
+          const creditToday = d.udhaar?.creditToday ?? d.udhaar?.creditIssued ?? 0;
+          const creditRecovered = d.udhaar?.totalRecovered ?? d.cash?.cashFromRepayments ?? 0;
+          const refunds = d.cash?.cashPaidRefunds ?? 0;
+
+          // Cash Drawer = sum of total sales + milling revenue - credit (+ repayments - refunds)
+          const drawerBalance =
+            d.cash?.cashDrawerBalance ??
+            Math.max(0, salesTotal + millingRevenue - creditToday + creditRecovered - refunds);
+
           setMetrics({
-            todaySales: d.sales?.totalAmount || 0,
-            creditRecovery: d.udhaar?.totalOutstanding || 0,
-            todayPisaiKg: d.pisai?.totalRevenue || d.pisai?.weightKg || 0,
-            cashDrawerBalance: d.cash?.netCashInHand || 0,
+            todaySales: salesTotal,
+            todayCredit: creditToday,
+            todayPisaiKg: millingRevenue,
+            cashDrawerBalance: drawerBalance,
           });
         }
       }
@@ -435,13 +446,14 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
       {/* 3. Key Metrics Single Card with 4 Compartments matching reference image */}
       <ShiftKpiCards
         todaySales={metrics.todaySales}
-        creditRecovery={metrics.creditRecovery}
+        todayCredit={metrics.todayCredit}
+        creditRecovery={metrics.todayCredit}
         todayPisaiKg={metrics.todayPisaiKg}
         cashDrawerBalance={metrics.cashDrawerBalance}
         onCardClick={(metric) => {
           if (metric === 'sales') onNewBill();
           else if (metric === 'pisai') onNewPisaiToken();
-          else if (metric === 'recovery') onViewUdhaar();
+          else if (metric === 'credit' || metric === 'recovery') onViewUdhaar();
           else if (metric === 'drawer') onViewAllInvoices?.();
         }}
       />

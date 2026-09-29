@@ -61,8 +61,8 @@ reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Respo
       },
     };
 
-    // Execute all 6 aggregate queries in parallel to minimize cross-region network round-trips
-    const [bills, pisaiTickets, expenses, repayments, returns, customers] = await Promise.all([
+    // Execute aggregate queries in parallel to minimize cross-region network round-trips
+    const [bills, pisaiTickets, expenses, repayments, returns, customers, creditEntries] = await Promise.all([
       // 1. Product Sales
       prisma.bill.findMany({
         where: dateFilter,
@@ -71,7 +71,7 @@ reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Respo
       // 2. Pisai Milling Revenue
       prisma.pisaiRecord.findMany({
         where: dateFilter,
-        select: { netTotal: true, receivedAmount: true, weightKg: true },
+        select: { netTotal: true, receivedAmount: true, weightKg: true, paymentMethod: true },
       }),
       // 3. Shop Expenses
       prisma.expense.findMany({
@@ -98,6 +98,14 @@ reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Respo
       prisma.customer.findMany({
         select: { currentBalance: true },
       }),
+      // 7. Credit purchases / debit charges during period
+      prisma.ledgerEntry.findMany({
+        where: {
+          ...dateFilter,
+          type: 'DEBIT_PURCHASE',
+        },
+        select: { amount: true },
+      }),
     ]);
 
     const totalSalesAmount = bills.reduce((sum, b) => sum + b.netTotal, 0);
@@ -113,17 +121,35 @@ reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Respo
     const totalRepaymentsCash = repayments.reduce((sum, r) => sum + r.amount, 0);
     const totalCashRefunds = returns.reduce((sum, r) => sum + r.amount, 0);
 
+    // Credit calculation for the period (Today's Credit / Udhaar)
+    const billCredit = bills.reduce(
+      (sum, b) => (b.paymentMethod === 'CREDIT' ? sum + Math.max(0, b.netTotal - b.receivedAmount) : sum),
+      0
+    );
+    const pisaiCredit = pisaiTickets.reduce(
+      (sum, p) => (p.paymentMethod === 'CREDIT' ? sum + Math.max(0, p.netTotal - p.receivedAmount) : sum),
+      0
+    );
+    const totalCreditFromLedger = creditEntries.reduce((sum, c) => sum + c.amount, 0);
+    const totalCreditIssued = Math.max(totalCreditFromLedger, billCredit + pisaiCredit);
+
     const totalCustomerUdhaar = customers.reduce(
       (sum, c) => sum + (c.currentBalance > 0 ? c.currentBalance : 0),
       0
     );
     const activeDebtorsCount = customers.filter((c) => c.currentBalance > 0).length;
 
-    // Net Cash in Hand Formula
-    const netCashInHand = Math.max(
+    // Accurate Cash Drawer Formula:
+    // Cash drawer = total sales (atta etc) + milling revenue - credit (+ repayments - cash refunds)
+    const cashDrawerBalance = Math.max(
       0,
-      cashFromSales + cashFromPisai + totalRepaymentsCash - totalExpenses - totalCashRefunds
+      totalSalesAmount + totalPisaiRevenue - totalCreditIssued + totalRepaymentsCash - totalCashRefunds
     );
+
+    const totalInflows = cashFromSales + cashFromPisai + totalRepaymentsCash;
+    const totalOutflows = totalExpenses + totalCashRefunds;
+
+    const netCashInHand = cashDrawerBalance;
 
     const resultData = {
       sales: {
@@ -144,14 +170,21 @@ reportRouter.get('/dashboard-kpis', requireAuth, async (req: Request, res: Respo
       udhaar: {
         totalOutstanding: totalCustomerUdhaar,
         debtorsCount: activeDebtorsCount,
+        totalRecovered: totalRepaymentsCash,
+        recoveredToday: totalRepaymentsCash,
+        creditIssued: totalCreditIssued,
+        creditToday: totalCreditIssued,
       },
       cash: {
         netCashInHand,
+        cashDrawerBalance,
         cashFromSales,
         cashFromPisai,
         cashFromRepayments: totalRepaymentsCash,
         cashPaidExpenses: totalExpenses,
         cashPaidRefunds: totalCashRefunds,
+        inflows: totalInflows,
+        outflows: totalOutflows,
       },
       dateRange: {
         startDate,

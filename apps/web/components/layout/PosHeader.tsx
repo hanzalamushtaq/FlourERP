@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   Clock,
+  Printer,
   FileSpreadsheet,
   LogOut,
   Check,
@@ -70,7 +71,8 @@ const renderHeaderIcon = (tab?: string) => {
 };
 
 interface PosHeaderProps {
-  onOpenZReport: () => void;
+  onPrintDailyReport?: () => void;
+  onOpenZReport?: () => void;
   onRefresh?: () => void;
   operatorName?: string;
   roleName?: string;
@@ -89,6 +91,7 @@ interface PosHeaderProps {
 }
 
 export const PosHeader: React.FC<PosHeaderProps> = ({
+  onPrintDailyReport,
   onOpenZReport,
   operatorName = '',
   roleName = 'Biller',
@@ -313,20 +316,21 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
       },
     },
     {
-      id: 'srv-zreport',
+      id: 'srv-daily-report',
       category: 'service' as const,
-      titleEn: 'End of Shift Z-Report / Closing',
-      titleUr: 'شفٹ کا اختتام و زیڈ رپورٹ کلوزنگ',
-      subtitleEn: 'Daily cash reconciliation & closing',
-      subtitleUr: 'روزانہ کلوزنگ و کیش دراز پڑتال',
-      badgeEn: 'Closing',
-      badgeUr: 'کلوزنگ',
-      badgeBg: 'rgba(220, 38, 38, 0.12)',
-      badgeColor: '#DC2626',
-      icon: <FileSpreadsheet size={18} color="#DC2626" />,
-      keywords: ['zreport', 'closing', 'shift', 'drawer', 'کلوزنگ', 'زیڈ رپورٹ', 'شفٹ'],
+      titleEn: 'Print Daily Financial Report',
+      titleUr: 'یومیہ مالیاتی رپورٹ پرنٹ کریں',
+      subtitleEn: 'Daily sales, pisai, credit & cash summary',
+      subtitleUr: 'آج کی مکمل سیلز، پسائی اور کیش کی تفصیلی رپورٹ',
+      badgeEn: 'Report',
+      badgeUr: 'رپورٹ',
+      badgeBg: 'rgba(24, 119, 242, 0.12)',
+      badgeColor: '#1877F2',
+      icon: <Printer size={18} color="#1877F2" />,
+      keywords: ['daily', 'report', 'print', 'closing', 'drawer', 'رپورٹ', 'یومیہ', 'پرنٹ', 'کیش'],
       action: () => {
-        onOpenZReport();
+        if (onPrintDailyReport) onPrintDailyReport();
+        else if (onOpenZReport) onOpenZReport();
         setIsSearchOpen(false);
         setSearchQuery('');
       },
@@ -1086,18 +1090,19 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
           )}
         </div>
 
-        {/* End Shift (Z-Report) Button */}
+        {/* Print Daily Report Button */}
         {canCloseDay && (
           <button
             type="button"
-            onClick={onOpenZReport}
+            onClick={onPrintDailyReport || onOpenZReport}
             className="touch-active header-shift-btn"
+            title={t('آج کی یومیہ رپورٹ پرنٹ کریں', 'Print Today\'s Daily Report')}
             style={{
               backgroundColor: '#1877F2',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '7px',
-              padding: '6px 10px',
+              padding: '6px 12px',
               fontSize: isUrdu ? '15px' : '13px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -1106,16 +1111,16 @@ export const PosHeader: React.FC<PosHeaderProps> = ({
               gap: '6px',
               whiteSpace: 'nowrap',
               flexShrink: 0,
-              boxShadow: 'none',
+              boxShadow: '0 2px 6px rgba(24, 119, 242, 0.25)',
               outline: 'none',
             }}
           >
-            <FileSpreadsheet size={15} color="#FFFFFF" />
+            <Printer size={15} color="#FFFFFF" />
             <span
               className={`header-shift-btn-text ${isUrdu ? 'font-nastaleeq' : ''}`}
               style={{ fontSize: '12px', fontWeight: 800 }}
             >
-              {t('شفٹ اختتام', 'End Shift')}
+              {t('یومیہ رپورٹ', 'Daily Report')}
             </span>
           </button>
         )}

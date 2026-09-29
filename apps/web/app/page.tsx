@@ -385,6 +385,7 @@ export default function Home() {
       >
         {/* Top Action Header */}
         <PosHeader
+          onPrintDailyReport={() => setIsZReportOpen(true)}
           onOpenZReport={() => setIsZReportOpen(true)}
           onOpenPriceModal={() => setIsPriceModalOpen(true)}
           operatorName={currentUser.fullName}
@@ -662,11 +663,10 @@ export default function Home() {
         isAdmin={userIsAdmin || hasPermission(currentUser, 'can_manage_prices')}
       />
 
-      {/* End-of-Shift / Z-Report Reconciliation Modal */}
+      {/* Daily Financial Report Modal */}
       <ZReportModal
         isOpen={isZReportOpen}
         onClose={() => setIsZReportOpen(false)}
-        onConfirmCloseShift={handleConfirmShiftClose}
       />
 
       {/* Screen Masking PIN-Lock Overlay */}

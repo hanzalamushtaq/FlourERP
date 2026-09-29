@@ -8,14 +8,16 @@ import { useTheme } from '../../context/ThemeContext';
 
 interface ShiftKpiCardsProps {
   todaySales?: number;
+  todayCredit?: number;
   creditRecovery?: number;
   todayPisaiKg?: number;
   cashDrawerBalance?: number;
-  onCardClick?: (metric: 'sales' | 'recovery' | 'pisai' | 'drawer') => void;
+  onCardClick?: (metric: 'sales' | 'credit' | 'recovery' | 'pisai' | 'drawer') => void;
 }
 
 export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
   todaySales = 0,
+  todayCredit,
   creditRecovery = 0,
   todayPisaiKg = 0,
   cashDrawerBalance = 0,
@@ -34,9 +36,9 @@ export const ShiftKpiCards: React.FC<ShiftKpiCardsProps> = ({
       iconColor: '#059669',
     },
     {
-      id: 'recovery' as const,
-      title: t('ادھار وصولی', 'Credit Recovered'),
-      amount: creditRecovery,
+      id: 'credit' as const,
+      title: t('آج کا ادھار', "Today's Credit"),
+      amount: todayCredit !== undefined ? todayCredit : creditRecovery,
       icon: BookOpen,
       accentColor: '#F59E0B',
       lightBg: '#FEF3C7',

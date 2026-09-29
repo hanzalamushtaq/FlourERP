@@ -14,7 +14,7 @@ interface CounterDashboardProps {
   onEditRates: () => void;
   onReprintReceipt: (receipt: ReceiptData) => void;
   onViewAllInvoices?: () => void;
-  onMetricCardClick?: (metric: 'sales' | 'recovery' | 'pisai' | 'drawer') => void;
+  onMetricCardClick?: (metric: 'sales' | 'credit' | 'recovery' | 'pisai' | 'drawer') => void;
 }
 
 export const CounterDashboard: React.FC<CounterDashboardProps> = ({
@@ -47,6 +47,7 @@ export const CounterDashboard: React.FC<CounterDashboardProps> = ({
       {/* 2. Key Metrics Row */}
       <ShiftKpiCards
         todaySales={0}
+        todayCredit={0}
         creditRecovery={0}
         todayPisaiKg={0}
         cashDrawerBalance={0}

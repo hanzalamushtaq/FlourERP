@@ -37,12 +37,14 @@ interface NotificationDropdownProps {
   isAdmin: boolean;
   onOpenPriceModal?: () => void;
   onOpenZReport?: () => void;
+  onPrintDailyReport?: () => void;
 }
 
 export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   isAdmin,
   onOpenPriceModal,
   onOpenZReport,
+  onPrintDailyReport,
 }) => {
   const { isUrdu, t } = useLanguage();
   const { isDark } = useTheme();
@@ -193,17 +195,18 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       id: `closing_reminder_${new Date().toISOString().slice(0, 10)}`,
       type: 'closing',
       severity: 'info',
-      titleUr: 'روزانہ شفٹ اختتام (Z-Report) یاد دہانی',
-      titleEn: 'End of Shift (Z-Report) Reminder',
-      descUr: 'دن کی اختتامی رپورٹ نکالیں اور کیش دراز کا حساب مکمل کریں۔',
-      descEn: 'Remember to perform daily closing and print the official Z-Report.',
+      titleUr: 'روزانہ رپورٹ (Daily Report) یاد دہانی',
+      titleEn: 'Daily Financial Report Reminder',
+      descUr: 'آج کی مکمل سیلز اور کیش دراز کی رپورٹ پرنٹ کریں۔',
+      descEn: 'Print today\'s complete sales, milling and cash drawer report.',
       time: t('شام', 'Evening'),
       read: readIds.includes(`closing_reminder_${new Date().toISOString().slice(0, 10)}`),
-      actionLabelUr: 'شفٹ کلوز کریں',
-      actionLabelEn: 'Close Shift',
+      actionLabelUr: 'رپورٹ پرنٹ کریں',
+      actionLabelEn: 'Print Report',
       onAction: () => {
         setIsOpen(false);
-        if (onOpenZReport) onOpenZReport();
+        if (onPrintDailyReport) onPrintDailyReport();
+        else if (onOpenZReport) onOpenZReport();
       },
     });
   }

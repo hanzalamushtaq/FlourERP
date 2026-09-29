@@ -1,52 +1,47 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  FileSpreadsheet,
-  Lock,
   Printer,
   X,
-  CheckCircle2,
-  Database,
   Banknote,
   Sparkles,
   Receipt,
   HandCoins,
-  Unlock,
+  RefreshCw,
+  Calculator,
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { getSession, ensureValidToken } from '../../lib/auth';
 import { getApiBaseUrl } from '../../lib/api';
+import { useGeneralInfo } from '../../lib/generalInfo';
+import { generateTabularPdf } from '../../lib/pdfReportGenerator';
 
-interface ZReportModalProps {
+export interface DailyReportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirmCloseShift: () => void;
+  onConfirmCloseShift?: () => void;
   shiftData?: {
-    shiftName: string;
-    operatorName: string;
-    counter: string;
-    openedAt: string;
-    closedAt: string;
-    totalSales: number;
-    totalPisai: number;
-    creditRecovery: number;
-    expenses: number;
-    expectedCash: number;
+    shiftName?: string;
+    operatorName?: string;
+    counter?: string;
+    openedAt?: string;
+    closedAt?: string;
+    totalSales?: number;
+    totalPisai?: number;
+    creditRecovery?: number;
+    expenses?: number;
+    expectedCash?: number;
   };
 }
 
-export const ZReportModal: React.FC<ZReportModalProps> = ({
+export const DailyReportModal: React.FC<DailyReportModalProps> = ({
   isOpen,
   onClose,
-  onConfirmCloseShift,
   shiftData = {
-    shiftName: 'Morning Shift',
-    operatorName: 'محمد عاصف',
+    operatorName: 'آپریٹر',
     counter: '01',
-    openedAt: '18/09/2026, 08:00 AM',
-    closedAt: '18/09/2026, 06:45 PM',
     totalSales: 0,
     totalPisai: 0,
     creditRecovery: 0,
@@ -55,59 +50,67 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
   },
 }) => {
   const { isUrdu, t } = useLanguage();
+  const generalInfo = useGeneralInfo();
+
   const [actualCashInput, setActualCashInput] = useState<string>('0');
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [isClosedSuccess, setIsClosedSuccess] = useState<boolean>(false);
   const [isLoadingMetrics, setIsLoadingMetrics] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [backupFilename, setBackupFilename] = useState<string | null>(null);
 
   const [liveData, setLiveData] = useState({
-    totalSales: shiftData.totalSales,
-    totalPisai: shiftData.totalPisai,
-    creditRecovery: shiftData.creditRecovery,
-    expenses: shiftData.expenses,
-    expectedCash: shiftData.expectedCash,
+    totalSales: shiftData.totalSales || 0,
+    cashSales: 0,
+    creditSales: 0,
+    totalPisai: shiftData.totalPisai || 0,
+    cashPisai: 0,
+    creditPisai: 0,
+    creditRecovery: shiftData.creditRecovery || 0,
+    expenses: shiftData.expenses || 0,
+    cashReturns: 0,
+    expectedCash: shiftData.expectedCash || 0,
     billCount: 0,
     pisaiCount: 0,
-    isClosed: false,
   });
 
-  React.useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchPreview = async () => {
-      setIsLoadingMetrics(true);
-      setErrorMessage(null);
-      try {
-        const sess = getSession();
-        const token = await ensureValidToken(sess);
-        const res = await fetch(`${getApiBaseUrl()}/api/closing/preview`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+  const fetchPreview = async () => {
+    setIsLoadingMetrics(true);
+    setErrorMessage(null);
+    try {
+      const sess = getSession();
+      const token = await ensureValidToken(sess);
+      const res = await fetch(`${getApiBaseUrl()}/api/closing/preview`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        const d = json.data;
+        setLiveData({
+          totalSales: d.totalSales ?? ((d.cashSales || 0) + (d.creditSales || 0)),
+          cashSales: d.cashSales ?? 0,
+          creditSales: d.creditSales ?? 0,
+          totalPisai: d.totalPisai ?? ((d.cashPisai || 0) + (d.creditPisai || 0)),
+          cashPisai: d.cashPisai ?? 0,
+          creditPisai: d.creditPisai ?? 0,
+          creditRecovery: d.totalUdhaarCollected ?? 0,
+          expenses: d.totalExpenses ?? 0,
+          cashReturns: d.cashReturns ?? 0,
+          expectedCash: d.expectedCashInDrawer ?? 0,
+          billCount: d.billCount ?? 0,
+          pisaiCount: d.pisaiCount ?? 0,
         });
-        const json = await res.json();
-        if (json.success && json.data) {
-          const d = json.data;
-          setLiveData({
-            totalSales: d.cashSales ?? d.totalSales,
-            totalPisai: d.cashPisai ?? d.totalPisai,
-            creditRecovery: d.totalUdhaarCollected ?? 0,
-            expenses: d.totalExpenses ?? 0,
-            expectedCash: d.expectedCashInDrawer ?? 0,
-            billCount: d.billCount ?? 0,
-            pisaiCount: d.pisaiCount ?? 0,
-            isClosed: d.isClosed ?? false,
-          });
-          setActualCashInput(String(Math.round(d.expectedCashInDrawer ?? 0)));
-        }
-      } catch (err: any) {
-        console.error('Failed to load closing preview:', err);
-      } finally {
-        setIsLoadingMetrics(false);
+        setActualCashInput(String(Math.round(d.expectedCashInDrawer ?? 0)));
       }
-    };
+    } catch (err: any) {
+      console.error('Failed to load daily report preview:', err);
+      setErrorMessage(err.message || 'Failed to load report data');
+    } finally {
+      setIsLoadingMetrics(false);
+    }
+  };
 
-    fetchPreview();
+  useEffect(() => {
+    if (isOpen) {
+      fetchPreview();
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -116,82 +119,210 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
   const actualCash = parseFloat(actualCashInput) || 0;
   const discrepancy = actualCash - activeExpectedCash;
 
-  const handleExecuteClosing = async () => {
-    setIsProcessing(true);
-    setErrorMessage(null);
-    try {
-      const sess = getSession();
-      const token = await ensureValidToken(sess);
-      const res = await fetch(`${getApiBaseUrl()}/api/closing`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          actualCashInDrawer: actualCash,
-        }),
-      });
+  const currentDateStr = new Date().toLocaleDateString('en-PK', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+  const currentTimeStr = new Date().toLocaleTimeString('en-PK', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
 
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        setErrorMessage(json.error?.message || 'Failed to execute daily closing');
-        setIsProcessing(false);
+  // 1. Direct Thermal Printer Slip (80mm/58mm format)
+  const handleThermalPrint = () => {
+    try {
+      let iframe = document.getElementById('daily-report-thermal-iframe') as HTMLIFrameElement;
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'daily-report-thermal-iframe';
+        iframe.style.position = 'fixed';
+        iframe.style.top = '-9999px';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const doc = iframe.contentWindow?.document;
+      if (!doc) {
+        window.print();
         return;
       }
 
-      setBackupFilename(json.data?.backup?.filename || 'Backup Complete');
-      setIsProcessing(false);
-      setIsClosedSuccess(true);
+      const content = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Daily Report - ${currentDateStr}</title>
+          <style>
+            @page {
+              size: 80mm auto;
+              margin: 3mm;
+            }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              font-size: 13px;
+              line-height: 1.35;
+              color: #000;
+              margin: 0;
+              padding: 4px;
+              width: 72mm;
+            }
+            .center { text-align: center; }
+            .right { text-align: right; }
+            .left { text-align: left; }
+            .bold { font-weight: bold; }
+            .divider { border-top: 1px dashed #000; margin: 6px 0; }
+            .double-divider { border-top: 2px solid #000; margin: 8px 0; }
+            .row { display: flex; justify-content: space-between; margin: 3px 0; }
+            .sub-row { display: flex; justify-content: space-between; margin: 1px 0 1px 10px; font-size: 11.5px; color: #333; }
+            .header { margin-bottom: 8px; text-align: center; }
+            .header h2 { margin: 0; font-size: 17px; font-weight: 900; }
+            .header p { margin: 2px 0; font-size: 11px; }
+            .total-box { border: 1.5px solid #000; padding: 6px 8px; margin: 8px 0; text-align: center; }
+            .total-title { font-size: 11px; font-weight: bold; }
+            .total-amount { font-size: 19px; font-weight: 900; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>${generalInfo.mill_name || 'AL-MADINA FLOUR MILLS'}</h2>
+            <p>${generalInfo.address || 'Chakki & General Store'}</p>
+            ${generalInfo.phone_primary ? `<p>Tel: ${generalInfo.phone_primary}</p>` : ''}
+            <div class="double-divider"></div>
+            <div style="font-weight: 900; font-size: 14px;">DAILY BUSINESS REPORT</div>
+            <div style="font-size: 11px;">(یومیہ کاروباری سمری رپورٹ)</div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="row"><span>Date:</span><span class="bold">${currentDateStr}</span></div>
+          <div class="row"><span>Time:</span><span class="bold">${currentTimeStr}</span></div>
+          <div class="row"><span>Operator:</span><span class="bold">${shiftData.operatorName || 'Cashier'}</span></div>
+          <div class="row"><span>Counter:</span><span class="bold">#${shiftData.counter || '01'}</span></div>
+          <div class="divider"></div>
+
+          <div style="font-weight: bold; margin: 4px 0 2px;">1. PRODUCT SALES (پراڈکٹ سیلز)</div>
+          <div class="row"><span>Total Bills:</span><span class="bold">${liveData.billCount}</span></div>
+          <div class="row"><span>Gross Sales:</span><span class="bold">Rs ${Math.round(liveData.totalSales).toLocaleString()}</span></div>
+          <div class="sub-row"><span>- Cash Collected:</span><span>Rs ${Math.round(liveData.cashSales).toLocaleString()}</span></div>
+          <div class="sub-row"><span>- Credit (Udhaar):</span><span>Rs ${Math.round(liveData.creditSales).toLocaleString()}</span></div>
+          <div class="divider"></div>
+
+          <div style="font-weight: bold; margin: 4px 0 2px;">2. GUNDAM PISAI (گندم پسائی)</div>
+          <div class="row"><span>Total Tokens:</span><span class="bold">${liveData.pisaiCount}</span></div>
+          <div class="row"><span>Gross Pisai Fee:</span><span class="bold">Rs ${Math.round(liveData.totalPisai).toLocaleString()}</span></div>
+          <div class="sub-row"><span>- Cash Collected:</span><span>Rs ${Math.round(liveData.cashPisai).toLocaleString()}</span></div>
+          <div class="sub-row"><span>- Credit (Udhaar):</span><span>Rs ${Math.round(liveData.creditPisai).toLocaleString()}</span></div>
+          <div class="divider"></div>
+
+          <div style="font-weight: bold; margin: 4px 0 2px;">3. UDHAAR RECOVERY (ادھار وصولی)</div>
+          <div class="row"><span>Cash Recovered:</span><span class="bold">Rs ${Math.round(liveData.creditRecovery).toLocaleString()}</span></div>
+          <div class="divider"></div>
+
+          <div style="font-weight: bold; margin: 4px 0 2px;">4. EXPENSES & RETURNS (اخراجات و واپسی)</div>
+          <div class="row"><span>Shop Expenses:</span><span class="bold">- Rs ${Math.round(liveData.expenses).toLocaleString()}</span></div>
+          <div class="row"><span>Cash Returns:</span><span class="bold">- Rs ${Math.round(liveData.cashReturns).toLocaleString()}</span></div>
+          <div class="double-divider"></div>
+
+          <div class="total-box">
+            <div class="total-title">NET CASH IN DRAWER (کیش دراز)</div>
+            <div class="total-amount">Rs ${Math.round(activeExpectedCash).toLocaleString()}</div>
+          </div>
+
+          ${actualCash > 0 && discrepancy !== 0 ? `
+            <div class="row"><span>Counted Cash:</span><span class="bold">Rs ${Math.round(actualCash).toLocaleString()}</span></div>
+            <div class="row"><span>Difference (فرق):</span><span class="bold">${discrepancy >= 0 ? '+' : ''}Rs ${Math.round(discrepancy).toLocaleString()}</span></div>
+            <div class="divider"></div>
+          ` : ''}
+
+          <div class="center" style="font-size: 11px; margin-top: 10px; color: #444;">
+            <div>کمپیوٹرائزڈ تصدیق شدہ یومیہ رپورٹ</div>
+            <div>FlourERP • Al-Madina System</div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      doc.open();
+      doc.write(content);
+      doc.close();
+
       setTimeout(() => {
-        onConfirmCloseShift();
-        onClose();
-        setIsClosedSuccess(false);
-      }, 2000);
-    } catch (err: any) {
-      setErrorMessage(`Network error: ${err.message}`);
-      setIsProcessing(false);
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      }, 300);
+    } catch (e) {
+      console.error('Thermal print error:', e);
+      window.print();
     }
   };
 
-  const handleUnlockDay = async () => {
-    const confirmUnlock = window.confirm(
-      isUrdu
-        ? 'کیا آپ واقعی آج کا کاروباری دن دوبارہ کھولنا چاہتے ہیں تاکہ بلنگ جاری رکھی جا سکے؟'
-        : 'Are you sure you want to unlock today’s business day to resume billing?'
-    );
-    if (!confirmUnlock) return;
-
-    setIsProcessing(true);
-    setErrorMessage(null);
-    try {
-      const sess = getSession();
-      const token = await ensureValidToken(sess);
-      const res = await fetch(`${getApiBaseUrl()}/api/closing/unlock`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  // 2. Full A4 / PDF Export
+  const handleA4PdfPrint = () => {
+    generateTabularPdf({
+      title: generalInfo.mill_name ? `${generalInfo.mill_name} - یومیہ مالیاتی رپورٹ` : 'Al-Madina Flour Mills - Daily Financial Report',
+      subtitle: isUrdu ? 'آج کی مکمل کاروباری سمری، سیلز، پسائی و کیش دراز حساب' : 'Daily Sales, Pisai Milling, Credit Recoveries & Cash Reconciliation',
+      dateRangeStr: currentDateStr,
+      isUrdu,
+      summaryCards: [
+        { label: isUrdu ? 'کل پروڈکٹ سیلز' : 'Total Sales', value: `Rs ${Math.round(liveData.totalSales).toLocaleString()}`, color: '#059669' },
+        { label: isUrdu ? 'گندم پسائی آمدن' : 'Pisai Milling', value: `Rs ${Math.round(liveData.totalPisai).toLocaleString()}`, color: '#EA580C' },
+        { label: isUrdu ? 'ادھار وصولی' : 'Credit Recovered', value: `Rs ${Math.round(liveData.creditRecovery).toLocaleString()}`, color: '#D97706' },
+        { label: isUrdu ? 'دکان کے اخراجات' : 'Shop Expenses', value: `Rs ${Math.round(liveData.expenses).toLocaleString()}`, color: '#DC2626' },
+        { label: isUrdu ? 'کیش دراز خالص رقم' : 'Net Cash in Drawer', value: `Rs ${Math.round(activeExpectedCash).toLocaleString()}`, color: '#2563EB' },
+      ],
+      tables: [
+        {
+          title: isUrdu ? 'تفصیلات برائے یومیہ حساب کتاب' : 'Daily Accounts Breakdown',
+          headers: isUrdu
+            ? ['شعبہ / مد', 'تعداد', 'نقد وصولی', 'ادھار', 'کل رقم']
+            : ['Section / Description', 'Count', 'Cash Collected', 'Credit (Udhaar)', 'Total Amount'],
+          rows: [
+            [
+              isUrdu ? 'پروڈکٹ سیلز (آٹا، سوجی، میدہ)' : 'Product Sales (Atta, Suji, Maida)',
+              `${liveData.billCount} bills`,
+              `Rs ${Math.round(liveData.cashSales).toLocaleString()}`,
+              `Rs ${Math.round(liveData.creditSales).toLocaleString()}`,
+              `Rs ${Math.round(liveData.totalSales).toLocaleString()}`,
+            ],
+            [
+              isUrdu ? 'گندم پسائی اجرت' : 'Wheat Grinding Services',
+              `${liveData.pisaiCount} tokens`,
+              `Rs ${Math.round(liveData.cashPisai).toLocaleString()}`,
+              `Rs ${Math.round(liveData.creditPisai).toLocaleString()}`,
+              `Rs ${Math.round(liveData.totalPisai).toLocaleString()}`,
+            ],
+            [
+              isUrdu ? 'ادھار وصولی (کھاتہ داران)' : 'Customer Credit Repayments',
+              '-',
+              `Rs ${Math.round(liveData.creditRecovery).toLocaleString()}`,
+              '-',
+              `Rs ${Math.round(liveData.creditRecovery).toLocaleString()}`,
+            ],
+            [
+              isUrdu ? 'دکان اخراجات و نقد واپسی' : 'Shop Expenses & Cash Returns',
+              '-',
+              `- Rs ${Math.round(liveData.expenses + liveData.cashReturns).toLocaleString()}`,
+              '-',
+              `- Rs ${Math.round(liveData.expenses + liveData.cashReturns).toLocaleString()}`,
+            ],
+          ],
+          footers: [
+            isUrdu ? 'خالص کیش دراز بیلنس (Net Cash)' : 'Net Cash in Drawer',
+            '',
+            `Rs ${Math.round(activeExpectedCash).toLocaleString()}`,
+            '',
+            `Rs ${Math.round(activeExpectedCash).toLocaleString()}`,
+          ],
+          alignments: ['left', 'center', 'right', 'right', 'right'],
         },
-        body: JSON.stringify({}),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.error?.message || 'Failed to unlock business day');
-      }
-      alert(
-        isUrdu
-          ? 'کاروباری دن کامیابی سے ان لاک ہو گیا ہے! اب آپ بل اور ٹوکن بنا سکتے ہیں۔'
-          : 'Business day successfully unlocked! You can now issue bills and tokens.'
-      );
-      setLiveData((prev) => ({ ...prev, isClosed: false }));
-      onConfirmCloseShift();
-      onClose();
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Unlock error');
-    } finally {
-      setIsProcessing(false);
-    }
+      ],
+      notes: isUrdu ? 'کمپیوٹرائزڈ یومیہ مالیاتی رپورٹ - تصدیق شدہ' : 'Computerized Daily Financial Report - Verified and Stored',
+    });
   };
 
   return (
@@ -213,9 +344,9 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
           backgroundColor: '#ffffff',
           borderRadius: '20px',
           width: '100%',
-          maxWidth: '560px',
-          maxHeight: '90vh',
-          boxShadow: 'none',
+          maxWidth: '580px',
+          maxHeight: '92vh',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
           overflow: 'hidden',
           overflowY: 'auto',
           border: '1.5px solid #cbd5e1',
@@ -228,159 +359,128 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
           style={{
             backgroundColor: '#0f172a',
             color: '#ffffff',
-            padding: '18px 22px',
+            padding: '16px 22px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '36px',
-                height: '36px',
+                width: '38px',
+                height: '38px',
                 borderRadius: '10px',
-                backgroundColor: '#fbbf24',
-                color: '#0f172a',
+                backgroundColor: '#1877F2',
+                color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <FileSpreadsheet size={20} />
+              <Printer size={20} />
             </div>
             <div>
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
-                style={{ fontSize: '16px', fontWeight: 900, margin: 0, lineHeight: 1.2 }}
+                style={{ fontSize: '18px', fontWeight: 900, margin: 0, lineHeight: 1.2 }}
               >
-                {t('شفٹ کا اختتام و اختتامی رپورٹ', 'End of Shift Report')}
+                {t('آج کی یومیہ رپورٹ', 'Today\'s Daily Report')}
               </h2>
-              <p style={{ fontSize: '11px', color: '#94a3b8', margin: '2px 0 0' }}>
-                {t('شفٹ لیجر کا حساب کتاب اور ڈیٹا بیس بیک اپ', 'End of Shift Ledger Reconciliation & Database Backup')}
+              <p style={{ fontSize: '12px', color: '#94a3b8', margin: '3px 0 0' }}>
+                {t('فروخت، گندم پسائی، ادھار وصولی اور کیش دراز کا خلاصہ', 'Summary of sales, pisai, recoveries & drawer cash')}
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              backgroundColor: '#1e293b',
-              border: 'none',
-              color: '#94a3b8',
-              borderRadius: '8px',
-              width: '32px',
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <X size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={fetchPreview}
+              title={t('تازہ ترین ڈیٹا لائیں', 'Refresh data')}
+              style={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                color: '#94a3b8',
+                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <RefreshCw size={15} className={isLoadingMetrics ? 'animate-spin' : ''} />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                color: '#94a3b8',
+                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
-        <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {/* Metadata banner */}
           <div
             style={{
               backgroundColor: '#f8fafc',
               border: '1px solid #e2e8f0',
               borderRadius: '12px',
-              padding: '12px 16px',
+              padding: '10px 14px',
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              gap: '8px',
-              fontSize: '12px',
+              gap: '6px',
+              fontSize: '12.5px',
             }}
           >
             <div>
               <span style={{ color: '#64748b' }}>{t('آپریٹر: ', 'Operator: ')}</span>
-              <strong className="font-nastaleeq">{shiftData.operatorName}</strong>
+              <strong className="font-nastaleeq">{shiftData.operatorName || 'Cashier'}</strong>
             </div>
             <div>
               <span style={{ color: '#64748b' }}>{t('کاؤنٹر: ', 'Counter: ')}</span>
-              <strong>{isUrdu ? `کاؤنٹر #${shiftData.counter}` : `Counter #${shiftData.counter}`}</strong>
+              <strong>{isUrdu ? `کاؤنٹر #${shiftData.counter || '01'}` : `Counter #${shiftData.counter || '01'}`}</strong>
             </div>
             <div>
-              <span style={{ color: '#64748b' }}>{t('شفٹ: ', 'Shift: ')}</span>
-              <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                {isUrdu ? 'صبح شفٹ' : 'Morning Shift'}
-              </span>
+              <span style={{ color: '#64748b' }}>{t('تاریخ: ', 'Date: ')}</span>
+              <strong style={{ fontFamily: 'var(--font-mono)' }}>{currentDateStr}</strong>
             </div>
             <div>
               <span style={{ color: '#64748b' }}>{t('وقت: ', 'Time: ')}</span>
-              <span style={{ fontFamily: 'var(--font-mono)' }}>{shiftData.closedAt}</span>
+              <span style={{ fontFamily: 'var(--font-mono)' }}>{currentTimeStr}</span>
             </div>
           </div>
 
-          {/* Error / Closed status banner */}
+          {/* Error banner */}
           {errorMessage && (
             <div
               style={{
                 backgroundColor: '#fef2f2',
                 border: '1.5px solid #f87171',
                 borderRadius: '10px',
-                padding: '10px 14px',
+                padding: '8px 12px',
                 color: '#991b1b',
-                fontSize: '13px',
+                fontSize: '12px',
                 fontWeight: 700,
               }}
             >
               {errorMessage}
-            </div>
-          )}
-
-          {liveData.isClosed && (
-            <div
-              style={{
-                backgroundColor: '#eff6ff',
-                border: '1.5px solid #60a5fa',
-                borderRadius: '10px',
-                padding: '12px 16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '10px',
-              }}
-            >
-              <div>
-                <div style={{ color: '#1e40af', fontSize: '14px', fontWeight: 800 }} className={isUrdu ? 'font-nastaleeq' : ''}>
-                  {t('یہ کاروباری دن کلوز اور لاک ہو چکا ہے۔', 'This business day is closed and locked.')}
-                </div>
-                <div style={{ color: '#3b82f6', fontSize: '12px', fontWeight: 600 }}>
-                  {t('نئے بلز اور پسائی ٹوکنز جاری کرنے کے لیے دن کو ان لاک کریں۔', 'Unlock to resume issuing bills and grinding tokens.')}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleUnlockDay}
-                disabled={isProcessing}
-                style={{
-                  backgroundColor: '#dc2626',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '8px 16px',
-                  fontWeight: 800,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.25)',
-                }}
-              >
-                <Unlock size={15} />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                  {t('کاروبار ان لاک کریں', 'Unlock Business Day')}
-                </span>
-              </button>
             </div>
           )}
 
@@ -393,57 +493,80 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               fontSize: '13px',
             }}
           >
+            {/* Row 1: Product Sales */}
+            <div
+              style={{
+                padding: '10px 14px',
+                borderBottom: '1px solid #f1f5f9',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Banknote size={16} color="#15803d" />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800 }}>
+                    {t('کل پروڈکٹ سیلز', 'Product Sales')}
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>({liveData.billCount} {isUrdu ? 'بلز' : 'bills'})</span>
+                </span>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: '#15803d', fontSize: '15px' }}>
+                  {isUrdu ? `${Math.round(liveData.totalSales).toLocaleString()} روپے` : `Rs ${Math.round(liveData.totalSales).toLocaleString()}`}
+                </strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#64748b', marginTop: '3px', paddingLeft: '22px' }}>
+                <span>{t('نقد وصولی:', 'Cash:')} Rs {Math.round(liveData.cashSales).toLocaleString()}</span>
+                <span>{t('ادھار:', 'Credit:')} Rs {Math.round(liveData.creditSales).toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Row 2: Pisai Milling */}
+            <div
+              style={{
+                padding: '10px 14px',
+                borderBottom: '1px solid #f1f5f9',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Sparkles size={16} color="#b45309" />
+                  <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800 }}>
+                    {t('گندم پسائی آمدن', 'Milling Revenue')}
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>({liveData.pisaiCount} {isUrdu ? 'ٹوکنز' : 'tokens'})</span>
+                </span>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: '#b45309', fontSize: '15px' }}>
+                  {isUrdu ? `${Math.round(liveData.totalPisai).toLocaleString()} روپے` : `Rs ${Math.round(liveData.totalPisai).toLocaleString()}`}
+                </strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#64748b', marginTop: '3px', paddingLeft: '22px' }}>
+                <span>{t('نقد وصولی:', 'Cash:')} Rs {Math.round(liveData.cashPisai).toLocaleString()}</span>
+                <span>{t('ادھار:', 'Credit:')} Rs {Math.round(liveData.creditPisai).toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Row 3: Credit Recovery */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 padding: '10px 14px',
                 borderBottom: '1px solid #f1f5f9',
+                backgroundColor: '#ffffff',
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Banknote size={15} color="#15803d" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('کل نقد سیلز', 'Total Cash Sales')}</span>
+                <HandCoins size={16} color="#0284c7" />
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800 }}>
+                  {t('ادھار وصولی', 'Credit Recovered')}
+                </span>
               </span>
-              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `${liveData.totalSales.toLocaleString()} روپے` : `Rs ${liveData.totalSales.toLocaleString()}`}
+              <strong style={{ fontFamily: 'var(--font-mono)', color: '#0284c7', fontSize: '15px' }}>
+                {isUrdu ? `${Math.round(liveData.creditRecovery).toLocaleString()} روپے` : `Rs ${Math.round(liveData.creditRecovery).toLocaleString()}`}
               </strong>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '10px 14px',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Sparkles size={15} color="#b45309" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('گندم پسائی اجرت', 'Wheat Grinding Revenue')}</span>
-              </span>
-              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `${liveData.totalPisai.toLocaleString()} روپے` : `Rs ${liveData.totalPisai.toLocaleString()}`}
-              </strong>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '10px 14px',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <HandCoins size={15} color="#0284c7" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('ادھار وصولی', 'Credit Collected')}</span>
-              </span>
-              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `${liveData.creditRecovery.toLocaleString()} روپے` : `Rs ${liveData.creditRecovery.toLocaleString()}`}
-              </strong>
-            </div>
-
+            {/* Row 4: Expenses & Returns */}
             <div
               style={{
                 display: 'flex',
@@ -455,175 +578,196 @@ export const ZReportModal: React.FC<ZReportModalProps> = ({
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Receipt size={15} />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>{t('دکان کے اخراجات', 'Shop Expenses Paid')}</span>
+                <Receipt size={16} />
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontWeight: 800 }}>
+                  {t('دکان کے اخراجات و نقد واپسی', 'Shop Expenses & Returns')}
+                </span>
               </span>
-              <strong style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)' }}>
-                {isUrdu ? `- ${liveData.expenses.toLocaleString()} روپے` : `- Rs ${liveData.expenses.toLocaleString()}`}
+              <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '15px' }}>
+                {isUrdu
+                  ? `- ${Math.round(liveData.expenses + liveData.cashReturns).toLocaleString()} روپے`
+                  : `- Rs ${Math.round(liveData.expenses + liveData.cashReturns).toLocaleString()}`}
               </strong>
             </div>
 
+            {/* Row 5: Drawer Cash Balance */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
+                alignItems: 'center',
                 padding: '12px 14px',
-                backgroundColor: '#f1f5f9',
+                backgroundColor: '#f0fdf4',
+                borderTop: '2px solid #bbf7d0',
                 fontSize: '15px',
                 fontWeight: 900,
               }}
             >
-              <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                {t('سسٹم کیش دراز بیلنس', 'Expected Drawer Cash Balance')}
-              </span>
-              <span style={{ fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)', color: '#0f172a' }}>
-                {isUrdu ? `${activeExpectedCash.toLocaleString()} روپے` : `Rs ${activeExpectedCash.toLocaleString()}`}
+              <div>
+                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ color: '#166534' }}>
+                  {t('کیش دراز میں کل نقد رقم', 'Net Cash in Drawer')}
+                </span>
+                <div style={{ fontSize: '11px', color: '#15803d', fontWeight: 600 }}>
+                  {isUrdu ? 'نقد سیلز + نقد پسائی + ادھار وصولی - اخراجات' : 'Cash Sales + Pisai + Recovery - Expenses'}
+                </div>
+              </div>
+              <span style={{ fontFamily: 'var(--font-mono)', color: '#15803d', fontSize: '20px', fontWeight: 900 }}>
+                {isUrdu ? `${Math.round(activeExpectedCash).toLocaleString()} روپے` : `Rs ${Math.round(activeExpectedCash).toLocaleString()}`}
               </span>
             </div>
           </div>
 
-          {/* Actual Physical Cash Counted Input */}
+          {/* Optional Counter Cash Calculator */}
           <div
             style={{
               backgroundColor: '#fffbeb',
               border: '1.5px solid #fde68a',
               borderRadius: '12px',
-              padding: '14px',
+              padding: '12px 14px',
             }}
           >
-            <label
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{
-                display: 'block',
-                fontSize: '13px',
-                fontWeight: 800,
-                color: '#92400e',
-                marginBottom: '6px',
-              }}
-            >
-              {t('کاؤنٹر پر گنی گئی اصل رقم:', 'Physical Cash Counted on Counter:')}
-            </label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  color: '#92400e',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Calculator size={15} />
+                {t('کاؤنٹر کیش پڑتال (اختیاری):', 'Physical Cash Check (Optional):')}
+              </label>
+              {discrepancy !== 0 && (
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    color: discrepancy > 0 ? '#15803d' : '#b91c1c',
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  {t('فرق:', 'Diff:')} {discrepancy > 0 ? `+Rs ${Math.round(discrepancy).toLocaleString()}` : `-Rs ${Math.round(Math.abs(discrepancy)).toLocaleString()}`}
+                </span>
+              )}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input
                 type="number"
                 value={actualCashInput}
                 onChange={(e) => setActualCashInput(e.target.value)}
+                placeholder="0"
                 style={{
                   flex: 1,
-                  height: '44px',
-                  padding: '0 14px',
+                  height: '38px',
+                  padding: '0 12px',
                   borderRadius: '8px',
                   border: '1.5px solid #cbd5e1',
-                  fontSize: '18px',
-                  fontWeight: 900,
+                  fontSize: '16px',
+                  fontWeight: 800,
                   fontFamily: 'var(--font-mono)',
                   direction: 'ltr',
-                  textAlign: 'left',
                 }}
               />
-              <span style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit' }}>
-                {isUrdu ? 'روپے' : 'Rs'}
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#475569' }}>
+                {isUrdu ? 'روپے' : 'PKR'}
               </span>
             </div>
-
-            {discrepancy !== 0 && (
-              <div
-                style={{
-                  marginTop: '8px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: discrepancy > 0 ? '#15803d' : '#b91c1c',
-                  fontFamily: isUrdu ? 'var(--font-urdu)' : 'inherit',
-                }}
-              >
-                {t('فرق:', 'Discrepancy:')}{' '}
-                {isUrdu
-                  ? `${discrepancy > 0 ? `+${discrepancy}` : discrepancy} روپے`
-                  : `${discrepancy > 0 ? `+${discrepancy}` : discrepancy} Rs`}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer Print Actions */}
         <div
           style={{
-            padding: '16px 24px',
+            padding: '14px 22px',
             backgroundColor: '#f8fafc',
             borderTop: '1px solid #e2e8f0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '12px',
+            gap: '10px',
+            flexWrap: 'wrap',
           }}
         >
           <button
             type="button"
             onClick={onClose}
-            disabled={isProcessing}
             className={isUrdu ? 'font-nastaleeq' : ''}
             style={{
-              padding: '10px 18px',
+              padding: '10px 16px',
               borderRadius: '10px',
               border: '1.5px solid #cbd5e1',
               backgroundColor: '#ffffff',
               color: '#475569',
-              fontSize: '14px',
+              fontSize: '13.5px',
               fontWeight: 700,
               cursor: 'pointer',
             }}
           >
-            {t('منسوخ کریں', 'Cancel')}
+            {t('بند کریں', 'Close')}
           </button>
 
-          <button
-            type="button"
-            onClick={handleExecuteClosing}
-            disabled={isProcessing || isClosedSuccess}
-            className="touch-active"
-            style={{
-              flex: 1,
-              padding: '12px 20px',
-              borderRadius: '10px',
-              border: 'none',
-              backgroundColor: isClosedSuccess ? '#10b981' : '#0f172a',
-              color: '#ffffff',
-              fontSize: '14px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: 'none',
-            }}
-          >
-            {isClosedSuccess ? (
-              <>
-                <CheckCircle2 size={18} />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px' }}>
-                  {t('شفٹ محفوظ اور ڈیٹا بیس بیک اپ مکمل!', 'Shift Closed & Backup Complete!')}
-                </span>
-              </>
-            ) : isProcessing ? (
-              <>
-                <Database size={18} className="animate-spin" />
-                <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                  {t('شفٹ بند ہو رہی ہے اور بیک اپ بن رہا ہے...', 'Locking shift and generating backup...')}
-                </span>
-              </>
-            ) : (
-              <>
-                <Lock size={16} />
-                <Printer size={16} />
-                <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14px' }}>
-                  {t('شفٹ لاک کریں اور اختتامی رپورٹ پرنٹ کریں', 'Lock Shift & Print Z-Report')}
-                </span>
-              </>
-            )}
-          </button>
+          <div style={{ display: 'flex', gap: '10px', flex: 1, justifyContent: 'flex-end' }}>
+            {/* 1. Thermal Slip Print Button */}
+            <button
+              type="button"
+              onClick={handleThermalPrint}
+              className="touch-active"
+              style={{
+                padding: '10px 16px',
+                borderRadius: '10px',
+                border: '1.5px solid #1877F2',
+                backgroundColor: '#EFF6FF',
+                color: '#1877F2',
+                fontSize: '13.5px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Receipt size={16} color="#1877F2" />
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                {t('تھرمل پرچی پرنٹ کریں', 'Print Thermal Slip')}
+              </span>
+            </button>
+
+            {/* 2. Full A4 / PDF Report Button */}
+            <button
+              type="button"
+              onClick={handleA4PdfPrint}
+              className="touch-active"
+              style={{
+                padding: '10px 18px',
+                borderRadius: '10px',
+                border: 'none',
+                backgroundColor: '#1877F2',
+                color: '#ffffff',
+                fontSize: '13.5px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '7px',
+                boxShadow: '0 2px 6px rgba(24, 119, 242, 0.3)',
+              }}
+            >
+              <Printer size={16} color="#ffffff" />
+              <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                {t('مکمل رپورٹ (A4 / PDF)', 'Print Full Report')}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+// Backward-compatibility alias
+export const ZReportModal = DailyReportModal;
+export default DailyReportModal;

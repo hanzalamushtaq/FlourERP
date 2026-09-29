@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Product } from '../ui/TouchCard';
 import { ReceiptPreviewModal, ReceiptData } from '../ui/ReceiptPreviewModal';
-import { Printer, Tag, Check, BookOpen, Plus, Trash2, X, AlertTriangle, Lock, RotateCcw, Search, UserCheck } from 'lucide-react';
+import { Printer, Tag, Check, BookOpen, Plus, Trash2, X, AlertTriangle, Lock, RotateCcw, Search, UserCheck, LayoutGrid } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getSession, ensureValidToken, clearSession } from '../../lib/auth';
@@ -298,6 +298,56 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
   const [dbCustomers, setDbCustomers] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+
+  // Product Card Picker Popup Modal
+  const [isProductPickerOpen, setIsProductPickerOpen] = useState<boolean>(false);
+  const [productPickerRow, setProductPickerRow] = useState<number>(0);
+  const [productPickerSearch, setProductPickerSearch] = useState<string>('');
+  const justClosedPickerRef = useRef<boolean>(false);
+
+  // Handle ESC key to close product picker popup
+  useEffect(() => {
+    if (!isProductPickerOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        justClosedPickerRef.current = true;
+        setIsProductPickerOpen(false);
+        setTimeout(() => {
+          justClosedPickerRef.current = false;
+        }, 300);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isProductPickerOpen]);
+
+  const handleSelectProductFromPicker = (p: Product) => {
+    const targetIdx =
+      productPickerRow >= 0 && productPickerRow < billItems.length
+        ? productPickerRow
+        : activeRowIndex >= 0 && activeRowIndex < billItems.length
+        ? activeRowIndex
+        : 0;
+
+    handleSelectProduct(p, targetIdx);
+    justClosedPickerRef.current = true;
+    setIsProductPickerOpen(false);
+    setTimeout(() => {
+      justClosedPickerRef.current = false;
+      quantityInputRefs.current[targetIdx]?.focus();
+      quantityInputRefs.current[targetIdx]?.select();
+    }, 100);
+  };
+
+  const filteredPickerProducts = products.filter((p) => {
+    if (!productPickerSearch.trim()) return true;
+    const q = productPickerSearch.toLowerCase().trim();
+    return (
+      (p.nameUr && p.nameUr.toLowerCase().includes(q)) ||
+      (p.nameEn && p.nameEn.toLowerCase().includes(q))
+    );
+  });
   const [selectedCustomerIndex, setSelectedCustomerIndex] = useState<number>(-1);
   const [selectedProductIndex, setSelectedProductIndex] = useState<number>(-1);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -1747,51 +1797,133 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                   >
                     {/* Input 1: Item */}
                     <div style={{ position: 'relative' }}>
-                      <label
-                        className={isUrdu ? 'font-nastaleeq' : ''}
+                      <div
                         style={{
-                          display: 'block',
-                          fontSize: isUrdu ? '18px' : '14px',
-                          fontWeight: 900,
-                          color: isDark ? '#E2E8F0' : '#1E293B',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
                           marginBottom: '6px',
                         }}
                       >
-                        {t('آئٹم:', 'Item:')}
-                      </label>
-                      <input
-                        ref={(el) => {
-                          itemInputRefs.current[idx] = el;
-                        }}
-                        type="text"
-                        placeholder={t('کارڈ ٹیپ کریں یا نام لکھیں...', 'Tap card or type name...')}
-                        value={item.itemName}
-                        onFocus={() => {
-                          setActiveRowIndex(idx);
-                        }}
-                        onBlur={() => {
-                          setTimeout(() => {
-                            setOpenSuggestionsRow(null);
-                          }, 200);
-                        }}
-                        onChange={(e) => handleItemNameChange(e.target.value, idx)}
-                        onKeyDown={(e) => handleItemKeyDown(e, idx)}
-                        className={isUrdu ? 'font-nastaleeq' : ''}
-                        style={{
-                          width: '100%',
-                          height: '52px',
-                          borderRadius: '10px',
-                          border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
-                          backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
-                          padding: '0 14px',
-                          fontSize: isUrdu ? '24px' : '17px',
-                          fontWeight: 800,
-                          color: isDark ? '#F8FAFC' : '#0F172A',
-                          outline: 'none',
-                          boxShadow: 'none',
-                          textAlign: 'left',
-                        }}
-                      />
+                        <label
+                          className={isUrdu ? 'font-nastaleeq' : ''}
+                          style={{
+                            fontSize: isUrdu ? '18px' : '14px',
+                            fontWeight: 900,
+                            color: isDark ? '#E2E8F0' : '#1E293B',
+                            margin: 0,
+                          }}
+                        >
+                          {t('آئٹم:', 'Item:')}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveRowIndex(idx);
+                            setProductPickerRow(idx);
+                            setProductPickerSearch('');
+                            setIsProductPickerOpen(true);
+                          }}
+                          className="touch-active"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            background: isDark ? 'rgba(56, 189, 248, 0.15)' : '#EFF6FF',
+                            border: isDark ? '1px solid #0284C7' : '1px solid #BFDBFE',
+                            borderRadius: '6px',
+                            padding: '2px 8px',
+                            fontSize: isUrdu ? '14px' : '11px',
+                            fontWeight: 800,
+                            color: isDark ? '#38BDF8' : '#1D4ED8',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <LayoutGrid size={12} />
+                          <span className={isUrdu ? 'font-nastaleeq' : ''}>
+                            {t('کارڈز دیکھیں', 'Browse Cards')}
+                          </span>
+                        </button>
+                      </div>
+
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <input
+                          ref={(el) => {
+                            itemInputRefs.current[idx] = el;
+                          }}
+                          type="text"
+                          placeholder={t('کارڈ منتخب کریں یا نام لکھیں...', 'Select card or type name...')}
+                          value={item.itemName}
+                          onFocus={() => {
+                            setActiveRowIndex(idx);
+                            if (!justClosedPickerRef.current && (!item.itemName || item.itemName.trim() === '')) {
+                              setProductPickerRow(idx);
+                              setProductPickerSearch('');
+                              setIsProductPickerOpen(true);
+                            }
+                          }}
+                          onClick={() => {
+                            setActiveRowIndex(idx);
+                            setProductPickerRow(idx);
+                            setProductPickerSearch('');
+                            setIsProductPickerOpen(true);
+                          }}
+                          onBlur={() => {
+                            setTimeout(() => {
+                              setOpenSuggestionsRow(null);
+                            }, 200);
+                          }}
+                          onChange={(e) => handleItemNameChange(e.target.value, idx)}
+                          onKeyDown={(e) => handleItemKeyDown(e, idx)}
+                          className={isUrdu ? 'font-nastaleeq' : ''}
+                          style={{
+                            width: '100%',
+                            height: '52px',
+                            borderRadius: '10px',
+                            border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                            backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+                            padding: isUrdu ? '0 44px 0 14px' : '0 14px 0 44px',
+                            fontSize: isUrdu ? '24px' : '17px',
+                            fontWeight: 800,
+                            color: isDark ? '#F8FAFC' : '#0F172A',
+                            outline: 'none',
+                            boxShadow: 'none',
+                            textAlign: 'left',
+                          }}
+                        />
+
+                        {/* Interactive Product Cards Quick-Trigger Icon inside input */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setActiveRowIndex(idx);
+                            setProductPickerRow(idx);
+                            setProductPickerSearch('');
+                            setIsProductPickerOpen(true);
+                          }}
+                          title={t('تمام پروڈکٹ کارڈز کھولیں', 'Open all product cards')}
+                          className="touch-active"
+                          style={{
+                            position: 'absolute',
+                            left: isUrdu ? '8px' : 'auto',
+                            right: isUrdu ? 'auto' : '8px',
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '8px',
+                            backgroundColor: isDark ? '#1E293B' : '#EFF6FF',
+                            border: isDark ? '1px solid #334155' : '1px solid #BFDBFE',
+                            color: '#1877F2',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <LayoutGrid size={17} />
+                        </button>
+                      </div>
 
                       {/* Dropdown Suggestions */}
                       {openSuggestionsRow === idx && item.itemName.trim() !== '' && matchingProducts.length > 0 && (
@@ -3250,6 +3382,327 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Product Selection Popup Modal */}
+      {isProductPickerOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.72)',
+            backdropFilter: 'blur(5px)',
+            zIndex: 1500,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={() => {
+            justClosedPickerRef.current = true;
+            setIsProductPickerOpen(false);
+            setTimeout(() => {
+              justClosedPickerRef.current = false;
+            }, 300);
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="dash-card-animated"
+            style={{
+              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+              borderRadius: '20px',
+              border: isDark ? '1.5px solid #334155' : '1.5px solid #CBD5E1',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+              width: '100%',
+              maxWidth: '820px',
+              maxHeight: '85vh',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px 20px',
+                borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    backgroundColor: isDark ? '#1E3A8A' : '#EFF6FF',
+                    color: '#1877F2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <LayoutGrid size={20} />
+                </div>
+                <div>
+                  <h3
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                    style={{
+                      margin: 0,
+                      fontSize: isUrdu ? '22px' : '17px',
+                      fontWeight: 900,
+                      color: isDark ? '#F8FAFC' : '#0F172A',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {t('پروڈکٹ کارڈ منتخب کریں', 'Select Product Card')}
+                  </h3>
+                  <p
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                    style={{
+                      margin: '2px 0 0',
+                      fontSize: isUrdu ? '14px' : '12px',
+                      color: isDark ? '#94A3B8' : '#64748B',
+                    }}
+                  >
+                    {isUrdu
+                      ? `قطار #${(productPickerRow ?? activeRowIndex) + 1} کے لیے مطلوبہ پروڈکٹ کارڈ پر کلک کریں`
+                      : `Click any product card to select for row #${(productPickerRow ?? activeRowIndex) + 1}`}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  justClosedPickerRef.current = true;
+                  setIsProductPickerOpen(false);
+                  setTimeout(() => {
+                    justClosedPickerRef.current = false;
+                  }, 300);
+                }}
+                className="touch-active"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  border: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                  backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                  color: isDark ? '#94A3B8' : '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Search filter in modal */}
+            <div
+              style={{
+                padding: '12px 20px',
+                borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
+                backgroundColor: isDark ? '#162032' : '#FFFFFF',
+              }}
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Search
+                  size={18}
+                  style={{
+                    position: 'absolute',
+                    left: isUrdu ? 'auto' : '12px',
+                    right: isUrdu ? '12px' : 'auto',
+                    color: isDark ? '#94A3B8' : '#64748B',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <input
+                  type="text"
+                  autoFocus
+                  value={productPickerSearch}
+                  onChange={(e) => setProductPickerSearch(e.target.value)}
+                  placeholder={
+                    isUrdu
+                      ? 'پروڈکٹ تلاش کریں (چکی آٹا، فائن، میدہ، سوجی...)'
+                      : 'Search products by name...'
+                  }
+                  className={isUrdu ? 'font-nastaleeq' : ''}
+                  style={{
+                    width: '100%',
+                    height: '42px',
+                    borderRadius: '10px',
+                    border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
+                    backgroundColor: isDark ? '#0B0F19' : '#F8FAFC',
+                    padding: isUrdu ? '0 38px 0 12px' : '0 12px 0 38px',
+                    fontSize: isUrdu ? '17px' : '14px',
+                    fontWeight: 700,
+                    color: isDark ? '#F8FAFC' : '#0F172A',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Product Cards Grid */}
+            <div
+              style={{
+                padding: '18px 20px',
+                overflowY: 'auto',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+                gap: '12px',
+                maxHeight: 'calc(85vh - 150px)',
+              }}
+            >
+              {filteredPickerProducts.map((p, idx) => {
+                const palettes = isDark ? DARK_CARD_PALETTES : CARD_PALETTES;
+                const theme = palettes[idx % palettes.length];
+                const isAlreadySelected = billItems.some((it) => it.productId === p.id);
+
+                return (
+                  <div
+                    key={p.id}
+                    onClick={() => handleSelectProductFromPicker(p)}
+                    className="touch-active product-action-tile"
+                    style={{
+                      borderRadius: '14px',
+                      padding: '12px 14px',
+                      backgroundColor: isDark ? '#0F172A' : theme.bg,
+                      border: isAlreadySelected
+                        ? (isDark ? '2.5px solid #60A5FA' : `2.5px solid ${theme.accent}`)
+                        : (isDark ? '1.5px solid #334155' : `1.5px solid ${theme.border}`),
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      transition: 'all 0.15s ease',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                    }}
+                  >
+                    {/* Left: Emoji + Rate */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '4px',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '12px',
+                          backgroundColor: isDark ? '#1E293B' : theme.iconBg,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: isDark ? '1px solid #334155' : `1px solid ${theme.border}`,
+                          fontSize: '24px',
+                          userSelect: 'none',
+                        }}
+                      >
+                        {renderProductIcon(p.id, p.emoji, idx)}
+                      </div>
+                      <span
+                        className={isUrdu ? 'font-nastaleeq' : ''}
+                        style={{
+                          fontWeight: 900,
+                          fontSize: isUrdu ? '15px' : '11.5px',
+                          fontFamily: isUrdu ? 'var(--font-urdu)' : 'var(--font-mono)',
+                          color: isDark ? '#FDE047' : theme.badgeText,
+                          backgroundColor: isDark ? '#1E293B' : theme.badgeBg,
+                          padding: '2px 6px',
+                          borderRadius: '6px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {p.ratePerKg > 0
+                          ? isUrdu
+                            ? `${p.ratePerKg} روپے/کلو`
+                            : `Rs ${p.ratePerKg}/kg`
+                          : isUrdu
+                          ? 'غیر مقرر'
+                          : 'Unset'}
+                      </span>
+                    </div>
+
+                    {/* Right: Product Name */}
+                    <div
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: isUrdu ? 'flex-end' : 'flex-start',
+                        minWidth: 0,
+                      }}
+                    >
+                      {isAlreadySelected && (
+                        <span
+                          className={isUrdu ? 'font-nastaleeq' : ''}
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            color: '#10B981',
+                            marginBottom: '2px',
+                          }}
+                        >
+                          {isUrdu ? '● بل میں شامل' : '● In Bill'}
+                        </span>
+                      )}
+                      <div
+                        className={isUrdu ? 'font-nastaleeq' : ''}
+                        style={{
+                          fontSize: isUrdu ? '24px' : '16px',
+                          fontWeight: 900,
+                          color: isDark ? '#F8FAFC' : theme.text,
+                          lineHeight: 1.15,
+                          textAlign: isUrdu ? 'right' : 'left',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {isUrdu ? p.nameUr : p.nameEn}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {filteredPickerProducts.length === 0 && (
+                <div
+                  style={{
+                    gridColumn: '1 / -1',
+                    textAlign: 'center',
+                    padding: '36px 16px',
+                    color: isDark ? '#94A3B8' : '#64748B',
+                  }}
+                >
+                  <p
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                    style={{ fontSize: isUrdu ? '18px' : '14px', margin: 0 }}
+                  >
+                    {isUrdu ? 'اس نام سے کوئی پروڈکٹ نہیں ملی' : 'No matching products found'}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
