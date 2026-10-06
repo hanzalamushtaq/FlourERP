@@ -177,3 +177,50 @@ export function isBiller(user: UserSession | null): boolean {
   if (!user) return false;
   return user.role === 'Biller' || user.role === 'Biller (کاؤنٹر آپریٹر)';
 }
+
+export async function refreshCurrentUserProfile(): Promise<UserSession | null> {
+  if (typeof window === 'undefined') return null;
+  const current = getSession();
+  if (!current || !current.token) return null;
+
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${current.token}` },
+    });
+
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data?.user) {
+        const u = json.data.user;
+        const currentPerms = Array.isArray(current.permissions) ? current.permissions : [];
+        const newPerms = Array.isArray(u.permissions) ? u.permissions : [];
+
+        const roleChanged = current.role !== u.role;
+        const permsChanged =
+          currentPerms.length !== newPerms.length ||
+          currentPerms.some((p) => !newPerms.includes(p));
+
+        if (roleChanged || permsChanged || current.fullName !== u.fullName) {
+          const updated: UserSession = {
+            ...current,
+            fullName: u.fullName || current.fullName,
+            role: u.role || current.role,
+            permissions: newPerms,
+            hasPin: u.hasPin !== undefined ? u.hasPin : current.hasPin,
+          };
+          saveSession(updated);
+          window.dispatchEvent(new CustomEvent('flour_erp_token_refreshed', { detail: updated }));
+          return updated;
+        }
+        return current;
+      }
+    } else if (res.status === 401 || res.status === 403) {
+      clearSession();
+      window.dispatchEvent(new CustomEvent('flour_erp_session_cleared'));
+      return null;
+    }
+  } catch {
+    // Silently ignore network hiccup
+  }
+  return current;
+}

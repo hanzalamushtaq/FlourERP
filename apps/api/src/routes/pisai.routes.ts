@@ -172,9 +172,10 @@ pisaiRouter.post(
       let customerId: string | null = null;
       if (parsed.customerName && parsed.customerName.trim().length > 0) {
         const trimmedName = parsed.customerName.trim();
-        let customer = await prisma.customer.findFirst({
-          where: { name: trimmedName },
-        });
+        const allCust = await prisma.customer.findMany();
+        let customer = allCust.find(
+          (c) => c.name.trim().toLowerCase() === trimmedName.toLowerCase()
+        );
         if (!customer) {
           customer = await prisma.customer.create({
             data: {
@@ -603,9 +604,10 @@ pisaiRouter.patch('/:id', requireAuth, async (req: Request, res: Response) => {
 
     // Resolve or link customer if name provided
     if (finalCustName) {
-      let cust = await prisma.customer.findFirst({
-        where: { name: finalCustName },
-      });
+      const allCust = await prisma.customer.findMany();
+      let cust = allCust.find(
+        (c) => c.name.trim().toLowerCase() === finalCustName.toLowerCase()
+      );
       if (!cust) {
         cust = await prisma.customer.create({
           data: {

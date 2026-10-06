@@ -86,10 +86,19 @@ export const PisaiBillingScreen: React.FC = () => {
   // Customer State & Autocomplete
   const [customerName, setCustomerName] = useState<string>('');
   const [customerPhone, setCustomerPhone] = useState<string>('');
-  const [dbCustomers, setDbCustomers] = useState<any[]>([]);
+  const [dbCustomers, setDbCustomers] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('flour_erp_customers');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedCustomerIndex, setSelectedCustomerIndex] = useState<number>(-1);
+  const pisaiCustomerContainerRef = useRef<HTMLDivElement>(null);
 
   // Hover & Tactile States for Dashboard-Style Polish
   const [hoveredService, setHoveredService] = useState<'safai_pisai' | 'pisai' | null>(null);
@@ -173,12 +182,66 @@ export const PisaiBillingScreen: React.FC = () => {
       .then((json) => {
         if (json.success && Array.isArray(json.data?.customers)) {
           setDbCustomers(json.data.customers);
+          try {
+            localStorage.setItem('flour_erp_customers', JSON.stringify(json.data.customers));
+          } catch {}
         }
       })
       .catch(() => {});
   }, []);
 
+  // Outside click listener to dismiss suggestions
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (pisaiCustomerContainerRef.current && !pisaiCustomerContainerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
   // Autocomplete via in-memory instant filter + /api/customers/search
+  const filterAndSortCustomers = (list: any[], queryStr: string) => {
+    const q = queryStr.trim().toLowerCase();
+    if (!q) {
+      const sorted = [...list];
+      sorted.sort((a: any, b: any) => (a.name || '').localeCompare(b.name || ''));
+      return sorted.slice(0, 8);
+    }
+
+    const matched = list.filter((c: any) => {
+      const name = (c.name || '').trim().toLowerCase();
+      const phone = (c.phone || '').trim().toLowerCase();
+
+      if (/^\d+$/.test(q)) {
+        return phone.startsWith(q) || phone.replace(/\D/g, '').startsWith(q);
+      }
+
+      if (name.startsWith(q)) return true;
+
+      const segments = name.split(/[\(\)\/\-_]/).map((s: string) => s.trim()).filter(Boolean);
+      return segments.some((s: string) => s.startsWith(q));
+    });
+
+    matched.sort((a: any, b: any) => {
+      const aName = (a.name || '').trim();
+      const bName = (b.name || '').trim();
+
+      const getCompareKey = (str: string) => {
+        if (/^[a-zA-Z]/.test(q)) {
+          const latin = str.match(/[a-zA-Z][a-zA-Z0-9\s]*/);
+          if (latin) return latin[0].trim().toLowerCase();
+        }
+        return str.toLowerCase();
+      };
+
+      return getCompareKey(aName).localeCompare(getCompareKey(bName));
+    });
+
+    return matched;
+  };
+
   const handleCustomerNameChange = (val: string) => {
     setCustomerName(val);
     const q = val.trim().toLowerCase();
@@ -195,23 +258,7 @@ export const PisaiBillingScreen: React.FC = () => {
       return;
     }
 
-    const filterAndSort = (list: any[]) => {
-      const matched = list.filter((c: any) => {
-        const name = (c.name || '').toLowerCase();
-        const phone = (c.phone || '');
-        return name.includes(q) || phone.includes(q);
-      });
-      matched.sort((a: any, b: any) => {
-        const aStarts = (a.name || '').toLowerCase().startsWith(q);
-        const bStarts = (b.name || '').toLowerCase().startsWith(q);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-        return (a.name || '').localeCompare(b.name || '');
-      });
-      return matched;
-    };
-
-    const immediate = filterAndSort(dbCustomers);
+    const immediate = filterAndSortCustomers(dbCustomers, val);
     setSuggestions(immediate);
     setShowSuggestions(immediate.length > 0);
     setSelectedCustomerIndex(immediate.length > 0 ? 0 : -1);
@@ -226,14 +273,34 @@ export const PisaiBillingScreen: React.FC = () => {
           setDbCustomers((prev) => {
             const map = new Map(prev.map((c) => [c.id, c]));
             json.data.customers.forEach((c: any) => map.set(c.id, c));
-            return Array.from(map.values());
+            const merged = Array.from(map.values());
+            try {
+              localStorage.setItem('flour_erp_customers', JSON.stringify(merged));
+            } catch {}
+            return merged;
           });
-          const fresh = filterAndSort(json.data.customers);
+          const fresh = filterAndSortCustomers(json.data.customers, val);
           setSuggestions(fresh);
           setShowSuggestions(fresh.length > 0);
         }
       })
       .catch(() => {});
+  };
+
+  const handleCustomerFocus = () => {
+    const q = customerName.trim().toLowerCase();
+    if (!q) {
+      if (dbCustomers.length > 0) {
+        setSuggestions(dbCustomers.slice(0, 8));
+        setShowSuggestions(true);
+        setSelectedCustomerIndex(0);
+      }
+    } else {
+      const immediate = filterAndSortCustomers(dbCustomers, customerName);
+      setSuggestions(immediate);
+      setShowSuggestions(immediate.length > 0);
+      setSelectedCustomerIndex(immediate.length > 0 ? 0 : -1);
+    }
   };
 
   const handleSelectCustomer = (cust: { name: string; phone?: string | null }) => {
@@ -1633,7 +1700,7 @@ export const PisaiBillingScreen: React.FC = () => {
           </div>
 
           {/* 3. Customer Name */}
-          <div style={{ position: 'relative' }}>
+          <div ref={pisaiCustomerContainerRef} style={{ position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
               <span className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '19px' : '15px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A' }}>
                 {t('گاہک کا نام (اختیاری):', 'Customer Name (Optional):')}
@@ -1645,6 +1712,7 @@ export const PisaiBillingScreen: React.FC = () => {
               type="text"
               placeholder={t('گاہک کا نام لکھیں...', 'Enter customer name...')}
               value={customerName}
+              onFocus={handleCustomerFocus}
               onChange={(e) => handleCustomerNameChange(e.target.value)}
               onKeyDown={(e) => {
                 if (showSuggestions && suggestions.length > 0) {
@@ -1705,6 +1773,7 @@ export const PisaiBillingScreen: React.FC = () => {
                   marginTop: '4px',
                   maxHeight: '180px',
                   overflowY: 'auto',
+                  boxSizing: 'border-box',
                 }}
               >
                 {suggestions.map((c, idx) => {
@@ -1731,9 +1800,23 @@ export const PisaiBillingScreen: React.FC = () => {
                           : (isDark ? '#1E293B' : '#FFFFFF'),
                         borderLeft: isHighlighted ? '3px solid #1877F2' : '3px solid transparent',
                         transition: 'background-color 0.1s ease',
+                        boxSizing: 'border-box',
+                        minWidth: 0,
+                        gap: '8px',
                       }}
                     >
-                      <span className="font-nastaleeq" style={{ fontSize: isUrdu ? '18px' : '14px', fontWeight: 800, color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A') }}>
+                      <span
+                        className="font-nastaleeq"
+                        style={{
+                          fontSize: isUrdu ? '18px' : '14px',
+                          fontWeight: 800,
+                          color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A'),
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          minWidth: 0,
+                        }}
+                      >
                         {c.name}
                       </span>
                       <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: '12px', marginRight: '8px', fontFamily: 'var(--font-mono)' }}>

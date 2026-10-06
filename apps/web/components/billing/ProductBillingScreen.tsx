@@ -295,7 +295,15 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
   const [customerPhone, setCustomerPhone] = useState<string>('');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedCustomerCredit, setSelectedCustomerCredit] = useState<number | null>(null);
-  const [dbCustomers, setDbCustomers] = useState<any[]>([]);
+  const [dbCustomers, setDbCustomers] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('flour_erp_customers');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
@@ -430,6 +438,9 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
           const json = await res.json();
           if (isMounted && json.success && Array.isArray(json.data?.customers)) {
             setDbCustomers(json.data.customers);
+            try {
+              localStorage.setItem('flour_erp_customers', JSON.stringify(json.data.customers));
+            } catch {}
           }
         }
       } catch (err) {
@@ -830,7 +841,47 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
     }
   };
 
-  // Dynamic Customer Search & Suggestions (starts-with prioritized)
+  // Dynamic Customer Search & Suggestions (strictly starts-with prefix, alphabetical order)
+  const filterAndSortCustomers = (list: any[], queryStr: string) => {
+    const q = queryStr.trim().toLowerCase();
+    if (!q) {
+      const sorted = [...list];
+      sorted.sort((a: any, b: any) => (a.name || '').localeCompare(b.name || ''));
+      return sorted.slice(0, 8);
+    }
+
+    const matched = list.filter((c: any) => {
+      const name = (c.name || '').trim().toLowerCase();
+      const phone = (c.phone || '').trim().toLowerCase();
+
+      if (/^\d+$/.test(q)) {
+        return phone.startsWith(q) || phone.replace(/\D/g, '').startsWith(q);
+      }
+
+      if (name.startsWith(q)) return true;
+
+      const segments = name.split(/[\(\)\/\-_]/).map((s: string) => s.trim()).filter(Boolean);
+      return segments.some((s: string) => s.startsWith(q));
+    });
+
+    matched.sort((a: any, b: any) => {
+      const aName = (a.name || '').trim();
+      const bName = (b.name || '').trim();
+
+      const getCompareKey = (str: string) => {
+        if (/^[a-zA-Z]/.test(q)) {
+          const latin = str.match(/[a-zA-Z][a-zA-Z0-9\s]*/);
+          if (latin) return latin[0].trim().toLowerCase();
+        }
+        return str.toLowerCase();
+      };
+
+      return getCompareKey(aName).localeCompare(getCompareKey(bName));
+    });
+
+    return matched;
+  };
+
   const handleCustomerNameChange = (val: string) => {
     setCustomerName(val);
     setSelectedCustomerCredit(null);
@@ -850,26 +901,10 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
       return;
     }
 
-    // 1. Instant 0ms In-Memory Filter with Starts-With Priority
-    const filterAndSort = (list: any[]) => {
-      const matched = list.filter((c: any) => {
-        const name = (c.name || '').toLowerCase();
-        const phone = (c.phone || '');
-        return name.includes(q) || phone.includes(q);
-      });
-      matched.sort((a: any, b: any) => {
-        const aStarts = (a.name || '').toLowerCase().startsWith(q);
-        const bStarts = (b.name || '').toLowerCase().startsWith(q);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-        return (a.name || '').localeCompare(b.name || '');
-      });
-      return matched;
-    };
-
-    const immediateMatches = filterAndSort(dbCustomers);
+    // 1. Instant 0ms In-Memory Filter with Starts-With & Alphabetical Sort
+    const immediateMatches = filterAndSortCustomers(dbCustomers, val);
     setSuggestions(immediateMatches);
-    setShowSuggestions(true);
+    setShowSuggestions(immediateMatches.length > 0);
     setSelectedCustomerIndex(immediateMatches.length > 0 ? 0 : -1);
 
     // 2. Debounced API search to pick up newly added customers
@@ -886,15 +921,19 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
             setDbCustomers((prev) => {
               const map = new Map(prev.map((c) => [c.id, c]));
               json.data.customers.forEach((c: any) => map.set(c.id, c));
-              return Array.from(map.values());
+              const merged = Array.from(map.values());
+              try {
+                localStorage.setItem('flour_erp_customers', JSON.stringify(merged));
+              } catch {}
+              return merged;
             });
-            const freshMatches = filterAndSort(json.data.customers);
+            const freshMatches = filterAndSortCustomers(json.data.customers, val);
             setSuggestions(freshMatches);
-            setShowSuggestions(true);
+            setShowSuggestions(freshMatches.length > 0);
           }
         }
       } catch {}
-    }, 200);
+    }, 150);
   };
 
   const handleCustomerFocus = () => {
@@ -906,20 +945,9 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
         setSelectedCustomerIndex(0);
       }
     } else {
-      const matched = dbCustomers.filter((c: any) => {
-        const name = (c.name || '').toLowerCase();
-        const phone = (c.phone || '');
-        return name.includes(q) || phone.includes(q);
-      });
-      matched.sort((a: any, b: any) => {
-        const aStarts = (a.name || '').toLowerCase().startsWith(q);
-        const bStarts = (b.name || '').toLowerCase().startsWith(q);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-        return (a.name || '').localeCompare(b.name || '');
-      });
+      const matched = filterAndSortCustomers(dbCustomers, customerName);
       setSuggestions(matched);
-      setShowSuggestions(true);
+      setShowSuggestions(matched.length > 0);
       setSelectedCustomerIndex(matched.length > 0 ? 0 : -1);
     }
   };
@@ -1172,6 +1200,28 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
 
       setReceiptData(receipt);
       setIsReceiptOpen(true);
+
+      // Cache newly entered customer locally so they appear in autocomplete immediately
+      if (customerName.trim()) {
+        const trimmed = customerName.trim();
+        setDbCustomers((prev) => {
+          const exists = prev.some((c) => (c.name || '').toLowerCase() === trimmed.toLowerCase());
+          if (!exists) {
+            const newEntry = {
+              id: createdBill?.customerId || `cust-${Date.now()}`,
+              name: trimmed,
+              phone: customerPhone.trim() || '',
+              currentBalance: isCreditSale ? (netTotal - (numReceived || 0)) : 0,
+            };
+            const updated = [newEntry, ...prev];
+            try {
+              localStorage.setItem('flour_erp_customers', JSON.stringify(updated));
+            } catch {}
+            return updated;
+          }
+          return prev;
+        });
+      }
 
       // Auto-refresh / reset for next bill entry immediately
       resetBillForm();
@@ -1882,13 +1932,13 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                             borderRadius: '10px',
                             border: isDark ? '1.5px solid #475569' : '1.5px solid #CBD5E1',
                             backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
-                            padding: isUrdu ? '0 44px 0 14px' : '0 14px 0 44px',
+                            padding: isUrdu ? '0 16px 0 50px' : '0 50px 0 16px',
                             fontSize: isUrdu ? '24px' : '17px',
                             fontWeight: 800,
                             color: isDark ? '#F8FAFC' : '#0F172A',
                             outline: 'none',
                             boxShadow: 'none',
-                            textAlign: 'left',
+                            textAlign: isUrdu ? 'right' : 'left',
                           }}
                         />
 
@@ -2423,7 +2473,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
             )}
 
             {/* Dynamic Suggestions Dropdown */}
-            {showSuggestions && (
+            {showSuggestions && suggestions.length > 0 && (
               <div
                 onMouseDown={(e) => e.preventDefault()}
                 style={{
@@ -2439,6 +2489,7 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                   maxHeight: '220px',
                   overflowY: 'auto',
                   marginTop: '4px',
+                  boxSizing: 'border-box',
                 }}
               >
                 {/* Header hint */}
@@ -2450,16 +2501,12 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                     color: isDark ? '#94A3B8' : '#64748B',
                     backgroundColor: isDark ? '#0F172A' : '#F1F5F9',
                     borderBottom: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
-                    display: 'flex',
-                    justifyContent: 'space-between',
+                    boxSizing: 'border-box',
                   }}
                 >
                   <span className={isUrdu ? 'font-nastaleeq' : ''}>
-                    {suggestions.length > 0
-                      ? t(`ڈیٹا بیس سے تجاویز (${suggestions.length})`, `Customers from Database (${suggestions.length})`)
-                      : t('کوئی گاہک نہیں ملا', 'No customer found')}
+                    {t(`تجاویز (${suggestions.length})`, `Suggestions (${suggestions.length})`)}
                   </span>
-                  <span>{t('↑↓ سے چنیں، Enter دبائیں', '↑↓ navigate, Enter select')}</span>
                 </div>
 
                 {suggestions.map((c, cIdx) => {
@@ -2495,9 +2542,12 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                         borderLeft: isHighlighted ? '4px solid #1877F2' : '4px solid transparent',
                         borderBottom: isDark ? '1px solid #293548' : '1px solid #F1F5F9',
                         transition: 'background-color 0.1s ease',
+                        boxSizing: 'border-box',
+                        minWidth: 0,
+                        gap: '8px',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, overflow: 'hidden' }}>
                         {/* Initial Avatar Bubble */}
                         <div
                           style={{
@@ -2516,13 +2566,19 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                           {initial}
                         </div>
 
-                        <div>
+                        <div style={{ minWidth: 0, overflow: 'hidden' }}>
                           <span
                             className={isUrdu ? 'font-nastaleeq' : ''}
                             style={{
                               fontWeight: 800,
                               color: isHighlighted ? '#1877F2' : (isDark ? '#F8FAFC' : '#0F172A'),
                               fontSize: isUrdu ? '18px' : '15px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              display: 'inline-block',
+                              maxWidth: '160px',
+                              verticalAlign: 'bottom',
                             }}
                           >
                             {c.name}
@@ -2571,32 +2627,6 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
                     </div>
                   );
                 })}
-
-                {/* If typing a new name not yet in DB */}
-                {customerName.trim() && !suggestions.some((s) => s.name.toLowerCase() === customerName.trim().toLowerCase()) && (
-                  <div
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      setShowSuggestions(false);
-                    }}
-                    style={{
-                      padding: '8px 14px',
-                      fontSize: '12px',
-                      color: isDark ? '#94A3B8' : '#64748B',
-                      backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
-                      borderTop: isDark ? '1px solid #334155' : '1px solid #E2E8F0',
-                      fontStyle: 'italic',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <Plus size={14} color="#10B981" />
-                    <span>
-                      {t(`نیا گاہک محفوظ ہوگا: "${customerName}"`, `Will save as new customer: "${customerName}"`)}
-                    </span>
-                  </div>
-                )}
               </div>
             )}
           </div>

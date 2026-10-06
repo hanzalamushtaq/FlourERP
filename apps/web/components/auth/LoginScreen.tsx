@@ -171,18 +171,31 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     <div
       className="login-screen-root"
       style={{
-        minHeight: '100vh',
-        width: '100%',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        maxHeight: '100dvh',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehaviorY: 'contain',
         backgroundColor: dark ? '#0B0F19' : '#F8FAFC',
         backgroundImage: dark
           ? 'radial-gradient(#1E293B 1.2px, #0B0F19 1.2px)'
           : 'radial-gradient(#CBD5E1 1.2px, #F8FAFC 1.2px)',
         backgroundSize: '24px 24px',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px 16px',
+        justifyContent: 'flex-start',
+        padding: '32px 16px 80px',
         direction: 'rtl',
+        boxSizing: 'border-box',
+        zIndex: 100,
       }}
     >
       <div
@@ -190,6 +203,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
         style={{
           width: '100%',
           maxWidth: '440px',
+          margin: '0 auto',
+          flexShrink: 0,
           backgroundColor: dark ? '#1E293B' : '#FFFFFF',
           borderRadius: '20px',
           boxShadow: dark

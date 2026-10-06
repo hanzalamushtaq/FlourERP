@@ -540,12 +540,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               <h2 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '22px' : '18px', fontWeight: 900, margin: 0, color: '#0F172A' }}>
                 {t('اختیارات و رولز مینیجر', 'Roles & Permissions Manager')}
               </h2>
-              <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '14px' : '12px', color: '#64748B', marginTop: '2px', fontWeight: 700 }}>
-                {t(
-                  'ہر رول کے اختیارات کو اپنی مرضی سے بنائیں، تبدیل کریں اور سٹاف کو لگائیں',
-                  'Customize role permissions and assign them to staff members'
-                )}
-              </div>
             </div>
           </div>
 
@@ -950,9 +944,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                   <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '17px' : '14px', fontWeight: 900, color: '#0F172A' }}>
                     {t(`سٹاف اور لاگ ان اکاؤنٹس (${staff.length})`, `Staff & Login Accounts (${staff.length})`)}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#64748B' }}>
-                    {t('سٹاف کے لیے رول منتخب کریں یا لاگ ان کی / پاس ورڈ تبدیل کریں', 'Assign roles, change login keys or manage staff members')}
-                  </div>
                 </div>
 
                 <button
@@ -1154,9 +1145,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                   <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 900, color: '#166534' }}>
                     {t('نیا سٹاف صارف اور لاگ ان کی تفویض', 'Add New Staff User & Assign Login Key')}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#15803D' }}>
-                    {t('ایڈمنسٹریٹر یہاں سے نیا آپریٹر شامل کر سکتا ہے اور اس کی لاگ ان آئی ڈی اور پاس ورڈ/پن سیٹ کر سکتا ہے۔', 'Admin can register a new operator with login ID and password/PIN key.')}
-                  </div>
                 </div>
               </div>
 
@@ -1187,9 +1175,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     />
                     <span style={{ position: 'absolute', left: '10px', top: '10px', color: '#94A3B8', fontWeight: 800 }}>@</span>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>
-                    {t('لاگ ان سکرین پر یہ آئی ڈی درج کی جائے گی (صرف انگریزی حروف و اعداد)', 'Used on login screen (letters & numbers only)')}
-                  </span>
                 </div>
 
                 {/* 2. Full Name */}
@@ -1213,9 +1198,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                       outline: 'none',
                     }}
                   />
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>
-                    {t('بلز، رپورٹس اور ٹرمینل پر ظاہر ہونے والا نام', 'Display name on bills and receipts')}
-                  </span>
                 </div>
 
                 {/* 3. Assign Role */}
@@ -1244,9 +1226,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                       </option>
                     ))}
                   </select>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>
-                    {t('اس صارف کے مجاز اختیارات (بلنگ، ڈسکاؤنٹ، رپورٹس وغیرہ)', 'Permission level for this operator')}
-                  </span>
                 </div>
 
                 {/* 4. Login Password / Key */}
@@ -1289,9 +1268,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                       {showNewUserPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>
-                    {t('یہ کی صارف لاگ ان کے وقت پاس ورڈ کے خانے میں درج کرے گا', 'Key used by operator to log into terminal')}
-                  </span>
                 </div>
 
                 {/* 5. Optional PIN */}
@@ -1317,9 +1293,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                       direction: 'ltr',
                     }}
                   />
-                  <span style={{ fontSize: '11px', color: '#64748B' }}>
-                    {t('ٹرمینل کے ٹچ کی پیڈ پر فوری انٹری کے لیے (اختیاری)', 'For touch keypad quick enter (optional)')}
-                  </span>
                 </div>
               </div>
 

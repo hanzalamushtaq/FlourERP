@@ -296,9 +296,10 @@ billingRouter.post(
       let customerId: string | null = null;
       if (parsed.customerName && parsed.customerName.trim().length > 0) {
         const trimmedName = parsed.customerName.trim();
-        let customer = await prisma.customer.findFirst({
-          where: { name: { equals: trimmedName, mode: 'insensitive' } },
-        });
+        const allCust = await prisma.customer.findMany();
+        let customer = allCust.find(
+          (c) => c.name.trim().toLowerCase() === trimmedName.toLowerCase()
+        );
         if (!customer) {
           customer = await prisma.customer.create({
             data: {

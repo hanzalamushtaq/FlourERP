@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../config/db.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, invalidateUserCache } from '../middleware/auth.js';
 import { requirePermission } from '../middleware/rbac.js';
 import { hashPassword, hashPin } from '../utils/auth.js';
 
@@ -219,9 +219,10 @@ roleRouter.post('/staff', requireAuth, requirePermission('can_manage_users'), as
   const cleanUsername = username.trim().toLowerCase();
 
   // Check unique username
-  const existing = await prisma.user.findFirst({
-    where: { username: { equals: cleanUsername, mode: 'insensitive' } },
-  });
+  const allUsers = await prisma.user.findMany();
+  const existing = allUsers.find(
+    (u) => u.username.trim().toLowerCase() === cleanUsername
+  );
 
   if (existing) {
     return res.status(409).json({
@@ -444,6 +445,8 @@ roleRouter.put('/staff/:userId', requireAuth, requirePermission('can_manage_user
     include: { role: true },
   });
 
+  invalidateUserCache(userId);
+
   res.json({
     success: true,
     data: {
@@ -500,6 +503,7 @@ roleRouter.delete('/staff/:userId', requireAuth, requirePermission('can_manage_u
   }
 
   await prisma.user.delete({ where: { id: userId } });
+  invalidateUserCache(userId);
   res.json({
     success: true,
     message: 'صارف کامیابی سے حذف کر دیا گیا۔',
@@ -563,6 +567,8 @@ roleRouter.put('/:id', requireAuth, requirePermission('can_manage_users'), async
     }
   });
 
+  invalidateUserCache();
+
   res.json({
     success: true,
     data: {
@@ -611,6 +617,7 @@ roleRouter.delete('/:id', requireAuth, requirePermission('can_manage_users'), as
   }
 
   await prisma.role.delete({ where: { id } });
+  invalidateUserCache();
 
   res.json({
     success: true,

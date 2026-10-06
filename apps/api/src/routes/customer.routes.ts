@@ -87,18 +87,9 @@ function generateThermalPaymentSlip(data: {
 customerRouter.get('/search', requireAuth, async (req: Request, res: Response) => {
   try {
     const { q } = req.query;
-    const query = typeof q === 'string' ? q.trim() : '';
+    const query = typeof q === 'string' ? q.trim().toLowerCase() : '';
 
-    const customers = await prisma.customer.findMany({
-      where: query
-        ? {
-            OR: [
-              { name: { contains: query, mode: 'insensitive' } },
-              { phone: { contains: query } },
-            ],
-          }
-        : undefined,
-      take: 25,
+    const allCustomers = await prisma.customer.findMany({
       select: {
         id: true,
         name: true,
@@ -109,20 +100,26 @@ customerRouter.get('/search', requireAuth, async (req: Request, res: Response) =
       orderBy: { name: 'asc' },
     });
 
+    let customers = allCustomers;
     if (query) {
-      const qLower = query.toLowerCase();
-      customers.sort((a, b) => {
-        const aStarts = a.name.toLowerCase().startsWith(qLower);
-        const bStarts = b.name.toLowerCase().startsWith(qLower);
-        if (aStarts && !bStarts) return -1;
-        if (!aStarts && bStarts) return 1;
-        return a.name.localeCompare(b.name);
+      customers = allCustomers.filter((c) => {
+        const nameLower = (c.name || '').trim().toLowerCase();
+        const phone = (c.phone || '').trim().toLowerCase();
+        if (/^\d+$/.test(query)) {
+          return phone.startsWith(query) || phone.replace(/\D/g, '').startsWith(query);
+        }
+        if (nameLower.startsWith(query)) return true;
+        const segments = nameLower.split(/[\(\)\/\-_]/).map((s: string) => s.trim()).filter(Boolean);
+        return segments.some((s: string) => s.startsWith(query));
       });
+
+      // Strict alphabetical sort
+      customers.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }
 
     return res.json({
       success: true,
-      data: { customers },
+      data: { customers: customers.slice(0, 30) },
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -171,17 +168,9 @@ customerRouter.get('/ledger/summary', requireAuth, async (_req: Request, res: Re
 customerRouter.get('/', requireAuth, async (req: Request, res: Response) => {
   try {
     const { q } = req.query;
-    const query = typeof q === 'string' ? q.trim() : '';
+    const query = typeof q === 'string' ? q.trim().toLowerCase() : '';
 
-    const customers = await prisma.customer.findMany({
-      where: query
-        ? {
-            OR: [
-              { name: { contains: query, mode: 'insensitive' } },
-              { phone: { contains: query } },
-            ],
-          }
-        : undefined,
+    const allCustomers = await prisma.customer.findMany({
       include: {
         _count: {
           select: { ledgerEntries: true, bills: true, pisaiRecords: true },
@@ -197,6 +186,23 @@ customerRouter.get('/', requireAuth, async (req: Request, res: Response) => {
         { name: 'asc' },
       ],
     });
+
+    let customers = allCustomers;
+    if (query) {
+      customers = allCustomers.filter((c) => {
+        const nameLower = (c.name || '').trim().toLowerCase();
+        const phone = (c.phone || '').trim().toLowerCase();
+        if (/^\d+$/.test(query)) {
+          return phone.startsWith(query) || phone.replace(/\D/g, '').startsWith(query);
+        }
+        if (nameLower.startsWith(query)) return true;
+        const segments = nameLower.split(/[\(\)\/\-_]/).map((s: string) => s.trim()).filter(Boolean);
+        return segments.some((s: string) => s.startsWith(query));
+      });
+
+      // Strict alphabetical sort
+      customers.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
 
     const formatted = customers.map((c) => {
       const lastEntry = c.ledgerEntries[0];

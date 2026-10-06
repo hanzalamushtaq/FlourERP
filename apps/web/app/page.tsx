@@ -25,6 +25,7 @@ import {
   clearSession,
   ensureValidToken,
   isTokenExpired,
+  refreshCurrentUserProfile,
   isAdmin,
   isBiller,
   hasPermission,
@@ -224,7 +225,67 @@ export default function Home() {
     };
   }, []);
 
-  // Global Keyboard Shortcuts (F8, F2, F3, Esc, Alt+K)
+  // Real-time RBAC Profile Sync: poll every 6s and re-check on tab focus / visibility
+  useEffect(() => {
+    if (!currentUser) return;
+
+    // Immediate check
+    refreshCurrentUserProfile();
+
+    // Regular heartbeat polling to catch changes made by Admin
+    const interval = setInterval(() => {
+      refreshCurrentUserProfile();
+    }, 6000);
+
+    const handleFocus = () => {
+      refreshCurrentUserProfile();
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshCurrentUserProfile();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [currentUser?.id]);
+
+  // Dynamic User Permissions Gating
+  const userIsAdmin = isAdmin(currentUser);
+  const userIsBiller = isBiller(currentUser);
+  const canBill = userIsAdmin || hasPermission(currentUser, 'can_bill');
+  const canPisai = userIsAdmin || hasPermission(currentUser, 'can_pisai');
+  const canIssueCredit = userIsAdmin || hasPermission(currentUser, 'can_issue_credit');
+  const canManagePrices = userIsAdmin || hasPermission(currentUser, 'can_manage_prices');
+  const canViewReports = userIsAdmin || hasPermission(currentUser, 'can_view_reports');
+  const canCloseDay = userIsAdmin || hasPermission(currentUser, 'can_close_day');
+
+  // RBAC Tab Kickback Guard: If Admin revokes permission for the active tab, immediately return to dashboard
+  useEffect(() => {
+    if (!currentUser) return;
+    if (activeTab === 'billing' && !canBill) {
+      setActiveTab('dashboard');
+    } else if (activeTab === 'pisai' && !canPisai) {
+      setActiveTab('dashboard');
+    } else if (activeTab === 'udhaar' && !canIssueCredit) {
+      setActiveTab('dashboard');
+    } else if (activeTab === 'rates' && !canManagePrices) {
+      setActiveTab('dashboard');
+    } else if (activeTab === 'reports' && !canViewReports) {
+      setActiveTab('dashboard');
+    } else if (activeTab === 'admin' && !userIsAdmin) {
+      setActiveTab('dashboard');
+    }
+  }, [currentUser, activeTab, canBill, canPisai, canIssueCredit, canManagePrices, canViewReports, userIsAdmin]);
+
+  // Global Keyboard Shortcuts (F8, F2, F3, Esc, Alt+K) - Gated by Permissions
   useEffect(() => {
     if (!currentUser) return;
 
@@ -232,20 +293,26 @@ export default function Home() {
       const target = e.target as HTMLElement;
       const isInputActive = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
 
-      // F8 -> New Sales Bill
+      // F8 -> New Sales Bill (if permitted)
       if (e.key === 'F8') {
         e.preventDefault();
-        setActiveTab('billing');
+        if (canBill) {
+          setActiveTab('billing');
+        }
       }
-      // F2 -> Gundam Pisai & Token
+      // F2 -> Gundam Pisai & Token (if permitted)
       else if (e.key === 'F2') {
         e.preventDefault();
-        setActiveTab('pisai');
+        if (canPisai) {
+          setActiveTab('pisai');
+        }
       }
-      // F3 -> Daily Rates Tab
+      // F3 -> Daily Rates Tab (if permitted)
       else if (e.key === 'F3') {
         e.preventDefault();
-        setActiveTab('rates');
+        if (canManagePrices) {
+          setActiveTab('rates');
+        }
       }
       // Esc -> Home / Dashboard
       else if (e.key === 'Escape') {
@@ -259,16 +326,18 @@ export default function Home() {
           setActiveTab('dashboard');
         }
       }
-      // Alt+K -> Customer Udhaar Ledger
+      // Alt+K -> Customer Udhaar Ledger (if permitted)
       else if (e.altKey && (e.key === 'k' || e.key === 'K' || e.key === 'ک')) {
         e.preventDefault();
-        setActiveTab('udhaar');
+        if (canIssueCredit) {
+          setActiveTab('udhaar');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentUser, isReceiptOpen, isPriceModalOpen, isZReportOpen]);
+  }, [currentUser, isReceiptOpen, isPriceModalOpen, isZReportOpen, canBill, canPisai, canManagePrices, canIssueCredit]);
 
   const handleLoginSuccess = (user: UserSession) => {
     setCurrentUser(user);
@@ -310,10 +379,6 @@ export default function Home() {
   if (!currentUser) {
     return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
-
-  const userIsAdmin = isAdmin(currentUser);
-  const userIsBiller = isBiller(currentUser);
-  const canCloseDay = userIsAdmin || hasPermission(currentUser, 'can_close_day');
 
   return (
     <div
@@ -459,12 +524,20 @@ export default function Home() {
               <BillerDashboard
                 billerName={currentUser.fullName}
                 counterId={userIsAdmin ? 'مرکزی کنٹرول' : 'کاؤنٹر #01'}
-                onNewBill={() => setActiveTab('billing')}
-                onNewPisaiToken={() => setActiveTab('pisai')}
-                onViewUdhaar={() => setActiveTab('udhaar')}
+                permissions={currentUser.permissions}
+                isAdmin={userIsAdmin}
+                onNewBill={() => {
+                  if (canBill) setActiveTab('billing');
+                }}
+                onNewPisaiToken={() => {
+                  if (canPisai) setActiveTab('pisai');
+                }}
+                onViewUdhaar={() => {
+                  if (canIssueCredit) setActiveTab('udhaar');
+                }}
                 onReprintReceipt={handleReprintReceipt}
                 onViewAllInvoices={() => {
-                  if (userIsAdmin) setActiveTab('reports');
+                  if (canViewReports) setActiveTab('reports');
                 }}
               />
             </div>
@@ -473,24 +546,141 @@ export default function Home() {
           {/* Billing Screen (F8) */}
           {activeTab === 'billing' && (
             <div className="dashboard-nastaleeq-scope main-content-view-container">
-              <ProductBillingScreen initialProductId={selectedProductIdForBilling} />
+              {canBill ? (
+                <ProductBillingScreen initialProductId={selectedProductIdForBilling} />
+              ) : (
+                <div
+                  style={{
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                    borderRadius: '16px',
+                    border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FCA5A5',
+                    padding: '36px',
+                    maxWidth: '600px',
+                    margin: '40px auto',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '40px', marginBottom: '10px' }}>🔒</div>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B' }}>
+                    بلنگ کا اختیار موجود نہیں (Billing Restricted)
+                  </h2>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#475569', marginTop: '10px' }}>
+                    آپ کے اکاؤنٹ کو پراڈکٹ سیلز اور بل بنانے کا اختیار حاصل نہیں ہے۔
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('dashboard')}
+                    className="touch-active"
+                    style={{
+                      marginTop: '20px',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      backgroundColor: '#7F4F24',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ڈیش بورڈ پر واپس جائیں (Esc)
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
           {/* Pisai Screen (F2) */}
           {activeTab === 'pisai' && (
             <div className="dashboard-nastaleeq-scope main-content-view-container">
-              <PisaiBillingScreen />
+              {canPisai ? (
+                <PisaiBillingScreen />
+              ) : (
+                <div
+                  style={{
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                    borderRadius: '16px',
+                    border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FCA5A5',
+                    padding: '36px',
+                    maxWidth: '600px',
+                    margin: '40px auto',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '40px', marginBottom: '10px' }}>🔒</div>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B' }}>
+                    پسائی ٹوکن کا اختیار موجود نہیں
+                  </h2>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#475569', marginTop: '10px' }}>
+                    آپ کے اکاؤنٹ کو گندم پسائی ٹوکن جاری کرنے کا اختیار حاصل نہیں ہے۔
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('dashboard')}
+                    className="touch-active"
+                    style={{
+                      marginTop: '20px',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      backgroundColor: '#7F4F24',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ڈیش بورڈ پر واپس جائیں (Esc)
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
           {/* Udhaar Ledger (Alt+K) */}
           {activeTab === 'udhaar' && (
             <div className="dashboard-nastaleeq-scope main-content-view-container">
-              <CustomerLedgerView
-                initialSearch={customerSearchForLedger}
-                targetCustomerId={selectedCustomerIdForLedger || undefined}
-              />
+              {canIssueCredit ? (
+                <CustomerLedgerView
+                  initialSearch={customerSearchForLedger}
+                  targetCustomerId={selectedCustomerIdForLedger || undefined}
+                />
+              ) : (
+                <div
+                  style={{
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                    borderRadius: '16px',
+                    border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FCA5A5',
+                    padding: '36px',
+                    maxWidth: '600px',
+                    margin: '40px auto',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '40px', marginBottom: '10px' }}>🔒</div>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B' }}>
+                    ادھار کھاتہ کا اختیار موجود نہیں
+                  </h2>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#475569', marginTop: '10px' }}>
+                    آپ کے اکاؤنٹ کو کسٹمر ادھار کھاتے دیکھنے اور ادھار جاری کرنے کا اختیار حاصل نہیں ہے۔
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('dashboard')}
+                    className="touch-active"
+                    style={{
+                      marginTop: '20px',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      backgroundColor: '#7F4F24',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ڈیش بورڈ پر واپس جائیں (Esc)
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -604,7 +794,46 @@ export default function Home() {
           {/* Daily Rates View (F3) */}
           {activeTab === 'rates' && (
             <div className="dashboard-nastaleeq-scope main-content-view-container">
-              <RateListView />
+              {canManagePrices ? (
+                <RateListView />
+              ) : (
+                <div
+                  style={{
+                    backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                    borderRadius: '16px',
+                    border: isDark ? '1.5px solid #7F1D1D' : '1.5px solid #FCA5A5',
+                    padding: '36px',
+                    maxWidth: '600px',
+                    margin: '40px auto',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '40px', marginBottom: '10px' }}>🔒</div>
+                  <h2 className="font-nastaleeq" style={{ fontSize: '20px', fontWeight: 900, color: isDark ? '#FCA5A5' : '#991B1B' }}>
+                    ریٹ لسٹ کا اختیار موجود نہیں
+                  </h2>
+                  <p className="font-nastaleeq" style={{ fontSize: '14px', color: isDark ? '#94A3B8' : '#475569', marginTop: '10px' }}>
+                    روزانہ کے ریٹ تبدیل کرنے اور ریٹ لسٹ دیکھنے کا اختیار حاصل نہیں ہے۔
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('dashboard')}
+                    className="touch-active"
+                    style={{
+                      marginTop: '20px',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      backgroundColor: '#7F4F24',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ڈیش بورڈ پر واپس جائیں (Esc)
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

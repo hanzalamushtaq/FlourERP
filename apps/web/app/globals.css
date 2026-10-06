@@ -748,7 +748,7 @@ h4.font-nastaleeq {
   }
 }
 
-/* 4. Dual Top Action Cards Grid (Pisai, Udhaar, Warehouse Stock) */
+/* 4. Dual Top Action Cards Grid (Pisai, Warehouse Stock) */
 .dual-top-action-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 360px));
@@ -756,6 +756,22 @@ h4.font-nastaleeq {
   gap: 14px;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* 4b. Customer Ledger Top 3 Action Cards (Always 1 single line on desktop) */
+.ledger-top-3-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 820px) {
+  .ledger-top-3-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }
 
 .dual-action-card {
@@ -2177,8 +2193,21 @@ html.dark ::-webkit-scrollbar-thumb:hover {
    Guarantee 100% crisp readability for labels, cards, and inputs in both modes
    ============================================================================== */
 .login-screen-root {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
   background-color: #F8FAFC;
   background-image: radial-gradient(#CBD5E1 1.2px, #F8FAFC 1.2px);
+  z-index: 50;
 }
 html.dark .login-screen-root {
   background-color: #0B0F19 !important;
@@ -2186,6 +2215,8 @@ html.dark .login-screen-root {
 }
 
 .login-card-container {
+  margin: 32px auto 64px auto !important;
+  flex-shrink: 0 !important;
   background-color: #FFFFFF !important;
   border: 1.5px solid #E2E8F0 !important;
   color: #0F172A !important;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getSession, ensureValidToken } from '../../lib/auth';
 import { getApiBaseUrl } from '../../lib/api';
 import {
@@ -145,11 +145,45 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
     });
   }, [selectedCustomer?.id]);
 
-  const filteredCustomers = customers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.phone.includes(searchQuery)
-  );
+  const filteredCustomers = useMemo(() => {
+    const q = (searchQuery || '').trim().toLowerCase();
+    if (!q) {
+      const sorted = [...customers];
+      sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      return sorted;
+    }
+
+    const matched = customers.filter((c) => {
+      const name = (c.name || '').trim().toLowerCase();
+      const phone = (c.phone || '').trim().toLowerCase();
+
+      if (/^\d+$/.test(q)) {
+        return phone.startsWith(q) || phone.replace(/\D/g, '').startsWith(q);
+      }
+
+      if (name.startsWith(q)) return true;
+
+      const segments = name.split(/[\(\)\/\-_]/).map((s) => s.trim()).filter(Boolean);
+      return segments.some((s) => s.startsWith(q));
+    });
+
+    matched.sort((a, b) => {
+      const aName = (a.name || '').trim();
+      const bName = (b.name || '').trim();
+
+      const getCompareKey = (str: string) => {
+        if (/^[a-zA-Z]/.test(q)) {
+          const latin = str.match(/[a-zA-Z][a-zA-Z0-9\s]*/);
+          if (latin) return latin[0].trim().toLowerCase();
+        }
+        return str.toLowerCase();
+      };
+
+      return getCompareKey(aName).localeCompare(getCompareKey(bName));
+    });
+
+    return matched;
+  }, [customers, searchQuery]);
 
   const handleRecordPayment = async () => {
     const amount = parseFloat(repaymentAmount) || 0;
@@ -326,83 +360,20 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
-      {/* 1. TOP DASHBOARD ACTION CARDS (Responsive on Mobile & Desktop) */}
-      <div className="dual-top-action-cards">
-        {/* Card 1: نیا کھاتہ کھولیں - Cobalt Blue Action Card */}
-        <div
-          onClick={() => setIsNewCustomerOpen(true)}
-          onMouseEnter={() => setHoveredTopCard('new')}
-          onMouseLeave={() => setHoveredTopCard(null)}
-          className="dual-action-card touch-active"
-          style={{
-            width: '100%',
-            maxWidth: '360px',
-            background: 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)',
-            borderRadius: '14px',
-            border: '2px solid #1E40AF',
-            boxShadow: '0 6px 16px rgba(24, 119, 242, 0.26)',
-            padding: '14px 22px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            direction: isUrdu ? 'rtl' : 'ltr',
-            cursor: 'pointer',
-            minHeight: '62px',
-            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
-            boxSizing: 'border-box',
-          }}
-        >
-          {/* Icon + Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '12px',
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.12)',
-                flexShrink: 0,
-              }}
-            >
-              <UserPlus size={22} color={isDark ? '#93C5FD' : '#1877F2'} strokeWidth={2.4} />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
-              <h2
-                className={isUrdu ? 'font-nastaleeq' : ''}
-                style={{
-                  fontSize: isUrdu ? '28px' : '20px',
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  margin: 0,
-                  padding: '2px 8px',
-                  lineHeight: 1.25,
-                  letterSpacing: '0',
-                }}
-              >
-                {t('+ نیا کھاتہ کھولیں', '+ Open New Ledger')}
-              </h2>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: مجموعی ادھار کھاتہ - Emerald Green Summary Card */}
+      {/* 1. TOP DASHBOARD ACTION CARDS (3 Cards in One Single Line) */}
+      <div className="ledger-top-3-cards">
+        {/* Card 1: مجموعی ادھار کھاتہ - Emerald Green Summary Card */}
         <div
           onMouseEnter={() => setHoveredTopCard('total')}
           onMouseLeave={() => setHoveredTopCard(null)}
           className="dual-action-card dash-card-animated"
           style={{
             width: '100%',
-            maxWidth: '360px',
             background: 'linear-gradient(135deg, #0E8A54 0%, #065F46 100%)',
             borderRadius: '14px',
             border: '2px solid #065F46',
             boxShadow: '0 6px 16px rgba(14, 138, 84, 0.26)',
-            padding: '14px 22px',
+            padding: '14px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -436,7 +407,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
                 <h2
                   className={`ledger-card-title ${isUrdu ? 'font-nastaleeq' : ''}`}
                   style={{
-                    fontSize: isUrdu ? '28px' : '20px',
+                    fontSize: isUrdu ? '26px' : '18px',
                     fontWeight: 900,
                     color: '#FFFFFF',
                     margin: 0,
@@ -465,7 +436,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
                 dir="ltr"
                 className="ledger-card-amount"
                 style={{
-                  fontSize: '24px',
+                  fontSize: '22px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   fontFamily: 'var(--font-mono)',
@@ -480,18 +451,78 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
           </div>
         </div>
 
+        {/* Card 2: نیا کھاتہ کھولیں - Cobalt Blue Action Card */}
+        <div
+          onClick={() => setIsNewCustomerOpen(true)}
+          onMouseEnter={() => setHoveredTopCard('new')}
+          onMouseLeave={() => setHoveredTopCard(null)}
+          className="dual-action-card touch-active"
+          style={{
+            width: '100%',
+            background: 'linear-gradient(135deg, #1877F2 0%, #1D4ED8 100%)',
+            borderRadius: '14px',
+            border: '2px solid #1E40AF',
+            boxShadow: '0 6px 16px rgba(24, 119, 242, 0.26)',
+            padding: '14px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            direction: isUrdu ? 'rtl' : 'ltr',
+            cursor: 'pointer',
+            minHeight: '62px',
+            transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Icon + Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.12)',
+                flexShrink: 0,
+              }}
+            >
+              <UserPlus size={22} color={isDark ? '#93C5FD' : '#1877F2'} strokeWidth={2.4} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-start' : 'flex-start' }}>
+              <h2
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '26px' : '18px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
+                  letterSpacing: '0',
+                }}
+              >
+                {t('+ نیا کھاتہ کھولیں', '+ Open New Ledger')}
+              </h2>
+            </div>
+          </div>
+        </div>
+
         {/* Card 3: جنرل لیجر PDF ڈاؤن لوڈ - Royal Indigo Action Card */}
         <div
           onClick={handleDownloadGeneralLedgerPdf}
           className="dual-action-card touch-active"
           style={{
             width: '100%',
-            maxWidth: '360px',
             background: 'linear-gradient(135deg, #6D28D9 0%, #4C1D95 100%)',
             borderRadius: '14px',
             border: '2px solid #5B21B6',
             boxShadow: '0 6px 16px rgba(109, 40, 217, 0.26)',
-            padding: '14px 22px',
+            padding: '14px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -525,7 +556,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
               <h2
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '26px' : '18px',
+                  fontSize: isUrdu ? '24px' : '17px',
                   fontWeight: 900,
                   color: '#FFFFFF',
                   margin: 0,
@@ -538,7 +569,7 @@ export const CustomerLedgerView: React.FC<CustomerLedgerViewProps> = ({
               <span
                 className={isUrdu ? 'font-nastaleeq' : ''}
                 style={{
-                  fontSize: isUrdu ? '15px' : '11px',
+                  fontSize: isUrdu ? '14px' : '11px',
                   color: '#DDD6FE',
                   fontWeight: 700,
                   padding: '0 8px',

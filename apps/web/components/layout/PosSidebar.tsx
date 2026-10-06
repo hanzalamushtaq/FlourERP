@@ -147,9 +147,14 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
   };
 
   const isAdminUser =
-    roleName.toLowerCase().includes('admin') || permissions.includes('can_manage_users');
-  const canViewReports =
-    isAdminUser || permissions.includes('can_view_reports');
+    roleName.toLowerCase().includes('admin') ||
+    roleName.toLowerCase().includes('super') ||
+    permissions.includes('can_manage_users');
+  const canBill = isAdminUser || permissions.includes('can_bill');
+  const canPisai = isAdminUser || permissions.includes('can_pisai');
+  const canIssueCredit = isAdminUser || permissions.includes('can_issue_credit');
+  const canManagePrices = isAdminUser || permissions.includes('can_manage_prices');
+  const canViewReports = isAdminUser || permissions.includes('can_view_reports');
 
   const allMenuItems = [
     {
@@ -164,28 +169,28 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
       label: t('نیا بل', 'New Bill'),
       icon: (color: string) => <PlusCircle size={22} color={color} strokeWidth={1.8} />,
       onClick: () => handleItemSelect('billing'),
-      visible: true,
+      visible: canBill,
     },
     {
       id: 'pisai',
       label: t('گندم پسائی', 'Wheat Grinding'),
       icon: (color: string) => <ChakkiMachineIcon size={22} color={color} />,
       onClick: () => handleItemSelect('pisai'),
-      visible: true,
+      visible: canPisai,
     },
     {
       id: 'udhaar',
       label: t('ادھار کھاتے', 'Customer Ledger'),
       icon: (color: string) => <BookOpen size={22} color={color} strokeWidth={1.8} />,
       onClick: () => handleItemSelect('udhaar'),
-      visible: true,
+      visible: canIssueCredit,
     },
     {
       id: 'rates',
       label: t('ریٹ لسٹ', 'Daily Rates'),
       icon: (color: string) => <Tag size={22} color={color} strokeWidth={2} />,
       onClick: () => handleItemSelect('rates'),
-      visible: true,
+      visible: canManagePrices,
     },
     {
       id: 'stock',

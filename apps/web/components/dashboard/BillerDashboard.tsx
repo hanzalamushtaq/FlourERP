@@ -73,6 +73,8 @@ const KhataBookIcon = () => (
 interface BillerDashboardProps {
   billerName?: string;
   counterId?: string;
+  permissions?: string[];
+  isAdmin?: boolean;
   onNewBill: () => void;
   onNewPisaiToken: () => void;
   onViewUdhaar: () => void;
@@ -83,6 +85,8 @@ interface BillerDashboardProps {
 export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   billerName = '',
   counterId = '01',
+  permissions = [],
+  isAdmin = false,
   onNewBill,
   onNewPisaiToken,
   onViewUdhaar,
@@ -93,6 +97,10 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
   const { isDark } = useTheme();
   const [hoveredCard, setHoveredCard] = React.useState<string | null>(null);
   const [pressedCard, setPressedCard] = React.useState<string | null>(null);
+
+  const canBill = isAdmin || permissions.includes('can_bill');
+  const canPisai = isAdmin || permissions.includes('can_pisai');
+  const canIssueCredit = isAdmin || permissions.includes('can_issue_credit');
 
   // Live Metrics & Recent Bills from Database
   const [metrics, setMetrics] = React.useState({
@@ -227,220 +235,226 @@ export const BillerDashboard: React.FC<BillerDashboardProps> = ({
       {/* Top 3 Action Cards (Responsive on Mobile) */}
       <div className="dashboard-3-action-cards">
         {/* Card 1: Create New Bill */}
-        <div
-          onClick={onNewBill}
-          onMouseEnter={() => setHoveredCard('billing')}
-          onMouseLeave={() => {
-            setHoveredCard(null);
-            setPressedCard(null);
-          }}
-          onMouseDown={() => setPressedCard('billing')}
-          onMouseUp={() => setPressedCard(null)}
-          onTouchStart={() => setPressedCard('billing')}
-          onTouchEnd={() => setPressedCard(null)}
-          className="touch-active"
-          style={{
-            background: '#1877F2',
-            borderRadius: '16px',
-            border: 'none',
-            outline: 'none',
-            padding: '22px 26px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            minHeight: '96px',
-            boxShadow: 'none',
-            transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transform:
-              pressedCard === 'billing'
-                ? 'scale(0.975) translateY(1px)'
-                : hoveredCard === 'billing'
-                  ? 'translateY(-4px)'
-                  : 'none',
-          }}
-        >
-          {/* Left: Squircle Icon Tile */}
+        {canBill && (
           <div
+            onClick={onNewBill}
+            onMouseEnter={() => setHoveredCard('billing')}
+            onMouseLeave={() => {
+              setHoveredCard(null);
+              setPressedCard(null);
+            }}
+            onMouseDown={() => setPressedCard('billing')}
+            onMouseUp={() => setPressedCard(null)}
+            onTouchStart={() => setPressedCard('billing')}
+            onTouchEnd={() => setPressedCard(null)}
+            className="touch-active"
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+              background: '#1877F2',
+              borderRadius: '16px',
+              border: 'none',
+              outline: 'none',
+              padding: '22px 26px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              minHeight: '96px',
               boxShadow: 'none',
-              flexShrink: 0,
-              transition: 'transform 0.25s ease',
-              transform: hoveredCard === 'billing' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
+              transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              transform:
+                pressedCard === 'billing'
+                  ? 'scale(0.975) translateY(1px)'
+                  : hoveredCard === 'billing'
+                    ? 'translateY(-4px)'
+                    : 'none',
             }}
           >
-            <ReceiptPrinterIcon />
-          </div>
-
-          {/* Right Text */}
-          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
-            <h2
-              className={isUrdu ? 'font-nastaleeq' : ''}
+            {/* Left: Squircle Icon Tile */}
+            <div
               style={{
-                fontSize: isUrdu ? '32px' : '22px',
-                fontWeight: 900,
-                color: '#FFFFFF',
-                margin: 0,
-                padding: '2px 8px',
-                lineHeight: 1.25,
+                width: '56px',
+                height: '56px',
+                borderRadius: '13px',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'none',
+                flexShrink: 0,
+                transition: 'transform 0.25s ease',
+                transform: hoveredCard === 'billing' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
               }}
             >
-              {t('نیا بل بنائیں', 'Create New Bill')}
-            </h2>
+              <ReceiptPrinterIcon />
+            </div>
+
+            {/* Right Text */}
+            <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
+              <h2
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '32px' : '22px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
+                }}
+              >
+                {t('نیا بل بنائیں', 'Create New Bill')}
+              </h2>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Card 2: Milling Token */}
-        <div
-          onClick={onNewPisaiToken}
-          onMouseEnter={() => setHoveredCard('pisai')}
-          onMouseLeave={() => {
-            setHoveredCard(null);
-            setPressedCard(null);
-          }}
-          onMouseDown={() => setPressedCard('pisai')}
-          onMouseUp={() => setPressedCard(null)}
-          onTouchStart={() => setPressedCard('pisai')}
-          onTouchEnd={() => setPressedCard(null)}
-          className="touch-active"
-          style={{
-            background: '#D97706',
-            borderRadius: '16px',
-            border: 'none',
-            outline: 'none',
-            padding: '22px 26px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            minHeight: '96px',
-            boxShadow: 'none',
-            transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transform:
-              pressedCard === 'pisai'
-                ? 'scale(0.975) translateY(1px)'
-                : hoveredCard === 'pisai'
-                  ? 'translateY(-4px)'
-                  : 'none',
-          }}
-        >
-          {/* Left: Squircle Icon Tile */}
+        {canPisai && (
           <div
+            onClick={onNewPisaiToken}
+            onMouseEnter={() => setHoveredCard('pisai')}
+            onMouseLeave={() => {
+              setHoveredCard(null);
+              setPressedCard(null);
+            }}
+            onMouseDown={() => setPressedCard('pisai')}
+            onMouseUp={() => setPressedCard(null)}
+            onTouchStart={() => setPressedCard('pisai')}
+            onTouchEnd={() => setPressedCard(null)}
+            className="touch-active"
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+              background: '#D97706',
+              borderRadius: '16px',
+              border: 'none',
+              outline: 'none',
+              padding: '22px 26px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              minHeight: '96px',
               boxShadow: 'none',
-              flexShrink: 0,
-              transition: 'transform 0.25s ease',
-              transform: hoveredCard === 'pisai' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
+              transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              transform:
+                pressedCard === 'pisai'
+                  ? 'scale(0.975) translateY(1px)'
+                  : hoveredCard === 'pisai'
+                    ? 'translateY(-4px)'
+                    : 'none',
             }}
           >
-            <ChakkiGrinderIcon />
-          </div>
-
-          {/* Right Text */}
-          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
-            <h2
-              className={isUrdu ? 'font-nastaleeq' : ''}
+            {/* Left: Squircle Icon Tile */}
+            <div
               style={{
-                fontSize: isUrdu ? '32px' : '22px',
-                fontWeight: 900,
-                color: '#FFFFFF',
-                margin: 0,
-                padding: '2px 8px',
-                lineHeight: 1.25,
+                width: '56px',
+                height: '56px',
+                borderRadius: '13px',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'none',
+                flexShrink: 0,
+                transition: 'transform 0.25s ease',
+                transform: hoveredCard === 'pisai' ? 'scale(1.08) rotate(1.5deg)' : 'scale(1)',
               }}
             >
-              {t('گندم پسائی ٹوکن', 'Milling Token')}
-            </h2>
+              <ChakkiGrinderIcon />
+            </div>
+
+            {/* Right Text */}
+            <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
+              <h2
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '32px' : '22px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
+                }}
+              >
+                {t('گندم پسائی ٹوکن', 'Milling Token')}
+              </h2>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Card 3: Customer Ledger */}
-        <div
-          onClick={onViewUdhaar}
-          onMouseEnter={() => setHoveredCard('udhaar')}
-          onMouseLeave={() => {
-            setHoveredCard(null);
-            setPressedCard(null);
-          }}
-          onMouseDown={() => setPressedCard('udhaar')}
-          onMouseUp={() => setPressedCard(null)}
-          onTouchStart={() => setPressedCard('udhaar')}
-          onTouchEnd={() => setPressedCard(null)}
-          className="touch-active"
-          style={{
-            background: '#0E8A54',
-            borderRadius: '16px',
-            border: 'none',
-            outline: 'none',
-            padding: '22px 26px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            minHeight: '96px',
-            boxShadow: 'none',
-            transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transform:
-              pressedCard === 'udhaar'
-                ? 'scale(0.975) translateY(1px)'
-                : hoveredCard === 'udhaar'
-                  ? 'translateY(-4px)'
-                  : 'none',
-          }}
-        >
-          {/* Left: Squircle Icon Tile */}
+        {canIssueCredit && (
           <div
+            onClick={onViewUdhaar}
+            onMouseEnter={() => setHoveredCard('udhaar')}
+            onMouseLeave={() => {
+              setHoveredCard(null);
+              setPressedCard(null);
+            }}
+            onMouseDown={() => setPressedCard('udhaar')}
+            onMouseUp={() => setPressedCard(null)}
+            onTouchStart={() => setPressedCard('udhaar')}
+            onTouchEnd={() => setPressedCard(null)}
+            className="touch-active"
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '13px',
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+              background: '#0E8A54',
+              borderRadius: '16px',
+              border: 'none',
+              outline: 'none',
+              padding: '22px 26px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              minHeight: '96px',
               boxShadow: 'none',
-              flexShrink: 0,
-              transition: 'transform 0.25s ease',
-              transform: hoveredCard === 'udhaar' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
+              transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              transform:
+                pressedCard === 'udhaar'
+                  ? 'scale(0.975) translateY(1px)'
+                  : hoveredCard === 'udhaar'
+                    ? 'translateY(-4px)'
+                    : 'none',
             }}
           >
-            <KhataBookIcon />
-          </div>
-
-          {/* Right Text */}
-          <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
-            <h2
-              className={isUrdu ? 'font-nastaleeq' : ''}
+            {/* Left: Squircle Icon Tile */}
+            <div
               style={{
-                fontSize: isUrdu ? '32px' : '22px',
-                fontWeight: 900,
-                color: '#FFFFFF',
-                margin: 0,
-                padding: '2px 8px',
-                lineHeight: 1.25,
+                width: '56px',
+                height: '56px',
+                borderRadius: '13px',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'none',
+                flexShrink: 0,
+                transition: 'transform 0.25s ease',
+                transform: hoveredCard === 'udhaar' ? 'scale(1.08) rotate(-1.5deg)' : 'scale(1)',
               }}
             >
-              {t('ادھار کھاتے و وصولی', 'Customer Ledger')}
-            </h2>
+              <KhataBookIcon />
+            </div>
+
+            {/* Right Text */}
+            <div style={{ textAlign: isUrdu ? 'right' : 'left', display: 'flex', flexDirection: 'column', alignItems: isUrdu ? 'flex-end' : 'flex-start', padding: '0 4px' }}>
+              <h2
+                className={isUrdu ? 'font-nastaleeq' : ''}
+                style={{
+                  fontSize: isUrdu ? '32px' : '22px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  padding: '2px 8px',
+                  lineHeight: 1.25,
+                }}
+              >
+                {t('ادھار کھاتے و وصولی', 'Customer Ledger')}
+              </h2>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* 3. Key Metrics Single Card with 4 Compartments matching reference image */}
