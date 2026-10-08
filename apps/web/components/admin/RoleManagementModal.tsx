@@ -705,9 +705,6 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                   <h3 className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '20px' : '17px', fontWeight: 900, color: '#0F172A', margin: 0 }}>
                     {t('رول کے اختیارات:', 'Edit Role Permissions:')} {editingRole.name}
                   </h3>
-                  <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: isUrdu ? '14px' : '12px', color: '#64748B', marginTop: '3px', fontWeight: 700 }}>
-                    {t('اختیارات کو منتخب یا غیر منتخب کریں اور محفوظ کریں', 'Check or uncheck permissions and save')}
-                  </div>
                 </div>
 
                 <button
@@ -770,15 +767,8 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                         {isChecked && <Check size={12} color="#FFFFFF" strokeWidth={3} />}
                       </div>
 
-                      <div>
-                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14.5px', fontWeight: 900, color: isChecked ? '#92400E' : '#0F172A' }}>
-                          {isUrdu ? perm.labelUr : perm.labelEn}
-                        </div>
-                        {perm.descUr && (
-                          <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '11px', fontWeight: 600, color: isChecked ? '#B45309' : '#64748B', marginTop: '2px' }}>
-                            {isUrdu ? perm.descUr : (perm.descEn || perm.labelEn)}
-                          </div>
-                        )}
+                      <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 900, color: isChecked ? '#92400E' : '#0F172A' }}>
+                        {isUrdu ? perm.labelUr : perm.labelEn}
                       </div>
                     </div>
                   );
@@ -1443,15 +1433,8 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                           {isChecked && <Check size={12} color="#FFFFFF" strokeWidth={3} />}
                         </div>
 
-                        <div>
-                          <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14.5px', fontWeight: 900, color: isChecked ? '#92400E' : '#0F172A' }}>
-                            {isUrdu ? perm.labelUr : perm.labelEn}
-                          </div>
-                          {perm.descUr && (
-                            <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '11px', fontWeight: 600, color: isChecked ? '#B45309' : '#64748B', marginTop: '2px' }}>
-                              {isUrdu ? perm.descUr : (perm.descEn || perm.labelEn)}
-                            </div>
-                          )}
+                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '15px', fontWeight: 900, color: isChecked ? '#92400E' : '#0F172A' }}>
+                          {isUrdu ? perm.labelUr : perm.labelEn}
                         </div>
                       </div>
                     );
