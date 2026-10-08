@@ -291,17 +291,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {t('آن لائن ایڈمن کنٹرول روم', 'Online Admin Control')}
               </span>
             </div>
-            <p
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{
-                fontSize: isUrdu ? '15px' : '13px',
-                color: isDark ? '#94A3B8' : '#64748B',
-                margin: '4px 0 0 0',
-                fontWeight: 600,
-              }}
-            >
-              {t('انتظامی ڈیش بورڈ، سکیورٹی رولز اور یومیہ مالیاتی کنٹرول سنٹر', 'Executive Dashboard, Security Roles & Financial Control Center')}
-            </p>
           </div>
         </div>
 
@@ -385,12 +374,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               {t('+ نیا صارف / لاگ ان کی', '+ Add Staff User & Key')}
             </div>
-            <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{ fontSize: isUrdu ? '13px' : '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600, marginTop: '3px' }}
-            >
-              {t('نیا کیشیر و آپریٹر لاگ ان بنائیں', 'Create cashier / operator account')}
-            </div>
           </div>
         </button>
 
@@ -438,12 +421,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               {t('سٹاف رولز و اختیارات', 'Staff Roles & Permissions')}
             </div>
-            <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{ fontSize: isUrdu ? '13px' : '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600, marginTop: '3px' }}
-            >
-              {t('RBAC سکیورٹی اور رسائی کا کنٹرول', 'RBAC access & security control')}
-            </div>
           </div>
         </button>
 
@@ -487,12 +464,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               style={{ fontSize: isUrdu ? '17px' : '13.5px', fontWeight: 900, color: isDark ? '#F8FAFC' : '#0F172A', lineHeight: 1.2 }}
             >
               {t('روزانہ کے ریٹس', 'Daily Product Rates')}
-            </div>
-            <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{ fontSize: isUrdu ? '13px' : '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600, marginTop: '3px' }}
-            >
-              {t('آٹا، میدہ اور پسائی نرخ تبدیل کریں', 'Update atta, maida & milling prices')}
             </div>
           </div>
         </button>
@@ -541,12 +512,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 ? t('بیک اپ ہو رہا ہے...', 'Backing up...')
                 : t('یومیہ کلوزنگ و بیک اپ', 'Daily Shift Closing')}
             </div>
-            <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{ fontSize: isUrdu ? '13px' : '11px', color: isDark ? '#94A3B8' : '#64748B', fontWeight: 600, marginTop: '3px' }}
-            >
-              {t('روزانہ حساب اور لیجر بیک اپ لیں', 'Save daily ledger snapshot')}
-            </div>
           </div>
         </button>
       </div>
@@ -576,7 +541,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              minHeight: '110px',
+              minHeight: '84px',
               transition: 'all 0.18s ease',
             }}
           >
@@ -634,22 +599,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {isUrdu ? 'روپے' : 'PKR'}
                 </span>
               </div>
-            </div>
-
-            {/* Subtitle */}
-            <div
-              className={isUrdu ? 'font-nastaleeq' : ''}
-              style={{
-                fontSize: isUrdu ? '13px' : '11px',
-                color: isDark ? '#94A3B8' : '#64748B',
-                fontWeight: 600,
-                marginTop: '8px',
-                lineHeight: 1.3,
-                borderTop: isDark ? '1px solid #334155' : '1px solid #F1F5F9',
-                paddingTop: '6px',
-              }}
-            >
-              {card.subtitle}
             </div>
           </div>
         ))}
