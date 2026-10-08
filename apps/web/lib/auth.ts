@@ -103,8 +103,12 @@ export async function ensureValidToken(user?: UserSession | null, forceRefresh: 
   const current = user || getSession();
   if (!current) return null;
 
-  if (!forceRefresh && current.token && current.token.startsWith('local-token-')) {
+  // Local sessions are self-contained and must not be invalidated by remote refresh
+  if (current.token && current.token.startsWith('local-token-')) {
     return current.token;
+  }
+  if (current.id && current.id.startsWith('local-')) {
+    return current.token || null;
   }
 
   // If token is already a real 3-part JWT and not expired, and not forced, use it
@@ -182,6 +186,11 @@ export async function refreshCurrentUserProfile(): Promise<UserSession | null> {
   if (typeof window === 'undefined') return null;
   const current = getSession();
   if (!current || !current.token) return null;
+
+  // Local/preset/offline sessions must NEVER be rejected or cleared by remote 401
+  if (current.token.startsWith('local-token-') || current.id?.startsWith('local-')) {
+    return current;
+  }
 
   try {
     const res = await fetch(`${getApiBaseUrl()}/api/auth/me`, {
