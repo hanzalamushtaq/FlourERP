@@ -28,6 +28,8 @@ export interface PermissionItem {
   code: string;
   labelUr: string;
   labelEn: string;
+  descUr?: string;
+  descEn?: string;
   category: 'billing' | 'pricing' | 'credit' | 'reports' | 'admin';
 }
 
@@ -51,15 +53,15 @@ export interface StaffUser {
 }
 
 export const ALL_PERMISSIONS: PermissionItem[] = [
-  { code: 'can_bill', labelUr: 'نیا سیلز بل بنانا', labelEn: 'Standard Product Billing', category: 'billing' },
-  { code: 'can_pisai', labelUr: 'گندم پسائی ٹوکن جاری کرنا', labelEn: 'Grinding Token Issuance', category: 'billing' },
-  { code: 'can_discount', labelUr: 'بل میں رعایت دینا', labelEn: 'Apply Discretionary Discounts', category: 'billing' },
-  { code: 'can_manage_prices', labelUr: 'روزانہ کے ریٹ تبدیل کرنا', labelEn: 'Manage Daily Rates', category: 'pricing' },
-  { code: 'can_issue_credit', labelUr: 'ادھار کھاتہ جاری کرنا', labelEn: 'Issue Credit (Udhaar)', category: 'credit' },
-  { code: 'can_view_reports', labelUr: 'روزنامچہ و منافع رپورٹس دیکھنا', labelEn: 'View Financial Reports & Ledger', category: 'reports' },
-  { code: 'can_void_bills', labelUr: 'بل منسوخ کرنا', labelEn: 'Void Completed Bills', category: 'admin' },
-  { code: 'can_close_day', labelUr: 'دن کا اختتام اور اختتامی رپورٹ', labelEn: 'Daily Closing & Shift Reports', category: 'admin' },
-  { code: 'can_manage_users', labelUr: 'سٹاف اور رولز مینیج کرنا', labelEn: 'Manage Staff & Role Permissions', category: 'admin' },
+  { code: 'can_bill', labelUr: 'نیا بل', labelEn: 'New Bill (نیا بل)', descUr: 'سیلز بل کا مکمل پیج', category: 'billing' },
+  { code: 'can_pisai', labelUr: 'گندم پسائی', labelEn: 'Wheat Grinding (گندم پسائی)', descUr: 'گندم پسائی و ٹوکن کا پیج', category: 'billing' },
+  { code: 'can_issue_credit', labelUr: 'ادھار کھاتے', labelEn: 'Customer Ledger (ادھار کھاتے)', descUr: 'گاہکوں کے کھاتوں و ادھار کا پیج', category: 'credit' },
+  { code: 'can_manage_prices', labelUr: 'ریٹ لسٹ', labelEn: 'Daily Rates (ریٹ لسٹ)', descUr: 'روزانہ ریٹ لسٹ تبدیل کرنے کا پیج', category: 'pricing' },
+  { code: 'can_view_reports', labelUr: 'روزنامچہ و حساب', labelEn: 'Reports & Accounts (روزنامچہ و حساب)', descUr: 'رپورٹس اور حساب کتاب کا پیج', category: 'reports' },
+  { code: 'can_manage_users', labelUr: 'ایڈمن و اختیارات', labelEn: 'Admin & Settings (ایڈمن و اختیارات)', descUr: 'سٹاف اور رولز کنٹرول کرنے کا پیج', category: 'admin' },
+  { code: 'can_discount', labelUr: 'رعایت (ڈسکاؤنٹ)', labelEn: 'Discounts (رعایت)', descUr: 'بل بناتے وقت ڈسکاؤنٹ کی اجازت', category: 'billing' },
+  { code: 'can_void_bills', labelUr: 'بل منسوخی', labelEn: 'Void Bill (بل منسوخی)', descUr: 'غلط یا کینسل بل ڈیلیٹ کرنے کا اختیار', category: 'admin' },
+  { code: 'can_close_day', labelUr: 'دن کا اختتام (Z-Report)', labelEn: 'Day Close (دن کا اختتام)', descUr: 'کاؤنٹر شفٹ اور دن کی فائنل کلوزنگ', category: 'admin' },
 ];
 
 const INITIAL_ROLES: RoleItem[] = [
@@ -769,9 +771,14 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                       </div>
 
                       <div>
-                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: isChecked ? '#92400E' : '#334155' }}>
+                        <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14.5px', fontWeight: 900, color: isChecked ? '#92400E' : '#0F172A' }}>
                           {isUrdu ? perm.labelUr : perm.labelEn}
                         </div>
+                        {perm.descUr && (
+                          <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '11px', fontWeight: 600, color: isChecked ? '#B45309' : '#64748B', marginTop: '2px' }}>
+                            {isUrdu ? perm.descUr : (perm.descEn || perm.labelEn)}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -1437,9 +1444,14 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                         </div>
 
                         <div>
-                          <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '13px', fontWeight: 800, color: isChecked ? '#92400E' : '#334155' }}>
+                          <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '14.5px', fontWeight: 900, color: isChecked ? '#92400E' : '#0F172A' }}>
                             {isUrdu ? perm.labelUr : perm.labelEn}
                           </div>
+                          {perm.descUr && (
+                            <div className={isUrdu ? 'font-nastaleeq' : ''} style={{ fontSize: '11px', fontWeight: 600, color: isChecked ? '#B45309' : '#64748B', marginTop: '2px' }}>
+                              {isUrdu ? perm.descUr : (perm.descEn || perm.labelEn)}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
