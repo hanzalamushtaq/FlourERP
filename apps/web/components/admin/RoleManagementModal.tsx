@@ -494,7 +494,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '16px',
+        padding: '8px',
       }}
     >
       <div
@@ -562,14 +562,18 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
           </button>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation - Tactile Scrollable Button Pills */}
         <div
           style={{
             display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#F1F5F9',
             borderBottom: '1.5px solid #E2E8F0',
-            backgroundColor: '#F8FAFC',
-            padding: '0 20px',
-            gap: '12px',
+            padding: '8px 12px',
+            gap: '8px',
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
           }}
         >
           <button
@@ -578,21 +582,26 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               setActiveTab('roles');
               setEditingRole(null);
             }}
+            className="touch-active"
             style={{
-              padding: '12px 18px',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'roles' ? '3px solid #2563EB' : '3px solid transparent',
-              color: activeTab === 'roles' ? '#0F172A' : '#64748B',
-              fontWeight: activeTab === 'roles' ? 900 : 700,
-              fontSize: isUrdu ? '17px' : '14px',
-              display: 'flex',
+              padding: '8px 14px',
+              borderRadius: '10px',
+              border: activeTab === 'roles' ? '1.5px solid #1D4ED8' : '1.5px solid #CBD5E1',
+              backgroundColor: activeTab === 'roles' ? '#2563EB' : '#FFFFFF',
+              color: activeTab === 'roles' ? '#FFFFFF' : '#334155',
+              fontWeight: 800,
+              fontSize: isUrdu ? '14px' : '13px',
+              display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              justifyContent: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              cursor: 'pointer',
+              boxShadow: activeTab === 'roles' ? '0 2px 6px rgba(37, 99, 235, 0.35)' : '0 1px 2px rgba(0,0,0,0.05)',
             }}
           >
-            <KeyRound size={17} color={activeTab === 'roles' ? '#2563EB' : '#64748B'} />
+            <KeyRound size={15} color={activeTab === 'roles' ? '#FFFFFF' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {isUrdu ? `موجودہ رولز (${roles.length})` : `Existing Roles (${roles.length})`}
             </span>
@@ -604,21 +613,26 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               setActiveTab('staff');
               setEditingRole(null);
             }}
+            className="touch-active"
             style={{
-              padding: '12px 18px',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'staff' ? '3px solid #2563EB' : '3px solid transparent',
-              color: activeTab === 'staff' ? '#0F172A' : '#64748B',
-              fontWeight: activeTab === 'staff' ? 900 : 700,
-              fontSize: isUrdu ? '17px' : '14px',
-              display: 'flex',
+              padding: '8px 14px',
+              borderRadius: '10px',
+              border: activeTab === 'staff' ? '1.5px solid #1D4ED8' : '1.5px solid #CBD5E1',
+              backgroundColor: activeTab === 'staff' ? '#2563EB' : '#FFFFFF',
+              color: activeTab === 'staff' ? '#FFFFFF' : '#334155',
+              fontWeight: 800,
+              fontSize: isUrdu ? '14px' : '13px',
+              display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              justifyContent: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              cursor: 'pointer',
+              boxShadow: activeTab === 'staff' ? '0 2px 6px rgba(37, 99, 235, 0.35)' : '0 1px 2px rgba(0,0,0,0.05)',
             }}
           >
-            <Users size={17} color={activeTab === 'staff' ? '#2563EB' : '#64748B'} />
+            <Users size={15} color={activeTab === 'staff' ? '#FFFFFF' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {isUrdu ? `سٹاف اکاؤنٹس (${staff.length})` : `Staff Accounts (${staff.length})`}
             </span>
@@ -630,21 +644,26 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               setActiveTab('add_user');
               setEditingRole(null);
             }}
+            className="touch-active"
             style={{
-              padding: '12px 18px',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'add_user' ? '3px solid #2563EB' : '3px solid transparent',
-              color: activeTab === 'add_user' ? '#0F172A' : '#64748B',
-              fontWeight: activeTab === 'add_user' ? 900 : 700,
-              fontSize: isUrdu ? '17px' : '14px',
-              display: 'flex',
+              padding: '8px 14px',
+              borderRadius: '10px',
+              border: activeTab === 'add_user' ? '1.5px solid #1D4ED8' : '1.5px solid #CBD5E1',
+              backgroundColor: activeTab === 'add_user' ? '#2563EB' : '#FFFFFF',
+              color: activeTab === 'add_user' ? '#FFFFFF' : '#334155',
+              fontWeight: 800,
+              fontSize: isUrdu ? '14px' : '13px',
+              display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              justifyContent: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              cursor: 'pointer',
+              boxShadow: activeTab === 'add_user' ? '0 2px 6px rgba(37, 99, 235, 0.35)' : '0 1px 2px rgba(0,0,0,0.05)',
             }}
           >
-            <UserPlus size={17} color={activeTab === 'add_user' ? '#2563EB' : '#64748B'} />
+            <UserPlus size={15} color={activeTab === 'add_user' ? '#FFFFFF' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {isUrdu ? '+ نیا صارف شامل کریں' : '+ Add Staff User'}
             </span>
@@ -656,21 +675,26 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               setActiveTab('create');
               setEditingRole(null);
             }}
+            className="touch-active"
             style={{
-              padding: '12px 18px',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'create' ? '3px solid #2563EB' : '3px solid transparent',
-              color: activeTab === 'create' ? '#0F172A' : '#64748B',
-              fontWeight: activeTab === 'create' ? 900 : 700,
-              fontSize: isUrdu ? '17px' : '14px',
-              display: 'flex',
+              padding: '8px 14px',
+              borderRadius: '10px',
+              border: activeTab === 'create' ? '1.5px solid #1D4ED8' : '1.5px solid #CBD5E1',
+              backgroundColor: activeTab === 'create' ? '#2563EB' : '#FFFFFF',
+              color: activeTab === 'create' ? '#FFFFFF' : '#334155',
+              fontWeight: 800,
+              fontSize: isUrdu ? '14px' : '13px',
+              display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              justifyContent: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              cursor: 'pointer',
+              boxShadow: activeTab === 'create' ? '0 2px 6px rgba(37, 99, 235, 0.35)' : '0 1px 2px rgba(0,0,0,0.05)',
             }}
           >
-            <Plus size={17} color={activeTab === 'create' ? '#2563EB' : '#64748B'} />
+            <Plus size={15} color={activeTab === 'create' ? '#FFFFFF' : '#64748B'} />
             <span className={isUrdu ? 'font-nastaleeq' : ''}>
               {t('+ نیا رول بنائیں', '+ Create Role')}
             </span>
@@ -1125,20 +1149,22 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             </div>
           ) : activeTab === 'add_user' ? (
             /* TAB 3: CREATE NEW USER & ASSIGN KEY */
-            <form onSubmit={handleCreateStaffUser} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleCreateStaffUser} style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
                   backgroundColor: '#F8FAFC',
-                  padding: '18px',
+                  padding: '16px',
                   borderRadius: '12px',
                   border: '1.5px solid #E2E8F0',
+                  boxSizing: 'border-box',
+                  width: '100%',
                 }}
               >
                 {/* 1. Username / Login ID */}
-                <div>
+                <div style={{ width: '100%' }}>
                   <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '6px' }}>
                     {t('صارف نام (Username)', 'Username / Login ID')} <span style={{ color: '#DC2626' }}>*</span>
                   </label>
@@ -1150,6 +1176,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     required
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       height: '42px',
                       padding: '0 12px',
                       borderRadius: '8px',
@@ -1163,7 +1190,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 </div>
 
                 {/* 2. Full Name */}
-                <div>
+                <div style={{ width: '100%' }}>
                   <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '6px' }}>
                     {t('مکمل نام (Full Name)', 'Staff Full Name')} <span style={{ color: '#DC2626' }}>*</span>
                   </label>
@@ -1176,6 +1203,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     className={isUrdu ? 'font-nastaleeq' : ''}
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       height: '42px',
                       padding: '0 12px',
                       borderRadius: '8px',
@@ -1188,7 +1216,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 </div>
 
                 {/* 3. Assign Role */}
-                <div>
+                <div style={{ width: '100%' }}>
                   <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '6px' }}>
                     {t('اختیارات / رول منتخب کریں', 'Assign Role')} <span style={{ color: '#DC2626' }}>*</span>
                   </label>
@@ -1197,6 +1225,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     onChange={(e) => setNewUserRole(e.target.value)}
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       height: '42px',
                       padding: '0 12px',
                       borderRadius: '8px',
@@ -1224,11 +1253,11 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 </div>
 
                 {/* 4. Login Password / Key */}
-                <div>
+                <div style={{ width: '100%' }}>
                   <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '6px' }}>
                     {t('لاگ ان پاس ورڈ', 'Login Password')} <span style={{ color: '#DC2626' }}>*</span>
                   </label>
-                  <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'relative', width: '100%' }}>
                     <input
                       type={showNewUserPassword ? 'text' : 'password'}
                       placeholder={t('کم از کم 4 ہندسے یا حروف', 'At least 4 characters')}
@@ -1237,6 +1266,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                       required
                       style={{
                         width: '100%',
+                        boxSizing: 'border-box',
                         height: '42px',
                         padding: '0 40px 0 12px',
                         borderRadius: '8px',
@@ -1267,7 +1297,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                 </div>
 
                 {/* 5. Optional PIN */}
-                <div>
+                <div style={{ width: '100%' }}>
                   <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '6px' }}>
                     {t('4 ہندسوں کا کوئیک پن (اختیاری)', 'Quick 4-Digit PIN (Optional)')}
                   </label>
@@ -1279,6 +1309,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       height: '42px',
                       padding: '0 12px',
                       borderRadius: '8px',
@@ -1294,14 +1325,15 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
                 <button
                   type="submit"
                   disabled={isSubmittingUser}
                   className="touch-active"
                   style={{
-                    height: '42px',
-                    padding: '0 24px',
+                    flex: 1,
+                    height: '44px',
+                    padding: '0 20px',
                     borderRadius: '8px',
                     backgroundColor: '#2563EB',
                     color: '#FFFFFF',
@@ -1311,6 +1343,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                     cursor: isSubmittingUser ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '8px',
                     boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
                     opacity: isSubmittingUser ? 0.7 : 1,
@@ -1327,7 +1360,7 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
                   onClick={() => setActiveTab('staff')}
                   className="touch-active"
                   style={{
-                    height: '42px',
+                    height: '44px',
                     padding: '0 18px',
                     borderRadius: '8px',
                     backgroundColor: '#FFFFFF',
@@ -1344,48 +1377,68 @@ export const RoleManagementModal: React.FC<RoleManagementModalProps> = ({
             </form>
           ) : (
             /* TAB 4: CREATE NEW ROLE */
-            <form onSubmit={handleCreateRole} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
-                  {t('رول کا نام:', 'Role Name:')}
-                </label>
-                <input
-                  type="text"
-                  placeholder={t('مثلاً: کیشیئر مینیجر', 'e.g. Cashier Manager')}
-                  value={newRoleName}
-                  onChange={(e) => setNewRoleName(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    height: '38px',
-                    padding: '0 12px',
-                    borderRadius: '6px',
-                    border: '1.5px solid #CBD5E1',
-                    fontSize: '13px',
-                    outline: 'none',
-                  }}
-                />
-              </div>
+            <form onSubmit={handleCreateRole} style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                  backgroundColor: '#F8FAFC',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1.5px solid #E2E8F0',
+                  boxSizing: 'border-box',
+                  width: '100%',
+                }}
+              >
+                <div style={{ width: '100%' }}>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '6px' }}>
+                    {t('رول کا نام', 'Role Name')} <span style={{ color: '#DC2626' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t('مثلاً: کیشیئر مینیجر', 'e.g. Cashier Manager')}
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                    required
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      height: '42px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #CBD5E1',
+                      backgroundColor: '#FFFFFF',
+                      fontSize: '14px',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
 
-              <div>
-                <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>
-                  {t('تفصیل:', 'Description:')}
-                </label>
-                <input
-                  type="text"
-                  placeholder={t('اس رول کے بنیادی اختیارات کی وضاحت لکھیں...', 'Enter role description...')}
-                  value={newRoleDesc}
-                  onChange={(e) => setNewRoleDesc(e.target.value)}
-                  style={{
-                    width: '100%',
-                    height: '38px',
-                    padding: '0 12px',
-                    borderRadius: '6px',
-                    border: '1.5px solid #CBD5E1',
-                    fontSize: '13px',
-                    outline: 'none',
-                  }}
-                />
+                <div style={{ width: '100%' }}>
+                  <label className={isUrdu ? 'font-nastaleeq' : ''} style={{ display: 'block', fontSize: '13.5px', fontWeight: 800, color: '#334155', marginBottom: '6px' }}>
+                    {t('تفصیل (اختیاری)', 'Description (Optional)')}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t('اس رول کے اختیارات کی تفصیل لکھیں...', 'Enter role description...')}
+                    value={newRoleDesc}
+                    onChange={(e) => setNewRoleDesc(e.target.value)}
+                    className={isUrdu ? 'font-nastaleeq' : ''}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      height: '42px',
+                      padding: '0 12px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #CBD5E1',
+                      backgroundColor: '#FFFFFF',
+                      fontSize: '14px',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
               </div>
 
               <div>
