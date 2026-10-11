@@ -23,6 +23,6 @@ services:
       - key: DIRECT_URL
         sync: false
       - key: JWT_SECRET
-        generateValue: true
+        value: flour-erp-jwt-secret-key-counter-shift-2026
       - key: CORS_ORIGIN
         sync: false

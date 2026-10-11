@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 @font-face {
   font-family: 'Jameel Noori Nastaleeq';
-  src: url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
+  src: url('/fonts/JameelNooriNastaleeqRegular.woff2') format('woff2'),
+       url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
        url('/fonts/JameelNooriNastaleeqRegular.ttf') format('truetype'),
        local('Jameel Noori Nastaleeq'),
        local('JameelNooriNastaleeq'),
@@ -10,30 +11,33 @@
        local('NooriNastaleeq');
   font-weight: 100 900;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Jameel Noori Nastaleeq';
-  src: url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
+  src: url('/fonts/JameelNooriNastaleeqRegular.woff2') format('woff2'),
+       url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
        url('/fonts/JameelNooriNastaleeqRegular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Jameel Noori Nastaleeq';
-  src: url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
+  src: url('/fonts/JameelNooriNastaleeqRegular.woff2') format('woff2'),
+       url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
        url('/fonts/JameelNooriNastaleeqRegular.ttf') format('truetype');
   font-weight: bold;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Noori Nastaleeq';
-  src: url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
+  src: url('/fonts/JameelNooriNastaleeqRegular.woff2') format('woff2'),
+       url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
        url('/fonts/JameelNooriNastaleeqRegular.ttf') format('truetype'),
        local('Jameel Noori Nastaleeq'),
        local('JameelNooriNastaleeq'),
@@ -41,25 +45,27 @@
        local('NooriNastaleeq');
   font-weight: 100 900;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Noori Nastaleeq';
-  src: url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
+  src: url('/fonts/JameelNooriNastaleeqRegular.woff2') format('woff2'),
+       url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
        url('/fonts/JameelNooriNastaleeqRegular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Noori Nastaleeq';
-  src: url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
+  src: url('/fonts/JameelNooriNastaleeqRegular.woff2') format('woff2'),
+       url('/fonts/JameelNooriNastaleeqRegular.woff') format('woff'),
        url('/fonts/JameelNooriNastaleeqRegular.ttf') format('truetype');
   font-weight: bold;
   font-style: normal;
-  font-display: block;
+  font-display: swap;
 }
 
 :root {
@@ -116,7 +122,7 @@
 
   /* Typography */
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-nastaleeq-stack: 'Jameel Noori Nastaleeq', 'Noori Nastaleeq', 'Urdu Typesetting', 'Microsoft Uighur', 'Noto Sans Arabic', Tahoma, sans-serif;
+  --font-nastaleeq-stack: 'Jameel Noori Nastaleeq', 'Noori Nastaleeq', 'Urdu Typesetting', 'Microsoft Uighur', Tahoma, sans-serif;
   --font-urdu: var(--font-nastaleeq-stack);
   --font-mono: 'JetBrains Mono', monospace;
 }

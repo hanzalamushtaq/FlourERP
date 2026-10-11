@@ -169,16 +169,12 @@ export default function Home() {
     const handleUnauthorized = () => {
       const current = getSession();
       if (current) {
-        ensureValidToken(current, true).then((fresh) => {
+        ensureValidToken(current, false).then((fresh) => {
           if (fresh) {
             const refreshed = getSession();
             if (refreshed) setCurrentUser(refreshed);
-          } else {
-            setCurrentUser(null);
           }
-        }).catch(() => {
-          setCurrentUser(null);
-        });
+        }).catch(() => {});
       }
     };
 
@@ -189,7 +185,11 @@ export default function Home() {
     };
 
     const handleCleared = () => {
-      setCurrentUser(null);
+      // Only clear if explicit logout occurred
+      const s = getSession();
+      if (!s) {
+        setCurrentUser(null);
+      }
     };
 
     if (typeof window !== 'undefined') {
@@ -207,7 +207,7 @@ export default function Home() {
         setActiveTab(savedTab);
       }
 
-      // Always ensure token is verified against the active backend
+      // Quietly ensure token is refreshed in background without disrupting current screen
       ensureValidToken(saved, isTokenExpired(saved.token)).then((freshToken) => {
         if (freshToken) {
           const refreshed = getSession();
@@ -225,17 +225,12 @@ export default function Home() {
     };
   }, []);
 
-  // Real-time RBAC Profile Sync: poll every 6s and re-check on tab focus / visibility
+  // RBAC Profile Sync: check on mount and on tab focus / visibility change
   useEffect(() => {
     if (!currentUser) return;
 
-    // Immediate check
+    // Immediate check on mount/login
     refreshCurrentUserProfile();
-
-    // Regular heartbeat polling to catch changes made by Admin
-    const interval = setInterval(() => {
-      refreshCurrentUserProfile();
-    }, 6000);
 
     const handleFocus = () => {
       refreshCurrentUserProfile();
@@ -251,7 +246,6 @@ export default function Home() {
     document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibility);
     };

@@ -150,14 +150,8 @@ export async function ensureValidToken(user?: UserSession | null, forceRefresh: 
     }
   }
 
-  if (forceRefresh) {
-    clearSession();
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('flour_erp_session_cleared'));
-    }
-    return null;
-  }
-
+  // If token refresh was forced or expired, and remote re-auth didn't succeed,
+  // NEVER log out or clear the active user session! Keep current session safely.
   return current.token || null;
 }
 
@@ -223,11 +217,9 @@ export async function refreshCurrentUserProfile(): Promise<UserSession | null> {
         }
         return current;
       }
-    } else if (res.status === 401 || res.status === 403) {
-      clearSession();
-      window.dispatchEvent(new CustomEvent('flour_erp_session_cleared'));
-      return null;
     }
+    // If backend returns 401/403 or server error, NEVER kick user out of terminal!
+    // Maintain existing session in resilient mode.
   } catch {
     // Silently ignore network hiccup
   }

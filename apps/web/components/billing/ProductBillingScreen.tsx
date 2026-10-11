@@ -1115,9 +1115,8 @@ export const ProductBillingScreen: React.FC<ProductBillingScreenProps> = ({
         }
 
         if (res.status === 401) {
-          alert(isUrdu ? 'سیشن ختم ہو چکا ہے۔ برائے مہربانی دوبارہ لاگ ان کریں۔' : 'Session expired. Please log in again.');
-          clearSession();
-          window.location.reload();
+          sound.playWarningSound();
+          alert(isUrdu ? 'سرور سے تصدیق نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔' : 'Server authentication failed. Please retry.');
           return;
         }
 

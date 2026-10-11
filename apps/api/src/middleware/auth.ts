@@ -36,28 +36,39 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction
 ) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'UNAUTHORIZED',
+        message: 'Authentication token required.',
+      },
+    });
+  }
+
+  const token = authHeader.split(' ')[1];
+  let payload: any;
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'Authentication token required.',
-        },
-      });
-    }
+    payload = verifyToken(token);
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid or expired session token.',
+      },
+    });
+  }
 
-    const token = authHeader.split(' ')[1];
-    const payload = verifyToken(token);
+  // Fast-path: Check memory cache first to avoid ~300ms remote database round-trip
+  const cached = userCache.get(payload.userId);
+  if (cached && cached.expiresAt > Date.now()) {
+    req.user = cached.user;
+    return next();
+  }
 
-    // Fast-path: Check memory cache first to avoid ~300ms remote database round-trip
-    const cached = userCache.get(payload.userId);
-    if (cached && cached.expiresAt > Date.now()) {
-      req.user = cached.user;
-      return next();
-    }
-
+  try {
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
       include: {
@@ -101,12 +112,14 @@ export const requireAuth = async (
 
     req.user = authUser;
     next();
-  } catch (error) {
-    return res.status(401).json({
+  } catch (dbError) {
+    // Database connection error must never be masked as 401 INVALID_TOKEN
+    console.error('Database connection error in requireAuth:', dbError);
+    return res.status(503).json({
       success: false,
       error: {
-        code: 'INVALID_TOKEN',
-        message: 'Invalid or expired session token.',
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'Database temporarily unavailable. Please retry.',
       },
     });
   }

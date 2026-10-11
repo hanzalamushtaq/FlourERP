@@ -43,6 +43,17 @@ const themeInitScript = `
       if (isNative) {
         document.documentElement.classList.add('is-native-app');
       }
+
+      // Pre-cache primary Urdu Nastaliq font into browser CacheStorage for zero-latency instant rendering
+      if ('caches' in window) {
+        caches.open('flour_erp_fonts_v1').then(function(cache) {
+          cache.match('/fonts/JameelNooriNastaleeqRegular.woff2').then(function(matched) {
+            if (!matched) {
+              cache.add('/fonts/JameelNooriNastaleeqRegular.woff2').catch(function() {});
+            }
+          }).catch(function() {});
+        }).catch(function() {});
+      }
     } catch (e) {}
   })();
 `;
@@ -55,7 +66,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preload" href="/fonts/JameelNooriNastaleeqRegular.woff" as="font" type="font/woff" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/JameelNooriNastaleeqRegular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
